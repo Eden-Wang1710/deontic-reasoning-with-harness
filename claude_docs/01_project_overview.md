@@ -46,6 +46,7 @@ This is in-group work — the author is reachable, and missing pieces can simply
 | `README.md` | Short English pointer for the GitHub landing page. |
 | `CLAUDE.md` | Context auto-loaded by Claude Code: index of `claude_docs/` plus the easy-to-get-wrong list. |
 | `claude_docs/` | All project documentation, numbered `NN_snake_case.md`. |
+| `tools/` | Small project-owned scripts (e.g. data statistics). Kept outside the subtrees. |
 | `DeonticBench/` | ①'s upstream code (scripts, `hard` / `smoke` data, statutes, prompts). **git subtree** (`guangyaodou/DeonticBench` @ `3c168f9`, squashed). Plain files; editing them is fine. |
 | `harbor-deonticbench/` | ②'s upstream code (Harbor 0.3.0 + meta-harness + DeonticBench adapters + scorer). **git subtree** (`guangyaodou/harbor-deonticbench` @ `2fe3aa4`, squashed, vendored 2026-09-17). Apache-2.0. |
 
