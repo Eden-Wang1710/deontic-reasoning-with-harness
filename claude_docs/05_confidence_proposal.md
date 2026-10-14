@@ -1,244 +1,236 @@
-# 05 · Thesis Direction: Trace-Based Confidence for Agentic Deontic Reasoning
+# 05 · Thesis Proposal: Enhancing Agentic Deontic Reasoning with Self-Verification and Confidence Calibration
 
-- **Date**: 2026-09-27
-- **Status**: preliminary plan, written as input for the thesis proposal. The purpose of the proposal
-  is to tell a first story and obtain compute; details below are deliberately not locked down.
-- **Replaces**: the earlier `05_thesis_directions.md` (candidate directions A–E). That file is
-  deleted; it remains in git history. What carries over from it is summarised in §9.
-- **This file also holds the project decision log** (§10).
+- **Date**: 2026-10-14
+- **Status**: this is the thesis direction. It transcribes the independent-study proposal
+  (`Proposal_Independent_Study_Zixuan.pdf`, "Enhancing Agentic Deontic Reasoning with
+  Self-Verification and Confidence Calibration", Zixuan Wang, JHU CS), which has been reviewed with
+  the senior PhD student (Guangyao Dou) and the advisor. The PDF is the authoritative text; this file
+  restates it so that every session has the plan in context, and adds repo-specific notes.
+- **Replaces**: the earlier version of this file (a Claude-drafted "trace-based confidence" plan,
+  2026-09-27). That draft is superseded in full and survives only in git history.
+- **This file also holds the project decision log** (§8).
 - **Confidence convention**: ✅ = checked directly against code, data or a web page on the date
   given. 🔶 = expectation, inference, or a number taken from a secondary summary.
-- **Nothing here has been run.** No task has been executed and no metric computed.
+- **Nothing here has been run.** No trajectories have been collected and no metric computed.
 
-## 1. One-paragraph story
+## 1. Background and motivation
 
-DeonticBench and DAR measure whether an LLM, alone or inside an agentic harness, gets a rule-based
-answer *right*. Neither asks whether the system *knows when it is wrong*. In the domains these
-benchmarks model (tax, immigration, fees), a wrong answer that is delivered confidently costs real
-money, while an answer that is withheld and sent to a human costs a known, bounded amount. This
-thesis adds a **confidence estimate to the DAR harness**: after the agent solves a case, a verifier
-reads the agent's reasoning trace and outputs the probability that the answer is correct. The
-estimate is evaluated in two ways: **statistically**, by calibration (ECE and Kuiper), and
-**economically**, by how much the expected real-world cost per case falls when low-confidence
-answers are refused and handed to a human.
+Deontic reasoning is the derivation of obligations, permissions and prohibitions from explicit
+rules and case-specific facts. DeonticBench benchmarks this across legal and policy domains
+([03](03_deonticbench_review.md)); DAR studies agentic harnesses that give the model on-demand
+access to the rules and tool-assisted reasoning ([04](04_dar_review.md)).
 
-## 2. Background
+In high-stakes domains such as tax, a wrong prediction has a real price: overpayment is lost
+money, substantial underpayment draws penalties (Jurayj et al., 2026). Estimating how likely an
+answer is to be correct therefore matters in its own right, because it identifies the uncertain
+cases that should go to a human.
 
-| Work | What it contributes here | Source |
+The project has two goals:
+
+1. **Improve accuracy** of agentic deontic reasoning through self-verification: rubric-based and
+   symbolic checks that find reasoning errors and guide answer revision.
+2. **Improve reliability** through calibrated confidence in the final answer, so the system can
+   decide whether to accept the answer or abstain.
+
+## 2. Proposed approach
+
+A module is integrated into the DAR harness that (a) performs self-verification on a completed
+trajectory and (b) estimates the probability that the agent's final answer is correct. Both
+verification approaches below **reuse the same model that produced the trajectory**, through
+additional inference calls. The input to either approach is a completed candidate trajectory:
+case facts, retrieved rules, tool calls, reasoning trace and the candidate answer. Either approach
+can feed back to the agent to drive further reasoning and answer revision. Only the rubric-based
+approach additionally yields a confidence estimate for the final retained answer.
+
+### 2.1 Rubric-based self-verification
+
+The model reviews its own trajectory and reasoning against a **manually initialised rubric set**
+tailored to rule-grounded reasoning. Inspired by process evaluations (Guan et al., 2025,
+*Monitoring Monitorability*), the initial rubrics check:
+
+1. **Tool use**: whether tool calls use valid formats and appropriate arguments.
+2. **Provision coverage**: whether the agent checked the relevant provisions, including their
+   conditions, exceptions and cross-references.
+3. **Grounded reasoning**: whether the reasoning follows from those provisions and the case facts.
+   Concretely: which provisions were used, and whether their conditions and exceptions were applied
+   correctly to the facts.
+
+For each criterion the model reports one of **satisfied / violated / cannot be assessed** from the
+available evidence. The agent can then use this feedback to revise its answer.
+
+Two questions are explored on top of this:
+
+- **Rubric → confidence.** How rubric assessments map to a calibrated confidence `p ∈ [0, 1]` that
+  the final retained answer is correct. The mapping and its calibration are developed on held-out
+  data using the metrics in §3, and the resulting `p` drives the accept / abstain decision.
+- **Rubric self-improvement.** Following trajectory-based failure analysis and rubric evolution
+  (Wan et al., 2026; Zhu et al., 2026, *SkillCoach*), failed trajectories and verification errors
+  are analysed to find recurring failure modes and to propose additions or revisions to the
+  criteria.
+
+### 2.2 Symbolic reasoning verification
+
+Inspired by SymDiag (Cui et al., 2026), Prolog is used to check the agent's reasoning. The model
+encodes the relevant rules and case facts in Prolog and generates queries that test its
+**intermediate conclusions**. When a check fails, the harness tells the agent which step is wrong
+and why, and the agent regenerates an answer.
+
+Repo note ✅ (2026-10-14): the DAR container already has `swipl`, and the DAR agent already writes
+and runs Prolog programs as part of solving (see [04](04_dar_review.md)). The symbolic verifier
+reuses that infrastructure but targets intermediate claims, not just the final program.
+
+## 3. Evaluation
+
+Three axes: answer accuracy, confidence calibration, and cost in a practical setting.
+
+### 3.1 Accuracy
+
+Final-answer accuracy **before vs. after** self-verification and answer regeneration.
+
+Repo note ✅: correctness follows DAR's grader, which is exact integer match for numeric answers and
+case-insensitive string match otherwise; macro-F1 is used for the binary subdomains
+([04](04_dar_review.md) §2.3). No ±$1 tolerance. Numbers are not comparable with the DeonticBench
+paper without re-scoring (see `CLAUDE.md`).
+
+### 3.2 Confidence calibration
+
+Agreement between predicted confidence and empirical accuracy, measured by ECE and a
+confidence-weighted Kuiper-based measure (Radharapu et al., 2025). Both are lower-is-better and
+neither measures accuracy.
+
+**ECE** with `M` confidence bins over `N` examples, where `B_m` is the set of examples in bin `m`,
+`p̄_m` its mean predicted confidence and `ȳ_m` its empirical accuracy:
+
+```
+ECE = Σ_{m=1..M} (|B_m| / N) · |p̄_m − ȳ_m|
+```
+
+**Kuiper-based measure**, binning-free. Sort predicted confidences `p_1 ≤ … ≤ p_N` with correctness
+labels `y_i ∈ {0, 1}`, set `C_0 = 0`, and compute
+
+```
+C_k    = (1/N) · Σ_{i=1..k} p_i · (y_i − p_i),   k = 1..N
+Kuiper = max_{0≤k≤N} C_k − min_{0≤k≤N} C_k
+```
+
+`C_k` is the cumulative weighted discrepancy over the first `k` examples; the weight `p_i`
+emphasises high-confidence predictions. (Formulas transcribed from the proposal; re-check against
+Radharapu et al. before they appear in the thesis.)
+
+### 3.3 Cost and efficiency
+
+For numerical tax tasks, follow Jurayj et al. (2026) and report the **average cost per case**,
+which counts losses from overpayment, penalties for substantial underpayment, and an assumed cost of
+human review. The question is whether **referring low-confidence cases to a human** lowers this
+cost compared with (a) accepting every agent answer and (b) sending every case to a human.
+
+The additional **inference cost and latency** introduced by verification and confidence estimation
+are reported separately.
+
+## 4. Experiments
+
+### 4.1 Data
+
+Two roles for data:
+
+| Role | Datasets | Used for |
 |---|---|---|
-| **DeonticBench** (arXiv 2604.04443) | The tasks and gold labels; prompt-based evaluation | [03](03_deonticbench_review.md) |
-| **DAR** (arXiv 2606.05009) | The agentic harness the confidence step is added to; a recorded trajectory per run | [04](04_dar_review.md) |
-| **Calibrating LLM Judges** (arXiv 2512.22245) | The calibration metrics (ECE, weighted Kuiper) and the idea of estimating confidence after a completed judgement | `paper_review_gpt/04_calibrating_llm_judges.md` |
-| **LLMs and Logic Programs for Trustworthy Tax Reasoning** (arXiv 2508.21051, AAAI 2026) | The dollar cost model and abstention-to-human framing, on SARA | `paper_review_gpt/03_trustworthy_tax_reasoning.md` |
+| **Development / calibration** (auxiliary) | RuleArena **NBA** subset (Zhou et al., 2025); ShARC (Saeidi et al., 2018); ConditionalQA (Sun et al., 2022); FOLIO (Han et al., 2024) | Collect labelled DAR trajectories; refine the rubric set; fit and calibrate the rubric → confidence mapping; train representation probes (§5.1) |
+| **Evaluation benchmark** | **SARA** tasks within DeonticBench, run through the DAR harness | Test whether confidence methods developed on the auxiliary data transfer; calibration vs. baselines; abstention cost on SARA-Numeric |
 
-The last two are known to this project only through GPT-written summaries 🔶. Every number and
-formula quoted from them below must be checked against the original paper before it appears in the
-thesis.
+Trajectories on the auxiliary datasets are collected with the DAR harness, which means each
+auxiliary dataset needs a Harbor adapter in the style of `harbor-deonticbench/adapters/` 🔶 (none
+exists yet; see §6).
 
-Two gaps motivate the work:
+Repo note ✅: the vendored Harbor datasets hold the 173 `hard` tasks of four subdomains
+(sara_numeric 35, sara_binary 30, airline 80, uscis-aao 28); SARA `hard` is therefore 65 tasks
+([04](04_dar_review.md)). SARA `whole` (100 numeric, 276 binary) exists in DeonticBench but has not
+been generated as Harbor tasks 🔶. With sets this small, every reported number needs a confidence
+interval.
 
-- **DAR reports accuracy and token usage, not reliability.** Its own abstract states that weaker
-  models often degrade on numerical tasks under the harness. A harness that could flag those
-  failures would be useful even without fixing them.
-- **The tax paper's abstention signal is coarse.** It abstains when the program fails to run or when
-  two independent samples disagree 🔶. That is a binary signal costing a full second generation. A
-  graded confidence from one extra forward pass is cheaper and allows a tunable threshold.
+### 4.2 Models
 
-## 3. Research questions
-
-1. **RQ1 (calibration)**: Given the trace of an agentic run, can a second forward pass produce a
-   confidence that is well calibrated against answer correctness?
-2. **RQ2 (information in the trace)**: Does the trace add information beyond the final answer and
-   program alone?
-3. **RQ3 (cost)**: Does refusing low-confidence answers reduce expected real-world cost per case,
-   compared with always answering and with the tax paper's agreement-based abstention?
-
-## 4. Method
-
-### 4.1 Pipeline
-
-1. **Pass 1 — solve.** The DAR agent runs unchanged on a task. Its trajectory, final program,
-   execution output and answer are saved.
-2. **Pass 2 — verify.** One additional forward pass reads the statute, the case, the trace and the
-   answer, and outputs `p`, the estimated probability that the answer is correct. It never sees the
-   gold label.
-3. **Scoring.** Offline, the gold label gives `y ∈ {0, 1}` (answer correct or not), and the metrics
-   in §5 are computed over all `(p, y)` pairs.
-
-Pass 2 is first built as **offline post-processing over saved trajectories**. Pass 1 then runs only
-once, verifier prompts can be iterated cheaply, and our code stays outside the vendored
-`harbor-deonticbench/` subtree. Once it works it is integrated into the harness as a final step
-(for example, writing a confidence file next to the answer).
-
-### 4.2 What the trace contains
-
-Harbor stores every run as a `trajectory.json` in a common format ✅ (schema read in
-`harbor-deonticbench/src/harbor/models/trajectories/step.py`, 2026-09-27). Per agent step:
-
-| Field | Content | Availability |
+| Model | Access | Evaluated with |
 |---|---|---|
-| `message` | The agent's visible output; for `terminus-2`, an analysis and a plan per step | all models ✅ |
-| `tool_calls` | Commands executed, e.g. writing `solution.pl`, calling `swipl` | all models ✅ |
-| `observation` | Terminal output, including `swipl` errors and results | all models ✅ |
-| `reasoning_content` | The model's internal reasoning | depends on model and API 🔶 |
-| `metrics.logprobs` | Per-token log-probabilities | only if rollout-detail collection is enabled and the API supports it 🔶 |
-| other `metrics` | Tokens and cost per step | all models ✅ |
+| Open-weight Qwen, e.g. **Qwen3.5-35B-A3B** | Self-hosted, hidden states accessible | Rubric-based self-verification **and** representation-based probing (§5.1) |
+| A frontier **API** model | API only | Rubric-based self-verification only |
 
-The fields and the code that writes them exist ✅; whether they are populated in a real deontic run
-is unverified 🔶. Expectations:
+### 4.3 Evaluation protocol on SARA
 
-- Closed reasoning models (o3, GPT-5.x): raw reasoning is not exposed; at best a summary.
-- Open-weight models served locally (e.g. Qwen on vLLM): full reasoning, log-probabilities and
-  hidden states are all obtainable.
-- DAR's released run scripts do not enable log-probability collection ✅, so runs obtained from the
-  author are unlikely to contain them 🔶.
+- **Calibration**: ECE and Kuiper of the rubric-derived confidence against baselines, in
+  particular **self-verbalised confidence** (the model states a number directly).
+- **Abstention cost** on SARA-Numeric: the break-even price metric of Jurayj et al. (2026), testing
+  whether better confidence estimates reduce the combined cost of prediction errors and human
+  review.
+- **Overhead**: additional inference cost and latency, reported separately from accuracy.
 
-"Reasoning trace" in this thesis therefore means, by default, the **visible trajectory**: messages,
-commands, execution feedback and the final program.
+## 5. Extended exploration
 
-### 4.3 Verifier input variants
+### 5.1 Representation-based confidence probing
 
-| Variant | Verifier sees | Purpose |
+For models whose hidden states are accessible (the Qwen model), train lightweight confidence
+predictors on representations extracted **during verification**. Following Radharapu et al.
+(2025), these are linear probes predicting final-answer correctness, with labels derived from task
+ground truth. Compare their calibration and computational overhead with the rubric-based estimate.
+
+### 5.2 Harness distillation
+
+Inspired by Harness-Zero (Ye et al., 2026), distil the behaviours induced by the
+self-verification-enhanced harness into the open-weight model. Rubric-guided verification and
+correction trajectories (identifying reasoning gaps, inspecting missing rules, revising answers)
+serve as fine-tuning supervision for Qwen. The test is whether the fine-tuned model **retains these
+behaviours under standard harnesses** (`terminus-2`, Terminus-KIRA) without the added verification
+module, evaluated by final-answer accuracy and break-even price.
+
+## 6. Resources and open items
+
+- **No trajectories exist yet** ✅ (re-checked 2026-10-14: `outputs/`, `bootstrap_results/` and
+  `jobs/` are gitignored in both subtrees; the HuggingFace dataset carries cases, labels and
+  reference Prolog only). Pass-1 trajectories must be produced by running DAR, or obtained from the
+  author.
+- **Compute**: running DAR needs Docker and `swipl` on a server (see
+  [02](02_setup_and_sync.md) for per-machine status). Hosting Qwen3.5-35B-A3B with hidden-state
+  access, probe training and distillation need GPUs. This is the resource request the proposal
+  supports.
+- **Adapters for auxiliary datasets** (RuleArena-NBA, ShARC, ConditionalQA, FOLIO): none exist in
+  the vendored code ✅; they have to be written, outside the subtree directories.
+- **Where our code lives**: outside `DeonticBench/` and `harbor-deonticbench/` (subtree rule in
+  `CLAUDE.md`). The verification module should hook into the harness as a post-trajectory step
+  rather than editing Harbor internals, to keep `git subtree pull` clean 🔶 (exact integration
+  point to be decided once the harness has been run).
+- **Still open from the DAR review**: `kira_deontic_grounded` and `kira_compute_then_answer` are
+  missing from the released code ([04](04_dar_review.md) §3); ask the author.
+- **Not yet fixed**: the exact rubric wording; the functional form of the rubric → confidence
+  mapping; which frontier API model; the human-review cost and penalty parameters (take them from
+  Jurayj et al.).
+
+## 7. References and where their summaries live
+
+Chinese GPT-written summaries in `paper_review_gpt/` are secondary; check the original before
+relying on a number.
+
+| Reference | Role in the proposal | Summary |
 |---|---|---|
-| A | statute, case, final program, execution output, answer | control: no process information |
-| B | A plus the visible trajectory | **main variant**; available for every model |
-| C | B plus `reasoning_content` | only where reasoning is exposed |
+| Dou et al., 2026a — DeonticBench (arXiv 2604.04443) | Benchmark | `paper_review_gpt/01_deonticbench.md`, [03](03_deonticbench_review.md) |
+| Dou et al., 2026b — DAR (arXiv 2606.05009) | Harness the module is added to | `paper_review_gpt/02_dar_deontic_reasoning_with_agentic_harnesses.md`, [04](04_dar_review.md) |
+| Jurayj, Holzenberger, Van Durme, AAAI 2026 — LMs and logic programs for trustworthy tax reasoning | Cost model, break-even price, human-review abstention | `paper_review_gpt/03_trustworthy_tax_reasoning.md` |
+| Radharapu et al., 2025 — Calibrating LLM judges (arXiv 2512.22245) | ECE, Kuiper measure, linear probes | `paper_review_gpt/04_calibrating_llm_judges.md` |
+| Ye et al., 2026 — Harness-Zero (arXiv 2609.24974) | Harness distillation | `paper_review_gpt/05_harness_zero.md` |
+| Cui et al., 2026 — SymDiag (KDD 2026, arXiv 2608.08786) | Prolog-based symbolic verification | `paper_review_gpt/06_symdiag.md` |
+| Guan et al., 2025 — Monitoring monitorability (arXiv 2512.18311) | Process-evaluation rubrics | `paper_review_gpt/08_monitoring_monitorability.md` |
+| Wan et al., Findings of ACL 2026 — Test-time rubric-guided verification | Rubric evolution | — |
+| Zhu et al., 2026 — SkillCoach (arXiv 2607.01874) | Self-evolving rubrics | — |
+| Zhou et al., ACL 2025 — RuleArena | Auxiliary data (NBA subset) | — |
+| Saeidi et al., EMNLP 2018 — ShARC | Auxiliary data | — |
+| Sun, Cohen, Salakhutdinov, ACL 2022 — ConditionalQA | Auxiliary data | — |
+| Han et al., EMNLP 2024 — FOLIO | Auxiliary data | — |
 
-The gap between A and B answers RQ2. Trajectories may be long (each `terminus-2` step repeats
-terminal output); whether truncation or compression is needed is decided once real runs are seen.
-
-### 4.4 Method ladder
-
-The second forward pass is the starting point, not the final contribution.
-
-| Level | Method | Needs |
-|---|---|---|
-| L1 | Second forward pass reads the trace and states a confidence | text access only |
-| L2 | Verifier with tools: re-runs the program, perturbs facts, re-derives the answer independently | the harness container |
-| L3 | Linear probe on hidden states, as in Calibrating LLM Judges | open-weight model, GPU |
-
-Within L1 the axes to vary are: same model or a different model as verifier; input variant A/B/C;
-a stated number or the log-probability of a "correct / incorrect" token.
-
-### 4.5 Baselines
-
-| Baseline | Extra cost |
-|---|---|
-| Constant confidence equal to overall accuracy | none |
-| Confidence self-reported by the agent in Pass 1 | none |
-| Logistic regression on trace statistics (repair rounds, `swipl` errors, tokens, timeout) | none |
-| Agreement between the `direct` and Prolog routes (the tax paper's signal) | one extra run |
-| Agreement rate over K samples | K agent runs |
-
-Verbalised confidence is commonly overconfident and clustered near 0.9 🔶, so L1 must beat the
-free baselines to count as a result.
-
-## 5. Evaluation
-
-### 5.1 Data and grading
-
-- **Start with SARA `hard`**: 35 numeric and 30 binary cases ✅. The first goal is a working
-  end-to-end pipeline, not a final number.
-- **Correctness follows DAR's grader**: exact integer match for numeric answers, case-insensitive
-  string match otherwise ✅ (see [04](04_dar_review.md) §2.3). No ±$1 tolerance.
-- **Known limitation**: with 35 and 30 cases, a 10-bin ECE has about three cases per bin. Results on
-  `hard` alone are a pipeline check. For reportable numbers the plan is to extend to SARA `whole`
-  (100 numeric, 276 binary), use few equal-mass bins, and report bootstrap confidence intervals.
-  The existing Harbor datasets contain only the 173 `hard` tasks ✅; generating `whole` tasks
-  through the adapter has not been checked 🔶.
-- **Start with the `zeroshot` and `direct` task framings**, which avoid the reference-Prolog
-  contamination in few-shot exemplars ([03](03_deonticbench_review.md) §2.1).
-
-### 5.2 Part 1 — calibration
-
-Both metrics are lower-is-better and do not measure accuracy.
-
-- **ECE**: bin cases by confidence, take the absolute gap between mean confidence and empirical
-  accuracy per bin, and average weighted by bin size.
-- **Kuiper (weighted)** 🔶: sort cases by confidence `S_j`, with outcomes `R_j`, and compute
-  `C_k = (1/n) · Σ_{j≤k} (R_j − S_j) · S_j`, `C_0 = 0`, `K = max_k C_k − min_k C_k`.
-  It needs no binning, which suits small samples.
-- **Discrimination** is reported alongside: AUROC and the risk–coverage curve. A verifier that
-  always outputs the overall accuracy is well calibrated yet cannot select which answers to refuse.
-
-### 5.3 Part 2 — cost with abstention
-
-Answers with `p` below a threshold `τ` are refused and sent to a human. Cost per case follows the
-tax paper's break-even price 🔶:
-
-| Outcome | Cost counted |
-|---|---|
-| Over-reported tax | the full over-reported amount |
-| Under-reported by more than `max($5,000, 10% of true tax)` | 20% of the under-reported amount |
-| Any other answered case | $0 |
-| Refused, handled by a human | $270 |
-
-The mean is taken over all cases, refused ones included. Reported: the cost–coverage curve over
-`τ`, cost at a `τ` chosen without looking at test labels (cross-validation), and cost at the oracle
-`τ` as an upper bound. Reference point 🔶: the tax paper reports $270.00 for "refuse everything" and
-$6,431.84 for o3 answering directly, on the 100 SARA numeric cases.
-
-Notes:
-
-- The cost model applies to **SARA Numeric** only. SARA Binary has no dollar amounts and is
-  evaluated by risk–coverage.
-- The cost function is asymmetric, so the ideal refusal rule depends on expected loss and not only
-  on `P(correct)`. The first version uses `P(correct)`; predicting error magnitude is an extension.
-- Inference cost (tokens for Pass 2) is reported as well, since DAR's own framing is accuracy
-  against token usage.
-
-## 6. Plan
-
-| Phase | Work | Depends on |
-|---|---|---|
-| 0 | Scoring code (ECE, Kuiper, AUROC, bootstrap CIs) and a Harbor trajectory parser, tested on synthetic data | nothing |
-| 1 | Obtain Pass 1 trajectories on SARA `hard`; run L1 verifier variants A and B; report calibration | trajectories (§7) |
-| 2 | Add the abstention threshold and the cost evaluation on SARA Numeric | phase 1 |
-| 3 | Extend to SARA `whole`, more models, and the other DAR subdomains | compute |
-| 4 | L2 (verifier with tools) and L3 (probe on an open-weight model) | server with GPU |
-
-## 7. Resources and open items
-
-- **No released trajectories exist** ✅ (2026-09-27). Checked: both vendored repos (`outputs/`,
-  `bootstrap_results/` and `jobs/` are gitignored; the only trajectory files are Harbor's own
-  hello-world test fixtures), the HuggingFace dataset `gydou/DeonticBench` (cases, labels and
-  reference Prolog only), and the DAR project page (charts only).
-- **Two ways to get Pass 1 data**: ask the DAR author for his `jobs/` directories, ideally one
-  open-weight and one closed model on SARA; or run DAR ourselves.
-- **Compute**: neither Mac has Docker or `swipl` (see [02](02_setup_and_sync.md)). Running Pass 1
-  needs a server with Docker. L3 and any open-weight model additionally need GPUs. This is the
-  resource request the proposal supports.
-- **Still open from the DAR review**: the paper body is unread, and `kira_deontic_grounded` /
-  `kira_compute_then_answer` are missing from the released code ([04](04_dar_review.md) §3).
-- **Not yet decided**: which models to use as solver and verifier; whether the verifier is the same
-  model as the solver.
-
-## 8. Risks
-
-| Risk | Mitigation |
-|---|---|
-| Sample size too small for stable calibration estimates | Extend to `whole`; Kuiper and equal-mass bins; confidence intervals everywhere |
-| Verbalised confidence is uninformative | Log-probability scoring; L2 and L3; the trace-statistics baseline as a fallback signal |
-| Verifier and solver share the same blind spots | Use a different model as verifier; L2 independent re-derivation |
-| Trajectories exceed the verifier's context | Truncate or summarise observations; variant A as the short-input control |
-| Reasoning is hidden for closed models | Variant B is defined on visible content only; variant C on open-weight models |
-| Cost results depend on the cost model's assumptions | Report the curve over `τ`, not one number; state the assumptions of the tax paper explicitly |
-
-## 9. What carries over from the earlier candidate directions
-
-- **Evaluation hygiene** (old candidate A) is folded in: one grading rule, confidence intervals on
-  every number, no cross-paper comparison of numeric scores without re-scoring.
-- **Weaker models degrading under the harness** (old candidate B) is the natural test bed: these
-  are the runs where a useful confidence signal matters most.
-- Rule/fact separation, data cleaning and RL (old candidates C, D, E) are not pursued.
-
-## 10. Decision log
+## 8. Decision log
 
 | Date | Decision | Rationale |
 |---|---|---|
 | 2026-09-17 | Both upstream repos vendored as git subtrees; `harbor-deonticbench/datasets/` tracked in git rather than regenerated per machine | Pinned tasks mean every machine evaluates byte-identical inputs; regeneration drifts silently when `DeonticBench/` moves. See `02`. |
-| 2026-09-27 | Thesis direction: trace-based confidence estimation added to the DAR harness, evaluated by calibration and by real-world cost under abstention | Neither upstream paper measures reliability; both metrics have a published precedent; the first version needs only one extra forward pass. |
-| 2026-09-27 | Start on SARA `hard` | Goal is a working pipeline first; extension to `whole` is planned for reportable numbers. |
-| 2026-09-27 | Correctness graded by DAR's rule (exact integer match) | Confidence is attached to the DAR harness, so it is scored against that harness's own grader. |
-| 2026-09-27 | Work in two parts: calibration (ECE, Kuiper) first, abstention and cost second | The threshold and cost analysis depend on having a confidence signal that is worth thresholding. |
-| 2026-09-27 | First method is a single second forward pass over the reasoning trace | Simplest version; serves as the baseline for later levels. |
+| 2026-10-14 | Thesis direction fixed to the reviewed proposal: self-verification (rubric-based + Prolog symbolic) and confidence calibration inside the DAR harness, evaluated by accuracy, ECE/Kuiper and break-even price | Reviewed with the senior PhD student and the advisor. Supersedes the Claude-drafted 2026-09-27 plan and all of its decisions. |
+| 2026-10-14 | Verifier reuses the solver model via extra inference calls | As stated in the proposal; keeps the module model-agnostic and applicable to API models. |
+| 2026-10-14 | Development on auxiliary datasets (RuleArena-NBA, ShARC, ConditionalQA, FOLIO), evaluation on SARA via DAR | SARA `hard` is too small to both fit and evaluate a calibration mapping; transfer to SARA is itself a research question. |
+| 2026-10-14 | Correctness on SARA graded by DAR's rule (exact integer match, macro-F1 for binary) | The module lives in the DAR harness, so it is scored against that harness's own grader. |

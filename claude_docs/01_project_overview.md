@@ -18,11 +18,15 @@ weaker models often *degrade* on numerical tasks while consuming far more tokens
 
 ## What the thesis does
 
-**Add a confidence estimate to the DAR harness (②) and measure whether it can be trusted.** After
-the agent solves a case, a verifier reads the reasoning trace and outputs the probability that the
-answer is correct. This is evaluated by calibration (ECE, Kuiper) and by the real-world cost saved
-when low-confidence answers are refused. The plan is in
-[05_confidence_proposal.md](05_confidence_proposal.md), which doubles as the decision log.
+**Add self-verification and confidence calibration to the DAR harness (②).** After the agent
+completes a trajectory, the same model checks it against a rubric set (tool use, provision
+coverage, grounded reasoning) and against Prolog queries on its intermediate conclusions; the
+feedback drives answer revision, and the rubric assessments are mapped to a calibrated confidence
+that decides whether to accept the answer or send the case to a human. Evaluated by accuracy before
+vs. after verification, calibration (ECE, Kuiper) and break-even price on SARA-Numeric. Extensions:
+hidden-state probes and harness distillation into Qwen. The proposal, reviewed with the PhD senior
+and the advisor, is restated in [05_confidence_proposal.md](05_confidence_proposal.md), which
+doubles as the decision log.
 
 The direction is grounded in two close-reading notes:
 

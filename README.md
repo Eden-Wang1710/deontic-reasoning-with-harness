@@ -17,7 +17,7 @@ Built on two papers by Guangyao Dou (JHU, Van Durme group), both vendored here a
 | ├ [`02_setup_and_sync.md`](claude_docs/02_setup_and_sync.md) | Per-machine setup, multi-machine sync, regenerating datasets, pulling upstream |
 | ├ [`03_deonticbench_review.md`](claude_docs/03_deonticbench_review.md) | Close reading of the DeonticBench paper, code and data |
 | ├ [`04_dar_review.md`](claude_docs/04_dar_review.md) | Close reading of DAR and the Harbor harness |
-| └ [`05_confidence_proposal.md`](claude_docs/05_confidence_proposal.md) | Thesis direction (trace-based confidence in the DAR harness) and the decision log |
+| └ [`05_confidence_proposal.md`](claude_docs/05_confidence_proposal.md) | Thesis proposal (self-verification and confidence calibration in the DAR harness) and the decision log |
 | [`CLAUDE.md`](CLAUDE.md) | Context auto-loaded by Claude Code; indexes `claude_docs/` |
 | [`DeonticBench/`](DeonticBench/) | Upstream benchmark (prompt-based eval), git subtree |
 | [`harbor-deonticbench/`](harbor-deonticbench/) | Upstream agentic harness (Harbor + meta-harness), git subtree |

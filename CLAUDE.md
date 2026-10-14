@@ -5,8 +5,9 @@ built on two papers by a senior PhD student in the same group, Guangyao Dou (JHU
 **DeonticBench** (arXiv 2604.04443, vendored at `DeonticBench/`) and **DAR: Deontic Reasoning with
 Agentic Harnesses** (arXiv 2606.05009, vendored at `harbor-deonticbench/`).
 
-The owner works from several machines (work Mac, personal Mac, JHU cluster), so **this git repo is
-the only shared state** — anything worth keeping must be committed and pushed.
+The owner works on two lab cluster machines (0238, a DGX Spark with Docker; 601-606, the GPU
+nodes), so **this git repo is the only shared state** — anything worth keeping must be committed
+and pushed. See `claude_docs/02_setup_and_sync.md` for per-machine status.
 
 ## Docs: `claude_docs/`
 
@@ -16,10 +17,10 @@ on this summary alone.
 | File | What it contains | Read it when |
 |---|---|---|
 | `claude_docs/01_project_overview.md` | What the thesis is and what it builds on, repo layout, references, why the repo stays private | Starting a session; unsure what belongs where |
-| `claude_docs/02_setup_and_sync.md` | Per-machine setup (Python, SWI-Prolog, `uv`, Docker, `whole` splits), sync workflow, regenerating `datasets/`, pulling both subtrees, machine status table | Setting up or running anything; syncing; updating either subtree |
+| `claude_docs/02_setup_and_sync.md` | The two cluster machines (0238 DGX Spark, 601-606 GPU nodes) and their verified state, project env setup, sync workflow between them, regenerating `datasets/`, pulling both subtrees | Setting up or running anything on either machine; syncing; updating either subtree |
 | `claude_docs/03_deonticbench_review.md` | Close reading of DeonticBench: task/eval/training summary, headline results, verified problems (✅) vs. hypotheses (🔶), a script reproducing the reference-Prolog scan | Designing experiments; before trusting any number from that paper or any reference program |
 | `claude_docs/04_dar_review.md` | Close reading of DAR: what the harness actually does, grading differences vs. DeonticBench, gaps in the released code, what DAR leaves open | Working with `harbor-deonticbench/`; comparing the two regimes |
-| `claude_docs/05_confidence_proposal.md` | The thesis direction: trace-based confidence added to the DAR harness, evaluated by calibration (ECE, Kuiper) and by real-world cost under abstention; method, evaluation plan, open items, and the decision log | Writing the proposal; designing or running any confidence experiment; recording any project-level decision |
+| `claude_docs/05_confidence_proposal.md` | The thesis proposal (reviewed with the PhD senior and advisor): self-verification (rubric-based + Prolog symbolic) and confidence calibration inside the DAR harness, evaluated by accuracy, ECE/Kuiper and break-even price; data, models, extensions (probes, harness distillation), open items, and the decision log | Writing the thesis; designing or running any verification or confidence experiment; recording any project-level decision |
 
 ### Doc conventions
 
@@ -55,8 +56,8 @@ file per paper, named `NN_snake_case.md` with a two-digit reading-order prefix (
   note; expect a conflict there on `subtree pull` and keep our version. See `02`.
 - `harbor-deonticbench/meta-harness/` is documented upstream as a submodule but is committed as
   plain files on `main`; there is no `.gitmodules`, so `--recurse-submodules` is a no-op here.
-- Prolog eval needs `swipl` on PATH; the Harbor side needs Python ≥3.12, `uv` and a running Docker
-  daemon. None of that is installed on every machine — check the status table in `02` first.
+- Prolog eval needs `swipl` on PATH; the Harbor side needs Python ≥3.12, `uv` and a Docker daemon
+  the user can reach. Check the per-machine tables in `02` first; 0238 is ARM (aarch64).
 - API keys come from environment variables. Never write keys into files.
 
 ## Easy to get wrong (evidence in `claude_docs/03` and `04`)
