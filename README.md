@@ -22,5 +22,6 @@ Built on two papers by Guangyao Dou (JHU, Van Durme group), both vendored here a
 | [`DeonticBench/`](DeonticBench/) | Upstream benchmark (prompt-based eval), git subtree |
 | [`harbor-deonticbench/`](harbor-deonticbench/) | Upstream agentic harness (Harbor + meta-harness), git subtree |
 
-Private repo: `DeonticBench` ships no LICENSE file, and this also holds unpublished thesis work.
-(`harbor-deonticbench` is Apache-2.0, but that does not make the repo as a whole redistributable.)
+Licensing: `harbor-deonticbench` is Apache-2.0. `DeonticBench` ships no LICENSE file (only the
+HuggingFace dataset is CC-BY-4.0); it is vendored here as in-group code with the author's
+knowledge, not as a redistribution.

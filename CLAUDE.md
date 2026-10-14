@@ -16,7 +16,7 @@ on this summary alone.
 
 | File | What it contains | Read it when |
 |---|---|---|
-| `claude_docs/01_project_overview.md` | What the thesis is and what it builds on, repo layout, references, why the repo stays private | Starting a session; unsure what belongs where |
+| `claude_docs/01_project_overview.md` | What the thesis is and what it builds on, repo layout, references, repo visibility | Starting a session; unsure what belongs where |
 | `claude_docs/02_setup_and_sync.md` | The two cluster machines (0238 DGX Spark, 601-606 GPU nodes) and their verified state, project env setup, sync workflow between them, regenerating `datasets/`, pulling both subtrees | Setting up or running anything on either machine; syncing; updating either subtree |
 | `claude_docs/03_deonticbench_review.md` | Close reading of DeonticBench: task/eval/training summary, headline results, verified problems (✅) vs. hypotheses (🔶), a script reproducing the reference-Prolog scan | Designing experiments; before trusting any number from that paper or any reference program |
 | `claude_docs/04_dar_review.md` | Close reading of DAR: what the harness actually does, grading differences vs. DeonticBench, gaps in the released code, what DAR leaves open | Working with `harbor-deonticbench/`; comparing the two regimes |
@@ -86,4 +86,5 @@ file per paper, named `NN_snake_case.md` with a two-digit reading-order prefix (
   comments, commit messages — are in English.
 - Do not commit run artifacts (`outputs/`, `bootstrap_results/`, `jobs/`), model weights, or `whole`
   splits. `datasets/` is the deliberate exception (see above).
-- Keep the GitHub repo private.
+- The GitHub repo is **public** (owner's decision, 2026-10-14). Never commit API keys, run
+  artifacts or anything the author of the vendored repos has not released.

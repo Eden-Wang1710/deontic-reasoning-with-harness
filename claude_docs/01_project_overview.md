@@ -73,11 +73,10 @@ Where my own code will live is decided once the direction is fixed (see `05`). T
 
 ## Visibility
 
-This repo stays **private**, for two reasons:
+This repo is **public** (owner's decision, 2026-10-14). Consequences:
 
-1. `guangyaodou/DeonticBench` ships no LICENSE file (only the HF dataset is explicitly CC-BY-4.0).
-   `harbor-deonticbench` is Apache-2.0, which does not change the conclusion for the repo as a whole.
-2. It also holds my own unfinished thesis work.
-
-Licensing is a question to put directly to the author — this is in-group code, not an arm's-length
-upstream.
+- `guangyaodou/DeonticBench` ships no LICENSE file (only the HF dataset is explicitly CC-BY-4.0);
+  `harbor-deonticbench` is Apache-2.0. The vendored copies are in-group code kept here with the
+  author's knowledge; if licensing ever becomes a question, ask the author directly.
+- Never commit API keys, run artifacts, model weights, or anything the author has not released
+  (e.g. unreleased agents obtained privately). Unfinished thesis text is fine to keep here.
