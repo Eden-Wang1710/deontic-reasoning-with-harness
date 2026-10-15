@@ -21,6 +21,11 @@ it (SARA-Numeric 34.0 % direct → 11.4 % KIRA, Airline 13.7 % → 1.3 %, per th
 self-verification and confidence have room to help. Larger Qwen variants (122B-A10B, 397B) are
 deferred to a later scale comparison.
 
+**Scope decision (2026-10-15)**: for now only the two **SARA** subdomains are run (sara-numeric 35
++ sara-binary 30 = 65 tasks per framing); Airline and USCIS-AAO are deferred. SARA is the
+evaluation benchmark named in the proposal ([05](05_confidence_proposal.md) §4.1), and the
+break-even-price analysis needs SARA-Numeric specifically.
+
 Planned run order for each model:
 
 | # | Harness | Framing | Purpose |
@@ -66,7 +71,8 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 
 | Date | Framing | Tasks | Job name | Status | Notes |
 |---|---|---|---|---|---|
-| 2026-10-15 | direct | 2 | smoke | pending | pipeline check |
+| 2026-10-15 | direct | 2 (SARA) | smoke | pending | pipeline check |
+| 2026-10-15 | direct | 65 (SARA numeric + binary) | — | pending | first full pass |
 
 ### 1.4 Results
 

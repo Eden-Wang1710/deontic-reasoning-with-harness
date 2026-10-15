@@ -7,7 +7,11 @@
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
-#   tools/run_dar_qwen35_35b.sh direct                                  # full 173 tasks
+#   tools/run_dar_qwen35_35b.sh direct                                  # SARA numeric + binary (65 tasks)
+#   SUBSET=all tools/run_dar_qwen35_35b.sh direct                       # all 173 tasks
+#
+# SUBSET (default "sara") selects subdomains by task-name glob:
+#   sara = sara-numeric + sara-binary (decision 2026-10-15: only SARA for now), all = no filter
 #
 # Settings (decided 2026-10-15, see claude_docs/05 decision log):
 #   agent terminus-2, 4 concurrent trials, agent timeout 600 s x 3,
@@ -15,6 +19,12 @@
 set -euo pipefail
 
 FRAMING="${1:?framing: direct | zeroshot | fewshot}"; shift || true
+SUBSET="${SUBSET:-sara}"
+case "$SUBSET" in
+  sara) INCLUDE="--include-task-name '*-sara-numeric-*' --include-task-name '*-sara-binary-*'" ;;
+  all)  INCLUDE="" ;;
+  *) echo "unknown SUBSET=$SUBSET (sara|all)" >&2; exit 1 ;;
+esac
 MODEL_INFO='{"max_input_tokens": 49152, "max_output_tokens": 16384, "max_tokens": 65536, "input_cost_per_token": 0.0, "output_cost_per_token": 0.0}'
 
 cd "$(dirname "$0")/../harbor-deonticbench"
@@ -28,4 +38,5 @@ exec sg docker -c "$HOME/.local/bin/uv run harbor run \
   --n-concurrent 4 \
   --agent-timeout-multiplier 3 \
   --jobs-dir jobs/qwen3.5-35b-a3b/$FRAMING \
+  $INCLUDE \
   $*"
