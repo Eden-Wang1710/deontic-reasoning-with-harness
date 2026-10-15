@@ -22,6 +22,7 @@ on this summary alone.
 | `claude_docs/04_dar_review.md` | Close reading of DAR: what the harness actually does, grading differences vs. DeonticBench, gaps in the released code, what DAR leaves open | Working with `harbor-deonticbench/`; comparing the two regimes |
 | `claude_docs/05_confidence_proposal.md` | The thesis proposal (reviewed with the PhD senior and advisor): self-verification (rubric-based + Prolog symbolic) and confidence calibration inside the DAR harness, evaluated by accuracy, ECE/Kuiper and break-even price; data, models, extensions (probes, harness distillation), open items, and the decision log | Writing the thesis; designing or running any verification or confidence experiment; recording any project-level decision |
 | `claude_docs/06_data_statistics.md` | Measured sizes: case counts per domain/split, label balance, statute and exemplar token counts, full prompt length per DeonticBench mode, and exactly which data DAR uses (hard split, 4 subdomains, 173 × 3 tasks) with the agent's starting context per framing | Sizing any experiment; estimating context or cost; choosing splits |
+| `claude_docs/07_native_trajectories.md` | Log of pass-1 ("native") DAR trajectories per model: how each model was served (vLLM settings), harness configuration, runs, scores, and observed failure modes | Running or analysing a baseline trajectory; choosing serving/harness settings for a new model |
 
 ### Doc conventions
 

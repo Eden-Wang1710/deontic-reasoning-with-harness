@@ -22,15 +22,16 @@ synchronised automatically.
 |---|---|---|
 | OS | Ubuntu 24.04.3 LTS, aarch64 (ARM) | Note: ARM. Docker images and Python wheels must be `arm64`; check Harbor's task images build/pull on ARM 🔶. |
 | GPU | GB10, driver 580.82.09, CUDA 13.0 toolkit at `/usr/local/cuda` | — |
-| Docker | 28.3.3 installed; daemon socket **not accessible without sudo** (user is in `sudo` group, not `docker` group) | `sudo usermod -aG docker $USER`, then log out and back in. Verify with `docker ps`. Harbor needs this. |
-| Python | miniconda3 at `~/miniconda3`, base = 3.13.11; env `myenv` exists (contents unknown) | Create a project env, see §2.1 |
-| `uv` | ❌ not installed | `curl -LsSf https://astral.sh/uv/install.sh \| sh` (Harbor side needs it) |
-| `swipl` | ❌ not installed | `conda install -c conda-forge swi-prolog` into the project env, or `sudo apt install swi-prolog` |
-| `torch` | ❌ not in base | Install into the project env if serving models here (ARM + CUDA 13 wheels 🔶) |
+| Docker | 28.3.3; user added to `docker` group ✅ 2026-10-15. In a shell opened before that, use `sg docker -c "<cmd>"`; new logins get it directly. Base image `ghcr.io/laude-institute/t-bench/python-3-13:20250620` has an `arm64` manifest and a DAR task image builds and runs here ✅ (swipl 9.0.4, Python 3.13.1, tmux). | — |
+| Python | miniconda3 at `~/miniconda3`, base = 3.13.11; env `myenv` (Python 3.12) has **vllm 0.20.1, torch 2.11.0+cu130, transformers 5.8.0, flashinfer 0.6.8** and CUDA works on the GB10 ✅ 2026-10-15. Used for model serving (`tools/serve_qwen35_35b.sh`). | A separate DeonticBench env is still to do, see §2.1 |
+| `uv` | 0.13.1 at `~/.local/bin/uv` ✅ 2026-10-15; `harbor-deonticbench` synced (`uv sync --all-extras --dev`), `uv run harbor` works | — |
+| `swipl` | ❌ not on the host; **not needed for Harbor runs** (it is inside the task image) | Install into the project env only for DeonticBench's own Prolog eval |
+| `torch` | in `myenv` (see Python row) | — |
 | `gh` | ❌ not installed | Optional |
 | git identity | **not set** (`user.name` / `user.email` empty) | `git config --global user.name "Zixuan Wang"` and `git config --global user.email <email>` before the first commit |
 | git remote | `https://github.com/Eden-Wang1710/deontic-reasoning-with-harness`; no credential helper configured | Pushing needs either a PAT with a credential helper, or switch the remote to SSH and add this machine's key to GitHub. **Do this before the first push.** |
 | Repo path | `/home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness` | — |
+| Model weights | `~/models/Qwen3.5-35B-A3B` (bf16, 72 GB) ✅ 2026-10-15; vLLM logs in `~/vllm_logs/` | Download others with `hf download <repo> --local-dir ~/models/<name>` (from `myenv`) |
 
 ### 2.1 Project environment on 0238 (to do)
 
