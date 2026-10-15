@@ -71,13 +71,58 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 
 | Date | Framing | Tasks | Job name | Status | Notes |
 |---|---|---|---|---|---|
-| 2026-10-15 | direct | 2 (SARA) | smoke | pending | pipeline check |
-| 2026-10-15 | direct | 65 (SARA numeric + binary) | — | pending | first full pass |
+| 2026-10-15 | direct | 2 (1 numeric + 1 binary) | `smoke` | done ✅ | pipeline check; 12 min wall, 0 exceptions, mean reward 0.5 |
+| 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | running (started 23:36 UTC) | first full pass, `--n-concurrent 4` |
+
+### 1.3.1 Serving facts learned from the smoke test ✅ 2026-10-15
+
+- **First start needs a one-off kernel build.** FlashInfer JIT-compiles its CUTLASS fused-MoE
+  kernel for sm_121 (90 compile units, ninja + nvcc). Done with the model loaded, 7 parallel
+  `cicc` processes at ~8 GB each were OOM-killed. Fix: `~/vllm_logs/precompile_moe.sh` builds the
+  kernel standalone (82 s with `MAX_JOBS=10`), and the launcher caps `MAX_JOBS=4` and pins
+  `XDG_CACHE_HOME=~/.cache` so the cache survives. Later starts load it from cache.
+- **Startup**: weights 1 min 45 s from NVMe; torch.compile cached; KV cache 1,015,808 tokens
+  (15.5 concurrent 64k requests). ~93 GB of the 119 GB in use while serving.
+- **Reasoning split works**: with `--reasoning-parser qwen3` the OpenAI response carries the
+  thinking in `message.reasoning` (vLLM 0.20 field name; **not** `reasoning_content`) and the
+  answer in `content`. Harbor stores the thinking per step as `reasoning_content` in
+  `agent/trajectory.json`.
+- **Throughput** (bf16, thinking on): single stream 30 tok/s; 4 concurrent streams 33 tok/s
+  aggregate (8 tok/s each). Concurrency barely raises aggregate throughput on this machine 🔶
+  (bandwidth-bound unified memory, or the GDN linear-attention / MoE kernels not batching well);
+  it does not hurt either, so `--n-concurrent 4` stays. Total run time is therefore ≈ total
+  generated tokens / 33 tok/s.
+- **Thinking is long.** A trivial arithmetic prompt produced ~1k thinking tokens; a one-sentence
+  statute question hit the 2,048-token cap still thinking.
 
 ### 1.4 Results
 
-Not yet available.
+#### Smoke test (`jobs/qwen3.5-35b-a3b/direct/smoke`, 2026-10-15) ✅
+
+| Trial | Expected | Got | Reward | Wall | Agent steps | Prompt tok | Completion tok | Thinking chars |
+|---|---|---|---|---|---|---|---|---|
+| sara-binary (§2(b)(2)(C), Bob 2014) | Entailment | Entailment | 1.0 | 175 s | 6 | 28,863 | 2,358 | 3,939 |
+| sara-numeric (Alice 2015 tax) | 102150 | 102348 | 0.0 | 729 s | 6 | 27,019 | 18,562 | 53,921 |
+
+Both completed without exception or timeout. Time estimate for the full SARA pass 🔶: numeric
+≈ 35 × 12 min and binary ≈ 30 × 3 min of generation, with concurrency adding little, ≈ 6–8 h.
+
+#### Full SARA pass (`sara-t2-run1`)
+
+Pending.
 
 ### 1.5 Observations and failure modes
 
-Not yet available.
+From the smoke test only (n = 2; to be rewritten once the full pass is in):
+
+- **Trajectory shape**: `cat /app/statute.txt` first (output truncated by the terminal), then
+  `grep`/`sed -n` to the relevant section, then `echo 'Answer: …' > /app/output/answer.txt`,
+  then `mark_task_complete` with the harness's confirmation prompt. The binary case was
+  resolved in 6 steps with short thinking.
+- **Numeric case**: same 6 steps, but one turn carried most of the 18.5k completion tokens — a
+  very long in-head computation after reading the statute. The answer was off by 198 on a
+  102k figure, i.e. a computation or provision-application slip, not a format or tool failure.
+  Which provision was misapplied is to be read from the trajectory.
+- **Where to look**: `jobs/<…>/<trial>/agent/trajectory.json` (ATIF: per-step `message`,
+  `reasoning_content`, `tool_calls`, `observation`, `metrics`), `agent/episode-N/{prompt,response}.txt`,
+  `verifier/test-stdout.txt` (expected vs. got), `result.json` (timestamps, reward, exception).
