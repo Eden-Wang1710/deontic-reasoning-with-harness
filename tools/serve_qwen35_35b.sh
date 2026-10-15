@@ -14,6 +14,12 @@ LOG="${LOG:-$HOME/vllm_logs/qwen35-35b-a3b.log}"
 PY="$HOME/miniconda3/envs/myenv/bin"
 
 export HF_HUB_OFFLINE=1
+export CUDA_HOME=/usr/local/cuda
+export PATH="$PY:$CUDA_HOME/bin:$PATH"   # ninja lives in the conda env
+# FlashInfer JIT-compiles its CUTLASS fused-MoE kernel on first start (needs ninja + nvcc,
+# several minutes). Keep the compile cache in a stable place, not a per-session dir.
+export XDG_CACHE_HOME="$HOME/.cache"
+export MAX_JOBS=4   # cap ninja parallelism: each nvcc/cicc takes ~8 GB RAM next to the loaded model
 exec "$PY/vllm" serve "$MODEL_DIR" \
   --served-model-name qwen3.5-35b-a3b \
   --host 0.0.0.0 --port "$PORT" \
