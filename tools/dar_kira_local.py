@@ -101,24 +101,37 @@ def normalise_commands(cmds: Any) -> list[dict[str, Any]]:
     return out
 
 
+def repair_tool_call(tc: dict[str, Any]) -> dict[str, Any]:
+    """Return a copy of an execute_commands tool call with well-formed arguments."""
+    fn = tc.get("function") or {}
+    if fn.get("name") != "execute_commands":
+        return tc
+    args = fn.get("arguments", "{}")
+    try:
+        parsed = json.loads(args) if isinstance(args, str) else dict(args)
+    except (json.JSONDecodeError, TypeError):
+        return tc
+    if not isinstance(parsed, dict):
+        return tc
+    parsed = repair_arguments(parsed)
+    parsed["commands"] = normalise_commands(parsed.get("commands", []))
+    return {**tc, "function": {**fn, "arguments": json.dumps(parsed)}}
+
+
 class AgentHarness(_BaselineKira):
     @staticmethod
     def name() -> str:
         return "terminus-kira-local"
 
+    def _extract_tool_calls(self, response) -> list[dict[str, Any]]:
+        """Repair arguments *before* they enter the chat history.
+
+        baseline_kira echoes the raw tool calls back to the server on the next turn; vLLM
+        json-parses ``function.arguments`` while rendering the chat template and rejects the
+        malformed ones with HTTP 400 ``Expecting value`` (9 of 65 trials in sara-kira-run1,
+        2026-10-16). Repairing here fixes both the history and the parsing below.
+        """
+        return [repair_tool_call(tc) for tc in super()._extract_tool_calls(response)]
+
     def _parse_tool_calls(self, tool_calls: list[dict[str, Any]]):
-        fixed = []
-        for tc in tool_calls:
-            fn = (tc.get("function") or {})
-            if fn.get("name") == "execute_commands":
-                args = fn.get("arguments", "{}")
-                try:
-                    parsed = json.loads(args) if isinstance(args, str) else dict(args)
-                except (json.JSONDecodeError, TypeError):
-                    parsed = None
-                if isinstance(parsed, dict):
-                    parsed = repair_arguments(parsed)
-                    parsed["commands"] = normalise_commands(parsed.get("commands", []))
-                    tc = {**tc, "function": {**fn, "arguments": json.dumps(parsed)}}
-            fixed.append(tc)
-        return super()._parse_tool_calls(fixed)
+        return super()._parse_tool_calls([repair_tool_call(tc) for tc in tool_calls])
