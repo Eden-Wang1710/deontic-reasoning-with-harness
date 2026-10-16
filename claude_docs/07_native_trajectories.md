@@ -74,7 +74,8 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | Date | Framing | Tasks | Job name | Status | Notes |
 |---|---|---|---|---|---|
 | 2026-10-15 | direct | 2 (1 numeric + 1 binary) | `smoke` | done ✅ | pipeline check; 12 min wall, 0 exceptions, mean reward 0.5 |
-| 2026-10-16 | direct, **kira** | 2 | `kira-smoke`, `kira-smoke2`, `kira-smoke3` | done ✅ | smoke 1 crashed (tool-argument shape), smoke 2 ran 2/2 correct but with stray XML tags in every command, smoke 3 = clean wrapper (§1.6) |
+| 2026-10-16 | direct, **kira** | 2 | `kira-smoke` … `kira-smoke4` | done ✅ | smoke 1 crashed (tool-argument shape); smoke 2 ran 2/2 correct but with stray XML tags in every command; smoke 3: binary clean and correct, numeric looped to timeout (JSON-in-XML arguments); smoke 4 with the full wrapper: clean, binary ✅, numeric ✗ (99309 vs 102150). See §1.6. |
+| 2026-10-16 | direct, **kira** | 65 (SARA numeric + binary) | `sara-kira-run1` | running (started 03:06 UTC) | full KIRA pass, `--n-concurrent 4`, wrapper `tools/dar_kira_local.py` |
 | 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | done ✅ 2026-10-16 | first full pass, `--n-concurrent 4`; 2 h 25 min wall, 0 exceptions, 0 timeouts, mean reward 0.492 |
 
 ### 1.3.1 Serving facts learned from the smoke test ✅ 2026-10-15
@@ -218,19 +219,31 @@ What had to change to run it against Qwen3.5-35B-A3B on vLLM:
    the first command). After wrapping it in a list (`kira-smoke2`) both trials passed, but
    every command was preceded by a bogus `<parameter=keystrokes>` line that bash rejected
    (`syntax error near unexpected token 'newline'`), visible in every observation.
-3. **Fix, outside the subtree**: `tools/dar_kira_local.py` subclasses `AgentHarness` and
-   overrides `_parse_tool_calls` to (a) accept an object, a list of objects, a list of strings
-   or a JSON-encoded string under `commands`, and (b) strip stray `<parameter=…>` /
-   `</parameter>` lines and leading newlines from each keystroke. Nothing else is touched.
+3. **JSON inside one XML parameter.** In `kira-smoke3` the numeric trial produced 134 steps
+   and timed out: from the second turn on the model opened `<parameter=analysis>` and then
+   continued in *JSON* style (`…", "plan": "…", "commands": {"keystrokes": …}}`), so the
+   parser returned the whole thing as the `analysis` string, `commands` was missing, no
+   command ever ran, and the agent looped on terminus-2's "your response contained no tool
+   calls" warning while concluding "terminal output display is broken". 122 of the trial's
+   122 `execute_commands` calls had this shape.
+4. **Fix, outside the subtree**: `tools/dar_kira_local.py` subclasses `AgentHarness` and
+   overrides `_parse_tool_calls` to (a) recover `commands` from a JSON-in-XML value by
+   re-attaching the opening `{"analysis": "` and re-parsing (regex fallback on
+   `"keystrokes"`), (b) accept an object, a list of objects, a list of strings or a
+   JSON-encoded string under `commands`, and (c) strip stray `<parameter=…>` /
+   `</parameter>` lines and collapse trailing newlines in each keystroke to one. All 122
+   malformed calls from smoke 3 recover offline. Nothing else is touched.
    This is a deviation from the paper's harness 🔶: the paper ran open models through
    OpenRouter / vLLM with the stock agent, so part of its reported 27.8 % "execution-type
    error" rate for open models under KIRA may be this same tool-format failure rather than
    reasoning failure (hypothesis, worth checking against the paper's Table 3 and asking the
    author).
 
-Smoke results (`kira-smoke2`, before the keystroke clean-up; same two tasks as the terminus-2
-smoke): sara-binary Entailment ✅ in 90 s / 5 steps / 1,521 completion tokens; sara-numeric
-**102150 ✅** in 511 s / 11 steps / 13,250 completion tokens. In the numeric trial the model
-first wrote 102546, called `task_complete`, then on terminus-2's confirmation prompt
-re-derived and corrected to 102150 — the same task that terminus-2 (`tMSxBwb`) got wrong
-after revising in the other direction. n = 1, so no conclusion about KIRA vs. terminus-2 yet.
+Smoke results on the same two tasks as the terminus-2 smoke: `kira-smoke2` (stray tags, but
+commands ran) sara-binary Entailment ✅ 90 s / 5 steps / 1,521 completion tokens, sara-numeric
+**102150 ✅** 511 s / 11 steps / 13,250 tokens — the model first wrote 102546, called
+`task_complete`, then on the confirmation prompt re-derived and corrected to 102150, the same
+task terminus-2 (`tMSxBwb`) got wrong after revising in the other direction. `kira-smoke4`
+(final wrapper): binary ✅ 127 s / 7 steps / 2,280 tokens, numeric ✗ 99309 in 398 s / 7 steps /
+10,045 tokens, no malformed command in either. Sampling at temperature 1.0 makes single
+trials noisy; no KIRA-vs-terminus-2 conclusion from n = 2.
