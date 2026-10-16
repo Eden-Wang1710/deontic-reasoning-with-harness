@@ -6,6 +6,9 @@
 #   bf16 weights, thinking mode ON, reasoning parser splits <think> into reasoning_content,
 #   64k context, sampling defaults from the model's generation_config.json
 #   (temperature 1.0, top_p 0.95, top_k 20 = Qwen's "thinking mode, general tasks" recommendation).
+#   Native tool calling enabled (qwen3_xml parser) for the meta-harness baseline_kira agent,
+#   which passes `tools` and no max_tokens; max_new_tokens 16384 is the server-side default
+#   for such requests (terminus-2 sends its own max_tokens, unaffected). Added 2026-10-16.
 set -euo pipefail
 
 MODEL_DIR="${MODEL_DIR:-$HOME/models/Qwen3.5-35B-A3B}"
@@ -29,5 +32,7 @@ exec "$PY/vllm" serve "$MODEL_DIR" \
   --max-num-seqs 8 \
   --gpu-memory-utilization 0.75 \
   --reasoning-parser qwen3 \
+  --enable-auto-tool-choice --tool-call-parser qwen3_xml \
+  --override-generation-config '{"max_new_tokens": 16384}' \
   --limit-mm-per-prompt '{"image":0,"video":0}' \
   2>&1 | tee -a "$LOG"
