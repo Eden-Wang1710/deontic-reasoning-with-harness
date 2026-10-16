@@ -65,8 +65,9 @@ Confidence: <integer from 0 to 100>%
 followed by at most three sentences naming the main risk to the answer."""
 
 CONF_RE = re.compile(r"confidence\s*[:=]?\s*\**\s*([0-9]{1,3}(?:\.[0-9]+)?)\s*%", re.I)
-PCT_RE = re.compile(r"([0-9]{1,3}(?:\.[0-9]+)?)\s*%")
-PROB_RE = re.compile(r"\b(0\.[0-9]+|1\.0+)\b")
+# fallbacks must be tied to a confidence word: a bare "15%" in a tax answer is a tax rate
+PCT_RE = re.compile(r"([0-9]{1,3}(?:\.[0-9]+)?)\s*%\s*(?:confident|confidence|probability|likely|chance)", re.I)
+PROB_RE = re.compile(r"(?:confidence|probability)\s*(?:of|is|:|=)?\s*(0\.[0-9]+|1\.0+)\b", re.I)
 
 
 # ----------------------------------------------------------------------------- trial loading
@@ -221,7 +222,7 @@ def parse_confidence(text: str) -> tuple[float | None, str]:
         return min(float(m.group(1)), 100.0) / 100.0, "confidence_line"
     m = PCT_RE.search(text)
     if m:
-        return min(float(m.group(1)), 100.0) / 100.0, "any_percent"
+        return min(float(m.group(1)), 100.0) / 100.0, "percent_with_word"
     m = PROB_RE.search(text)
     if m:
         return float(m.group(1)), "probability"
@@ -247,11 +248,19 @@ def call_model(client, model: str, messages: list[dict], max_tokens: int, think:
 
 def run_trial(trial, harness, condition, datasets_root, client, model, max_tokens, think, out_dir):
     out_path = os.path.join(out_dir, trial["trial"] + ".json")
+    prev = None
     if os.path.exists(out_path):
-        return json.load(open(out_path)), True
+        prev = json.load(open(out_path))
+        # re-parse with the current parser; redo the call only if still unparsed (max 3 draws)
+        prev["confidence"], prev["parse"] = parse_confidence(prev.get("content", ""))
+        if prev["confidence"] is not None or prev.get("attempts", 1) >= 3:
+            return prev, True
     messages = build_messages(trial, harness, condition, datasets_root)
     rec = {k: v for k, v in trial.items() if k != "dir"}
-    rec.update(harness=harness, condition=condition, think=think, n_messages=len(messages))
+    rec.update(harness=harness, condition=condition, think=think, n_messages=len(messages),
+               attempts=(prev.get("attempts", 1) + 1) if prev else 1)
+    if prev:
+        rec["previous_unparsed_content"] = prev.get("content", "")
     try:
         rec.update(call_model(client, model, messages, max_tokens, think))
         rec["confidence"], rec["parse"] = parse_confidence(rec["content"])
@@ -347,6 +356,8 @@ def metrics(recs):
 
 def summarise(out_dir: str) -> str:
     recs = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(out_dir, "*.json"))) if not p.endswith("summary.json")]
+    for r in recs:  # always score with the current parser
+        r["confidence"], r["parse"] = parse_confidence(r.get("content", ""))
     lines = [f"# {out_dir}", f"records: {len(recs)}, unparsed/errors: {sum(1 for r in recs if r.get('confidence') is None)}",
              f"truncated (finish_reason=length): {sum(1 for r in recs if r.get('finish_reason') == 'length')}", ""]
     lines.append("| subset | n | acc | mean conf | ECE | Kuiper | Brier | AUROC | cov/acc @0.5 | @0.7 | @0.9 |")
