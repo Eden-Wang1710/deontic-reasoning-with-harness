@@ -72,7 +72,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | Date | Framing | Tasks | Job name | Status | Notes |
 |---|---|---|---|---|---|
 | 2026-10-15 | direct | 2 (1 numeric + 1 binary) | `smoke` | done ✅ | pipeline check; 12 min wall, 0 exceptions, mean reward 0.5 |
-| 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | running (started 23:36 UTC) | first full pass, `--n-concurrent 4` |
+| 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | done ✅ 2026-10-16 | first full pass, `--n-concurrent 4`; 2 h 25 min wall, 0 exceptions, 0 timeouts, mean reward 0.492 |
 
 ### 1.3.1 Serving facts learned from the smoke test ✅ 2026-10-15
 
@@ -87,11 +87,13 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
   thinking in `message.reasoning` (vLLM 0.20 field name; **not** `reasoning_content`) and the
   answer in `content`. Harbor stores the thinking per step as `reasoning_content` in
   `agent/trajectory.json`.
-- **Throughput** (bf16, thinking on): single stream 30 tok/s; 4 concurrent streams 33 tok/s
-  aggregate (8 tok/s each). Concurrency barely raises aggregate throughput on this machine 🔶
-  (bandwidth-bound unified memory, or the GDN linear-attention / MoE kernels not batching well);
-  it does not hurt either, so `--n-concurrent 4` stays. Total run time is therefore ≈ total
-  generated tokens / 33 tok/s.
+- **Throughput** (bf16, thinking on): single stream 30 tok/s. A synthetic 4-stream probe gave
+  only 33 tok/s aggregate, but during the real run the server log showed a steady **62–64 tok/s
+  generation with 4 requests running** (prefill ~400 tok/s, KV-cache usage 3 %) ✅ 2026-10-16 —
+  so 4-way concurrency roughly doubles throughput and the earlier "concurrency barely helps"
+  reading was an artefact of the probe. `--n-concurrent 4` stays; raising it to 6–8 is worth a
+  test 🔶. **Prefix cache hit rate stayed 0 %** throughout: vLLM does not prefix-cache this
+  hybrid (linear-attention) architecture, so every agent turn re-prefills the whole prompt.
 - **Thinking is long.** A trivial arithmetic prompt produced ~1k thinking tokens; a one-sentence
   statute question hit the 2,048-token cap still thinking.
 
@@ -107,22 +109,82 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 Both completed without exception or timeout. Time estimate for the full SARA pass 🔶: numeric
 ≈ 35 × 12 min and binary ≈ 30 × 3 min of generation, with concurrency adding little, ≈ 6–8 h.
 
-#### Full SARA pass (`sara-t2-run1`)
+#### Full SARA pass (`jobs/qwen3.5-35b-a3b/direct/sara-t2-run1`, 2026-10-15/16) ✅
 
-Pending.
+65 trials, 0 exceptions, 0 agent timeouts (longest agent phase 1,534 s < 1,800 s), 2 h 25 min
+job wall time at `--n-concurrent 4`. Numbers from `tools/dar_job_summary.py … --trials`.
 
-### 1.5 Observations and failure modes
+| Subdomain | n | Correct | Accuracy | Macro-F1 | Agent wall: median / max | Trials > 600 s | Accuracy at DAR's 600 s limit | Mean completion tok / trial |
+|---|---|---|---|---|---|---|---|---|
+| sara-binary | 30 | 26 | **0.867** | 0.867 | 201 s / 477 s | 0 | 0.867 | 3,651 |
+| sara-numeric | 35 | 6 | **0.171** | — | 676 s / 1,534 s | 20 (3 of them correct) | **0.086** (3/35) | 11,233 |
 
-From the smoke test only (n = 2; to be rewritten once the full pass is in):
+"Accuracy at 600 s" counts every trial whose agent phase exceeded DAR's default 600 s timeout as
+wrong, which is what the paper's harness would have done; it is the paper-comparable figure.
 
-- **Trajectory shape**: `cat /app/statute.txt` first (output truncated by the terminal), then
-  `grep`/`sed -n` to the relevant section, then `echo 'Answer: …' > /app/output/answer.txt`,
-  then `mark_task_complete` with the harness's confirmation prompt. The binary case was
-  resolved in 6 steps with short thinking.
-- **Numeric case**: same 6 steps, but one turn carried most of the 18.5k completion tokens — a
-  very long in-head computation after reading the statute. The answer was off by 198 on a
-  102k figure, i.e. a computation or provision-application slip, not a format or tool failure.
-  Which provision was misapplied is to be read from the trajectory.
+Binary confusion (expected → got): Contradiction→Contradiction 13, Entailment→Entailment 13,
+Contradiction→Entailment 3, Entailment→Contradiction 1. Classes are balanced (15/15) and the
+four misses go mostly towards "Entailment".
+
+Numeric error profile (29 wrong answers, relative error |got − expected| / expected):
+
+| < 1 % | 1–5 % | 5–20 % | ≥ 20 % | Under-estimates | Over-estimates |
+|---|---|---|---|---|---|
+| 7 | 7 | 10 | 5 | 25 | 4 |
+
+Half of the misses are within 5 % of the gold figure, and 25 of 29 are *below* it. No answer was
+off by a rounding margin (smallest miss: 204 on 63,345), so DeonticBench's ±$1 rule would not
+change a single score.
+
+Reference point from the paper (per the GPT summary of Table 1, 🔶 not yet checked against the
+PDF): Qwen3.5-35B SARA-Numeric **34.0 % prompt-based "Direct" → 11.4 % under KIRA**, with
+24.9 % of open-model KIRA runs timing out. Our terminus-2 numbers (17.1 % at 1,800 s, 8.6 % at
+600 s) are in the same band as the paper's harness result and well below its prompt-based
+figure, i.e. the "weaker model degrades on numeric tasks under a harness" finding reproduces
+qualitatively. The harness differs (terminus-2 vs. KIRA), so this is a sanity check, not a
+replication; run 3 (prompt-based direct) will check the 34.0 % side.
+
+### 1.5 Observations and failure modes ✅ 2026-10-16 (n = 65, from `sara-t2-run1`)
+
+- **Trajectory shape is uniform.** Every trial: `cat /app/statute.txt` (terminal truncates it),
+  then `grep` / `sed -n` / `cat` again for the relevant section (median 1 statute-reading
+  command, max 11), then `mkdir -p /app/output && echo 'Answer: …' > /app/output/answer.txt`,
+  then a "let me verify my reasoning once more" turn and `task_complete`. Binary tasks take 4–10
+  agent turns (median 6), numeric 3–9 (median 5). Command heads across all trials: `cat` 168,
+  `echo` 73, `mkdir` 63, `grep` 55, `sed` 31, `python3` 10, plus 136 empty keystrokes (waiting
+  for output).
+- **Almost no tool-assisted arithmetic.** Only 8 of 65 trials ran `python3` at all; the rest
+  compute the tax tables, phase-outs and percentages in the thinking block. The model does the
+  work "in its head" and uses the shell only to read the statute and write the answer. This is
+  the main lever a verification module could pull on numeric tasks 🔶.
+- **Numeric misses are provision errors, not arithmetic slips** (two near-misses read in full;
+  the rest are the owner's manual pass). Example `FuiwZyu` (off by 400 on 207,772): applied the
+  §68 itemised-deduction phase-out to the personal exemption instead of §151(d)(3), zeroing the
+  exemption. Example `HF3PXPD` (off by 204 on 63,345): cited a non-existent "§152(2)(A)" for the
+  standard deduction and never resolved whether the father is a dependent. In both the final
+  arithmetic over the chosen inputs is right. The 25-of-29 under-estimate skew is consistent with
+  missed income items / over-applied deductions rather than random error 🔶.
+- **Self-verification already happens, and it is empty.** The final turn is almost always a
+  re-statement of the same reasoning ("Let me verify my analysis one more time") that confirms
+  the answer; in `tMSxBwb` (smoke) the model did revise once, from a right-looking 102,546 to a
+  wrong 102,348. There is no independent check (no re-derivation, no code, no second reading).
+  This is the behaviour the rubric-based verifier in [05](05_confidence_proposal.md) §2.1 has
+  to replace, and the natural place to hook a confidence estimate.
+- **Token usage carries no correctness signal.** Numeric: correct 10,457 vs. wrong 11,394 mean
+  completion tokens (thinking 30k vs. 33k chars); binary: 3,624 vs. 3,823. No turn hit the 16k
+  output cap (max 10,011 completion tokens in one turn); max prompt 11,376 tokens, so terminus-2
+  never summarised context.
+- **Time is the real cost on local hardware.** Numeric trials average 12.6 min of agent time
+  and 20/35 exceed DAR's 600 s limit; under the paper's timeout half of this model's numeric
+  runs would be scored as failures regardless of answer quality. Any thesis table must state
+  the timeout used (decision in [05](05_confidence_proposal.md) §8).
+- **Harness noise**: 26 trials logged "Parser warnings: Extra text detected before JSON object"
+  (the model writes prose before the JSON tool call; terminus-2 still parses it), one "No valid
+  JSON object found" (recovered next turn). Six LiteLLM error footers appear in the job log
+  without any message body, no trial raised an exception and every episode has exactly one
+  model call, so they are harmless 🔶.
 - **Where to look**: `jobs/<…>/<trial>/agent/trajectory.json` (ATIF: per-step `message`,
-  `reasoning_content`, `tool_calls`, `observation`, `metrics`), `agent/episode-N/{prompt,response}.txt`,
-  `verifier/test-stdout.txt` (expected vs. got), `result.json` (timestamps, reward, exception).
+  `reasoning_content`, `tool_calls[].arguments.keystrokes`, `observation`, `metrics`),
+  `agent/episode-N/{prompt,response}.txt`, `verifier/test-stdout.txt` (expected vs. got),
+  `result.json` (timestamps, reward, exception). Per-trial table:
+  `python3 tools/dar_job_summary.py harbor-deonticbench/jobs/qwen3.5-35b-a3b/direct/sara-t2-run1 --trials`.
