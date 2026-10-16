@@ -75,7 +75,8 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 |---|---|---|---|---|---|
 | 2026-10-15 | direct | 2 (1 numeric + 1 binary) | `smoke` | done ✅ | pipeline check; 12 min wall, 0 exceptions, mean reward 0.5 |
 | 2026-10-16 | direct, **kira** | 2 | `kira-smoke` … `kira-smoke4` | done ✅ | smoke 1 crashed (tool-argument shape); smoke 2 ran 2/2 correct but with stray XML tags in every command; smoke 3: binary clean and correct, numeric looped to timeout (JSON-in-XML arguments); smoke 4 with the full wrapper: clean, binary ✅, numeric ✗ (99309 vs 102150). See §1.6. |
-| 2026-10-16 | direct, **kira** | 65 (SARA numeric + binary) | `sara-kira-run1` | running (started 03:06 UTC) | full KIRA pass, `--n-concurrent 4`, wrapper `tools/dar_kira_local.py` |
+| 2026-10-16 | direct, **kira** | 65 (SARA numeric + binary) | `sara-kira-run1` | done ✅ | full KIRA pass, `--n-concurrent 4`, wrapper `tools/dar_kira_local.py`; 56 finished, **9 HTTP 400 exceptions** (malformed tool-call history, see §1.6 item 5) |
+| 2026-10-16 | direct, **kira** | 9 (the failed ones) | `sara-kira-rerun9` | running | rerun after the history repair in `tools/dar_kira_local.py` |
 | 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | done ✅ 2026-10-16 | first full pass, `--n-concurrent 4`; 2 h 25 min wall, 0 exceptions, 0 timeouts, mean reward 0.492 |
 
 ### 1.3.1 Serving facts learned from the smoke test ✅ 2026-10-15
@@ -113,7 +114,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 Both completed without exception or timeout. Time estimate for the full SARA pass 🔶: numeric
 ≈ 35 × 12 min and binary ≈ 30 × 3 min of generation, with concurrency adding little, ≈ 6–8 h.
 
-#### Full SARA pass (`jobs/qwen3.5-35b-a3b/direct/sara-t2-run1`, 2026-10-15/16) ✅
+#### terminus-2, full SARA pass (`jobs/qwen3.5-35b-a3b/direct/sara-t2-run1`, 2026-10-15/16) ✅
 
 65 trials, 0 exceptions, 0 agent timeouts (longest agent phase 1,534 s < 1,800 s), 2 h 25 min
 job wall time at `--n-concurrent 4`. Numbers from `tools/dar_job_summary.py … --trials`.
@@ -147,6 +148,29 @@ PDF): Qwen3.5-35B SARA-Numeric **34.0 % prompt-based "Direct" → 11.4 % under K
 figure, i.e. the "weaker model degrades on numeric tasks under a harness" finding reproduces
 qualitatively. The harness differs (terminus-2 vs. KIRA), so this is a sanity check, not a
 replication; run 3 (prompt-based direct) will check the 34.0 % side.
+
+#### KIRA, full SARA pass (`jobs/qwen3.5-35b-a3b/kira-direct/sara-kira-run1`, 2026-10-16) ✅
+
+65 trials; 56 finished, 9 raised `BadRequestError` (vLLM HTTP 400 `Expecting value` while
+rendering a malformed tool call from the history, §1.6 item 5; being rerun as
+`sara-kira-rerun9`). Numbers below are over the finished trials unless stated.
+
+| Subdomain | n finished | Correct | Accuracy (finished) | Accuracy (exceptions = wrong) | Agent wall: median / max | Trials > 600 s | Accuracy at 600 s, over all n | Mean completion tok |
+|---|---|---|---|---|---|---|---|---|
+| sara-binary | 26 / 30 | 22 | **0.846** (macro-F1 0.846) | 0.733 | 207 s / 652 s | 3 (all correct) | 0.633 | 3,839 |
+| sara-numeric | 30 / 35 | 9 | **0.300** | 0.257 | 548 s / 1,255 s | 12 (2 correct) | 0.200 | 8,971 |
+
+Binary confusion (expected → got): E→E 11, C→C 11, C→E 3, E→C 1 — the same "Entailment"
+lean as terminus-2. Numeric misses (21): relative error < 1 %: 6, 1–5 %: 5, 5–20 %: 9,
+≥ 20 %: 1; 17 of 21 under-estimate. 3 of 65 trials used `python3`.
+
+**terminus-2 vs. KIRA on the 56 tasks both finished**: agree on 46 (23 both right, 23 both
+wrong); KIRA right where terminus-2 was wrong on 8 (7 of them numeric), the reverse on 2.
+Numeric: 2/30 → 9/30 on the common tasks. With temperature 1.0 and n = 30 this is suggestive,
+not significant 🔶; the paper's direction for this model (KIRA *below* prompt-based direct)
+cannot be checked until run 3 exists. KIRA numeric trials are also shorter (median 548 s vs.
+676 s agent time, 9k vs. 11k completion tokens) because the marker polling removes the fixed
+per-command waits.
 
 ### 1.5 Observations and failure modes ✅ 2026-10-16 (n = 65, from `sara-t2-run1`)
 
@@ -233,6 +257,12 @@ What had to change to run it against Qwen3.5-35B-A3B on vLLM:
    JSON-encoded string under `commands`, and (c) strip stray `<parameter=…>` /
    `</parameter>` lines and collapse trailing newlines in each keystroke to one. All 122
    malformed calls from smoke 3 recover offline. Nothing else is touched.
+5. **Malformed arguments in the history break the *next* request** (found in the full run,
+   9/65 trials). `baseline_kira` appends the raw tool call to the chat history and sends it
+   back on every later turn; vLLM json-parses `function.arguments` while rendering Qwen's chat
+   template and answers HTTP 400 `Expecting value: line 1 column 898`. The wrapper now repairs
+   the arguments in `_extract_tool_calls`, i.e. before they enter the history (commit
+   `d0610c2`), and the 9 tasks are rerun as `sara-kira-rerun9`.
    This is a deviation from the paper's harness 🔶: the paper ran open models through
    OpenRouter / vLLM with the stock agent, so part of its reported 27.8 % "execution-type
    error" rate for open models under KIRA may be this same tool-format failure rather than
