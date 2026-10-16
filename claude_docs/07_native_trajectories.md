@@ -49,6 +49,7 @@ Planned run order for each model:
 | Server | vLLM 0.20.1 in conda env `myenv` (torch 2.11.0+cu130, flashinfer 0.6.8), aarch64, GB10. Launcher: `tools/serve_qwen35_35b.sh`. |
 | Precision | **bf16** (paper-comparable; FP8 MoE kernels on GB10 untested 🔶). |
 | Thinking | **On** (model default). `--reasoning-parser qwen3` routes `<think>` into `reasoning_content` so the harness only sees the answer text. |
+| Tool calling | `--enable-auto-tool-choice --tool-call-parser qwen3_xml` (added 2026-10-16 for the KIRA harness; terminus-2 does not send `tools`). `--override-generation-config '{"max_new_tokens": 16384}'` gives requests that omit `max_tokens` (baseline_kira) the same 16k per-turn cap as terminus-2. |
 | Sampling | Model `generation_config.json`: temperature 1.0, top_p 0.95, top_k 20 — Qwen's "thinking mode, general tasks" recommendation. Harbor's terminus-2 default temperature is also 1.0. |
 | Context | `--max-model-len 65536`, `--max-num-seqs 8`, `--gpu-memory-utilization 0.75` (unified memory; leaves ~30 GB for OS and task containers). |
 | Endpoint | `http://0.0.0.0:9009/v1`, served model name `qwen3.5-35b-a3b`, api key `token-abc123` (dummy, local only). Containers use `http://172.17.0.1:9009/v1`. |
@@ -66,12 +67,14 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | `--n-concurrent` | 4 | Number of trials (task containers + agent loops) running in parallel; vLLM batches their requests. MoE with 3B active is bandwidth-bound, so 4-way batching is nearly free. |
 | Agent timeout | task default 600 s × `--agent-timeout-multiplier 3` = 1,800 s | Local throughput is far below the cloud APIs the paper used; 600 s would inflate timeouts. The 600 s accuracy can be recomputed post hoc from trajectory timestamps. |
 | Jobs dir | `harbor-deonticbench/jobs/qwen3.5-35b-a3b/<framing>/` (gitignored) | — |
+| `AGENT=kira` | `--agent-import-path dar_kira_local:AgentHarness` = `tools/dar_kira_local.py`, a subclass of meta-harness `agents.baseline_kira:AgentHarness` (the paper's KIRA harness: terminus-2 with native tool calling); jobs under `jobs/qwen3.5-35b-a3b/kira-<framing>/`; api key via `HOSTED_VLLM_API_KEY` because baseline_kira calls litellm directly and ignores `llm_kwargs` | The subclass only fixes the *shape* of the `commands` tool argument (see §1.6); prompt, tools and loop are upstream's. |
 
 ### 1.3 Runs
 
 | Date | Framing | Tasks | Job name | Status | Notes |
 |---|---|---|---|---|---|
 | 2026-10-15 | direct | 2 (1 numeric + 1 binary) | `smoke` | done ✅ | pipeline check; 12 min wall, 0 exceptions, mean reward 0.5 |
+| 2026-10-16 | direct, **kira** | 2 | `kira-smoke`, `kira-smoke2`, `kira-smoke3` | done ✅ | smoke 1 crashed (tool-argument shape), smoke 2 ran 2/2 correct but with stray XML tags in every command, smoke 3 = clean wrapper (§1.6) |
 | 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | done ✅ 2026-10-16 | first full pass, `--n-concurrent 4`; 2 h 25 min wall, 0 exceptions, 0 timeouts, mean reward 0.492 |
 
 ### 1.3.1 Serving facts learned from the smoke test ✅ 2026-10-15
@@ -188,3 +191,46 @@ replication; run 3 (prompt-based direct) will check the 34.0 % side.
   `agent/episode-N/{prompt,response}.txt`, `verifier/test-stdout.txt` (expected vs. got),
   `result.json` (timestamps, reward, exception). Per-trial table:
   `python3 tools/dar_job_summary.py harbor-deonticbench/jobs/qwen3.5-35b-a3b/direct/sara-t2-run1 --trials`.
+
+### 1.6 KIRA harness (`baseline_kira`) with a locally served Qwen ✅ 2026-10-16
+
+`baseline_kira` is upstream's `AgentHarness` in
+`harbor-deonticbench/meta-harness/reference_examples/terminal_bench_2/agents/baseline_kira.py`: a
+terminus-2 subclass that replaces the JSON-in-text protocol with native tool calls
+(`execute_commands{analysis, plan, commands[]}`, `task_complete`, `image_read`), polls for a
+completion marker instead of sleeping a fixed duration, and calls litellm directly (900 s
+per-call timeout, 5 retries, no `max_tokens`). It is the agent behind the paper's KIRA column.
+It runs from the fork's own `uv` env with the meta-harness directory on `PYTHONPATH`; no
+second environment is needed (its pinned PyPI `harbor==0.3.0` is not installed).
+
+What had to change to run it against Qwen3.5-35B-A3B on vLLM:
+
+1. **Server-side tool parsing.** vLLM must be started with `--enable-auto-tool-choice
+   --tool-call-parser qwen3_xml` (Qwen3.5 emits `<tool_call><function=…><parameter=…>` XML).
+   A probe with the kira tool schema returns a proper `tool_calls` entry and the thinking in
+   `reasoning`; litellm exposes it as `reasoning_content`, so trajectories keep the thinking.
+2. **Array-of-objects arguments come back malformed.** For `commands` (array of
+   `{keystrokes, duration}`) the model nests `<parameter=keystrokes>` inside
+   `<parameter=commands>`; the parser returns a single object instead of an array, with the
+   inner tag left as literal text: `{"keystrokes": "\n<parameter=keystrokes>\ncat
+   /app/statute.txt\n", "duration": 2.0}`. Stock `baseline_kira` crashes on the object
+   (`AttributeError: 'str' object has no attribute 'get'`, `kira-smoke`, both trials, before
+   the first command). After wrapping it in a list (`kira-smoke2`) both trials passed, but
+   every command was preceded by a bogus `<parameter=keystrokes>` line that bash rejected
+   (`syntax error near unexpected token 'newline'`), visible in every observation.
+3. **Fix, outside the subtree**: `tools/dar_kira_local.py` subclasses `AgentHarness` and
+   overrides `_parse_tool_calls` to (a) accept an object, a list of objects, a list of strings
+   or a JSON-encoded string under `commands`, and (b) strip stray `<parameter=…>` /
+   `</parameter>` lines and leading newlines from each keystroke. Nothing else is touched.
+   This is a deviation from the paper's harness 🔶: the paper ran open models through
+   OpenRouter / vLLM with the stock agent, so part of its reported 27.8 % "execution-type
+   error" rate for open models under KIRA may be this same tool-format failure rather than
+   reasoning failure (hypothesis, worth checking against the paper's Table 3 and asking the
+   author).
+
+Smoke results (`kira-smoke2`, before the keystroke clean-up; same two tasks as the terminus-2
+smoke): sara-binary Entailment ✅ in 90 s / 5 steps / 1,521 completion tokens; sara-numeric
+**102150 ✅** in 511 s / 11 steps / 13,250 completion tokens. In the numeric trial the model
+first wrote 102546, called `task_complete`, then on terminus-2's confirmation prompt
+re-derived and corrected to 102150 — the same task that terminus-2 (`tMSxBwb`) got wrong
+after revising in the other direction. n = 1, so no conclusion about KIRA vs. terminus-2 yet.
