@@ -8,7 +8,8 @@
 # AGENT (default "t2") selects the harness:
 #   t2   = Harbor's built-in terminus-2 (DAR main line), jobs under jobs/<model>/<framing>/
 #   kira = meta-harness baseline_kira (terminus-2 subclass with native tool calling, the agent
-#          behind the paper's KIRA numbers), jobs under jobs/<model>/kira-<framing>/.
+#          behind the paper's KIRA numbers) via tools/dar_kira_local.py, which only normalises
+#          the shape of the `commands` tool argument; jobs under jobs/<model>/kira-<framing>/.
 #          Needs the vLLM server started with tool calling enabled (tools/serve_qwen35_35b.sh
 #          does this). baseline_kira calls litellm directly and ignores llm_kwargs, so the api key
 #          goes through HOSTED_VLLM_API_KEY instead.
@@ -38,9 +39,10 @@ MODEL_INFO='{"max_input_tokens": 49152, "max_output_tokens": 16384, "max_tokens"
 AGENT="${AGENT:-t2}"
 case "$AGENT" in
   t2)   AGENT_ARGS="--agent terminus-2"; JOBS="jobs/qwen3.5-35b-a3b/$FRAMING" ;;
-  kira) AGENT_ARGS="--agent-import-path agents.baseline_kira:AgentHarness"
+  kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
         JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
-        export PYTHONPATH="meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
+        TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
   *) echo "unknown AGENT=$AGENT (t2|kira)" >&2; exit 1 ;;
 esac
