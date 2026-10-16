@@ -76,7 +76,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | 2026-10-15 | direct | 2 (1 numeric + 1 binary) | `smoke` | done ✅ | pipeline check; 12 min wall, 0 exceptions, mean reward 0.5 |
 | 2026-10-16 | direct, **kira** | 2 | `kira-smoke` … `kira-smoke4` | done ✅ | smoke 1 crashed (tool-argument shape); smoke 2 ran 2/2 correct but with stray XML tags in every command; smoke 3: binary clean and correct, numeric looped to timeout (JSON-in-XML arguments); smoke 4 with the full wrapper: clean, binary ✅, numeric ✗ (99309 vs 102150). See §1.6. |
 | 2026-10-16 | direct, **kira** | 65 (SARA numeric + binary) | `sara-kira-run1` | done ✅ | full KIRA pass, `--n-concurrent 4`, wrapper `tools/dar_kira_local.py`; 56 finished, **9 HTTP 400 exceptions** (malformed tool-call history, see §1.6 item 5) |
-| 2026-10-16 | direct, **kira** | 9 (the failed ones) | `sara-kira-rerun9` | running | rerun after the history repair in `tools/dar_kira_local.py` |
+| 2026-10-16 | direct, **kira** | 9 (the failed ones) | `sara-kira-rerun9` | done ✅ | rerun after the history repair in `tools/dar_kira_local.py`; 9/9 finished, 0 exceptions, binary 4/4, numeric 2/5 |
 | 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | done ✅ 2026-10-16 | first full pass, `--n-concurrent 4`; 2 h 25 min wall, 0 exceptions, 0 timeouts, mean reward 0.492 |
 
 ### 1.3.1 Serving facts learned from the smoke test ✅ 2026-10-15
@@ -164,13 +164,17 @@ Binary confusion (expected → got): E→E 11, C→C 11, C→E 3, E→C 1 — th
 lean as terminus-2. Numeric misses (21): relative error < 1 %: 6, 1–5 %: 5, 5–20 %: 9,
 ≥ 20 %: 1; 17 of 21 under-estimate. 3 of 65 trials used `python3`.
 
-**terminus-2 vs. KIRA on the 56 tasks both finished**: agree on 46 (23 both right, 23 both
-wrong); KIRA right where terminus-2 was wrong on 8 (7 of them numeric), the reverse on 2.
-Numeric: 2/30 → 9/30 on the common tasks. With temperature 1.0 and n = 30 this is suggestive,
-not significant 🔶; the paper's direction for this model (KIRA *below* prompt-based direct)
-cannot be checked until run 3 exists. KIRA numeric trials are also shorter (median 548 s vs.
-676 s agent time, 9k vs. 11k completion tokens) because the marker polling removes the fixed
-per-command waits.
+**KIRA complete, with the 9 reruns (`sara-kira-rerun9`, 0 exceptions) merged in** ✅:
+sara-binary **26/30 = 0.867** (macro-F1 0.867), sara-numeric **11/35 = 0.314**. The reruns
+are a second draw for those 9 tasks under the repaired wrapper, not a re-score, so the merged
+table mixes two runs of the harness 🔶; the next full KIRA pass should be run clean.
+
+**terminus-2 vs. KIRA over all 65 tasks**: agree on 54 (29 both right, 25 both wrong); KIRA
+right where terminus-2 was wrong on 8 (7 numeric), the reverse on 3. Numeric 6/35 → 11/35.
+With temperature 1.0 and n = 35 this is suggestive, not significant 🔶; the paper's direction
+for this model (KIRA *below* prompt-based direct) cannot be checked until run 3 exists. KIRA
+numeric trials are shorter (median 548 s vs. 676 s agent time, 9k vs. 11k completion tokens)
+because the marker polling removes the fixed per-command waits.
 
 ### 1.5 Observations and failure modes ✅ 2026-10-16 (n = 65, from `sara-t2-run1`)
 
