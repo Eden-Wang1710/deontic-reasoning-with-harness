@@ -7,6 +7,10 @@
 #
 # AGENT (default "t2") selects the harness:
 #   t2   = Harbor's built-in terminus-2 (DAR main line), jobs under jobs/<model>/<framing>/
+#   t2fix = terminus-2 with a truthful output-truncation marker (tools/dar_terminus2_local.py;
+#          same 10,000-byte limit, but the "N interior bytes omitted" count is no longer
+#          overwritten by a second truncation pass; decision 2026-10-16 in claude_docs/05 §8),
+#          jobs under jobs/<model>/t2fix-<framing>/.
 #   kira = meta-harness baseline_kira (terminus-2 subclass with native tool calling, the agent
 #          behind the paper's KIRA numbers) via tools/dar_kira_local.py, which only normalises
 #          the shape of the `commands` tool argument; jobs under jobs/<model>/kira-<framing>/.
@@ -17,6 +21,7 @@
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
 #   AGENT=kira tools/run_dar_qwen35_35b.sh direct                       # baseline_kira harness
+#   AGENT=t2fix tools/run_dar_qwen35_35b.sh direct                      # terminus-2, truthful marker
 #   tools/run_dar_qwen35_35b.sh direct                                  # SARA numeric + binary (65 tasks)
 #   SUBSET=all tools/run_dar_qwen35_35b.sh direct                       # all 173 tasks
 #
@@ -39,12 +44,16 @@ MODEL_INFO='{"max_input_tokens": 49152, "max_output_tokens": 16384, "max_tokens"
 AGENT="${AGENT:-t2}"
 case "$AGENT" in
   t2)   AGENT_ARGS="--agent terminus-2"; JOBS="jobs/qwen3.5-35b-a3b/$FRAMING" ;;
+  t2fix) AGENT_ARGS="--agent-import-path dar_terminus2_local:Terminus2TruthfulMarker"
+        JOBS="jobs/qwen3.5-35b-a3b/t2fix-$FRAMING"
+        TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
         JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
-  *) echo "unknown AGENT=$AGENT (t2|kira)" >&2; exit 1 ;;
+  *) echo "unknown AGENT=$AGENT (t2|t2fix|kira)" >&2; exit 1 ;;
 esac
 
 cd "$(dirname "$0")/../harbor-deonticbench"

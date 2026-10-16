@@ -18,7 +18,10 @@ Built on two papers by Guangyao Dou (JHU, Van Durme group), both vendored here a
 | ├ [`03_deonticbench_review.md`](claude_docs/03_deonticbench_review.md) | Close reading of the DeonticBench paper, code and data |
 | ├ [`04_dar_review.md`](claude_docs/04_dar_review.md) | Close reading of DAR and the Harbor harness |
 | ├ [`05_confidence_proposal.md`](claude_docs/05_confidence_proposal.md) | Thesis proposal (self-verification and confidence calibration in the DAR harness) and the decision log |
-| └ [`06_data_statistics.md`](claude_docs/06_data_statistics.md) | Measured dataset sizes, prompt lengths, and what DAR uses |
+| ├ [`06_data_statistics.md`](claude_docs/06_data_statistics.md) | Measured dataset sizes, prompt lengths, and what DAR uses |
+| ├ [`07_native_trajectories.md`](claude_docs/07_native_trajectories.md) | Pass-1 DAR trajectories per model: serving, harness config, runs, scores, failure modes |
+| ├ [`08_verbalized_confidence.md`](claude_docs/08_verbalized_confidence.md) | Self-verbalised confidence baseline and calibration metrics on those trajectories |
+| └ [`09_repo_additions.md`](claude_docs/09_repo_additions.md) | Map of every file we added outside the vendored subtrees |
 | [`tools/`](tools/) | Project-owned scripts (outside the subtrees) |
 | [`CLAUDE.md`](CLAUDE.md) | Context auto-loaded by Claude Code; indexes `claude_docs/` |
 | [`DeonticBench/`](DeonticBench/) | Upstream benchmark (prompt-based eval), git subtree |

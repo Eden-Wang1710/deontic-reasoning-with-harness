@@ -67,6 +67,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | `--n-concurrent` | 4 | Number of trials (task containers + agent loops) running in parallel; vLLM batches their requests. MoE with 3B active is bandwidth-bound, so 4-way batching is nearly free. |
 | Agent timeout | task default 600 s × `--agent-timeout-multiplier 3` = 1,800 s | Local throughput is far below the cloud APIs the paper used; 600 s would inflate timeouts. The 600 s accuracy can be recomputed post hoc from trajectory timestamps. |
 | Jobs dir | `harbor-deonticbench/jobs/qwen3.5-35b-a3b/<framing>/` (gitignored) | — |
+| `AGENT=t2fix` | `--agent-import-path dar_terminus2_local:Terminus2TruthfulMarker` = `tools/dar_terminus2_local.py`, a Terminus2 subclass whose `_limit_output_length` is idempotent; jobs under `jobs/qwen3.5-35b-a3b/t2fix-<framing>/` | Decision 2026-10-16 (`05` §8): stock terminus-2 truncates each observation twice, so the statute arrives with a "71 interior bytes omitted" marker while 17,205 bytes are missing (§1.5). The subclass keeps the 10,000-byte limit and only makes the count truthful (verified offline on `tax-case-10/statute.txt`: once → 17,205, twice → 71, fixed → 17,205). |
 | `AGENT=kira` | `--agent-import-path dar_kira_local:AgentHarness` = `tools/dar_kira_local.py`, a subclass of meta-harness `agents.baseline_kira:AgentHarness` (the paper's KIRA harness: terminus-2 with native tool calling); jobs under `jobs/qwen3.5-35b-a3b/kira-<framing>/`; api key via `HOSTED_VLLM_API_KEY` because baseline_kira calls litellm directly and ignores `llm_kwargs` | The subclass only fixes the *shape* of the `commands` tool argument (see §1.6); prompt, tools and loop are upstream's. |
 
 ### 1.3 Runs
@@ -78,6 +79,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | 2026-10-16 | direct, **kira** | 65 (SARA numeric + binary) | `sara-kira-run1` | done ✅ | full KIRA pass, `--n-concurrent 4`, wrapper `tools/dar_kira_local.py`; 56 finished, **9 HTTP 400 exceptions** (malformed tool-call history, see §1.6 item 5) |
 | 2026-10-16 | **prompt-based direct** (DeonticBench `generate_e2e.py --task direct`, no harness) | 65 (SARA numeric + binary), 4 generations each | `DeonticBench/outputs/<domain>/direct/vllm/qwen3.5-35b-a3b/` | running (started 19:55 UTC) | run 3: the paper's "direct" column; T 0.7, thinking on, `n=4`; `experiments/run_vllm.sh` could not be used (its health check ignores the API key), `tenacity` installed into `myenv` |
 | 2026-10-16 | direct, **kira** | 9 (the failed ones) | `sara-kira-rerun9` | done ✅ | rerun after the history repair in `tools/dar_kira_local.py`; 9/9 finished, 0 exceptions, binary 4/4, numeric 2/5 |
+| 2026-10-16 | direct, **t2fix** | 1 | `t2fix-smoke` | running | import-path smoke test of `tools/dar_terminus2_local.py` |
 | 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | done ✅ 2026-10-16 | first full pass, `--n-concurrent 4`; 2 h 25 min wall, 0 exceptions, 0 timeouts, mean reward 0.492 |
 
 ### 1.3.1 Serving facts learned from the smoke test ✅ 2026-10-15
