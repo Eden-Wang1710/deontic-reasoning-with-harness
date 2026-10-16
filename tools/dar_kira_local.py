@@ -7,7 +7,8 @@ objects. Qwen3.5 served through vLLM's ``qwen3_xml`` tool parser emits a single 
 then crashes with ``AttributeError: 'str' object has no attribute 'get'`` before the
 first command runs (observed 2026-10-16, see claude_docs/07 §1).
 
-This subclass only reshapes the arguments into the expected form; prompts, tools,
+This subclass only reshapes the arguments into the expected form and strips stray
+``<parameter=...>`` tags from keystrokes; prompts, tools,
 loop logic and everything else are inherited unchanged.
 
 Usage (from ``harbor-deonticbench/``, with ``tools/`` and
@@ -19,9 +20,28 @@ Usage (from ``harbor-deonticbench/``, with ``tools/`` and
 """
 
 import json
+import re
 from typing import Any
 
 from agents.baseline_kira import AgentHarness as _BaselineKira
+
+
+_STRAY_TAG = re.compile(r"^\s*</?parameter(=\w+)?>\s*$", re.MULTILINE)
+
+
+def clean_keystrokes(ks: str) -> str:
+    """Drop stray XML parameter tags the qwen3_xml parser leaves inside keystrokes.
+
+    For an array-of-objects argument the model nests ``<parameter=keystrokes>`` inside
+    ``<parameter=commands>``; vLLM's parser keeps the inner tag as literal text, so the
+    keystrokes arrive as ``"\\n<parameter=keystrokes>\\ncat /app/statute.txt\\n"`` and the
+    shell would run a bogus ``<parameter=keystrokes>`` line first (observed 2026-10-16).
+    """
+    ks = _STRAY_TAG.sub("", ks)
+    ks = ks.lstrip("\n")
+    if ks and not ks.endswith("\n"):
+        ks += "\n"
+    return ks
 
 
 def normalise_commands(cmds: Any) -> list[dict[str, Any]]:
@@ -38,9 +58,14 @@ def normalise_commands(cmds: Any) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     for c in cmds:
         if isinstance(c, dict):
-            out.append(c)
+            c = dict(c)
+            c["keystrokes"] = clean_keystrokes(str(c.get("keystrokes", "")))
         elif isinstance(c, str):
-            out.append({"keystrokes": c if c.endswith("\n") else c + "\n", "duration": 1.0})
+            c = {"keystrokes": clean_keystrokes(c), "duration": 1.0}
+        else:
+            continue
+        if c["keystrokes"]:
+            out.append(c)
     return out
 
 
