@@ -7,8 +7,9 @@ objects. Qwen3.5 served through vLLM's ``qwen3_xml`` tool parser emits a single 
 then crashes with ``AttributeError: 'str' object has no attribute 'get'`` before the
 first command runs (observed 2026-10-16, see claude_docs/07 §1).
 
-This subclass only reshapes the arguments into the expected form and strips stray
-``<parameter=...>`` tags from keystrokes; prompts, tools,
+This subclass only reshapes the arguments into the expected form, recovers ``commands``
+when the model wrote JSON inside one XML parameter, and strips stray ``<parameter=...>``
+tags from keystrokes; prompts, tools,
 loop logic and everything else are inherited unchanged.
 
 Usage (from ``harbor-deonticbench/``, with ``tools/`` and
@@ -38,10 +39,41 @@ def clean_keystrokes(ks: str) -> str:
     shell would run a bogus ``<parameter=keystrokes>`` line first (observed 2026-10-16).
     """
     ks = _STRAY_TAG.sub("", ks)
-    ks = ks.lstrip("\n")
-    if ks and not ks.endswith("\n"):
-        ks += "\n"
-    return ks
+    # exactly one trailing newline: the model tends to add one more "\n" per turn, and a bare
+    # "\n" (press Enter / wait) stays a bare "\n"
+    return ks.strip("\n") + "\n"
+
+
+_KEYSTROKES_RE = re.compile(r'\\?"keystrokes\\?"\s*:\s*\\?"(.*?)\\?"\s*,\s*\\?"duration\\?"', re.DOTALL)
+
+
+def repair_arguments(parsed: dict[str, Any]) -> dict[str, Any]:
+    """Recover ``commands`` when the model wrote JSON inside one XML parameter.
+
+    Observed 2026-10-16 (kira-smoke3): the model opens ``<parameter=analysis>`` and then
+    continues in JSON style, so the parser returns
+    ``{"analysis": 'I read the statute...", "plan": "...", "commands": {...}}'}`` and
+    ``commands`` is missing. The value is the remainder of a JSON object, so re-attaching
+    the opening ``{"analysis": "`` usually makes it parse; failing that, the keystrokes are
+    pulled out with a regex.
+    """
+    if "commands" in parsed:
+        return parsed
+    for key, val in list(parsed.items()):
+        if not isinstance(val, str) or "commands" not in val:
+            continue
+        for candidate in (f'{{"{key}": "{val}', f'{{"{key}": "{val}}}'):
+            try:
+                fixed = json.loads(candidate)
+            except json.JSONDecodeError:
+                continue
+            if isinstance(fixed, dict) and "commands" in fixed:
+                return {**parsed, **fixed}
+        m = _KEYSTROKES_RE.findall(val)
+        if m:
+            cmds = [json.loads(f'"{k}"') if "\\" in k else k for k in m]
+            return {**parsed, "commands": cmds}
+    return parsed
 
 
 def normalise_commands(cmds: Any) -> list[dict[str, Any]]:
@@ -85,6 +117,7 @@ class AgentHarness(_BaselineKira):
                 except (json.JSONDecodeError, TypeError):
                     parsed = None
                 if isinstance(parsed, dict):
+                    parsed = repair_arguments(parsed)
                     parsed["commands"] = normalise_commands(parsed.get("commands", []))
                     tc = {**tc, "function": {**fn, "arguments": json.dumps(parsed)}}
             fixed.append(tc)
