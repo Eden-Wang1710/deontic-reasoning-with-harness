@@ -50,7 +50,7 @@ Planned run order for each model:
 | Precision | **bf16** (paper-comparable; FP8 MoE kernels on GB10 untested 🔶). |
 | Thinking | **On** (model default). `--reasoning-parser qwen3` routes `<think>` into `reasoning_content` so the harness only sees the answer text. |
 | Tool calling | `--enable-auto-tool-choice --tool-call-parser qwen3_xml` (added 2026-10-16 for the KIRA harness; terminus-2 does not send `tools`). `--override-generation-config '{"max_new_tokens": 16384}'` gives requests that omit `max_tokens` (baseline_kira) the same 16k per-turn cap as terminus-2. |
-| Sampling | Model `generation_config.json`: temperature 1.0, top_p 0.95, top_k 20 — Qwen's "thinking mode, general tasks" recommendation. Harbor's terminus-2 default temperature is also 1.0. |
+| Sampling | Server defaults from `generation_config.json`: temperature 1.0, top_p 0.95, top_k 20. **But both harnesses send `temperature: 0.7`** (Terminus2's constructor default, inherited by baseline_kira; confirmed in `episode-N/debug.json`, ✅ 2026-10-16) and no `max_tokens`, so the agent runs used T 0.7 with the server's top-p/top-k. Only the verbalised-confidence calls ([08](08_verbalized_confidence.md)) use T 1.0. Earlier text here claiming T 1.0 for the runs was wrong. |
 | Context | `--max-model-len 65536`, `--max-num-seqs 8`, `--gpu-memory-utilization 0.75` (unified memory; leaves ~30 GB for OS and task containers). |
 | Endpoint | `http://0.0.0.0:9009/v1`, served model name `qwen3.5-35b-a3b`, api key `token-abc123` (dummy, local only). Containers use `http://172.17.0.1:9009/v1`. |
 | Memory estimate 🔶 | weights 72 GB + runtime ~8 GB + KV cache 20 KB/token for the 10 full-attention layers (1.34 GB per 64k sequence) ≈ 90 GB in use. |
@@ -63,7 +63,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 |---|---|---|
 | Agent | `terminus-2` | DAR main line |
 | Model name | `hosted_vllm/qwen3.5-35b-a3b` | Harbor's `hosted_vllm` path validates `model_info` and routes to `api_base` |
-| `model_info` | max_input 49,152 / max_output 16,384 / max 65,536 tokens, zero cost | terminus-2 uses these to decide when to summarise context; 16k per turn is a compromise between Qwen's 32k recommendation and the time limit |
+| `model_info` | max_input 49,152 / max_output 16,384 / max 65,536 tokens, zero cost | terminus-2 uses these only to decide when to summarise context; it does **not** send `max_tokens` (✅ debug.json), so per-turn output was bounded by the server (max-model-len − prompt during `sara-t2-run1`; 16,384 default since the 2026-10-16 restart) |
 | `--n-concurrent` | 4 | Number of trials (task containers + agent loops) running in parallel; vLLM batches their requests. MoE with 3B active is bandwidth-bound, so 4-way batching is nearly free. |
 | Agent timeout | task default 600 s × `--agent-timeout-multiplier 3` = 1,800 s | Local throughput is far below the cloud APIs the paper used; 600 s would inflate timeouts. The 600 s accuracy can be recomputed post hoc from trajectory timestamps. |
 | Jobs dir | `harbor-deonticbench/jobs/qwen3.5-35b-a3b/<framing>/` (gitignored) | — |
@@ -76,6 +76,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | 2026-10-15 | direct | 2 (1 numeric + 1 binary) | `smoke` | done ✅ | pipeline check; 12 min wall, 0 exceptions, mean reward 0.5 |
 | 2026-10-16 | direct, **kira** | 2 | `kira-smoke` … `kira-smoke4` | done ✅ | smoke 1 crashed (tool-argument shape); smoke 2 ran 2/2 correct but with stray XML tags in every command; smoke 3: binary clean and correct, numeric looped to timeout (JSON-in-XML arguments); smoke 4 with the full wrapper: clean, binary ✅, numeric ✗ (99309 vs 102150). See §1.6. |
 | 2026-10-16 | direct, **kira** | 65 (SARA numeric + binary) | `sara-kira-run1` | done ✅ | full KIRA pass, `--n-concurrent 4`, wrapper `tools/dar_kira_local.py`; 56 finished, **9 HTTP 400 exceptions** (malformed tool-call history, see §1.6 item 5) |
+| 2026-10-16 | **prompt-based direct** (DeonticBench `generate_e2e.py --task direct`, no harness) | 65 (SARA numeric + binary), 4 generations each | `DeonticBench/outputs/<domain>/direct/vllm/qwen3.5-35b-a3b/` | running (started 19:55 UTC) | run 3: the paper's "direct" column; T 0.7, thinking on, `n=4`; `experiments/run_vllm.sh` could not be used (its health check ignores the API key), `tenacity` installed into `myenv` |
 | 2026-10-16 | direct, **kira** | 9 (the failed ones) | `sara-kira-rerun9` | done ✅ | rerun after the history repair in `tools/dar_kira_local.py`; 9/9 finished, 0 exceptions, binary 4/4, numeric 2/5 |
 | 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | done ✅ 2026-10-16 | first full pass, `--n-concurrent 4`; 2 h 25 min wall, 0 exceptions, 0 timeouts, mean reward 0.492 |
 
@@ -281,3 +282,88 @@ task terminus-2 (`tMSxBwb`) got wrong after revising in the other direction. `ki
 (final wrapper): binary ✅ 127 s / 7 steps / 2,280 tokens, numeric ✗ 99309 in 398 s / 7 steps /
 10,045 tokens, no malformed command in either. Sampling at temperature 1.0 makes single
 trials noisy; no KIRA-vs-terminus-2 conclusion from n = 2.
+
+### 1.7 Comparison with DAR Table 1 and the list of deviations ✅ 2026-10-16
+
+The paper (`DeonticBench/docs/assets/dar_paper.pdf`, Table 1, p. 10; model row "Qwen3.5-35B" =
+Qwen3.5-35B-A3B per §3.2) reports, for SARA: direct 0.340 / 0.740, terminus-2 0.229 / 0.833,
+terminus-kira 0.114 / 0.829, claude-code 0.371 / 0.833 (SARA-Num accuracy / SARA-Bin macro-F1).
+Each trial has a 10-minute budget and timeouts, parse failures and runtime errors count as
+incorrect (p. 4). Open-source models under Terminus-KIRA had 27.8 % such errors, 24.9 %
+timeouts (Table 3).
+
+| Harness | Metric | Paper | Ours, 1,800 s limit | Ours, 600 s limit (paper rule) | Δ at 600 s, in items (n = 35 / 30) |
+|---|---|---|---|---|---|
+| terminus-2 | SARA-Num acc | 0.229 | 0.171 | **0.086** | −5 |
+| terminus-2 | SARA-Bin macro-F1 | 0.833 | 0.867 | 0.867 | +1 |
+| terminus-kira | SARA-Num acc | 0.114 | 0.314 | **0.229** | +4 |
+| terminus-kira | SARA-Bin macro-F1 | 0.829 | 0.867 | 0.733 (4 timeouts) | −3 |
+| direct (prompt) | SARA-Num acc | 0.340 | run 3 pending | — | — |
+| direct (prompt) | SARA-Bin macro-F1 | 0.740 | run 3 pending | — | — |
+
+Reading: SARA-Binary reproduces for both harnesses (within one or two items). SARA-Numeric
+does not: terminus-2 is below the paper and KIRA above it, i.e. the paper's ordering
+(terminus-2 > KIRA) is reversed here. With n = 35 one item is 2.9 points, so the KIRA gap
+(+4 items at 600 s, +7 at 1,800 s) is the only one worth explaining. Candidate causes, all
+🔶 until tested: (a) the tool-format repairs in `tools/dar_kira_local.py` — the paper ran the
+stock agent, and stock baseline_kira crashed or looped on this model in our smoke tests, so
+some of the paper's 27.8 % KIRA "execution errors" may be this; (b) local throughput: the
+paper's timeouts are counted as wrong and our 600 s re-scoring only approximates that (their
+tokens/s is unknown); (c) sampling: ours T 0.7 top-p 0.95 top-k 20 bf16 thinking-on, theirs
+unstated; (d) the 9 KIRA reruns are a second draw.
+
+**Deviations and gotchas, per harness.** Everything we changed or found that could move a
+number. "Stock" = unchanged upstream behaviour that still matters when reading results.
+
+terminus-2 (`sara-t2-run1`):
+
+1. *Stock, important:* **the model never sees the whole statute.** `cat /app/statute.txt`
+   (27,205 bytes) is cut by `_limit_output_length(max_bytes=10000)` to the first 5,000 and
+   last 5,000 bytes, and the limiter runs twice (once on the command output, once when the
+   prompt is built), so the second pass only removes the first pass's marker and the
+   observation claims "71 interior bytes omitted" when 17,205 are gone ✅ (checked on all 65
+   trials: all truncated, identical marker). What the model saw: §1 and §151(a)–(d)(3)(B),
+   then a jump to the end of §63(c)(5), §68 and §7703. **Never shown in that read: §2 (head
+   of household / surviving spouse), §152 (dependents), §3301/§3306, most of §63 (standard
+   deduction)** — exactly the provisions behind the numeric misses in §1.5. Only 27/65 trials
+   issued a follow-up targeted read (`grep` / `sed -n`); 38 answered from the truncated view.
+   The paper's terminus-2 runs used the same code, so this is part of what its numbers measure.
+2. *Stock:* temperature 0.7 and no `max_tokens` (see §1.1), thinking on, thinking of earlier
+   turns not in the history.
+3. *Stock:* 25/65 trials logged "Parser warnings: Extra text detected before JSON object"
+   (prose before the JSON; recovered), 1 "No valid JSON object found" (one wasted turn).
+4. *Ours:* agent timeout 600 s × 3; we report both limits. 20/35 numeric trials exceed 600 s.
+5. *Ours:* `--n-concurrent 4` on one GPU; affects wall time only.
+6. *Ours (serving):* bf16, vLLM 0.20.1 on GB10, `--reasoning-parser qwen3`; prefix caching
+   inactive for this hybrid architecture (correctness unaffected).
+
+KIRA (`sara-kira-run1` + `sara-kira-rerun9`):
+
+1. *Stock, important:* **output limit raised to 30,000 bytes** (`baseline_kira._limit_output_length`),
+   so the full statute fits in one `cat` ✅ (74/74 statute reads untruncated). This is the
+   largest *content* difference between the two harnesses on SARA and the most plausible reason
+   KIRA beats terminus-2 on numeric here 🔶; it also means "terminus-2 vs. KIRA" on SARA is
+   partly "truncated statute vs. full statute".
+2. *Stock:* native tool calls (`execute_commands` / `task_complete` / `image_read`), marker
+   polling instead of fixed waits (shorter wall time), litellm called directly with
+   `timeout 900 s` and 5 retries, `temperature 0.7`, no `max_tokens`.
+3. *Ours (serving):* `--enable-auto-tool-choice --tool-call-parser qwen3_xml`; server-side
+   default `max_new_tokens 16384` for requests without `max_tokens`.
+4. *Ours (wrapper `tools/dar_kira_local.py`)*, needed because Qwen3.5 via `qwen3_xml` does not
+   follow the tool schema (§1.6): `commands` object → list; stray `<parameter=…>` tags and
+   extra trailing newlines removed from keystrokes; JSON-written-inside-an-XML-parameter
+   recovered (122/122 such calls in smoke 3); the repaired arguments are also what goes into
+   the chat history (HTTP 400 otherwise, 9/65 trials in run 1). Prompt, tools, loop and
+   confirmation logic are untouched.
+5. *Ours:* the 9 trials that hit the HTTP 400 were rerun under the fixed wrapper and merged
+   (second draw for those tasks).
+6. *Stock:* 33 "no tool calls" turns across 74 trials (model answered in text only; the
+   harness re-prompts) — see the no-tool counts in `tools/dar_job_summary.py` output.
+7. *Ours (env):* run from the fork's `uv` env with the meta-harness directory on `PYTHONPATH`,
+   not from the pinned `harbor==0.3.0` PyPI env in `terminal_bench_2/pyproject.toml`.
+   `HOSTED_VLLM_API_KEY` carries the key because baseline_kira ignores `llm_kwargs`.
+
+Prompt-based direct (run 3, DeonticBench): statute fully in the prompt; `n = 4` generations at
+T 0.7; DeonticBench's own scorer uses ±$1 on numeric answers, so for the DAR comparison the
+outputs must be re-scored with exact match (decision 2026-10-14 in
+[05](05_confidence_proposal.md) §8).
