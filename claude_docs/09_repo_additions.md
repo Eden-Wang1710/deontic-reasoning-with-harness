@@ -47,6 +47,9 @@ deontic-reasoning-with-harness/
 │   ├── verbalized_confidence.py     elicit self-verbalised confidence on the last step of each
 │   │                                trajectory (t2 / kira; in-context / answer-only) and compute
 │   │                                ECE, Kuiper, Brier, AUROC, selective accuracy
+│   ├── db_direct_score.py           score a DeonticBench prompt-based direct run under both
+│   │                                grading rules (DAR exact match / DeonticBench ±1, macro-F1),
+│   │                                bootstrap CI; reuses DeonticBench's parser (needs pandas)
 │   ├── deonticbench_stats.py        dataset statistics behind claude_docs/06
 │   └── db_stats.json             ⬜ output of deonticbench_stats.py (regenerable)
 │
@@ -84,7 +87,8 @@ serve_qwen35_35b.sh ──► vLLM at :9009 ◄── run_dar_qwen35_35b.sh ─�
   `PYTHONPATH`; the run script sets that. They inherit prompts, parsing and the loop from upstream
   and override one method each, so a `git subtree pull` never touches them.
 - DeonticBench's own prompt-based runs use its `scripts/generate_e2e.py` directly (no wrapper), with
-  the model served by the same `serve_qwen35_35b.sh`.
+  the model served by the same `serve_qwen35_35b.sh`; `db_direct_score.py` scores the resulting
+  `DeonticBench/outputs/<domain>/direct/vllm/<model>/source.json`.
 
 ## 3. Conventions for new files
 
