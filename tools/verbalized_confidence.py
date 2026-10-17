@@ -257,8 +257,8 @@ def run_trial(trial, harness, condition, datasets_root, client, model, max_token
             return prev, True
     messages = build_messages(trial, harness, condition, datasets_root)
     rec = {k: v for k, v in trial.items() if k != "dir"}
-    rec.update(harness=harness, condition=condition, think=think, n_messages=len(messages),
-               attempts=(prev.get("attempts", 1) + 1) if prev else 1)
+    rec.update(harness=harness, condition=condition, think=think, max_tokens=max_tokens,
+               n_messages=len(messages), attempts=(prev.get("attempts", 1) + 1) if prev else 1)
     if prev:
         rec["previous_unparsed_content"] = prev.get("content", "")
     try:
