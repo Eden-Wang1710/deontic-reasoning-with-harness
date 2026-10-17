@@ -79,7 +79,8 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | 2026-10-16 | direct, **kira** | 65 (SARA numeric + binary) | `sara-kira-run1` | done ✅ | full KIRA pass, `--n-concurrent 4`, wrapper `tools/dar_kira_local.py`; 56 finished, **9 HTTP 400 exceptions** (malformed tool-call history, see §1.6 item 5) |
 | 2026-10-16 | **prompt-based direct** (DeonticBench `generate_e2e.py --task direct`, no harness) | 65 (SARA numeric + binary), 4 generations each | `DeonticBench/outputs/<domain>/direct/vllm/qwen3.5-35b-a3b/` | running (started 19:55 UTC) | run 3: the paper's "direct" column; T 0.7, thinking on, `n=4`; `experiments/run_vllm.sh` could not be used (its health check ignores the API key), `tenacity` installed into `myenv` |
 | 2026-10-16 | direct, **kira** | 9 (the failed ones) | `sara-kira-rerun9` | done ✅ | rerun after the history repair in `tools/dar_kira_local.py`; 9/9 finished, 0 exceptions, binary 4/4, numeric 2/5 |
-| 2026-10-16 | direct, **t2fix** | 1 | `t2fix-smoke` | running | import-path smoke test of `tools/dar_terminus2_local.py` |
+| 2026-10-16 | direct, **t2fix** | 1 | `t2fix-smoke` | done ✅ (agent timeout) | the subclass works (marker read 17,347 bytes omitted), but the trial starved: the server's 8 sequence slots were held by the confidence queue and the prompt-based direct run, its request sat in vLLM's queue (`Waiting: 1`) for 29 min. Lesson: never share the server with a timed run. |
+| 2026-10-17 | direct, **t2fix** | 65 (SARA numeric + binary) | `sara-t2fix-run1` | done ✅ | server otherwise idle (direct run paused with SIGSTOP), `--n-concurrent 4`; 2 h 39 min wall, 1 agent timeout (numeric `tax-case-94`, 1,800 s), 0 other exceptions |
 | 2026-10-15 | direct | 65 (SARA numeric + binary) | `sara-t2-run1` | done ✅ 2026-10-16 | first full pass, `--n-concurrent 4`; 2 h 25 min wall, 0 exceptions, 0 timeouts, mean reward 0.492 |
 
 ### 1.3.1 Serving facts learned from the smoke test ✅ 2026-10-15
@@ -151,6 +152,35 @@ PDF): Qwen3.5-35B SARA-Numeric **34.0 % prompt-based "Direct" → 11.4 % under K
 figure, i.e. the "weaker model degrades on numeric tasks under a harness" finding reproduces
 qualitatively. The harness differs (terminus-2 vs. KIRA), so this is a sanity check, not a
 replication; run 3 (prompt-based direct) will check the 34.0 % side.
+
+#### terminus-2 with a truthful truncation marker (`jobs/qwen3.5-35b-a3b/t2fix-direct/sara-t2fix-run1`, 2026-10-17) ✅
+
+Same harness, prompt, sampling (T 0.7) and 10,000-byte observation limit as `sara-t2-run1`;
+the only change is `tools/dar_terminus2_local.py` (decision 2026-10-16, `05` §8): the model is
+told the true number of omitted bytes (`17347 interior bytes omitted` in 68/68 statute reads)
+instead of `71`. Server otherwise idle, so the timings are comparable with run 1. 65 trials,
+1 agent timeout (counted wrong), 2 h 39 min wall.
+
+| Subdomain | n | Correct | Accuracy | Macro-F1 | Agent wall: median / max | Trials > 600 s | Accuracy at 600 s | Mean completion tok / trial | Trials with a follow-up statute read |
+|---|---|---|---|---|---|---|---|---|---|
+| sara-binary | 30 | 27 | **0.900** | 0.900 | 210 s / 756 s | 2 | 0.867 | 3,883 | 22 (run 1: 22) |
+| sara-numeric | 35 | 7 | **0.200** | — | 687 s / 1800 s | 22 | **0.086** (3/35) | 11,507 | 11 (run 1: 5) |
+
+Per-task comparison with the stock run (same 65 tasks, one draw each):
+
+| Subdomain | Agree | Both correct | t2fix only | Stock only |
+|---|---|---|---|---|
+| sara-binary | 29/30 | 26 | 1 | 0 |
+| sara-numeric | 26/35 | 2 | 5 | 4 |
+
+Reading ✅: the truthful marker changes *behaviour* (numeric trials that go back to the statute
+with `grep -n`/`sed -n` rise from 5 to 11 of 35; typical reads are `grep -n "3306"`, `grep -n
+'152'`, `sed -n '95,200p'`) but not the *score*: numeric 6 → 7 correct at 1,800 s, 3 → 3 at
+600 s, binary 26 → 27. Among numeric trials that did re-read, 4/11 are correct versus
+3/24 without (run 1: 1/5 vs 5/30), suggestive but far inside the noise at these counts 🔶. The per-task overlap (only 2 of the 7 + 6 numeric hits shared) says the
+same thing as §1.6: at n = 35 a single draw per task is dominated by sampling noise, and any
+t2 / t2fix / KIRA ordering needs repeated draws (`--n-attempts`). Cost of the extra reads:
+median numeric agent time 676 s → 687 s, one timeout where run 1 had none.
 
 #### KIRA, full SARA pass (`jobs/qwen3.5-35b-a3b/kira-direct/sara-kira-run1`, 2026-10-16) ✅
 
@@ -298,6 +328,8 @@ timeouts (Table 3).
 |---|---|---|---|---|---|
 | terminus-2 | SARA-Num acc | 0.229 | 0.171 | **0.086** | −5 |
 | terminus-2 | SARA-Bin macro-F1 | 0.833 | 0.867 | 0.867 | +1 |
+| terminus-2, truthful marker (`t2fix`) | SARA-Num acc | (0.229) | 0.200 | **0.086** | −5 |
+| terminus-2, truthful marker (`t2fix`) | SARA-Bin macro-F1 | (0.833) | 0.900 | 0.867 (2 over 600 s) | +1 |
 | terminus-kira | SARA-Num acc | 0.114 | 0.314 | **0.229** | +4 |
 | terminus-kira | SARA-Bin macro-F1 | 0.829 | 0.867 | 0.733 (4 timeouts) | −3 |
 | direct (prompt) | SARA-Num acc | 0.340 | run 3 pending | — | — |
