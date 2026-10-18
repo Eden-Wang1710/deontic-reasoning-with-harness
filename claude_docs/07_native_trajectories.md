@@ -77,7 +77,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | 2026-10-15 | direct | 2 (1 numeric + 1 binary) | `smoke` | done ✅ | pipeline check; 12 min wall, 0 exceptions, mean reward 0.5 |
 | 2026-10-16 | direct, **kira** | 2 | `kira-smoke` … `kira-smoke4` | done ✅ | smoke 1 crashed (tool-argument shape); smoke 2 ran 2/2 correct but with stray XML tags in every command; smoke 3: binary clean and correct, numeric looped to timeout (JSON-in-XML arguments); smoke 4 with the full wrapper: clean, binary ✅, numeric ✗ (99309 vs 102150). See §1.6. |
 | 2026-10-16 | direct, **kira** | 65 (SARA numeric + binary) | `sara-kira-run1` | done ✅ | full KIRA pass, `--n-concurrent 4`, wrapper `tools/dar_kira_local.py`; 56 finished, **9 HTTP 400 exceptions** (malformed tool-call history, see §1.6 item 5) |
-| 2026-10-16 | **prompt-based direct** (DeonticBench `generate_e2e.py --task direct`, no harness) | 65 (SARA numeric + binary), 4 generations each | `DeonticBench/outputs/<domain>/direct/vllm/qwen3.5-35b-a3b/` | running (started 19:55 UTC) | run 3: the paper's "direct" column; T 0.7, thinking on, `n=4`; `experiments/run_vllm.sh` could not be used (its health check ignores the API key), `tenacity` installed into `myenv` |
+| 2026-10-16 | **prompt-based direct** (DeonticBench `generate_e2e.py --task direct`, no harness) | 65 (SARA numeric + binary), 4 generations each | `DeonticBench/outputs/<domain>/direct/vllm/qwen3.5-35b-a3b/` | done ✅ 2026-10-18 (paused with SIGSTOP 2026-10-16 23:10 → 2026-10-17 21:40 UTC while the timed t2fix run had the server; 35 h wall in total, ~11 h of it generating) | run 3: the paper's "direct" column; T 0.7, thinking on, `n=4`; `experiments/run_vllm.sh` could not be used (its health check ignores the API key), `tenacity` installed into `myenv` |
 | 2026-10-16 | direct, **kira** | 9 (the failed ones) | `sara-kira-rerun9` | done ✅ | rerun after the history repair in `tools/dar_kira_local.py`; 9/9 finished, 0 exceptions, binary 4/4, numeric 2/5 |
 | 2026-10-16 | direct, **t2fix** | 1 | `t2fix-smoke` | done ✅ (agent timeout) | the subclass works (marker read 17,347 bytes omitted), but the trial starved: the server's 8 sequence slots were held by the confidence queue and the prompt-based direct run, its request sat in vLLM's queue (`Waiting: 1`) for 29 min. Lesson: never share the server with a timed run. |
 | 2026-10-17 | direct, **t2fix** | 65 (SARA numeric + binary) | `sara-t2fix-run1` | done ✅ | server otherwise idle (direct run paused with SIGSTOP), `--n-concurrent 4`; 2 h 39 min wall, 1 agent timeout (numeric `tax-case-94`, 1,800 s), 0 other exceptions |
@@ -332,8 +332,8 @@ timeouts (Table 3).
 | terminus-2, truthful marker (`t2fix`) | SARA-Bin macro-F1 | (0.833) | 0.900 | 0.867 (2 over 600 s) | +1 |
 | terminus-kira | SARA-Num acc | 0.114 | 0.314 | **0.229** | +4 |
 | terminus-kira | SARA-Bin macro-F1 | 0.829 | 0.867 | 0.733 (4 timeouts) | −3 |
-| direct (prompt) | SARA-Num acc | 0.340 | run 3 pending | — | — |
-| direct (prompt) | SARA-Bin macro-F1 | 0.740 | run 3 pending | — | — |
+| direct (prompt) | SARA-Num acc | 0.340 (±1 rule) | **0.478** [0.371, 0.600] ±1 rule; **0.435** [0.343, 0.543] exact | no time limit | +5 |
+| direct (prompt) | SARA-Bin macro-F1 | 0.740 | **0.822** [0.764, 0.866] (acc 0.823) | no time limit | +2 to +3 |
 
 Reading: SARA-Binary reproduces for both harnesses (within one or two items). SARA-Numeric
 does not: terminus-2 is below the paper and KIRA above it, i.e. the paper's ordering
@@ -345,6 +345,21 @@ some of the paper's 27.8 % KIRA "execution errors" may be this; (b) local throug
 paper's timeouts are counted as wrong and our 600 s re-scoring only approximates that (their
 tokens/s is unknown); (c) sampling: ours T 0.7 top-p 0.95 top-k 20 bf16 thinking-on, theirs
 unstated; (d) the 9 KIRA reruns are a second draw.
+
+**Prompt-based direct (run 3, `tools/db_direct_score.py`, 2026-10-18) ✅.** 35 + 30 cases, 4
+generations each at T 0.7 with thinking (`generate_e2e.py --task direct`, statute in the
+prompt, no tools, no time limit), bootstrap = one generation per case, 1,000 replicates.
+Numeric: 0.478 [0.371, 0.600] with DeonticBench's ±1 rule, 0.435 [0.343, 0.543] with DAR's
+exact match; abstain 1.4 % (2 empty outputs of 140); 8 cases right in all 4 draws, 12 wrong in
+all 4; majority vote 0.486, pass@4 0.657; ~12k generated tokens per answer. Binary: accuracy
+0.823, macro-F1 0.822 [0.764, 0.866], no abstentions, pooled confusion Entailment→Contradiction
+12/56, Contradiction→Entailment 9/64. Both are above the paper's direct column (0.340 / 0.740)
+by 2–5 items; the ±1 vs. exact gap is 1.5 items (🔶 why we exceed the paper: sampling settings
+and the exact model build are not stated there). The comparison that matters is within our own
+runs: the same model on the same cases goes from 0.44 (prompt, exact rule) to 0.17 (terminus-2),
+0.20 (t2fix) and 0.31 (KIRA) at 1,800 s, with the same ~11–12k thinking tokens per answer, so
+the DAR degradation finding reproduces here and is larger than in the paper (0.340 → 0.229 /
+0.114). Binary moves the other way (0.82 prompt → 0.87–0.90 harness), as in the paper.
 
 **Deviations and gotchas, per harness.** Everything we changed or found that could move a
 number. "Stock" = unchanged upstream behaviour that still matters when reading results.
