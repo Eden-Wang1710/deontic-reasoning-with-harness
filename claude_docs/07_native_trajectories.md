@@ -271,20 +271,34 @@ all of §152 (dependents), all of §2 (surviving spouse / head of household), §
 employer's FUTA tax) and §63(a)–(c)(3) including the **basic standard deduction amounts**
 ($3,000 / $4,400 / 200 %). Line-level coverage of the observations confirms it: in the stock
 run 25/29 wrong and 5/6 right numeric trials never saw §63(c)(2); 0/35 saw §152, §2 or §3306.
-With the truthful marker 11/35 trials re-read, mostly §152 and §2; still 0/35 read §3301–3306.
+With the truthful marker 11/35 trials re-read (7 of the 28 wrong, 4 of the 7 right), mostly §152 and §2; still 0/35 read §3301–3306.
 
-| Error label (what the model did) | Hidden provision | Stock, of 29 | Truthful marker, of 28 |
+**Table A — did the wrong trials have the relevant text, and did they go back for it?** A
+"hidden & never read" trial carries at least one label whose provision stayed below 50 % line
+coverage in its observations; "visible or read, still wrong" trials failed on text they had
+(§68, the bracket tables, rounding, or §2 after reading it).
+
+| Wrong numeric trials | Stock (29 wrong of 35) | Truthful marker (28 wrong of 35) |
+|---|---|---|
+| Relevant provision hidden by the truncation and never read | 27 | 24 |
+| Relevant provision visible or read, still wrong | 2 (arithmetic, bracket base) | 4 (rounding, arithmetic, §68/AGI, HoH after reading §2) |
+| Re-read the statute at all (more than the initial `cat`) | 4 | 7 |
+| … of which still missed the provision they needed | 4 | 4 |
+| Never re-read | 25 | 21 |
+| (Correct trials that re-read, for contrast) | 1 of 6 | 4 of 7 |
+
+**Table B — error labels** (not exclusive; a trial can carry several).
+
+| Error label (what the model did) | Provision | Stock, of 29 wrong | Truthful marker, of 28 wrong |
 |---|---|---|---|
-| Standard deduction amount from prior knowledge or invented (e.g. $6,350 / $12,700 / $9,350 for 2017, $6,300 / $12,600 for 2015–16, $12,200 for 2013, $5,000, $8,800, $5,800), usually with a fabricated cite (§162, §163, §153, §152(a)(2)(B)) | §63(c)(2) | 16 | 14 |
-| Employer FUTA tax ignored when the case pays wages ("the agricultural labor is a red herring", "the statute only covers income tax") | §3301–3306 | 7 | 7 |
-| Filing status: head of household assumed from "same abode" without the maintain-the-household cost fact, or joint return kept for a nonresident alien | §2 | 7 | 7 |
-| Dependent misjudged (parent / uncle / grandchild with no income not counted, or counted when the facts do not allow it) | §152 | 4 | 4 |
-| Personal exemptions kept in 2018–2019 cases (statute zeroes them) | §151(d)(5) | 2 | 3 |
+| Standard deduction amount from prior knowledge or invented (e.g. $6,350 / $12,700 / $9,350 for 2017, $6,300 / $12,600 for 2015–16, $12,200 for 2013, $5,000, $8,800, $5,800), usually with a fabricated cite (§162, §163, §153, §152(a)(2)(B)) | §63(c)(2), hidden | 16 | 14 |
+| Employer FUTA tax ignored when the case pays wages ("the agricultural labor is a red herring", "the statute only covers income tax") | §3301–3306, hidden | 7 | 7 |
+| Filing status: head of household assumed from "same abode" without the maintain-the-household cost fact, or joint return kept for a nonresident alien | §2, hidden | 7 | 7 |
+| Dependent misjudged (parent / uncle / grandchild with no income not counted, or counted when the facts do not allow it) | §152, hidden | 4 | 4 |
+| Personal exemptions kept in 2018–2019 cases (statute zeroes them) | §151(d)(5), hidden | 2 | 3 |
 | Exemption phase-out or §68 limitation mis-applied (wrong rate, not applied, AGI reduced by itemised deductions first) | §151(d)(3) half visible; §68 visible | 4 | 4 |
 | Wages paid to employees deducted from gross income as a "business expense" (no basis in the statute) | — | 1 | 3 |
 | Arithmetic / rounding / bracket-table slip with all inputs right (429,313 × 0.396 computed as 169,608 or 170,000 instead of 170,008; 26,566.50 rounded down; MFS bracket base read from the wrong row) | — | 2 | 3 |
-| Trials with at least one hidden-provision label | | 26/29 | 24/28 |
-| Trials that re-read the statute at all | | 5/29 | 11/28 |
 
 Per-trial labels (trial suffix → labels; case number in brackets): stock — x6mWBs4 [10] SD, FUTA,
 wage-deduction; dZzNJ8W [15] SD; n6a8h2b [18] SD; YEAGroo [2] SD; XmAkJeY [29] SD; cask4sJ [35]
@@ -324,7 +338,7 @@ Reading:
 - **Pure computation errors exist but are few** (2 and 3), always in the mental multiplication
   of the top bracket or in rounding; python was used in 5 of the 57 wrong trials.
 - **Implication for the verifier (05 §2.1)**: a provision-coverage check ("did the agent read
-  the section its answer depends on?") would flag 26/29 and 24/28 of these misses before any
+  the section its answer depends on?") would flag 27/29 and 24/28 of these misses before any
   arithmetic check, and a cheap "every dollar amount in the answer must be quoted from the file"
   rule would catch the standard-deduction class outright 🔶.
 
