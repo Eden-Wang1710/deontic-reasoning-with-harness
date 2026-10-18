@@ -155,6 +155,15 @@ replication; run 3 (prompt-based direct) will check the 34.0 % side.
 
 #### terminus-2 with a truthful truncation marker (`jobs/qwen3.5-35b-a3b/t2fix-direct/sara-t2fix-run1`, 2026-10-17) ✅
 
+Summary against the paper (SARA, Qwen3.5-35B-A3B, terminus-2; our runs at the 1,800 s limit):
+
+| Run | Numeric correct (n = 35) | Numeric acc | Numeric trials > 600 s | Numeric timeouts / errors | Numeric agent time, median / max | Binary macro-F1 (n = 30) | Binary agent time, median / max |
+|---|---|---|---|---|---|---|---|
+| DAR paper (Table 1) | 8/35 (inferred from 0.229) | 0.229 | — (10 min limit, timeouts counted wrong) | not reported per harness | not reported | 0.833 | not reported |
+| terminus-2 stock (`sara-t2-run1`) | 6/35 | 0.171 | 20 | 0 | 676 s / 1,534 s | 0.867 | 201 s / 477 s |
+| terminus-2 truthful marker (`sara-t2fix-run1`) | 7/35 | 0.200 | 22 | 1 (case-94, hit 1,800 s) | 687 s / 1,800 s | 0.900 | 210 s / 756 s |
+
+
 Same harness, prompt, sampling (T 0.7) and 10,000-byte observation limit as `sara-t2-run1`;
 the only change is `tools/dar_terminus2_local.py` (decision 2026-10-16, `05` §8): the model is
 told the true number of omitted bytes (`17347 interior bytes omitted` in 68/68 statute reads)
@@ -286,6 +295,17 @@ coverage in its observations; "visible or read, still wrong" trials failed on te
 | … of which still missed the provision they needed | 4 | 4 |
 | Never re-read | 25 | 21 |
 | (Correct trials that re-read, for contrast) | 1 of 6 | 4 of 7 |
+
+Re-reading × correctness, all 35 numeric trials per run (the contrast row above, in full):
+
+| | Stock: re-read | Stock: no re-read | Truthful marker: re-read | Truthful marker: no re-read |
+|---|---|---|---|---|
+| correct | 1 | 5 | 4 | 3 |
+| wrong | 4 | 25 | 7 | 21 |
+
+Under the truthful marker the trials that went back to the file were right 4/11 times versus
+3/24 for those that did not (stock: 1/5 vs. 5/30). Suggestive of "re-reading helps", but with
+7 correct trials in total it is not a result 🔶.
 
 **Table B — error labels** (not exclusive; a trial can carry several).
 
