@@ -254,6 +254,80 @@ because the marker polling removes the fixed per-command waits.
   `result.json` (timestamps, reward, exception). Per-trial table:
   `python3 tools/dar_job_summary.py harbor-deonticbench/jobs/qwen3.5-35b-a3b/direct/sara-t2-run1 --trials`.
 
+### 1.5.1 Error taxonomy of the numeric misses, stock vs. truthful marker ✅ 2026-10-19
+
+Method: `tools/dar_trajectory_dossiers.py` builds one dossier per numeric trial (facts, gold
+Prolog comments, the statute lines that actually appeared in the model's observations, the
+statute-reading commands, the final analysis and the tail of the answer-writing thought); the
+57 wrong trials (29 stock `sara-t2-run1`, 28 `sara-t2fix-run1`) were then read and labelled by
+hand, checking each label against the dollar gap where possible (e.g. a $1,307 gap at 39.6 %
+= the $3,300 difference between the real-world and the statute's standard deduction). Labels
+are not exclusive; a trial can carry several.
+
+**What the 10 KB truncation hides.** The first 5,000 bytes end inside §151(d)(3) (line 86 of
+523), the last 5,000 start at §63(c)(5) (line 404). Everything in between is invisible unless
+the model re-reads: the rest of the exemption phase-out, §151(d)(5) (no exemptions 2018–2025),
+all of §152 (dependents), all of §2 (surviving spouse / head of household), §3301–3306 (the
+employer's FUTA tax) and §63(a)–(c)(3) including the **basic standard deduction amounts**
+($3,000 / $4,400 / 200 %). Line-level coverage of the observations confirms it: in the stock
+run 25/29 wrong and 5/6 right numeric trials never saw §63(c)(2); 0/35 saw §152, §2 or §3306.
+With the truthful marker 11/35 trials re-read, mostly §152 and §2; still 0/35 read §3301–3306.
+
+| Error label (what the model did) | Hidden provision | Stock, of 29 | Truthful marker, of 28 |
+|---|---|---|---|
+| Standard deduction amount from prior knowledge or invented (e.g. $6,350 / $12,700 / $9,350 for 2017, $6,300 / $12,600 for 2015–16, $12,200 for 2013, $5,000, $8,800, $5,800), usually with a fabricated cite (§162, §163, §153, §152(a)(2)(B)) | §63(c)(2) | 16 | 14 |
+| Employer FUTA tax ignored when the case pays wages ("the agricultural labor is a red herring", "the statute only covers income tax") | §3301–3306 | 7 | 7 |
+| Filing status: head of household assumed from "same abode" without the maintain-the-household cost fact, or joint return kept for a nonresident alien | §2 | 7 | 7 |
+| Dependent misjudged (parent / uncle / grandchild with no income not counted, or counted when the facts do not allow it) | §152 | 4 | 4 |
+| Personal exemptions kept in 2018–2019 cases (statute zeroes them) | §151(d)(5) | 2 | 3 |
+| Exemption phase-out or §68 limitation mis-applied (wrong rate, not applied, AGI reduced by itemised deductions first) | §151(d)(3) half visible; §68 visible | 4 | 4 |
+| Wages paid to employees deducted from gross income as a "business expense" (no basis in the statute) | — | 1 | 3 |
+| Arithmetic / rounding / bracket-table slip with all inputs right (429,313 × 0.396 computed as 169,608 or 170,000 instead of 170,008; 26,566.50 rounded down; MFS bracket base read from the wrong row) | — | 2 | 3 |
+| Trials with at least one hidden-provision label | | 26/29 | 24/28 |
+| Trials that re-read the statute at all | | 5/29 | 11/28 |
+
+Per-trial labels (trial suffix → labels; case number in brackets): stock — x6mWBs4 [10] SD, FUTA,
+wage-deduction; dZzNJ8W [15] SD; n6a8h2b [18] SD; YEAGroo [2] SD; XmAkJeY [29] SD; cask4sJ [35]
+SD, status; cEihyWr [39] status; jMBLdZH [44] status (nonresident alien); PubZBsD [47] SD, FUTA;
+Sh3HGrS [49] dependent, phase-out; S4Ac8LJ [51] SD; kp4Ei3T [58] SD, FUTA; xqFtq4R [6] §68/AGI,
+phase-out; KWkXWCv [60] dependent; dt5MGVb [61] SD, status, exemptions omitted; FVFNhgD [63]
+2018 rule; JWoibqm [64] status, phase-out; FuiwZyu [67] arithmetic; Feqfmvy [70] bracket base;
+QBB64uS [71] SD, phase-out; 74t9jGN [74] SD; PdAUjwL [75] status/dependent; N5Tkrkf [78] 2018
+rule, status; xPyBa33 [83] FUTA; XUuTHgh [91] SD, FUTA; WFrmvX5 [93] SD; HF3PXPD [94] SD,
+dependent, FUTA; jdkZZ8V [95] SD; oS6ZpSX [97] FUTA. Truthful marker — 3gC97sL [10] wage-
+deduction, FUTA; nyTdf2U [15] SD; Q7Y6CHj [18] SD, dependent; XZpTdmh [2] rounding; QZgDsJq [29]
+SD; NxBRgHY [35] SD, status, exemptions omitted; rj5AVfP [39] SD, status; kCFyz68 [44] status,
+SD; fJ3hctm [47] SD, FUTA; tPm25A7 [49] SD, dependent; Q5hz4uV [56] phase-out; fw5ygme [58] SD,
+wage-deduction, FUTA; zUmRLF5 [6] §68/AGI; KJbFhee [60] SD, dependent; dscEQQh [61] status;
+kQKWaUU [63] 2018 rule, SD table; ANUzNqN [64] status, phase-out; QZxUYzM [67] arithmetic;
+7dqgEsY [69] SD; Akyidv2 [70] bracket base, phase-out; oEza2Pz [75] status/dependent; kjKkw22
+[78] 2018 rule, status; Ci4Fpgd [83] FUTA; hxGBtTM [84] SD; ihXTCRF [90] 2018 rule; snXUPmL [91]
+FUTA; hy8XzSs [94] SD (2018 amount used for 2010), wage-deduction, FUTA, timeout; RqobqLo [97]
+FUTA.
+
+Reading:
+
+- **The dominant failure is substituting memory for the hidden text, not misreading the
+  visible text.** 16/29 and 14/28 misses use a real-world or invented standard deduction, and
+  the model backs it with a section number that does not exist in the file. The truthful
+  marker did not cure this: 13 of the 14 SD misses in the fix run issued exactly one read.
+  Being told "17,347 bytes omitted" made the model look up dependents and filing status
+  (§152, §2) but not amounts it believed it knew.
+- **FUTA is invisible to the model in both runs** (7 + 7). No trial ever read §3301–3306, and
+  several explicitly declared the wage facts a distraction. These are the cases the paper's
+  "harness lets the model navigate" premise fails on: the model does not know there is
+  something to navigate to.
+- **Re-reading helps the sub-problem that was read, not the answer.** The fix-run trials that
+  read §2/§152 got dependents right more often but still lost on FUTA or arithmetic (`3gC97sL`,
+  `dscEQQh`, `ANUzNqN`); XZpTdmh [2] read everything, computed 26,566.50 and rounded the wrong
+  way.
+- **Pure computation errors exist but are few** (2 and 3), always in the mental multiplication
+  of the top bracket or in rounding; python was used in 5 of the 57 wrong trials.
+- **Implication for the verifier (05 §2.1)**: a provision-coverage check ("did the agent read
+  the section its answer depends on?") would flag 26/29 and 24/28 of these misses before any
+  arithmetic check, and a cheap "every dollar amount in the answer must be quoted from the file"
+  rule would catch the standard-deduction class outright 🔶.
+
 ### 1.6 KIRA harness (`baseline_kira`) with a locally served Qwen ✅ 2026-10-16
 
 `baseline_kira` is upstream's `AgentHarness` in

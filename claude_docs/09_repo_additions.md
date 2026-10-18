@@ -42,6 +42,9 @@ deontic-reasoning-with-harness/
 │   │                                (AGENT=t2fix): same 10 KB limit, idempotent limiter
 │   ├── dar_kira_local.py            baseline_kira subclass (AGENT=kira): reshapes Qwen's
 │   │                                non-conforming execute_commands tool arguments
+│   ├── dar_trajectory_dossiers.py   per-trial dossiers of SARA-numeric trajectories (what
+│   │                                statute lines the model saw, its reads, final reasoning);
+│   │                                source of the error taxonomy in claude_docs/07 §1.5.1
 │   ├── dar_job_summary.py           score a Harbor job dir: accuracy / macro-F1 per subdomain,
 │   │                                timing, tokens, 600 s re-scoring; --trials for per-trial lines
 │   ├── verbalized_confidence.py     elicit self-verbalised confidence on the last step of each
