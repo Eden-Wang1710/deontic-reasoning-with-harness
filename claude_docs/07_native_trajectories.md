@@ -326,6 +326,8 @@ Under the truthful marker the trials that went back to the file were right 4/11 
 | Error label (what the model did) | Provision | Stock, of 29 wrong | Truthful marker, of 28 wrong |
 |---|---|---|---|
 | Standard deduction amount from prior knowledge or invented (e.g. $6,350 / $12,700 / $9,350 for 2017, $6,300 / $12,600 for 2015–16, $12,200 for 2013, $5,000, $8,800, $5,800), usually with a fabricated cite (§162, §163, §153, §152(a)(2)(B)) | §63(c)(2), hidden | 16 | 14 |
+| … of which a real-world or invented figure stated in the model's own analysis (e.g. "From §163: … shall be $12,700", "though the output appears incomplete … based on what's visible, $12,700") | | 13 | 12 |
+| … of which a statute figure taken from the visible §63(c)(7) ("substitute $18,000 for $4,400") but applied to the wrong status or year ($4,400 for single or joint; $18,000 for joint or for 2010) | | 3 | 2 |
 | Employer FUTA tax ignored when the case pays wages ("the agricultural labor is a red herring", "the statute only covers income tax") | §3301–3306, hidden | 7 | 7 |
 | Filing status: head of household assumed from "same abode" without the maintain-the-household cost fact, or joint return kept for a nonresident alien | §2, hidden | 7 | 7 |
 | Dependent misjudged (parent / uncle / grandchild with no income not counted, or counted when the facts do not allow it) | §152, hidden | 4 | 4 |
