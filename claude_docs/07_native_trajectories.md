@@ -437,6 +437,64 @@ task terminus-2 (`tMSxBwb`) got wrong after revising in the other direction. `ki
 10,045 tokens, no malformed command in either. Sampling at temperature 1.0 makes single
 trials noisy; no KIRA-vs-terminus-2 conclusion from n = 2.
 
+### 1.6.1 Error taxonomy of the KIRA numeric misses ✅ 2026-10-19
+
+Same method as §1.5.1 (`tools/dar_trajectory_dossiers.py` on `sara-kira-run1` with the 9
+`sara-kira-rerun9` tasks substituted; 24 wrong of 35, read and labelled by hand, labels checked
+against the dollar gap). Under KIRA's 30,000-byte limit the whole statute is in context after
+the first `cat`: every key provision reaches ≥ 50 % line coverage in all 35 trials (the only
+exception, §151(d)(3), is a measurement artefact of 160-column line wrapping), no trial issued a
+second read, and the §1.5.1 "hidden & never read" class is empty by construction. Every KIRA miss
+is therefore a provision the model had in view and misapplied.
+
+| Error label (what the model did) | Provision | KIRA, of 24 wrong | terminus-2 stock, of 29 | terminus-2 truthful marker, of 28 |
+|---|---|---|---|---|
+| Standard deduction amount from prior knowledge or invented | §63(c)(2) | **0** | 16 | 14 |
+| Employer FUTA tax ignored although the case pays wages ("red herring for FUTA purposes") | §3301–3306 | 7 | 7 | 7 |
+| Filing status: head of household from "same abode" without the cost-of-household fact; §7703(b) exception denied; HoH kept although the only dependent is a non-relative (§2(b)(3)(B)) | §2, §7703 | 8 | 7 | 7 |
+| Exemption phase-out not applied or wrong threshold | §151(d)(3) | 3 | 4 (incl. §68 cases) | 4 (incl. §68 cases) |
+| §68 itemised-deduction limitation not applied or wrong applicable amount ($125,000 instead of $150,000 for MFS) | §68 | 3 | — | — |
+| Dependent misjudged (uncle not counted; grandson excluded as "already Bob's qualifying child") | §152 | 2 | 4 | 4 |
+| Aged/blind additional standard deduction misapplied (spouse's $600 missed; $600 given to the spouse when the taxpayer is the other one) | §63(f) | 2 | 0 | 0 |
+| Wages paid to employees deducted from gross income as a "business expense" | — | 2 | 1 | 3 |
+| FUTA "employment" definition used as an income exclusion (hospital-patient wages dropped from gross income) | §3306(c)(10)(B) | 1 | 0 | 0 |
+| Joint liability halved as "Alice's share" | question reading | 1 | 0 | 0 |
+| Personal exemptions kept in 2018–2019 cases | §151(d)(5) | 0 | 2 | 3 |
+| Arithmetic / rounding | — | 1 (off by 1) | 2 | 3 |
+| Trials with a hidden, never-read provision | | 0/24 | 27/29 | 24/28 |
+| Trials that used python | | 3/24 (0 of the 11 right) | 5/29 | — |
+
+Per-trial labels (trial suffix → labels; case in brackets): xSGzNB4 [10] wage-deduction, FUTA;
+nMNCPyt [15] aged spouse; ioe5zjB [18] status, dependent; ZxRvqyT [29] FUTA; WeTQmMR [35] status;
+fccWXh7 [39] status; sbY8LeH [47] FUTA; dhWYi5u [49] phase-out; RkddfbW [56] §68; chtGXJ8 [58]
+FUTA; MYUJ4Z4 [6] §68; 9PMTUwR [60] dependent; Y9Qenf9 [61] status; rfDG28D [63] aged (wrong
+person); YLDiU22 [64] status, phase-out; fEAbasD [70] §68 threshold; 3xnGKev [71] joint tax
+halved; oG66pXa [74] §3306 used as income exclusion; Ddv63aS [78] status (§7703(b)); sxjE3c8 [83]
+rounding; U4KSAxp [90] status (§2(b)(3)(B)); jdoZ4q5 [91] phase-out, FUTA; 66TNYGE [94] status,
+FUTA; oyVVheT [97] wage-deduction, FUTA.
+
+Reading:
+
+- **Seeing the statute removes exactly one error class.** The standard-deduction-from-memory
+  class (16 and 14 under terminus-2) is gone: every KIRA trial quotes $3,000 / $4,400 / 200 %.
+  This is the 4–5 item gap between KIRA and terminus-2 on numeric, and it is the only class
+  that moved. Nothing else improved.
+- **FUTA is ignored just as often with the section in context (7 = 7 = 7).** The model reads
+  §3301–3306, then writes "the agricultural labor information seems to be a red herring for FUTA
+  tax purposes, but the question is asking about Alice's personal income tax". It is a question-
+  framing error, not a retrieval error: the model does not consider that "how much tax does Alice
+  pay" includes a tax she owes as an employer. The gold Prolog sums income tax and FUTA.
+- **Filing status is the largest KIRA class (8/24)** and is a fact-sufficiency problem: "same
+  principal place of abode" is read as "maintains the household", which §2(b) defines as
+  furnishing over half the cost. Two cases add statute misreadings on top (§7703(b) ruled
+  inapplicable, §2(b)(3)(B) non-relative exclusion missed).
+- **The visible-but-skipped limitations (§68 ×3, phase-out ×3)** are provisions the model
+  names in other trials; here it simply did not run them. These are the cases a checklist-style
+  verifier ("which limitations apply at this AGI?") is designed for 🔶.
+- **KIRA's own completion checklist** ("verify from the perspective of a test engineer, QA
+  engineer, user") produced no corrections: in all 24 the second `task_complete` restates the
+  same figures.
+
 ### 1.7 Comparison with DAR Table 1 and the list of deviations ✅ 2026-10-16
 
 The paper (`DeonticBench/docs/assets/dar_paper.pdf`, Table 1, p. 10; model row "Qwen3.5-35B" =

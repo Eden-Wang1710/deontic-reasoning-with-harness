@@ -80,7 +80,7 @@ def run(job,tag):
     for x in sorted(out,key=lambda x:(x["ok"],x["task"])):
         try: rel=100*(int(x["got"])-int(x["exp"]))/int(x["exp"])
         except: rel=float("nan")
-        print(f"{x['trial'][-7:]}  {'Y' if x['ok'] else 'N'}  {x['exp']:>8} {str(x['got']):>8} {rel:6.1f} {len(x['reads']):5d} {'y' if x['py'] else '.'}  | "+" | ".join(f"{x['key'][n][0]:3d}/{x['key'][n][1]:<3d}" for n in names))
+        print(f"{x['trial'][-7:]}  {'Y' if x['ok'] else 'N'}  {str(x['exp']):>8} {str(x['got']):>8} {rel:6.1f} {len(x['reads']):5d} {'y' if x['py'] else '.'}  | "+" | ".join(f"{x['key'][n][0]:3d}/{x['key'][n][1]:<3d}" for n in names))
     # aggregate: fraction of trials that saw >=50% of each key range, wrong vs right
     print("\nshare of trials with >=50% of the range seen: wrong | right")
     for n in names:
