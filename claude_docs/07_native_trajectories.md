@@ -193,6 +193,19 @@ median numeric agent time 676 s → 687 s, one timeout where run 1 had none.
 
 #### KIRA, full SARA pass (`jobs/qwen3.5-35b-a3b/kira-direct/sara-kira-run1`, 2026-10-16) ✅
 
+Summary against the paper (SARA, Qwen3.5-35B-A3B, Terminus-KIRA; our runs at the 1,800 s limit).
+"run1 as-is" scores the first pass under the paper's protocol (the 9 trials that crashed with
+`BadRequestError` count as wrong, binary macro-F1 with the crashed trials as misses of their
+true class, as `evaluate_deonticbench.py --strict` does); "run1 + rerun9" replaces those 9 with
+the rerun after the history repair in `tools/dar_kira_local.py` (a second draw for 9 tasks).
+
+| Run | Numeric correct (n = 35) | Numeric acc | Numeric trials > 600 s | Numeric timeouts / errors | Numeric agent time, median / max | Binary macro-F1 (n = 30) | Binary agent time, median / max |
+|---|---|---|---|---|---|---|---|
+| DAR paper (Table 1) | 4/35 (inferred from 0.114) | 0.114 | — (10 min limit) | not per harness; open-source models under KIRA pooled: 27.8 % runtime errors, 24.9 % timeouts (Table 3) | not reported | 0.829 | not reported |
+| KIRA run1 as-is (paper protocol) | 9/35 | 0.257 | 12 | 5 crashes (`BadRequestError`, malformed tool-call history), 0 timeouts | 541 s / 1,255 s | 0.786 (22/30 correct, 4 crashes) | 195 s / 652 s |
+| KIRA run1 + rerun9 (wrapper-repaired) | 11/35 | 0.314 | 15 | 0 | 556 s / 1,390 s | 0.867 (26/30) | 224 s / 652 s |
+
+
 65 trials; 56 finished, 9 raised `BadRequestError` (vLLM HTTP 400 `Expecting value` while
 rendering a malformed tool call from the history, §1.6 item 5; being rerun as
 `sara-kira-rerun9`). Numbers below are over the finished trials unless stated.
