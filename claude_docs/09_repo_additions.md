@@ -31,7 +31,8 @@ deontic-reasoning-with-harness/
 │   └── 09_repo_additions.md         this file
 │
 ├── paper_review_gpt/             ✅ GPT-written Chinese summaries of related papers (owner's;
-│   └── NN_snake_case.md             do not edit; exception to the English-only rule)
+│   ├── NN_snake_case.md             do not edit; exception to the English-only rule)
+│   └── 11_selfcompact.md            SelfCompact: rubric-gated context compaction (added 2026-10-22)
 │
 ├── tools/                        ✅ project-owned scripts; nothing of ours goes in the subtrees
 │   ├── serve_qwen35_35b.sh          start vLLM for Qwen3.5-35B-A3B on 0238 (bf16, thinking

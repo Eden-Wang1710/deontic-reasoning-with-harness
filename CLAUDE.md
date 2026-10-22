@@ -25,6 +25,7 @@ on this summary alone.
 | `claude_docs/07_native_trajectories.md` | Log of pass-1 ("native") DAR trajectories per model: how each model was served (vLLM settings), harness configuration, runs, scores, and observed failure modes | Running or analysing a baseline trajectory; choosing serving/harness settings for a new model |
 | `claude_docs/08_verbalized_confidence.md` | Self-verbalised confidence baseline on the native trajectories: method (in-context vs. answer-only elicitation), calibration results (ECE, Kuiper, Brier, AUROC, selective accuracy) per harness and subdomain, observations | Running or comparing any confidence estimate; before designing the rubric → confidence mapping |
 | `claude_docs/09_repo_additions.md` | File map of everything we added outside (and the two edits inside) the vendored subtrees: what each `tools/` script does, how they fit together, which paths are gitignored artifacts | Adding, renaming or looking for one of our own files; orienting in the repo |
+| `paper_review_gpt/11_selfcompact.md` | GPT-written Chinese review of SelfCompact: rubric-gated context compaction, execution flow, evaluation budgets, and limits | Reviewing context management; verify technical claims against the linked paper/code |
 
 ### Doc conventions
 
