@@ -10,7 +10,7 @@
 | Name | Hardware | Role | Status |
 |---|---|---|---|
 | **0238** (`spark-0238`) | NVIDIA DGX Spark: 1× GB10 (Grace Blackwell), 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe, aarch64 ✅ | Docker available → runs the DAR harness (Harbor tasks in containers); small-model serving; all docs and code | Partially set up, see §2 |
-| **601-606** | 4× A100 + 48× RTX 6000 🔶 (as described by the owner; verify on login) | GPU work: hosting Qwen3.5-35B-A3B with hidden-state access, probe training, distillation (see [05](05_confidence_proposal.md) §4.2, §5) | **Not yet set up.** Log in there, run Claude Code from the repo, and fill in §3 from that machine. |
+| **BRTX** (`brtx601`–`brtx606.idies.jhu.edu`) | 6 Slurm nodes, x86_64, RHEL 9.8. **602**: 4× A100 80GB PCIe, 2× Xeon Silver 4214 (24 threads), 754 GB RAM ✅ 2026-10-23. 601: 8× Quadro RTX 6000 24GB; 603–606: 10× RTX 6000 each (48 total) ✅ from `sinfo`. Every node: 2× 3.5 TB NVMe | GPU work on **602** (`ba100` partition): hosting Qwen3.5-35B-A3B with hidden-state access, probe training, distillation (see [05](05_confidence_proposal.md) §4.2, §5). RTX 6000 nodes for small jobs. **No Docker for us** → DAR harness runs on 0238 only | Account works, repo cloned; **no Python env yet, local disks full**, see §3 |
 
 Both machines clone the same GitHub repo. **The repo is the only shared state**: commit and push
 on one machine before switching to the other; `git pull` first thing on the other. Nothing else is
@@ -53,21 +53,99 @@ Upstream's README differs from this repo in two places (still true ✅):
 
 Update the table in §2 once each item is done.
 
-## 3. 601-606 — to be written from that machine
+## 3. BRTX (601–606) — current state ✅ 2026-10-23, written on brtx602
 
-Placeholder. On first login, record here with ✅ and a date:
+Sources: checked on `brtx602` on 2026-10-23, plus the lab's BRTX wiki (`/srv/local1/zwang544/BRTX.pdf`,
+a Teams export; the wiki itself is from 2023, so prefer the live checks where they differ).
 
-- hostname(s), OS and architecture (x86_64 expected 🔶), login path (direct SSH or via a jump host,
-  Slurm or not)
-- GPUs actually visible (`nvidia-smi`), driver and CUDA version
-- whether Docker (or Podman/Apptainer) is available without sudo — decides whether the DAR harness
-  can run here or only on 0238
-- Python / conda / `uv` / `swipl` availability
-- scratch and home disk quotas, where model weights should live
-- git identity and push auth, same checks as §2
-- how to serve Qwen3.5-35B-A3B with hidden-state access (vLLM vs. plain `transformers`) 🔶
+### 3.1 Access and scheduling
 
-Then update the machine table in §1.
+| Item | State |
+|---|---|
+| Hostnames | `brtx601.idies.jhu.edu` … `brtx606.idies.jhu.edu`. Currently on `brtx602` (IPs 172.23.93.102 / 10.99.93.102). |
+| Login path | **No direct SSH.** Jump through `dslogin01.pha.jhu.edu` (IDIES) or a CLSP login node. Current access is via VS Code Remote. Suggested `~/.ssh/config` on the client: `Host brtx*.idies` / `Hostname %h.jhu.edu` / `ProxyJump dslogin01.pha.jhu.edu`, then `ssh brtx602.idies`. |
+| User / group | `zwang544`, group `vandurme` (no `docker` group). |
+| Scheduler | **Slurm, mandatory for all GPU use** (wiki rule). `srun`/`sbatch`/`sinfo`/`squeue` in `/usr/bin`. Slurm sets `CUDA_VISIBLE_DEVICES`. |
+| Partitions (`sinfo` ✅) | `ba100` → brtx602, 4× A100, **24 h limit**, LLM jobs. `brtx6-dev` → brtx601, 8× RTX 6000, 12 h, interactive only (≤1 GPU, ≤1 session, and `srun` for it must be launched **from brtx601**). `brtx6` → brtx604-605, 10× RTX 6000 each, 24 h batch. `brtx6-ir` → brtx603 (IR group). `brtx-pod` → brtx606. |
+| Typical commands | Interactive (from 601): `srun --pty --gpus=1 -p brtx6-dev bash`. Batch on the A100s: `sbatch --gpus=N -p ba100 script.sh` (`--nodelist=brtx602` is implied by the partition). Defaults via `export SLURM_PARTITION=brtx6-dev` / `export SBATCH_PARTITION=ba100`. Status: `squeue -O 'JobID,Name,UserName,tres-per-job,TimeUsed,ReasonList'`. |
+| Contention | On 2026-10-23 three of the four A100s were in use by another user's `ba100` jobs; plan for queueing. Node-wide `gpustat`/`nvidia-smi -l 5`; cross-node dashboard: `gpustat-web` (wiki §GPUs). Helper scripts: <https://github.com/JHU-CLSP/brtx-utils>. |
+| Networking | Most ports between nodes are blocked; **TCP 50000–51024 are open between all six nodes** (use these for a vLLM server that other nodes/jobs talk to). Inside a node, use `127.0.0.1` not `localhost` (IPv6 hang with Docker-published ports). |
+
+### 3.2 Hardware and drivers on brtx602 ✅
+
+| Item | State |
+|---|---|
+| OS / arch | RHEL 9.8 (Plow), kernel 5.14, **x86_64** (so wheels and images from 0238's ARM setup do not transfer; environments are rebuilt per machine). |
+| CPU / RAM | 2× Intel Xeon Silver 4214 @ 2.2 GHz, 24 threads; 754 GB RAM (Slurm `RealMemory` 739 GB). 602–606 share this CPU spec. |
+| GPUs | 4× **NVIDIA A100 80GB PCIe** (81920 MiB each). Driver 595.58.03, CUDA driver API 13.2. Toolkit at `/usr/local/cuda-13.2` (`/usr/local/cuda` symlink) but `nvcc` is **not on PATH** — add `/usr/local/cuda/bin` if compiling kernels. |
+| Containers | ❌ `docker`, `podman`, `apptainer`, `enroot` all absent from PATH on 602; docker service inactive, no socket, and we are not in a `docker` group. `/srv/local2/docker` exists on every node, so Docker may exist for other users/nodes 🔶 — ask on Teams if the harness must run here. **Decision for now: the DAR harness (Harbor + task containers) runs only on 0238; BRTX is for GPU jobs.** |
+
+### 3.3 Software ✅ (all "missing" below are things we still have to install)
+
+| Item | State | Action needed |
+|---|---|---|
+| Python | system `/usr/bin/python3` = **3.9.25**, no `pip`, `venv` works. Too old for Harbor (≥3.12) and the vLLM stack. | Install **miniconda** (or `uv`) under our own directory, see §3.5. |
+| conda / `uv` | ❌ neither | `uv`: `curl -LsSf https://astral.sh/uv/install.sh \| sh` (→ `~/.local/bin/uv`, already on PATH). conda: Miniconda x86_64 installer. |
+| `swipl` | ❌ | `conda install -c conda-forge swi-prolog` in the project env (needed only for DeonticBench's own Prolog eval). |
+| `torch` / `vllm` | ❌ | Into the project env, CUDA 12.x/13.x wheels (x86_64; driver 595 supports both). |
+| `gh` | ❌ | Optional. |
+| `git` | 2.52.0 ✅ | — |
+| `rsync` / `scp` | ✅ | For moving weights/outputs between nodes and to 0238. |
+| Environment modules | none (`module` not found); nothing under `/opt` except `nvidia`. | — |
+| Shell profile | `~/.bashrc` is the 2020 default; no API keys, no `SLURM_PARTITION`. | Add exports: API keys (§4), `SBATCH_PARTITION=ba100`, `RAYON_RS_NUM_CPUS=1` (wiki: fast tokenizers otherwise spawn a thread per core and thrash the node), `HF_HOME` pointing at scratch (§3.4). |
+
+### 3.4 Storage ✅ — **this is the blocker**
+
+| Location | Size / free on 2026-10-23 | Notes |
+|---|---|---|
+| `/home/zwang544` | **25 GB** NFS quota, 3.7 GB used, 22 GB free | Shared across all six nodes. Slow. Fine for configs, `uv`, maybe a small conda; **not** for weights or run outputs. |
+| `/srv/local1` on 602 | 3.5 TB NVMe, **100% full, 249 MB free** | Our repo lives here (`/srv/local1/zwang544/deontic-reasoning-with-harness`, 82 MB). Nothing more fits until other users free space. |
+| `/srv/local2` on 602 | 3.5 TB NVMe, **100% full, 1.5 GB free** | Holds `/srv/local2/docker`; wiki says prefer `local1` anyway. |
+| Other nodes' NVMe, cross-mounted at `/brtx/60{1..6}-nvme{1,2}` (NFS) | 605-nvme1 **639 GB** free, 605-nvme2 327 GB, 601-nvme2 277 GB, 601-nvme1 252 GB, 606-nvme2 235 GB; everything else ≤100 GB | Readable/writable from 602 but over NFS, so slower than local NVMe. A 72 GB bf16 checkpoint read once at vLLM start-up is acceptable from here. |
+
+Plan: ask on Teams whether 602's `/srv/local1` can be cleaned up (we need ~150 GB: weights + env + outputs). Until then,
+**put model weights and HF cache on `/brtx/605-nvme1/zwang544/`** (create it) and point `HF_HOME` there; keep the repo
+on 602's `local1`. Weekly cron on each node runs `docker system prune -f` (Mon 02:00) — irrelevant to us without Docker.
+
+### 3.5 Git ✅
+
+| Item | State | Action needed |
+|---|---|---|
+| Repo | `/srv/local1/zwang544/deontic-reasoning-with-harness`, `main` tracking `origin/main`, clean at `8a07362` | — |
+| Identity | **not set** | `git config --global user.name "Zixuan Wang"` and `git config --global user.email <email>` before the first commit. |
+| Push auth | HTTPS remote, no credential helper, **no `~/.ssh` directory at all** | Same as 0238: either `git config --global credential.helper store` + PAT, or `ssh-keygen` and switch the remote to `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`. The home dir is shared across nodes, so this is done once for all six. |
+
+### 3.6 Project environment on BRTX (to do)
+
+Mirrors §2.1 but x86_64 and disk-aware. Run on 602 (CPU-only steps don't need Slurm):
+
+```bash
+# one-off: scratch dir on a node with free space, and tools in $HOME (25 GB quota)
+mkdir -p /brtx/605-nvme1/zwang544/{models,hf_cache,outputs}
+echo 'export HF_HOME=/brtx/605-nvme1/zwang544/hf_cache' >> ~/.bashrc
+echo 'export SBATCH_PARTITION=ba100 RAYON_RS_NUM_CPUS=1' >> ~/.bashrc
+curl -LsSf https://astral.sh/uv/install.sh | sh              # uv → ~/.local/bin
+# miniconda: install to /srv/local1/zwang544/miniconda3 once space exists, else ~/miniconda3 (watch the 25 GB quota)
+
+# project env (same recipe as 0238)
+conda create -n deontic python=3.12 -y && conda activate deontic
+conda install -c conda-forge swi-prolog -y
+grep -v '^vllm' DeonticBench/requirements.txt | pip install -r /dev/stdin
+pip install vllm torch                                        # serving env; or a separate `myenv` as on 0238
+cd harbor-deonticbench && uv sync --all-extras --dev && cd ..  # Harbor CLI only; tasks can't run here (no Docker)
+
+# weights
+hf download Qwen/Qwen3.5-35B-A3B --local-dir /brtx/605-nvme1/zwang544/models/Qwen3.5-35B-A3B
+```
+
+### 3.7 Serving Qwen3.5-35B-A3B with hidden-state access 🔶
+
+Not yet tried. Starting point: one A100 80GB holds the bf16 weights (72 GB) with little KV room, so request
+`--gpus=2` and run vLLM with `--tensor-parallel-size 2` under `sbatch -p ba100` (24 h limit → the server
+must be resubmitted daily; write the script so it restarts cleanly). Serve on a port in 50000–51024 so
+jobs on other nodes can reach it. For hidden states, vLLM does not expose them; the plan in
+[05](05_confidence_proposal.md) §4.2 needs either a `transformers` forward pass with `output_hidden_states=True`
+on a second GPU, or a vLLM hook — decide once the env exists.
 
 ## 4. Sync workflow
 
