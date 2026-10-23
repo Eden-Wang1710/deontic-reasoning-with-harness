@@ -112,8 +112,8 @@ on 602's `local1`. Weekly cron on each node runs `docker system prune -f` (Mon 0
 | Item | State | Action needed |
 |---|---|---|
 | Repo | `/srv/local1/zwang544/deontic-reasoning-with-harness`, `main` tracking `origin/main`, clean at `8a07362` | — |
-| Identity | **not set** | `git config --global user.name "Zixuan Wang"` and `git config --global user.email <email>` before the first commit. |
-| Push auth | HTTPS remote, no credential helper, **no `~/.ssh` directory at all** | Same as 0238: either `git config --global credential.helper store` + PAT, or `ssh-keygen` and switch the remote to `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`. The home dir is shared across nodes, so this is done once for all six. |
+| Identity | set ✅ 2026-10-23 (`user.name` / `user.email` in `~/.gitconfig`, shared by all six nodes) | — |
+| Push auth | HTTPS remote, no credential helper, no `~/.ssh`. **Pushing works from VS Code Remote sessions** ✅ 2026-10-23 because VS Code injects `GIT_ASKPASS` and answers with the GitHub login on the client machine. From a plain SSH shell or a Slurm job it will fail. | If pushes are needed outside VS Code: `git config --global credential.helper store` + PAT, or `ssh-keygen` and switch the remote to `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`. Home is shared, so once for all nodes. |
 
 ### 3.6 Project environment on BRTX (to do)
 
