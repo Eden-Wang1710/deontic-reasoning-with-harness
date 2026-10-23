@@ -48,9 +48,13 @@ deontic-reasoning-with-harness/
 │   │                                source of the error taxonomy in claude_docs/07 §1.5.1
 │   ├── dar_job_summary.py           score a Harbor job dir: accuracy / macro-F1 per subdomain,
 │   │                                timing, tokens, 600 s re-scoring; --trials for per-trial lines
-│   ├── verbalized_confidence.py     elicit self-verbalised confidence on the last step of each
-│   │                                trajectory (t2 / kira; in-context / answer-only) and compute
-│   │                                ECE, Kuiper, Brier, AUROC, selective accuracy
+│   ├── verbalized_confidence.py     elicit self-verbalised confidence on finished trajectories
+│   │                                (t2 / kira; in-context / answer-only / lastturn, the latter
+│   │                                re-samples the answer step) and compute ECE, Kuiper, Brier,
+│   │                                AUROC, selective accuracy
+│   ├── db_direct_confidence.py      the same for the prompt-based direct run: joint (answer +
+│   │                                confidence in one generation) / posthoc; reuses the stored
+│   │                                prompts of source.json and verbalized_confidence's metrics
 │   ├── db_direct_score.py           score a DeonticBench prompt-based direct run under both
 │   │                                grading rules (DAR exact match / DeonticBench ±1, macro-F1),
 │   │                                bootstrap CI; reuses DeonticBench's parser (needs pandas)

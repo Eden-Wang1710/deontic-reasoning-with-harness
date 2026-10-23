@@ -22,6 +22,8 @@
 | Model | The same served Qwen3.5-35B-A3B (bf16, thinking on, model-default sampling T 1.0 / top-p 0.95 / top-k 20), one extra call per trial, `max_tokens` 8,192. Sampling is stochastic, so a single call is one draw 🔶 (repeat draws are a cheap follow-up). |
 | Condition `incontext` | The agent's own conversation at the moment it confirmed `task_complete`, then one user turn asking for confidence. terminus-2: the exact `messages` of the last LLM call (from `agent/episode-N/debug.json`) plus its final assistant content. KIRA: rebuilt from `agent/trajectory.json` in KIRA's native format (assistant `tool_calls` → `tool: executed` → user terminal output); the elicitation is appended to the last terminal output. Thinking of earlier turns is *not* in the history, as in the real runs. |
 | Condition `answeronly` | A fresh context: the statute, the task instruction and the agent's final answer, no trajectory. A judge-style baseline showing how much the trajectory context changes the estimate. |
+| Condition `lastturn` (added 2026-10-23, owner's proposal) | The conversation as it was *before* the step that wrote the answer file (terminus-2: that episode's `debug.json` messages; KIRA: trajectory steps before the answer-writing `execute_commands`), with the last terminal output extended by a request to reply in plain text with `Answer: <value>` and `Confidence: NN%` in the same response. The answer is therefore **re-sampled** (T 0.7, 16,384 tokens, thinking on) and re-graded with DAR's `test.sh` rule; records keep `reward` (new answer) and `reward_orig` (trajectory). Differences from `incontext`: the confidence is produced with the live thinking of the answer step, before any completion-confirmation turn, and costs nothing extra in a real harness. |
+| Direct analogues (`tools/db_direct_confidence.py`, 2026-10-23) | `joint`: the stored direct prompt of run 3 plus "end with `Confidence: NN%`", one new generation per case, graded with DAR's exact rule (`reward`) and DeonticBench's ±1 (`reward_pm1`). `posthoc`: each stored generation replayed as the assistant turn plus the in-context elicitation (258 ok generations). |
 | Elicitation | "…estimate how likely it is that this answer is exactly correct … The grader uses exact match … Consider whether you may have misread or misapplied a provision, missed a cross-reference or an exception, misjudged filing status or a dependency, or made an arithmetic slip. Reply in plain text, not JSON … first line exactly `Confidence: <0–100>%` followed by at most three sentences naming the main risk." (full text in the script) |
 | Label | DAR's verifier reward (exact match), from `verifier/test-stdout.txt`. |
 | Metrics | ECE (10 equal-width bins), the confidence-weighted Kuiper measure as transcribed in [05](05_confidence_proposal.md) §3.2, Brier, AUROC (correct vs. wrong), and selective accuracy / coverage at confidence ≥ 0.5 / 0.7 / 0.9. Reliability table with 5 bins. |
@@ -199,6 +201,10 @@ which a confidence module living inside the harness might not "deserve". Resolut
   Tests whether de-anchoring can happen in place (no second context); if AUROC rises it is the
   cheapest verifier design, if not, the trajectory's presence is itself the anchor.
 - **Prompt parity**: align the risk-list sentence across conditions before any rerun (§1).
-- **t2fix trajectories**: no confidence pass yet (~2 h of server time with the same script).
+- **Answer-step confidence** (`lastturn`, direct `joint` / `posthoc`): queued 2026-10-23
+  (`~/vllm_logs/lastturn_queue.log`): t2fix 64 trials, KIRA 65, direct 65 + 258. Smoke (8 + 4
+  trials): format followed in 11/12, one terminus-2 reply ignored the request and asked for
+  another `grep` (the script re-draws unparsed replies, max 3). Results go in §2.3.
+- **t2fix trajectories**: `incontext` / `answeronly` not run on them (only `lastturn`).
 - **Repeated draws**: every number above is one sample at the server's default temperature;
   3–5 draws per trial would give per-trial variance for the numeric AUROC.

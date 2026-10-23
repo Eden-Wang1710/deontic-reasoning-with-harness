@@ -13,6 +13,13 @@ Conditions (``--condition``):
               tool-call format) + the elicitation turn. "Self" confidence.
   answeronly  a fresh context: statute + task + the agent's final answer, no trajectory.
               A judge-style baseline that shows how much the trajectory context matters.
+  lastturn    the conversation as it was *before* the step that wrote the final answer
+              (terminus-2: that episode's debug.json messages; KIRA: trajectory steps before
+              the answer-writing execute_commands). The model is asked to give the answer and
+              its confidence in the same response, so the confidence is produced with the
+              live reasoning of the answer step, at zero extra cost in a real harness. The
+              answer is re-sampled, so it is re-graded with DAR's test.sh rule; the record
+              keeps ``reward`` (new answer) and ``reward_orig`` (the trajectory's).
 
 Usage (from the repo root, vLLM server from tools/serve_qwen35_35b.sh running):
   python3 tools/verbalized_confidence.py --job harbor-deonticbench/jobs/qwen3.5-35b-a3b/direct/sara-t2-run1 \
@@ -63,6 +70,13 @@ Estimate how likely it is that this answer is exactly correct under the statute 
 Reply in plain text. The first line must be exactly:
 Confidence: <integer from 0 to 100>%
 followed by at most three sentences naming the main risk to the answer."""
+
+ELICIT_LASTTURN = """You are now at the point of giving your final answer. Do not run any more commands and do not reply in JSON. Reply in plain text with exactly these two lines first:
+Answer: <value>
+Confidence: <integer from 0 to 100>%
+where <value> is the whole-dollar amount (no $ sign) or Entailment/Contradiction, and the confidence is your estimate of how likely it is that this answer is exactly correct under the statute and the case facts (the grader uses exact match). Then add at most three sentences naming the main risk to the answer."""
+
+ANSWER_RE = re.compile(r"^\s*\**\s*Answer\s*[:：]\s*\**\s*([^\n]+?)\s*\**\s*$", re.I | re.M)
 
 CONF_RE = re.compile(r"confidence\s*[:=]?\s*\**\s*([0-9]{1,3}(?:\.[0-9]+)?)\s*%", re.I)
 # fallbacks must be tied to a confidence word: a bare "15%" in a tax answer is a tax rate
@@ -128,6 +142,54 @@ def t2_messages(trial: dict) -> list[dict]:
     return msgs
 
 
+WRITE_RE = re.compile(r"answer\.txt")
+
+
+def _writes_answer(keystrokes: str) -> bool:
+    """A shell command that writes the answer file (echo/printf/cat/tee ... > answer.txt)."""
+    return bool(WRITE_RE.search(keystrokes)) and (">" in keystrokes or "tee " in keystrokes)
+
+
+def t2_lastturn_messages(trial: dict) -> list[dict]:
+    """terminus-2: the messages of the last episode whose response wrote the answer file."""
+    eps = sorted(
+        glob.glob(os.path.join(trial["dir"], "agent", "episode-*")),
+        key=lambda p: int(p.rsplit("-", 1)[1]),
+    )
+    chosen = None
+    for e in eps:
+        dj = json.load(open(os.path.join(e, "debug.json")))
+        content = json.loads(dj["original_response"])["choices"][0]["message"]["content"] or ""
+        try:
+            cmds = json.loads(content.strip()).get("commands", [])
+            ks = "\n".join(c.get("keystrokes", "") for c in cmds if isinstance(c, dict))
+        except Exception:
+            ks = content
+        if _writes_answer(ks):
+            chosen = dj
+    if chosen is None:
+        raise RuntimeError(f"{trial['trial']}: no answer-writing episode")
+    return [{"role": m["role"], "content": m["content"]} for m in chosen["messages"]]
+
+
+def kira_answer_step(steps: list[dict]) -> int:
+    """Index of the last agent step whose bash_command keystrokes write the answer file."""
+    idx = None
+    for i, s in enumerate(steps):
+        if s.get("source") != "agent":
+            continue
+        ks = "\n".join(
+            tc["arguments"].get("keystrokes", "")
+            for tc in s.get("tool_calls") or []
+            if tc.get("function_name") == "bash_command"
+        )
+        if _writes_answer(ks):
+            idx = i
+    if idx is None:
+        raise RuntimeError("no answer-writing step")
+    return idx
+
+
 def _split_analysis_plan(message: str) -> tuple[str, str]:
     analysis, plan = message, ""
     m = re.match(r"Analysis:\s*(.*?)\nPlan:\s*(.*)\Z", message, re.S)
@@ -136,15 +198,17 @@ def _split_analysis_plan(message: str) -> tuple[str, str]:
     return analysis, plan
 
 
-def kira_messages(trial: dict) -> list[dict]:
+def kira_messages(trial: dict, upto_step: int | None = None) -> list[dict]:
     """KIRA: rebuild the native tool-call conversation from the ATIF trajectory.
+
+    With ``upto_step`` the rebuild stops before that step index (steps[upto_step:] are dropped).
 
     baseline_kira keeps: user prompt -> assistant{content, tool_calls} -> one tool message
     "executed" per call -> user (terminal output) -> ...  The final terminal output is merged
     into the elicitation turn by the caller (it is returned as a trailing user message).
     """
     t = json.load(open(os.path.join(trial["dir"], "agent", "trajectory.json")))
-    steps = t["steps"]
+    steps = t["steps"] if upto_step is None else t["steps"][:upto_step]
     msgs = [{"role": "user", "content": steps[0]["message"]}]
     n_call = 0
     for s in steps[1:]:
@@ -199,6 +263,17 @@ def build_messages(trial: dict, harness: str, condition: str, datasets_root: str
     if condition == "answeronly":
         instr, statute = task_text(trial, datasets_root)
         return [{"role": "user", "content": ELICIT_ANSWERONLY.format(statute=statute, task=instr, answer=trial["got"])}]
+    if condition == "lastturn":
+        if harness == "t2":
+            msgs = t2_lastturn_messages(trial)
+        else:
+            steps = json.load(open(os.path.join(trial["dir"], "agent", "trajectory.json")))["steps"]
+            msgs = kira_messages(trial, upto_step=kira_answer_step(steps))
+        if msgs and msgs[-1]["role"] == "user":
+            msgs[-1]["content"] = msgs[-1]["content"] + "\n\n" + ELICIT_LASTTURN
+        else:
+            msgs.append({"role": "user", "content": ELICIT_LASTTURN})
+        return msgs
     elicit = ELICIT_INCONTEXT.format(answer=trial["got"])
     if harness == "t2":
         msgs = t2_messages(trial)
@@ -227,6 +302,25 @@ def parse_confidence(text: str) -> tuple[float | None, str]:
     if m:
         return float(m.group(1)), "probability"
     return None, "unparsed"
+
+
+def parse_answer(text: str) -> str | None:
+    m = ANSWER_RE.findall(text or "")
+    return m[-1].strip().strip("*").strip() if m else None
+
+
+def grade(answer: str | None, expected: str | None) -> float:
+    """DAR's tests/test.sh: whitespace stripped; integer expected -> drop decimals from the
+    answer and compare strings; otherwise case-insensitive string match."""
+    if answer is None or expected is None:
+        return 0.0
+    a = re.sub(r"\s+", "", answer)
+    e = re.sub(r"\s+", "", expected)
+    if re.fullmatch(r"-?[0-9]+", e):
+        a = a.replace("$", "").replace(",", "")
+        a = re.sub(r"\..*", "", a)
+        return 1.0 if a == e else 0.0
+    return 1.0 if a.lower() == e.lower() else 0.0
 
 
 def call_model(client, model: str, messages: list[dict], max_tokens: int, think: bool) -> dict:
@@ -264,6 +358,10 @@ def run_trial(trial, harness, condition, datasets_root, client, model, max_token
     try:
         rec.update(call_model(client, model, messages, max_tokens, think))
         rec["confidence"], rec["parse"] = parse_confidence(rec["content"])
+        if condition == "lastturn":
+            rec["reward_orig"], rec["got_orig"] = trial["reward"], trial["got"]
+            rec["got"] = parse_answer(rec["content"])
+            rec["reward"] = grade(rec["got"], trial["expected"])
     except Exception as e:  # keep going; the record says what failed
         rec.update(error=f"{type(e).__name__}: {e}", confidence=None, parse="error")
     with open(out_path, "w") as f:
@@ -358,7 +456,16 @@ def summarise(out_dir: str) -> str:
     recs = [json.load(open(p)) for p in sorted(glob.glob(os.path.join(out_dir, "*.json"))) if not p.endswith("summary.json")]
     for r in recs:  # always score with the current parser
         r["confidence"], r["parse"] = parse_confidence(r.get("content", ""))
-    lines = [f"# {out_dir}", f"records: {len(recs)}, unparsed/errors: {sum(1 for r in recs if r.get('confidence') is None)}",
+    lines = [f"# {out_dir}", f"records: {len(recs)}, unparsed/errors: {sum(1 for r in recs if r.get('confidence') is None)}",]
+    if any("reward_orig" in r for r in recs):
+        lt = [r for r in recs if "reward_orig" in r]
+        lines.append(
+            f"lastturn: answers re-sampled; new acc {sum(r['reward'] for r in lt)/len(lt):.3f} vs original "
+            f"{sum(r['reward_orig'] for r in lt)/len(lt):.3f}; same answer as the trajectory in "
+            f"{sum(1 for r in lt if (r.get('got') or '').lower().lstrip('$') == (r.get('got_orig') or '').lower())}/{len(lt)}; "
+            f"no Answer line parsed in {sum(1 for r in lt if r.get('got') is None)}"
+        )
+    lines += [
              f"truncated (finish_reason=length): {sum(1 for r in recs if r.get('finish_reason') == 'length')}", ""]
     lines.append("| subset | n | acc | mean conf | ECE | Kuiper | Brier | AUROC | cov/acc @0.5 | @0.7 | @0.9 |")
     lines.append("|---|---|---|---|---|---|---|---|---|---|---|")
@@ -390,7 +497,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--job")
     ap.add_argument("--harness", choices=["t2", "kira"])
-    ap.add_argument("--condition", choices=["incontext", "answeronly"], default="incontext")
+    ap.add_argument("--condition", choices=["incontext", "answeronly", "lastturn"], default="incontext")
     ap.add_argument("--out")
     ap.add_argument("--summary", help="only recompute metrics for this output dir")
     ap.add_argument("--datasets-root", default="harbor-deonticbench/datasets/deonticbench-direct")
@@ -401,6 +508,7 @@ def main():
     ap.add_argument("--no-think", action="store_true", help="disable thinking for the confidence turn")
     ap.add_argument("--concurrency", type=int, default=4)
     ap.add_argument("--limit", type=int)
+    ap.add_argument("--subdomain", choices=["sara-numeric", "sara-binary"], help="only trials of this subdomain")
     a = ap.parse_args()
 
     if a.summary:
@@ -412,7 +520,10 @@ def main():
 
     client = OpenAI(base_url=a.base_url, api_key=a.api_key, timeout=1800)
     os.makedirs(a.out, exist_ok=True)
-    trials = load_trials(a.job)[: a.limit]
+    trials = load_trials(a.job)
+    if a.subdomain:
+        trials = [t for t in trials if t["subdomain"] == a.subdomain]
+    trials = trials[: a.limit]
     print(f"{len(trials)} trials from {a.job}; harness={a.harness} condition={a.condition} think={not a.no_think}", flush=True)
     done = 0
     with ThreadPoolExecutor(max_workers=a.concurrency) as ex:
