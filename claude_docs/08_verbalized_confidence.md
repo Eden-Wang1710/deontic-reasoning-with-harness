@@ -23,7 +23,7 @@
 | Condition `incontext` | The agent's own conversation at the moment it confirmed `task_complete`, then one user turn asking for confidence. terminus-2: the exact `messages` of the last LLM call (from `agent/episode-N/debug.json`) plus its final assistant content. KIRA: rebuilt from `agent/trajectory.json` in KIRA's native format (assistant `tool_calls` → `tool: executed` → user terminal output); the elicitation is appended to the last terminal output. Thinking of earlier turns is *not* in the history, as in the real runs. |
 | Condition `answeronly` | A fresh context: the statute, the task instruction and the agent's final answer, no trajectory. A judge-style baseline showing how much the trajectory context changes the estimate. |
 | Condition `lastturn` (added 2026-10-23, owner's proposal) | The conversation as it was *before* the step that wrote the answer file (terminus-2: that episode's `debug.json` messages; KIRA: trajectory steps before the answer-writing `execute_commands`), with the last terminal output extended by a request to reply in plain text with `Answer: <value>` and `Confidence: NN%` in the same response. The answer is therefore **re-sampled** (T 0.7, 16,384 tokens, thinking on) and re-graded with DAR's `test.sh` rule; records keep `reward` (new answer) and `reward_orig` (trajectory). Differences from `incontext`: the confidence is produced with the live thinking of the answer step, before any completion-confirmation turn, and costs nothing extra in a real harness. |
-| Direct analogues (`tools/db_direct_confidence.py`, 2026-10-23) | `joint`: the stored direct prompt of run 3 plus "end with `Confidence: NN%`", one new generation per case, graded with DAR's exact rule (`reward`) and DeonticBench's ±1 (`reward_pm1`). `posthoc`: each stored generation replayed as the assistant turn plus the in-context elicitation (258 ok generations). |
+| Direct analogues (`tools/db_direct_confidence.py`, 2026-10-23) | `joint`: the stored direct prompt of run 3 plus "end with `Confidence: NN%`", one new generation per case, graded with DAR's exact rule (`reward`) and DeonticBench's ±1 (`reward_pm1`). `posthoc` (replaying each stored generation with the in-context elicitation, 258 generations) was implemented but **cancelled by the owner 2026-10-24** before running: it would only repeat the in-context measurement of §2.1 in the direct setting. |
 | Elicitation | "…estimate how likely it is that this answer is exactly correct … The grader uses exact match … Consider whether you may have misread or misapplied a provision, missed a cross-reference or an exception, misjudged filing status or a dependency, or made an arithmetic slip. Reply in plain text, not JSON … first line exactly `Confidence: <0–100>%` followed by at most three sentences naming the main risk." (full text in the script) |
 | Label | DAR's verifier reward (exact match), from `verifier/test-stdout.txt`. |
 | Metrics | ECE (10 equal-width bins), the confidence-weighted Kuiper measure as transcribed in [05](05_confidence_proposal.md) §3.2, Brier, AUROC (correct vs. wrong), and selective accuracy / coverage at confidence ≥ 0.5 / 0.7 / 0.9. Reliability table with 5 bins. |
@@ -119,6 +119,75 @@ Metrics as defined in §1; `cov / acc @τ` = fraction of trials with confidence 
 accuracy on that subset. One trial is 2.9 points on numeric, 3.3 on binary; all AUROCs are on
 ≤ 11 positives (numeric) or ≤ 4 negatives (binary), so treat differences under ~0.15 as noise.
 
+### 2.3 Answer-step confidence (`lastturn`, direct `joint`) ✅ 2026-10-24 (`outputs/verbalized_confidence/{t2fix_lastturn,kira_lastturn,direct_joint}`)
+
+Owner's proposal 2026-10-23: instead of a confidence turn after the whole trajectory, replay
+the history up to the answer-writing step and ask for answer and confidence in one reply
+(method row in §1). Three settings: terminus-2 fix (`sara-t2fix-run1`), KIRA wrapper
+(`sara-kira-run1` + `rerun9`), and prompt-based direct (stored run-3 prompts plus a
+`Confidence: NN%` line after `\boxed{}`). One draw per trial at T 0.7, 16,384 tokens, thinking
+on. Because the answer is re-sampled, every row reports the new accuracy next to the
+trajectory's; the confidence is scored against the **new** answer.
+
+**Format compliance.** terminus-2 fix 60/64 parsed (3 replies kept answering in the agent's
+JSON command format, 1 hit 16,384 tokens: `QZxUYzM`); KIRA 63/65 (1 reply emitted a
+`<tool_call>`, 1 had no `Answer:` line); direct 64/65 (`tax_case_94` gen 0 hit 16,384 tokens
+without a `\boxed{}`). Unparsed replies were re-drawn up to three times by the script; these are
+the ones still unparsed after that.
+
+| Setting | Subset | n parsed | Acc (new answer) | Acc (original) | Same answer | Mean conf | AUROC [95 % CI] | ECE | Kuiper | Brier | cov / acc @0.9 | Mean compl. tokens |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| terminus-2 fix | numeric | 31 | 4/31 (0.13) | 7/34 (0.21) | 11/31 | 0.890 | 0.81 [0.61, 0.93] | 0.76 | 0.67 | 0.68 | 0.58 / 0.22 | 4,061 |
+| terminus-2 fix | binary | 29 | 21/29 (0.72) | 27/30 (0.90) | 24/29 | 0.943 | 0.74 [0.51, 0.94] | 0.22 | 0.20 | 0.23 | 0.90 / 0.77 | 1,454 |
+| KIRA | numeric | 35 | 12/35 (0.34) | 11/35 (0.31) | 23/35 | 0.906 | 0.40 [0.22, 0.59] | 0.59 | 0.53 | 0.56 | 0.77 / 0.37 | 2,737 |
+| KIRA | binary | 28 | 21/28 (0.75) | 26/30 (0.87) | 25/28 | 0.950 | 0.53 [0.25, 0.82] | 0.20 | 0.19 | 0.22 | 0.93 / 0.81 | 975 |
+| direct joint | numeric | 34 | 13/34 (0.38) exact, 18/34 (0.53) ±1 | 0.435 exact / 0.478 ±1 (run 3 mean, [07](07_native_trajectories.md) §4) | — | 0.943 | 0.48 [0.35, 0.61] | 0.56 | 0.53 | 0.55 | 0.97 / 0.39 | 11,989 |
+| direct joint | binary | 30 | 24/30 (0.80) | 0.823 (run 3 mean) | — | 0.973 | 0.61 [0.30, 0.92] | 0.17 | 0.17 | 0.18 | 0.97 / 0.83 | 6,257 |
+
+"Original" for the harness rows is the trajectory's verifier reward (`reward_orig`), restricted
+to the parsed trials where the two differ from the full-run counts; for direct it is the
+bootstrap mean of the four stored generations, since the joint generation is a fresh sample and
+has no one-to-one original. AUROC CIs are bootstrap over trials (2,000 resamples). Stated
+confidences take only five or six distinct values per setting (0.75–1.0; direct: 28/34 numeric
+replies say exactly 95 %), so ECE and Kuiper are effectively a single-bin gap.
+
+**Reading.**
+
+- **Overconfidence is unchanged.** Mean confidence 0.89–0.97 in every setting, against accuracy
+  0.13–0.38 on numeric; seeing its own live thinking at the answer step does not make the model
+  more cautious than the post-hoc turn of §2.1 (0.86–0.90), and the direct setting is the most
+  confident of all.
+- **Discrimination is not reliably better.** terminus-2 fix numeric reads 0.81 but rests on four
+  correct answers (CI lower end 0.61); KIRA numeric 0.40 and direct numeric 0.48 are at chance,
+  as §2.1 was (0.35 / 0.54). The three settings do not agree in direction, so `lastturn` cannot
+  be claimed to improve AUROC over the in-context baseline. Binary AUROCs have 3–8 negatives
+  each and CIs spanning 0.25–0.94.
+- **Re-sampling the answer step under the plain-text instruction lowered binary accuracy in both
+  harnesses** (27/30 → 21/29 and 26/30 → 21/28) while direct stayed at its run-3 level
+  (0.80 vs 0.82). All eight binary flips are originally-correct answers turning wrong, six of
+  them Entailment → Contradiction, stated at confidence 0.75–1.0: terminus-2 fix `o8gGXpA`,
+  `rwKHnFU`, `B5vJ7SW`, `q6upKML` (E→C), `ZdKge8S` (C→E); KIRA `NuxfopA`, `fi5rPaS` (E→C),
+  `z32iuV9` (C→E). Numeric flips go both ways (terminus-2 fix: 3 lost, 2 gained, among them
+  `XZpTdmh` 26566 → 26567 which fixes the rounding; KIRA: 1 lost, 2 gained). Two candidate
+  explanations, not yet separated: (a) sampling noise, though the three pass-1 runs all sat at
+  26–27/30 on binary and the one-sided direction of the flips argues against pure noise;
+  (b) the format change itself: in the trajectory the answer step is an `echo … > answer.txt`
+  command that merely executes a conclusion already formed, whereas the plain-text request makes
+  the model argue the case again, and the flipped replies open with a fresh "Looking at the
+  statute, I need to analyze…" rather than restating the answer. If (b) holds, the harness
+  answer and the answer the model gives when asked to state it in prose are not the same answer,
+  which is a stability finding in its own right. Separating (a) from (b) needs 3–5 draws per
+  trial on the same history (cheap: ~1–4k completion tokens per draw on the harnesses).
+- **Cost.** On the harnesses `lastturn` costs nothing extra in a deployed agent (it replaces the
+  answer step); as an offline measurement it is 1–4k completion tokens per trial. The direct
+  joint generation is a full solve (6–12k tokens) because it re-runs the whole task.
+
+**Status for the thesis.** `lastturn` is an alternative *elicitation point*, not a different
+confidence signal; it stays in the chapter as a sensitivity check on §2.1 (same overconfidence,
+no consistent AUROC change) and as the source of the answer-stability observation above. The
+in-context baseline of §2.1 remains the reference ([05](05_confidence_proposal.md) §8,
+2026-10-21).
+
 ## 3. Observations ✅ 2026-10-16/17
 
 ### 3.1 terminus-2 in-context (n = 65)
@@ -201,10 +270,10 @@ which a confidence module living inside the harness might not "deserve". Resolut
   Tests whether de-anchoring can happen in place (no second context); if AUROC rises it is the
   cheapest verifier design, if not, the trajectory's presence is itself the anchor.
 - **Prompt parity**: align the risk-list sentence across conditions before any rerun (§1).
-- **Answer-step confidence** (`lastturn`, direct `joint` / `posthoc`): queued 2026-10-23
-  (`~/vllm_logs/lastturn_queue.log`): t2fix 64 trials, KIRA 65, direct 65 + 258. Smoke (8 + 4
-  trials): format followed in 11/12, one terminus-2 reply ignored the request and asked for
-  another `grep` (the script re-draws unparsed replies, max 3). Results go in §2.3.
+- **Answer-step confidence** ✅ 2026-10-24: run and written up in §2.3 (`lastturn` on t2fix
+  and KIRA, direct `joint`); direct `posthoc` cancelled by the owner 2026-10-24 (no information
+  beyond §2.1). Follow-up 🔶: 3–5 draws per trial on the same answer-step history to separate
+  sampling noise from the format effect behind the binary flips in §2.3.
 - **t2fix trajectories**: `incontext` / `answeronly` not run on them (only `lastturn`).
 - **Repeated draws**: every number above is one sample at the server's default temperature;
   3–5 draws per trial would give per-trial variance for the numeric AUROC.
