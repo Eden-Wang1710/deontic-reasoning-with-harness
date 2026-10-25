@@ -137,15 +137,18 @@ the ones still unparsed after that.
 
 | Setting | Subset | n parsed | Acc (new answer) | Acc (original) | Same answer | Mean conf | AUROC [95 % CI] | ECE | Kuiper | Brier | cov / acc @0.9 | Mean compl. tokens |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| terminus-2 fix | numeric | 31 | 4/31 (0.13) | 7/34 (0.21) | 11/31 | 0.890 | 0.81 [0.61, 0.93] | 0.76 | 0.67 | 0.68 | 0.58 / 0.22 | 4,061 |
-| terminus-2 fix | binary | 29 | 21/29 (0.72) | 27/30 (0.90) | 24/29 | 0.943 | 0.74 [0.51, 0.94] | 0.22 | 0.20 | 0.23 | 0.90 / 0.77 | 1,454 |
+| terminus-2 fix | numeric | 31 | 4/31 (0.13) | 5/31 (0.16) | 11/31 | 0.890 | 0.81 [0.61, 0.93] | 0.76 | 0.67 | 0.68 | 0.58 / 0.22 | 4,061 |
+| terminus-2 fix | binary | 29 | 21/29 (0.72) | 26/29 (0.90) | 24/29 | 0.943 | 0.74 [0.51, 0.94] | 0.22 | 0.20 | 0.23 | 0.90 / 0.77 | 1,454 |
 | KIRA | numeric | 35 | 12/35 (0.34) | 11/35 (0.31) | 23/35 | 0.906 | 0.40 [0.22, 0.59] | 0.59 | 0.53 | 0.56 | 0.77 / 0.37 | 2,737 |
-| KIRA | binary | 28 | 21/28 (0.75) | 26/30 (0.87) | 25/28 | 0.950 | 0.53 [0.25, 0.82] | 0.20 | 0.19 | 0.22 | 0.93 / 0.81 | 975 |
+| KIRA | binary | 28 | 21/28 (0.75) | 24/28 (0.86) | 25/28 | 0.950 | 0.53 [0.25, 0.82] | 0.20 | 0.19 | 0.22 | 0.93 / 0.81 | 975 |
 | direct joint | numeric | 34 | 13/34 (0.38) exact, 18/34 (0.53) ±1 | 0.435 exact / 0.478 ±1 (run 3 mean, [07](07_native_trajectories.md) §4) | — | 0.943 | 0.48 [0.35, 0.61] | 0.56 | 0.53 | 0.55 | 0.97 / 0.39 | 11,989 |
 | direct joint | binary | 30 | 24/30 (0.80) | 0.823 (run 3 mean) | — | 0.973 | 0.61 [0.30, 0.92] | 0.17 | 0.17 | 0.18 | 0.97 / 0.83 | 6,257 |
 
-"Original" for the harness rows is the trajectory's verifier reward (`reward_orig`), restricted
-to the parsed trials where the two differ from the full-run counts; for direct it is the
+n is the number of parsed replies (answer and confidence both present); the full-run counts
+are 34 / 30 / 35 / 30 records (terminus-2 fix numeric has 34 because `tax-case-94` timed out in
+the original run and has no answer step to replay). "Original" for the harness rows is the
+trajectory's verifier reward (`reward_orig`) on the same parsed trials, so both accuracy
+columns share a denominator; for direct it is the
 bootstrap mean of the four stored generations, since the joint generation is a fresh sample and
 has no one-to-one original. AUROC CIs are bootstrap over trials (2,000 resamples). Stated
 confidences take only five or six distinct values per setting (0.75–1.0; direct: 28/34 numeric
@@ -163,7 +166,7 @@ replies say exactly 95 %), so ECE and Kuiper are effectively a single-bin gap.
   be claimed to improve AUROC over the in-context baseline. Binary AUROCs have 3–8 negatives
   each and CIs spanning 0.25–0.94.
 - **Re-sampling the answer step under the plain-text instruction lowered binary accuracy in both
-  harnesses** (27/30 → 21/29 and 26/30 → 21/28) while direct stayed at its run-3 level
+  harnesses** (26 → 21 of 29 and 24 → 21 of 28) while direct stayed at its run-3 level
   (0.80 vs 0.82). All eight binary flips are originally-correct answers turning wrong, six of
   them Entailment → Contradiction, stated at confidence 0.75–1.0: terminus-2 fix `o8gGXpA`,
   `rwKHnFU`, `B5vJ7SW`, `q6upKML` (E→C), `ZdKge8S` (C→E); KIRA `NuxfopA`, `fi5rPaS` (E→C),
