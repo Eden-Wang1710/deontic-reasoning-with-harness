@@ -191,6 +191,50 @@ no consistent AUROC change) and as the source of the answer-stability observatio
 in-context baseline of §2.1 remains the reference ([05](05_confidence_proposal.md) §8,
 2026-10-21).
 
+### 2.4 Post-hoc vs. answer-step, side by side ✅ 2026-10-25
+
+Reviewed with the owner 2026-10-25. The KIRA pair shares the same trajectories and is the
+clean comparison; the two terminus-2 rows come from different runs (stock for post-hoc, fix for
+answer-step).
+
+| Harness | Subset | Elicitation | Accuracy | Mean conf | AUROC | ECE |
+|---|---|---|---|---|---|---|
+| terminus-2 | numeric | post-hoc | 0.17 | 0.86 | 0.35 | 0.69 |
+| terminus-2 | numeric | answer-step | 0.13 | 0.89 | 0.81* | 0.76 |
+| terminus-2 | binary | post-hoc | 0.87 | 0.94 | 0.69 | 0.09 |
+| terminus-2 | binary | answer-step | 0.72 | 0.94 | 0.74 | 0.22 |
+| KIRA | numeric | post-hoc | 0.31 | 0.90 | 0.54 | 0.59 |
+| KIRA | numeric | answer-step | 0.34 | 0.91 | 0.40 | 0.59 |
+| KIRA | binary | post-hoc | 0.87 | 0.95 | 0.38 | 0.13 |
+| KIRA | binary | answer-step | 0.75 | 0.95 | 0.53 | 0.20 |
+
+*0.81 rests on 4 correct answers, 95 % CI [0.61, 0.93]; every other AUROC CI includes 0.5.
+
+**Conclusions (owner-reviewed):**
+
+1. The stated confidence is practically a constant: 0.86–0.97 in every cell, 5–6 distinct
+   values per setting. It is a fixed "I am sure", not a probability of being right.
+2. Moving the elicitation to the answer step does not improve discrimination: KIRA AUROC moves
+   0.54 → 0.40 (numeric) and 0.38 → 0.53 (binary), both inside the CIs.
+3. Because the confidence is constant, ECE and Kuiper reduce to |mean conf − accuracy| and
+   track accuracy, not self-knowledge. When the answer-step replay lowered binary accuracy
+   (0.87 → 0.75) at unchanged confidence, ECE got worse (0.13 → 0.20); it cannot get better
+   this way.
+4. Therefore the elicitation point is not where the signal is. A useful confidence has to draw
+   on information other than the answer itself: the rubric-based self-verification line, or an
+   independent re-solve such as the answer-only verifier of §4.
+
+**Reference thresholds used in this chapter** (rules of thumb, not hard cut-offs): AUROC 0.5
+chance, 0.6–0.7 weak, 0.7–0.8 usable, 0.8–0.9 good, > 0.9 excellent (Hosmer–Lemeshow
+discrimination bands); ECE < 0.05 well calibrated, 0.05–0.10 acceptable, 0.10–0.20 clearly
+off, > 0.20 unusable as a probability. Published verbalised-confidence ECEs for RLHF'd LLMs
+are typically 0.10–0.30 (Xiong et al. 2023, Tian et al. 2023). With n = 30–35 and 4–12
+positives, the AUROC CI is about ±0.2, so values below ~0.7 are indistinguishable from 0.5.
+**Working target for the confidence module on SARA numeric: AUROC ≥ 0.7 and ECE ≤ 0.15 at the
+same time**, the point at which refusing below a confidence threshold starts to raise selective
+accuracy. Both are needed: a constant confidence can score a low ECE with AUROC 0.5, and a
+correct ranking with inflated values scores a high AUROC with a poor ECE.
+
 ## 3. Observations ✅ 2026-10-16/17
 
 ### 3.1 terminus-2 in-context (n = 65)
