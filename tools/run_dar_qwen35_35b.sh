@@ -26,6 +26,9 @@
 #          field (report_confidence=false), verifier gets a trajectory index and reads the full
 #          trajectory from a file in the container (packet_mode=index), skill v2
 #          (tools/skills/rubric_verifier_v2/SKILL.md). Jobs under the same t2verify-<framing>/.
+#   t2verify3 = run-3 configuration (claude_docs/10 §9): answer file lists section numbers only
+#          (tools/templates/terminus-json-plain-derivation-v2.txt), skill v3 with a fixed
+#          four-step plan (verifier_max_steps=4), N_CONCURRENT defaults to 2.
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
@@ -71,13 +74,22 @@ case "$AGENT" in
           --ak skill_path=$TOOLS_DIR/skills/rubric_verifier_v2/SKILL.md"
         JOBS="jobs/qwen3.5-35b-a3b/t2verify-direct"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
+  t2verify3) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        AGENT_ARGS="--agent-import-path dar_terminus2_verifier:Terminus2RubricVerifier \
+          --ak derivation_record=true --ak report_confidence=false --ak packet_mode=index \
+          --ak derivation_template=$TOOLS_DIR/templates/terminus-json-plain-derivation-v2.txt \
+          --ak skill_path=$TOOLS_DIR/skills/rubric_verifier_v3/SKILL.md --ak verifier_max_steps=4"
+        JOBS="jobs/qwen3.5-35b-a3b/t2verify-direct"
+        N_CONCURRENT="${N_CONCURRENT:-2}"
+        export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
         JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
-  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|kira)" >&2; exit 1 ;;
+  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|kira)" >&2; exit 1 ;;
 esac
+N_CONCURRENT="${N_CONCURRENT:-4}"
 
 cd "$(dirname "$0")/../harbor-deonticbench"
 exec sg docker -c "$HOME/.local/bin/uv run harbor run \
@@ -87,7 +99,7 @@ exec sg docker -c "$HOME/.local/bin/uv run harbor run \
   --ak api_base=http://172.17.0.1:9009/v1 \
   --ak llm_kwargs='{\"api_key\": \"token-abc123\"}' \
   --ak model_info='$MODEL_INFO' \
-  --n-concurrent 4 \
+  --n-concurrent $N_CONCURRENT \
   --agent-timeout-multiplier 3 \
   --jobs-dir $JOBS \
   $INCLUDE \

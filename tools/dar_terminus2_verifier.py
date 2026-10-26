@@ -329,8 +329,10 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             return (
                 f"Decide how to proceed. {rounds_left} verification round(s) remain.\n"
                 "To continue: address the items above with commands and do NOT set "
-                '"task_complete". Change the answer file only if text you read from the '
-                "statute or a computation you ran supports the change; your next "
+                '"task_complete". A NO is a violation the verifier checked against the '
+                "rule file; an UNKNOWN is something it could not verify, a lead rather "
+                "than an instruction. Change the answer file only if text you read from "
+                "the statute or a computation you ran supports the change; your next "
                 "completion claim will be verified again.\n" + finish
             )
         return (
@@ -762,6 +764,13 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             )
             return f"{header}\nNo report: {reason}."
         lines = [header]
+        # Some replies wrap the whole reply object inside "report"; unwrap to the rubrics.
+        while (
+            isinstance(report, dict)
+            and "rubrics" not in report
+            and isinstance(report.get("report"), dict)
+        ):
+            report = report["report"]
         rubrics = report.get("rubrics")
         if isinstance(rubrics, list):
             for i, r in enumerate(rubrics, 1):
