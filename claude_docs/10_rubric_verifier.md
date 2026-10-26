@@ -183,8 +183,12 @@ v1 is frozen for `sara-t2verify-run1`):
    checks the solver's provisions instead of the case's facts and the FUTA / dependency /
    filing-status classes of [07](07_native_trajectories.md) §1.5.1 pass unnoticed.
 
-### 7.2 Full SARA pass (`sara-t2verify-run1`, started 2026-10-26 00:49 UTC)
+### 7.2 Full SARA pass (`sara-t2verify-run1`, started 2026-10-26 01:05 UTC)
 
-65 tasks (sara-numeric 35 + sara-binary 30), `--n-concurrent 4`, settings of §6. Results
-below when the job completes; scored with `tools/verifier_job_summary.py <job> --baseline
+65 tasks (sara-numeric 35 + sara-binary 30), `--n-concurrent 4`, settings of §6. A first
+launch at 00:49 was discarded after two trials (kept as `broken-run0-step-id-bug`): the
+system step added after the smoke test was built with `step_id=0`, pydantic rejected it after
+the report had been produced, and the solver received the error fallback instead of the
+report. Fixed (`fc50340`), verified on the first trial of the restart (report present in the
+solver's observation, system step recorded). Results below when the job completes; scored with `tools/verifier_job_summary.py <job> --baseline
 jobs/qwen3.5-35b-a3b/t2fix-direct/sara-t2fix-run1`.
