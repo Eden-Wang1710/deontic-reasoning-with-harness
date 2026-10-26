@@ -176,6 +176,8 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         self._original_instruction = ""
         self._previous_answer: str | None = None
         self._previous_report_text: str | None = None
+        self._pending_verifier_step: Step | None = None
+        self._final_answer: str | None = None
 
     @staticmethod
     def name() -> str:
@@ -193,6 +195,11 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
     ):
         if original_instruction:
             self._original_instruction = original_instruction
+        if self._pending_verifier_step is not None:
+            # Recorded here so that it follows the claiming step and precedes the decision.
+            self._pending_verifier_step.step_id = len(self._trajectory_steps) + 1
+            self._trajectory_steps.append(self._pending_verifier_step)
+            self._pending_verifier_step = None
         was_pending = self._pending_completion
         commands, is_task_complete, feedback, analysis, plan, llm_response = (
             await super()._handle_llm_interaction(
@@ -221,8 +228,8 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 self._final_confidence = confidence
                 if commands:
                     # Stock behaviour: the commands run and the trial ends; the answer
-                    # may therefore change after the last verification. Recorded, not
-                    # prevented.
+                    # may therefore change after the last verification. Recorded (and
+                    # checked against the answer file at the end), not prevented.
                     self._unverified_finish = True
         return commands, is_task_complete, feedback, analysis, plan, llm_response
 
@@ -310,6 +317,8 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             )
             if self._pending_completion and self._final_confidence is None:
                 await self._ask_confidence(chat)
+            if self._session is not None:
+                self._final_answer = await self._read_answer(self._session.environment)
         finally:
             self._write_summary()
 
@@ -458,13 +467,32 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             for r in (report or {}).get("rubrics", [])
             if isinstance(r, dict)
         )
-        self._pending_subagent_refs = [
-            SubagentTrajectoryRef(
-                session_id=session_id,
-                trajectory_path=traj_name,
-                extra={"summary": f"Rubric verifier round {round_no}: {statuses or 'no report'}"},
-            )
-        ]
+        self._pending_verifier_step = Step(
+            step_id=0,  # assigned when appended
+            timestamp=datetime.now(timezone.utc).isoformat(),
+            source="system",
+            message=(
+                f"Rubric verifier round {round_no} of {self._max_verify_rounds} consulted "
+                f"({steps_used} command steps, {elapsed:.0f} s); its report is the next "
+                "message to the solver."
+            ),
+            observation=Observation(
+                results=[
+                    ObservationResult(
+                        subagent_trajectory_ref=[
+                            SubagentTrajectoryRef(
+                                session_id=session_id,
+                                trajectory_path=traj_name,
+                                extra={
+                                    "summary": f"Rubric verifier round {round_no}: "
+                                    f"{statuses or 'no report'}"
+                                },
+                            )
+                        ]
+                    )
+                ]
+            ),
+        )
         self._previous_answer = answer
         self._previous_report_text = report_text
         return report_text
@@ -742,7 +770,14 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 ],
                 "decisions": self._decisions,
                 "final_confidence": self._final_confidence,
-                "unverified_finish": self._unverified_finish,
+                "finish_with_commands": self._unverified_finish,
+                "final_answer": self._final_answer,
+                "last_verified_answer": self._previous_answer,
+                "answer_changed_after_last_round": (
+                    None
+                    if self._final_answer is None or self._previous_answer is None
+                    else self._final_answer != self._previous_answer
+                ),
                 "completed_via_confirmation": self._pending_completion,
                 "verifier_prompt_tokens": self._subagent_metrics.total_prompt_tokens,
                 "verifier_completion_tokens": self._subagent_metrics.total_completion_tokens,
