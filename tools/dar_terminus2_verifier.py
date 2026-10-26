@@ -170,12 +170,16 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         include_reasoning: bool | str = False,
         answer_path: str = "/app/output/answer.txt",
         derivation_record: bool | str = False,
+        derivation_template: str | None = None,
         report_confidence: bool | str = True,
         packet_mode: str = "full",
         **kwargs,
     ):
         # Must be set before super().__init__, which reads the prompt template.
         self._derivation_record = _truthy(derivation_record)
+        self._derivation_template = (
+            Path(derivation_template) if derivation_template else DERIVATION_TEMPLATE_PATH
+        )
         super().__init__(*args, **kwargs)
         self._report_confidence = _truthy(report_confidence)
         if packet_mode not in ("full", "index"):
@@ -211,7 +215,7 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         if getattr(self, "_derivation_record", False):
             if self._parser_name != "json":
                 raise ValueError("derivation_record template exists for the json parser only")
-            return DERIVATION_TEMPLATE_PATH
+            return self._derivation_template
         return super()._get_prompt_template_path()
 
     # ------------------------------------------------------------------ hooks
@@ -874,6 +878,7 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 "include_reasoning": self._include_reasoning,
                 "skill_path": str(self._skill_path),
                 "derivation_record": self._derivation_record,
+                "derivation_template": str(self._derivation_template),
                 "report_confidence": self._report_confidence,
                 "packet_mode": self._packet_mode,
                 "rounds_run": self._verify_round,
