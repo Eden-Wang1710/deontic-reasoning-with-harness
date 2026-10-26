@@ -17,11 +17,16 @@
 #          Needs the vLLM server started with tool calling enabled (tools/serve_qwen35_35b.sh
 #          does this). baseline_kira calls litellm directly and ignores llm_kwargs, so the api key
 #          goes through HOSTED_VLLM_API_KEY instead.
+#   t2verify = t2fix plus a rubric-based verifier sub-agent consulted at every completion claim
+#          (tools/dar_terminus2_verifier.py + tools/skills/rubric_verifier/SKILL.md; design in
+#          claude_docs/10_rubric_verifier.md), jobs under jobs/<model>/t2verify-<framing>/.
+#          Tunables via --ak: max_verify_rounds=3 verifier_max_steps=8 include_reasoning=false.
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
 #   AGENT=kira tools/run_dar_qwen35_35b.sh direct                       # baseline_kira harness
 #   AGENT=t2fix tools/run_dar_qwen35_35b.sh direct                      # terminus-2, truthful marker
+#   AGENT=t2verify tools/run_dar_qwen35_35b.sh direct                   # t2fix + rubric verifier
 #   tools/run_dar_qwen35_35b.sh direct                                  # SARA numeric + binary (65 tasks)
 #   SUBSET=all tools/run_dar_qwen35_35b.sh direct                       # all 173 tasks
 #
@@ -48,12 +53,16 @@ case "$AGENT" in
         JOBS="jobs/qwen3.5-35b-a3b/t2fix-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
+  t2verify) AGENT_ARGS="--agent-import-path dar_terminus2_verifier:Terminus2RubricVerifier"
+        JOBS="jobs/qwen3.5-35b-a3b/t2verify-$FRAMING"
+        TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
         JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
-  *) echo "unknown AGENT=$AGENT (t2|t2fix|kira)" >&2; exit 1 ;;
+  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|kira)" >&2; exit 1 ;;
 esac
 
 cd "$(dirname "$0")/../harbor-deonticbench"

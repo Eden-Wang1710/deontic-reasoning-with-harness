@@ -28,7 +28,8 @@ deontic-reasoning-with-harness/
 │   ├── 07_native_trajectories.md    pass-1 trajectory log per model: serving, harness config,
 │   │                                runs, scores, failure modes, deviations from the paper
 │   ├── 08_verbalized_confidence.md  self-verbalised confidence baseline on those trajectories
-│   └── 09_repo_additions.md         this file
+│   ├── 09_repo_additions.md         this file
+│   └── 10_rubric_verifier.md        rubric-based verifier sub-agent: design, protocol, runs
 │
 ├── paper_review_gpt/             ✅ GPT-written Chinese summaries of related papers (owner's;
 │   ├── NN_snake_case.md             do not edit; exception to the English-only rule)
@@ -41,6 +42,12 @@ deontic-reasoning-with-harness/
 │   │                                SUBSET=sara|all; writes harbor-deonticbench/jobs/...
 │   ├── dar_terminus2_local.py       Terminus2 subclass with a truthful truncation marker
 │   │                                (AGENT=t2fix): same 10 KB limit, idempotent limiter
+│   ├── dar_terminus2_verifier.py    Terminus2RubricVerifier (AGENT=t2verify): t2fix whose
+│   │                                completion confirmation runs a verifier sub-agent in a
+│   │                                fresh context with shell access; ≤3 rounds, then finish
+│   │                                with a confidence; logs under <trial>/agent/rubric_verifier/
+│   ├── skills/rubric_verifier/SKILL.md  the verifier's instructions (five rubrics, report
+│   │                                schema); hand-written v1, the object of later optimisation
 │   ├── dar_kira_local.py            baseline_kira subclass (AGENT=kira): reshapes Qwen's
 │   │                                non-conforming execute_commands tool arguments
 │   ├── dar_trajectory_dossiers.py   per-trial dossiers of SARA-numeric trajectories (what
@@ -72,7 +79,8 @@ deontic-reasoning-with-harness/
     ├── datasets/                 ✏️✅ generated Harbor tasks, tracked here on purpose
     │                                (upstream gitignores them; see claude_docs/02 §5)
     ├── .gitignore                ✏️ the `/datasets/` line commented out, with a note
-    └── jobs/qwen3.5-35b-a3b/     ⬜ Harbor job dirs: <framing>/, t2fix-<framing>/, kira-<framing>/
+    └── jobs/qwen3.5-35b-a3b/     ⬜ Harbor job dirs: <framing>/, t2fix-<framing>/, kira-<framing>/,
+                                     t2verify-<framing>/
 ```
 
 Machine-local files that are not in the repository at all (0238): model weights under
