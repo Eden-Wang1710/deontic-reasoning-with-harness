@@ -541,6 +541,32 @@ three sections with `Answer:` last; the 4 others are timeouts before the first c
 4. ✅ Prefix caching removed prefill cost (83 % hit) but the budget is generation-bound;
    the record and the trajectory walk roughly doubled the tokens generated per trial.
 
+#### Verifier cost profile (run-2, 85 rounds) ✅ 2026-10-26
+
+Verifier time is its own generation: 59 ms per completion token over all rounds, so a round
+costs ≈ (calls × ≈500 tokens of mostly thinking) + (final report ≈1.3–1.6k tokens).
+
+| | numeric r1 (n=27) | numeric r2 (n=17) | binary r1 (n=30) | binary r2 (n=10) |
+|---|---|---|---|---|
+| command steps (median) · rounds that hit the 8-step budget | 7 · 12 | 5 · 1 | 5 · 5 | 2 · 0 |
+| LLM calls (mean) | 7.8 | 5.6 | 6.1 | 3.3 |
+| completion tokens (mean) | 6.3k | 5.3k | 5.0k | 2.9k |
+| elapsed (mean) | 374 s | 302 s | 298 s | 171 s |
+| commands run (mean) · output kept in context | 34 · 38 kchars | 19 · 19 kchars | 18 · 22 kchars | 8 · 5 kchars |
+
+Intermediate calls: thinking 1,266 chars median vs. reply 489 chars (thinking ≈80 % of the
+generated text); final-report calls: 2,223 vs. 2,413 chars (≈53 %). Of 1,846 commands,
+1,135 read the statute, 524 the uploaded trajectory file, 109 re-`cat` the answer file that
+is already in the first message, 75 run python; 65 are exact repeats within a round. The
+skill (16 kchars ≈ 4k tokens) is in every call's prefix (cached). Round-2 "delta checks"
+still cost 80 % of a round 1 on numeric. Solver repair segment between two rounds: median
+6 steps numeric, ≈230 s of solver time plus the next verifier round.
+
+Server-side: per-request generation speed on this machine is 29 tok/s at 1 running
+request, 24 at 2, 20 at 3, 16 at 4 (aggregate 29 → 65 tok/s), so `--n-concurrent 4`
+maximises throughput at the cost of per-trial latency; the 1,800 s wall clock is measured
+per trial.
+
 Raw per-trial records: `outputs/verifier_run2_trials.json` and
 `outputs/verifier_run2_summary.txt` on 0238 (gitignored); the numbers above are the shared
 copy. No run-3 parameters are decided; the owner reviews this section first.
