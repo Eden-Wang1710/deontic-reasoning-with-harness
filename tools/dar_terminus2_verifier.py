@@ -468,7 +468,7 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             if isinstance(r, dict)
         )
         self._pending_verifier_step = Step(
-            step_id=0,  # assigned when appended
+            step_id=len(self._trajectory_steps) + 1,  # re-assigned when appended
             timestamp=datetime.now(timezone.utc).isoformat(),
             source="system",
             message=(
