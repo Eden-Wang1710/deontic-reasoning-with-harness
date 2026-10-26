@@ -58,9 +58,31 @@ def _grade(answer: str | None, expected: str | None) -> float | None:
     return 1.0 if a.lower() == e.lower() else 0.0
 
 
+def _task_name(tdir: str) -> str:
+    """The task directory name (e.g. deonticbench-direct-sara-numeric-tax-case-15).
+
+    Trial directory names carry only the subdomain plus a random suffix, so the task identity
+    has to come from the trial's config.json (written at start) or result.json.
+    """
+    for fname in ("config.json", "result.json"):
+        path = os.path.join(tdir, fname)
+        if os.path.exists(path):
+            try:
+                d = json.load(open(path))
+            except Exception:
+                continue
+            if fname == "config.json":
+                task_path = (d.get("task") or {}).get("path")
+            else:
+                task_path = (d.get("task_id") or {}).get("path") or d.get("task_name")
+            if task_path:
+                return os.path.basename(task_path.rstrip("/"))
+    return os.path.basename(tdir).split("__")[0]
+
+
 def load_verifier_trial(tdir: str) -> dict:
     out = load_trial(tdir)
-    out["task"] = out["name"].split("__")[0]
+    out["task"] = _task_name(tdir)
     vdir = os.path.join(tdir, "agent", "rubric_verifier")
     out["rounds"] = []
     for path in sorted(glob.glob(os.path.join(vdir, "round-*.json"))):
@@ -166,7 +188,7 @@ def main():
             if os.path.isdir(d):
                 b = load_trial(d)
                 if b["done"]:
-                    baseline[b["name"].split("__")[0]] = b
+                    baseline[_task_name(d)] = b
 
     by_sub = defaultdict(list)
     for t in done:
@@ -287,22 +309,31 @@ def main():
             print(f"   rubric score on round 1: AUROC {_fmt(auroc(score1, y))}")
 
         if baseline:
-            agree = both = gained = lost = 0
-            for t in ok:
+            # Timed-out / excepted trials count as wrong, as in the job accuracy above.
+            agree = both = gained = lost = lost_timeout = n_cmp = 0
+            for t in ts:
                 b = baseline.get(t["task"])
-                if b is None or b.get("reward") is None or t.get("reward") is None:
+                if b is None or b.get("reward") is None:
                     continue
-                if b["reward"] == t["reward"]:
+                r = t.get("reward") if t.get("exception") is None else 0.0
+                if r is None:
+                    continue
+                n_cmp += 1
+                if b["reward"] == r:
                     agree += 1
-                    both += int(t["reward"] == 1.0)
-                elif t["reward"] == 1.0:
+                    both += int(r == 1.0)
+                elif r == 1.0:
                     gained += 1
                 else:
                     lost += 1
-            bcorrect = sum(1 for t in ok if (baseline.get(t["task"]) or {}).get("reward") == 1.0)
+                    lost_timeout += int(t.get("exception") is not None)
+            bcorrect = sum(
+                1 for t in ts if (baseline.get(t["task"]) or {}).get("reward") == 1.0
+            )
             print(
-                f"   vs baseline: baseline correct {bcorrect}/{len(ok)}; agree {agree} (both correct {both}); "
-                f"gained {gained}, lost {lost}"
+                f"   vs baseline (same {n_cmp} tasks, timeouts counted wrong): baseline correct "
+                f"{bcorrect}; agree {agree} (both correct {both}); gained {gained}, lost {lost} "
+                f"(of which lost by timeout {lost_timeout})"
             )
 
     if args.trials:
@@ -319,7 +350,7 @@ def main():
             b = baseline.get(t["task"]) if baseline else None
             bs = f" base={b['reward']:.0f}" if b and b.get("reward") is not None else ""
             print(
-                f"  {t['name'][-30:]:30s} {st:5s}{bs} exp={t.get('expected')} first={t.get('first_answer')} "
+                f"  {t['task'].split('-')[-1]:>3s} {t['name'][-7:]} {st:5s}{bs} exp={t.get('expected')} first={t.get('first_answer')} "
                 f"got={t.get('got')} conf={t.get('final_confidence')} rounds=[{rounds}] "
                 f"agent={_fmt(t.get('agent_s'), 0)}s unverified_finish={t.get('unverified_finish')}"
             )
