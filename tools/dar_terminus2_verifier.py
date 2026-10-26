@@ -33,6 +33,16 @@ Agent kwargs (``--ak key=value``): ``max_verify_rounds`` (3), ``verifier_max_ste
 ``skill_path`` (tools/skills/rubric_verifier/SKILL.md), ``include_reasoning`` (false),
 ``answer_path`` (/app/output/answer.txt, DAR's convention in all four subdomains).
 
+Run-2 options (claude_docs/10 §8), all off by default so that run-1 is reproducible:
+``derivation_record=true`` swaps the solver's prompt template for
+``tools/templates/terminus-json-plain-derivation.txt`` (the upstream template plus a
+paragraph asking for a three-section answer file: Statute quotes with line numbers,
+Reasoning, Answer line last); ``report_confidence=false`` drops the confidence field from the
+finish instruction and the extra confidence turn; ``packet_mode=index`` gives the verifier
+only the instruction, the answer file and a per-step index (commands, output size,
+truncation), uploads the full trajectory to ``/tmp/rubric_verifier/trajectory.txt`` in the
+container, and lets the verifier read it with its own tools.
+
 Usage (from ``harbor-deonticbench/``, with ``tools/`` on PYTHONPATH):
 
     harbor run --agent-import-path dar_terminus2_verifier:Terminus2RubricVerifier ...
@@ -73,6 +83,10 @@ from dar_terminus2_local import Terminus2TruthfulMarker
 DEFAULT_SKILL_PATH = (
     Path(__file__).resolve().parent / "skills" / "rubric_verifier" / "SKILL.md"
 )
+DERIVATION_TEMPLATE_PATH = (
+    Path(__file__).resolve().parent / "templates" / "terminus-json-plain-derivation.txt"
+)
+CONTAINER_TRAJECTORY_PATH = "/tmp/rubric_verifier/trajectory.txt"
 
 RUBRIC_LABELS = {
     "tool_call_integrity": "Tool-call integrity",
@@ -87,6 +101,7 @@ RUBRIC_LABELS = {
 # whole solver trajectory; the skill tells it to read narrow ranges.
 VERIFIER_OUTPUT_LIMIT = 6000
 
+MARKER_BYTES_RE = re.compile(r"output limited to \d+ bytes; (\d+) interior bytes omitted")
 CONFIDENCE_FIELD_RE = re.compile(
     r'"confidence"\s*:\s*"?\s*(\d{1,3}(?:\.\d+)?)\s*%?\s*"?', re.IGNORECASE
 )
@@ -154,9 +169,18 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         skill_path: str | None = None,
         include_reasoning: bool | str = False,
         answer_path: str = "/app/output/answer.txt",
+        derivation_record: bool | str = False,
+        report_confidence: bool | str = True,
+        packet_mode: str = "full",
         **kwargs,
     ):
+        # Must be set before super().__init__, which reads the prompt template.
+        self._derivation_record = _truthy(derivation_record)
         super().__init__(*args, **kwargs)
+        self._report_confidence = _truthy(report_confidence)
+        if packet_mode not in ("full", "index"):
+            raise ValueError(f"packet_mode must be 'full' or 'index', got {packet_mode!r}")
+        self._packet_mode = packet_mode
         self._max_verify_rounds = int(max_verify_rounds)
         self._verifier_max_steps = int(verifier_max_steps)
         self._include_reasoning = _truthy(include_reasoning)
@@ -182,6 +206,13 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
     @staticmethod
     def name() -> str:
         return "terminus-2-rubric-verifier"
+
+    def _get_prompt_template_path(self) -> Path:
+        if getattr(self, "_derivation_record", False):
+            if self._parser_name != "json":
+                raise ValueError("derivation_record template exists for the json parser only")
+            return DERIVATION_TEMPLATE_PATH
+        return super()._get_prompt_template_path()
 
     # ------------------------------------------------------------------ hooks
 
@@ -273,21 +304,23 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         if self._pending_report_text is None:
             body = (
                 "No verification rounds remain for this task. Finish now: respond with "
-                '"task_complete": true, an empty "commands" array, and a top-level field '
-                '"confidence": <integer 0-100>, your probability that the current answer '
-                "is exactly correct."
+                + self._finish_clause()
             )
         else:
             body = self._pending_report_text + "\n\n" + self._decision_instruction(rounds_left)
         return f"Current terminal state:\n{terminal_output}\n\n{body}"
 
-    @staticmethod
-    def _decision_instruction(rounds_left: int) -> str:
-        finish = (
-            'To finish: respond with "task_complete": true, an empty "commands" array, and '
-            'a top-level field "confidence": <integer 0-100>, your probability that the '
-            "current answer is exactly correct."
-        )
+    def _finish_clause(self) -> str:
+        if self._report_confidence:
+            return (
+                '"task_complete": true, an empty "commands" array, and a top-level field '
+                '"confidence": <integer 0-100>, your probability that the current answer '
+                "is exactly correct."
+            )
+        return '"task_complete": true and an empty "commands" array.'
+
+    def _decision_instruction(self, rounds_left: int) -> str:
+        finish = "To finish: respond with " + self._finish_clause()
         if rounds_left > 0:
             return (
                 f"Decide how to proceed. {rounds_left} verification round(s) remain.\n"
@@ -315,7 +348,11 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             await super()._run_agent_loop(
                 initial_prompt, chat, logging_dir, original_instruction
             )
-            if self._pending_completion and self._final_confidence is None:
+            if (
+                self._report_confidence
+                and self._pending_completion
+                and self._final_confidence is None
+            ):
                 await self._ask_confidence(chat)
             if self._session is not None:
                 self._final_answer = await self._read_answer(self._session.environment)
@@ -332,7 +369,12 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         started = time.time()
 
         answer = await self._read_answer(environment)
-        packet = self._build_packet(commands, terminal_output, answer, round_no)
+        if self._packet_mode == "index":
+            full_text = self._build_packet(commands, terminal_output, answer, round_no)
+            await self._upload_trajectory(environment, full_text, round_no)
+            packet = self._build_index_packet(commands, terminal_output, answer, round_no)
+        else:
+            packet = self._build_packet(commands, terminal_output, answer, round_no)
 
         vchat = Chat(self._llm, interleaved_thinking=self._interleaved_thinking)
         vsteps: list[Step] = []
@@ -610,6 +652,74 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             parts.append(self._previous_report_text)
         return "\n".join(parts)
 
+    async def _upload_trajectory(self, environment, text: str, round_no: int) -> None:
+        """Put the full trajectory text into the container for the verifier to read."""
+        local = self.logs_dir / "rubric_verifier" / f"round-{round_no}.trajectory.txt"
+        local.parent.mkdir(parents=True, exist_ok=True)
+        local.write_text(text)
+        await environment.exec(
+            f"mkdir -p {shlex.quote(str(Path(CONTAINER_TRAJECTORY_PATH).parent))}",
+            timeout_sec=10,
+        )
+        await environment.upload_file(local, CONTAINER_TRAJECTORY_PATH)
+
+    def _build_index_packet(
+        self, commands: list[Command], terminal_output: str, answer: str, round_no: int
+    ) -> str:
+        parts = [
+            "=== TASK INSTRUCTION ===",
+            self._original_instruction.strip(),
+            "",
+            f"=== ANSWER FILE (contents of {self._answer_path}) ===",
+            answer,
+            "",
+            "=== SOLVER TRAJECTORY INDEX ===",
+            f"Full trajectory (every analysis, command and terminal output exactly as the "
+            f"solver saw it) is at {CONTAINER_TRAJECTORY_PATH}; steps are headed "
+            f"'--- step N ---'. Read it with grep -n / sed -n as needed.",
+        ]
+        n = 0
+        for step in self._trajectory_steps:
+            if step.source != "agent":
+                continue
+            n += 1
+            cmds = [
+                tc.arguments.get("keystrokes", "").strip().splitlines()[0][:100]
+                if tc.arguments.get("keystrokes", "").strip()
+                else ""
+                for tc in (step.tool_calls or [])
+                if tc.function_name == "bash_command" and isinstance(tc.arguments, dict)
+            ]
+            claimed = any(
+                tc.function_name == "mark_task_complete" for tc in (step.tool_calls or [])
+            )
+            obs = ""
+            if step.observation and step.observation.results:
+                obs = "\n".join(r.content for r in step.observation.results if r.content)
+            parts.append(self._index_line(n, cmds, obs, claimed))
+        n += 1
+        cmds = [c.keystrokes.strip().splitlines()[0][:100] for c in commands if c.keystrokes.strip()]
+        parts.append(self._index_line(n, cmds, terminal_output, True))
+        parts.append("")
+        parts.append(f"=== VERIFICATION ROUND {round_no} of {self._max_verify_rounds} ===")
+        if round_no > 1 and self._previous_report_text:
+            changed = "unknown"
+            if self._previous_answer is not None:
+                changed = "yes" if answer != self._previous_answer else "no"
+            parts.append(f"Answer file changed since the previous round: {changed}")
+            parts.append("Previous report:")
+            parts.append(self._previous_report_text)
+        return "\n".join(parts)
+
+    @staticmethod
+    def _index_line(n: int, cmds: list[str], obs: str, claimed: bool) -> str:
+        size = len(obs.encode("utf-8"))
+        m = MARKER_BYTES_RE.search(obs)
+        trunc = f", truncated ({m.group(1)} bytes omitted)" if m else ""
+        cmd_text = "; ".join(c for c in cmds if c) or "(no commands)"
+        flag = " | task_complete claimed" if claimed else ""
+        return f"step {n} | {cmd_text} | output {size} bytes{trunc}{flag}"
+
     def _format_agent_step(self, n: int, step: Step) -> str:
         lines = [f"--- step {n} ---"]
         if self._include_reasoning and step.reasoning_content:
@@ -763,6 +873,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 "verifier_max_steps": self._verifier_max_steps,
                 "include_reasoning": self._include_reasoning,
                 "skill_path": str(self._skill_path),
+                "derivation_record": self._derivation_record,
+                "report_confidence": self._report_confidence,
+                "packet_mode": self._packet_mode,
                 "rounds_run": self._verify_round,
                 "rounds": [
                     {k: v for k, v in r.items() if k not in ("commands", "report_text")}

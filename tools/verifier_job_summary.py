@@ -85,11 +85,19 @@ def load_verifier_trial(tdir: str) -> dict:
     out["task"] = _task_name(tdir)
     vdir = os.path.join(tdir, "agent", "rubric_verifier")
     out["rounds"] = []
+    out["record_ok"] = None  # run-2: answer file has the three sections and ends with Answer:
     for path in sorted(glob.glob(os.path.join(vdir, "round-*.json"))):
         try:
             r = json.load(open(path))
         except Exception:
             continue
+        raw = r.get("answer") or ""
+        if raw and raw != "(no answer file)":
+            lines = [ln for ln in raw.strip().splitlines() if ln.strip()]
+            out["record_ok"] = (
+                "## Statute" in raw and "## Reasoning" in raw and "## Answer" in raw
+                and bool(lines) and lines[-1].lower().startswith("answer:")
+            )
         statuses = {}
         for item in (r.get("report") or {}).get("rubrics", []) or []:
             if isinstance(item, dict) and item.get("name"):
@@ -238,6 +246,9 @@ def main():
             f"{n_fin_cmd}, of which the answer changed after the last round {n_unver}; "
             f"extra confidence turn needed {n_extra}"
         )
+        rec = [t.get("record_ok") for t in ok if t.get("record_ok") is not None]
+        if rec:
+            print(f"   answer file in the three-section format at the last round: {sum(rec)}/{len(rec)}")
         no_report = sum(1 for t in ok for r in t["rounds"] if not r["has_report"])
         ctx = sum(1 for t in ok for r in t["rounds"] if r.get("context_exceeded"))
         steps = [r["steps_used"] for t in ok for r in t["rounds"] if r.get("steps_used") is not None]

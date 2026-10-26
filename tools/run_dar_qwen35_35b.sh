@@ -21,6 +21,11 @@
 #          (tools/dar_terminus2_verifier.py + tools/skills/rubric_verifier/SKILL.md; design in
 #          claude_docs/10_rubric_verifier.md), jobs under jobs/<model>/t2verify-<framing>/.
 #          Tunables via --ak: max_verify_rounds=3 verifier_max_steps=8 include_reasoning=false.
+#   t2verify2 = run-2 configuration of the same agent (claude_docs/10 §8): solver writes a
+#          three-section answer file (derivation_record=true, tools/templates/), no confidence
+#          field (report_confidence=false), verifier gets a trajectory index and reads the full
+#          trajectory from a file in the container (packet_mode=index), skill v2
+#          (tools/skills/rubric_verifier_v2/SKILL.md). Jobs under the same t2verify-<framing>/.
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
@@ -57,12 +62,18 @@ case "$AGENT" in
         JOBS="jobs/qwen3.5-35b-a3b/t2verify-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
+  t2verify2) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        AGENT_ARGS="--agent-import-path dar_terminus2_verifier:Terminus2RubricVerifier \
+          --ak derivation_record=true --ak report_confidence=false --ak packet_mode=index \
+          --ak skill_path=$TOOLS_DIR/skills/rubric_verifier_v2/SKILL.md"
+        JOBS="jobs/qwen3.5-35b-a3b/t2verify-direct"
+        export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
         JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
-  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|kira)" >&2; exit 1 ;;
+  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|kira)" >&2; exit 1 ;;
 esac
 
 cd "$(dirname "$0")/../harbor-deonticbench"

@@ -9,7 +9,14 @@
 #   Native tool calling enabled (qwen3_xml parser) for the meta-harness baseline_kira agent,
 #   which passes `tools` and no max_tokens; max_new_tokens 16384 is the server-side default
 #   for such requests (terminus-2 sends its own max_tokens, unaffected). Added 2026-10-16.
+# PREFIX_CACHE=1 (default since 2026-10-26, run-2 of the rubric verifier) adds
+# --enable-prefix-caching. vLLM disables automatic prefix caching by default for this hybrid
+# (Gated DeltaNet + attention) model; the hit rate was 0.0 % in every run before run-2
+# (claude_docs/10 §7.2). Set PREFIX_CACHE=0 to reproduce the earlier server configuration.
 set -euo pipefail
+PREFIX_CACHE="${PREFIX_CACHE:-1}"
+EXTRA_ARGS=""
+if [ "$PREFIX_CACHE" = "1" ]; then EXTRA_ARGS="--enable-prefix-caching"; fi
 
 MODEL_DIR="${MODEL_DIR:-$HOME/models/Qwen3.5-35B-A3B}"
 PORT="${PORT:-9009}"
@@ -35,4 +42,5 @@ exec "$PY/vllm" serve "$MODEL_DIR" \
   --enable-auto-tool-choice --tool-call-parser qwen3_xml \
   --override-generation-config '{"max_new_tokens": 16384}' \
   --limit-mm-per-prompt '{"image":0,"video":0}' \
+  $EXTRA_ARGS \
   2>&1 | tee -a "$LOG"

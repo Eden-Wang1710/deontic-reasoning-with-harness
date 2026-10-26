@@ -306,3 +306,26 @@ solver's own generation stalled), 6 during repair after one round.
 Raw per-trial records: `outputs/verifier_run1_trials.json` and
 `outputs/verifier_run1_summary.txt` on 0238 (gitignored); the numbers above are the shared
 copy.
+
+## 8. Run-2: derivation record, index packet, skill v2 (owner's decisions 2026-10-26)
+
+Decided after the review of §7.2. Everything below is switchable by agent kwargs so that
+run-1 stays reproducible (`AGENT=t2verify2` in `tools/run_dar_qwen35_35b.sh` sets them all).
+
+| Change | Mechanism | Why |
+|---|---|---|
+| **Solver writes a three-section answer file** (`derivation_record=true`) | The solver's prompt template is swapped for `tools/templates/terminus-json-plain-derivation.txt`: the upstream `terminus-json-plain.txt` plus one paragraph after the task description. The answer file named by the task must contain `## Statute` (verbatim quotes with section and line numbers), `## Reasoning` (provisions applied to the facts, origin of every number, python for arithmetic) and `## Answer`, with `Answer: <value>` as its last line. DAR's `test.sh` takes the last `Answer:` line, so the grader is unchanged. The solver writes it the way it already writes the answer (a heredoc through the terminal); no new mechanism. | §7.2 reading 1: the verifier only catches what is visible in the solver's text. The record makes the provisions and numbers explicit, so coverage and grounding become line-level checks and the fact ledger becomes a diff between the instruction and the Reasoning section. The idea is DAR's unreleased `kira_deontic_grounded`. The solver is **not** told what the verifier checks; the report says it. |
+| **No confidence** (`report_confidence=false`) | Finish instruction asks only for `task_complete: true` with empty commands; no extra turn. | Owner: a constant 100 % after an all-YES report carries nothing (§7.2 confidence table). |
+| **Index packet** (`packet_mode=index`) | The verifier's first message holds the instruction, the answer file and a one-line-per-step index (commands, output size, truncation marker, completion claim). The full trajectory text is uploaded to `/tmp/rubric_verifier/trajectory.txt` in the container (`environment.upload_file`); the verifier reads it with `grep -n` / `sed -n` like the statute. | Owner: let the verifier use the harness's own capabilities instead of receiving everything in-prompt. Also cuts the per-call prompt from 9–15k to a few k tokens. |
+| **Skill v2** (`tools/skills/rubric_verifier_v2/SKILL.md`) | Checks target the record: statute quotes verified at the cited lines and against what the solver's terminal actually displayed; every number in Reasoning classified (fact / quote / computation); fact ledger is a required report field `facts` (every case fact → consuming section or `UNUSED`); condition check includes limitations the file applies on top of the quoted provisions; entailment questions do not fail on facts the statement presupposes; "point, do not solve" rule with `quoted_lines`; only actionable items in `unresolved`; later rounds are delta checks. | §7.2: the three right→wrong cases were reports that supplied a wrong replacement; FUTA / dependents / status were never questioned because the fact ledger was advisory and not executed; round-2 reports re-audited everything. |
+| **Server: prefix caching on** | `tools/serve_qwen35_35b.sh` now passes `--enable-prefix-caching` (`PREFIX_CACHE=0` restores the old configuration). vLLM 0.20.1 accepts it for this model with "Mamba cache mode 'align'" and marks it experimental. | §7.2 cost: 0 % hit rate made every call re-prefill; verifier prefill starved the other solvers and caused the timeouts. Baseline is not re-run (owner): its single timeout was wrong by file anyway. |
+| Unchanged | t2fix base, T 0.7, thinking on, 3 rounds, 8 verifier steps, no solver thinking in the packet, 1,800 s wall clock, 65 SARA tasks, 4 concurrent, no new controls; binary included for comparability. | |
+
+Job: `jobs/qwen3.5-35b-a3b/t2verify-direct/sara-t2verify-run2`. Smoke test on one numeric
+and one binary task first; after the smoke test no code or skill change before the full run.
+If prefix caching could not be enabled, the contention problem has to be solved another way
+before run-2 (owner's instruction); the §8 run log records which.
+
+### 8.1 Run log
+
+(filled in as runs complete)
