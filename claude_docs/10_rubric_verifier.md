@@ -146,4 +146,45 @@ include them.
 
 ## 7. Runs
 
-(filled in as runs complete)
+### 7.1 Smoke test (`jobs/qwen3.5-35b-a3b/t2verify-direct/verify-smoke1`, 2026-10-26) ✅
+
+One SARA-numeric task (tax-case with "Bob is Alice's father, no income"; gold 102150). The
+pipeline ran end to end with no exception: 2 verifier rounds, one repair turn, the solver
+then finished with `task_complete` plus a `cat` of the answer file and no `confidence`
+field, so the extra confidence turn fired ("Confidence: 100%"). Agent time 934 s (baseline
+median for numeric 687 s), of which the verifier took 485 s; verifier tokens 66k prompt +
+14k completion on top of the solver's own. Files written as described in §5; the verifier
+rounds appear in `trajectory.json` as system steps with subagent references (first version
+reused terminus-2's summarisation hook, whose fixed message reads "Performed context
+summarization and handoff"; replaced by an explicit "Rubric verifier round N consulted"
+step before the full run).
+
+What the verifier did (round 1, 5 command steps, 19 commands, 204 s): `wc -l`, listed the
+section headings, grepped the solver's cited §161 and §160 (absent), read §63 and §151, re-ran
+the solver's two arithmetic steps in python. Report: integrity YES, coverage YES, grounding
+**NO** (§161 does not exist; the standard deduction is in §63), provision selection YES,
+computation **NO** (prose arithmetic). Suggested actions: verify citations, use python3,
+"replace §161 with §63". Round 2 (0 commands, 282 s of thinking): same five statuses, one
+unresolved item (the §161 citation in earlier steps).
+
+What the solver did: after round 1 it re-ran its own arithmetic in python, confirmed 102546,
+and re-claimed; after round 2 it argued that the citation error is "in my reasoning text, not
+in the final answer" and finished. The answer never changed and is wrong: the solver treated
+Alice as single with one exemption; the case facts make Bob a dependent (§152) with the
+consequences the gold Prolog applies. Neither round touched §152 or the fact "Bob has no
+income": provision selection was marked YES both times on the basis of the provisions the
+solver *did* apply, i.e. the fact ledger of the skill was not actually executed. Two
+observations for the skill, recorded here and not acted on before the full run (hand-written
+v1 is frozen for `sara-t2verify-run1`):
+
+1. The verifier re-reports historical defects that cannot be remedied (a citation in an
+   earlier step) as unresolved, which drives repair rounds that cannot change the answer.
+2. The fact ledger needs to be forced (one line per fact, every fact), otherwise the verifier
+   checks the solver's provisions instead of the case's facts and the FUTA / dependency /
+   filing-status classes of [07](07_native_trajectories.md) §1.5.1 pass unnoticed.
+
+### 7.2 Full SARA pass (`sara-t2verify-run1`, started 2026-10-26 00:49 UTC)
+
+65 tasks (sara-numeric 35 + sara-binary 30), `--n-concurrent 4`, settings of §6. Results
+below when the job completes; scored with `tools/verifier_job_summary.py <job> --baseline
+jobs/qwen3.5-35b-a3b/t2fix-direct/sara-t2fix-run1`.
