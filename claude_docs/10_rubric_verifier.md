@@ -190,5 +190,119 @@ launch at 00:49 was discarded after two trials (kept as `broken-run0-step-id-bug
 system step added after the smoke test was built with `step_id=0`, pydantic rejected it after
 the report had been produced, and the solver received the error fallback instead of the
 report. Fixed (`fc50340`), verified on the first trial of the restart (report present in the
-solver's observation, system step recorded). Results below when the job completes; scored with `tools/verifier_job_summary.py <job> --baseline
-jobs/qwen3.5-35b-a3b/t2fix-direct/sara-t2fix-run1`.
+solver's observation, system step recorded). Finished 05:42 UTC (4 h 37 min wall); 65/65
+trials, 11 `AgentTimeoutError` (all numeric). Scored with `tools/verifier_job_summary.py
+<job> --baseline jobs/qwen3.5-35b-a3b/t2fix-direct/sara-t2fix-run1 --trials` ✅ 2026-10-26.
+
+**Grading convention.** Harbor still runs `test.sh` on a timed-out trial, so a timed-out
+trial has a reward from whatever was in the answer file. The protocol of
+[07](07_native_trajectories.md) counts timed-out trials as wrong; the table gives that
+number first and the file-graded number in brackets. The baseline's single timeout
+(case 94) was wrong by file as well, so its numbers are the same under both conventions.
+
+#### Accuracy, per task against the baseline (same 65 tasks, one draw each)
+
+| Subdomain | n | run-1 correct | baseline `sara-t2fix-run1` | both | gained | lost | of lost: by timeout |
+|---|---|---|---|---|---|---|---|
+| sara-numeric | 35 | **10 (0.286)** [file-graded 13 (0.371)] | 7 (0.200) | 5 | 5 | 2 | 2 (cases 85, 71: correct answer in the file, no time left to confirm) |
+| sara-binary | 30 | **24 (0.800)**, macro-F1 0.796 | 27 (0.900) | 24 | 0 | 3 | 0 |
+
+Accuracy at DAR's 600 s limit: numeric 0/35, binary 21/30; every numeric trial now exceeds
+600 s, so the paper-comparable column is empty for this agent.
+
+#### What the verifier changed within a trial (finished trials only)
+
+| Subdomain | n finished | acc at first completion claim | final acc | answer changed | wrong→right | right→wrong |
+|---|---|---|---|---|---|---|
+| sara-numeric | 24 | 5/24 (0.208) | 10/24 (0.417) | 16 | 6 (cases 15, 51, 63, 73, 74, 93) | 1 (case 56) |
+| sara-binary | 30 | 25/30 (0.833) | 24/30 (0.800) | 3 | 1 (xC7p9y8) | 2 (JBnGGhw, akzbtTQ) |
+
+Rounds: numeric 2 rounds in 21 trials, 3 in 3; binary 1 round in 21, 2 in 8, 3 in 1. The
+solver chose *continue* after 27 of 51 numeric reports and 10 of 40 binary reports, never
+finished with commands that changed the answer after the last round, and needed the extra
+confidence turn twice. The verifier always returned a report (no step-budget or context
+failures); mean 3.3 command steps per numeric round, 2.2 per binary round; 0 commands in 6
+rounds (round-2 confirmations).
+
+**All six numeric repairs are the standard-deduction class** of
+[07](07_native_trajectories.md) §1.5.1: the solver had used $4,400 / $6,350 / $12,700 with a
+fabricated §162 / §163 / §161 citation; the verifier `grep`'d the citation (absent), read
+§63(c), reported "the figure is not in the file" and pointed at the section; the solver re-read
+it and recomputed, mostly with python. The two baseline-wrong cases among them (15, 63) are
+the net gain from repair; the other four were right in the baseline draw, so on those tasks
+the verifier recovered what sampling had lost. Case 63 took all three rounds (5 → 4 → 3 items
+not YES) and 1,711 s.
+
+**What was not repaired** (14 finished numeric trials still wrong): the classes the
+verifier cannot see in the solver's text. Dependents (cases 18, 29, 49, 60), FUTA
+(47, 58, 91, 97), filing status (35, 39, 64, 78), the 2018 rule (90), §68 / phase-out (6, 56).
+Round-1 reports mention the standard deduction in 24 of 28 numeric reports, a non-existent
+section in 11, dependents in 11, filing status in 7, **FUTA in 3** (of 6 FUTA cases that
+reached a round). Seven of the 14 changed their answer after the report and stayed wrong
+(e.g. 60: 3641 → 4631, gold 4331; 47: 43204 → 45616, gold 45946): the verifier's lead fixed
+one item and the remaining item kept the answer off.
+
+**The right→wrong cases are the verifier's own errors, obeyed by the solver.**
+Numeric case 56 (AGI $395k, itemised deductions): the verifier reported "§151 personal
+exemption of $2,000 not applied" and suggested adding it; the exemption is phased out to
+zero at that AGI by §151(d)(3), the solver's first answer (130388) was right, the repaired
+one (129596) is wrong. Binary JBnGGhw and akzbtTQ: the verifier flagged "a condition of the
+cited section is not stated in the facts" and the solver flipped Entailment →
+Contradiction; the statement presupposes the section, so the flip is wrong. In all three
+the report contained a replacement figure or conclusion, against the skill's rule.
+
+#### Confidence and rubric signals
+
+| Subdomain | n | stated confidence: mean / distinct values | AUROC | ECE | Brier | rubric score (1 − notYES/5), last round: AUROC | round 1: AUROC |
+|---|---|---|---|---|---|---|---|
+| sara-numeric | 24 | 1.00 / {1.0} | 0.50 | 0.58 | 0.58 | 0.43 (21 of 24 trials all-YES) | 0.60 |
+| sara-binary | 30 | 0.99 / {0.9, 0.95, 1.0} | 0.51 | 0.19 | 0.20 | 0.46 (28 of 30 all-YES) | 0.61 |
+
+The solver's stated confidence after the verifier loop is exactly as constant as in
+[08](08_verbalized_confidence.md): every numeric trial says 100 %. The last-round rubric
+statuses are almost all YES by construction (the solver repairs until the verifier is
+satisfied), so they carry no signal; the round-1 count of items not YES is weakly ordered
+(AUROC 0.60 / 0.61 with 10 / 6 positives, CIs include 0.5). Neither reaches the working target
+of [05](05_confidence_proposal.md) §8 (AUROC ≥ 0.7 and ECE ≤ 0.15).
+
+#### Cost
+
+| Subdomain | solver-only time, median | agent time incl. verifier, median (baseline) | verifier time / trial, mean | verifier tokens / trial, mean | solver tokens / trial, mean (baseline completion) | trials > 1,800 s |
+|---|---|---|---|---|---|---|
+| sara-numeric | 677 s | 1,119 s (687 s) | 471 s | 101k prompt + 7.6k completion | 69k prompt + 11.5k completion (11.5k) | 11 (baseline 1) |
+| sara-binary | 232 s | 442 s (210 s) | 254 s | 40k prompt + 4.0k completion | 34k + 4.1k (3.9k) | 0 |
+
+Verifier prompt tokens are the sum over the 4–6 calls of a round, each of which re-sends the
+whole verifier conversation (skill ≈ 2.5k + packet 5–9k + tool outputs; single calls are 9–15k
+tokens). The vLLM server reports a **prefix-cache hit rate of 0.0 %** throughout: prefix
+caching is disabled by default for this hybrid Gated-DeltaNet model, so every call re-prefills
+from scratch, for the solver's own episodes as much as for the verifier. With four trials
+sharing the server, that prefill load is what slows the other solvers: in the timed-out trial
+`rVqkyP7` one 7,843-token solver generation took 1,654 s (4.7 tok/s against ~15 tok/s normal).
+Of the 11 timeouts, 5 occurred before the first completion claim (0 verifier rounds; the
+solver's own generation stalled), 6 during repair after one round.
+
+#### Reading
+
+1. **Verification → repair works on the error class that is visible in the solver's text.**
+   Six of 24 finished numeric trials went from wrong to right, all standard-deduction /
+   fabricated-citation cases; none of the dependents, FUTA, filing-status or phase-out
+   cases was repaired, because the solver's analysis never mentions the fact or section the
+   verifier would need to question (FUTA named in 3 of 28 reports). This is the argument for
+   making the solver state its derivation explicitly (§8).
+2. **The 1,800 s wall clock takes back most of the gain.** Net +3 numeric under the protocol,
+   +6 file-graded; 11 timeouts against 1 in the baseline, three of them with the right answer
+   already in the file. The cause is server contention from un-cached prefill, not the
+   verifier's own reasoning time (median 446 s per numeric trial).
+3. **The verifier's reports are not answer-free.** 16 of 52 round-1 reports contain a figure
+   or a python expression; the three right→wrong cases are reports whose replacement was
+   wrong and which the solver followed without re-deriving. Binary, at 0.83–0.90 saturation,
+   has only downside: 1 repair, 2 damages.
+4. **No confidence signal yet.** Stated confidence is constant; last-round rubric statuses are
+   saturated by the repair loop itself. Any rubric-derived confidence has to come from the
+   round-1 report, from unresolved items, or from the solver's derivation record, not from
+   the final statuses.
+
+Raw per-trial records: `outputs/verifier_run1_trials.json` and
+`outputs/verifier_run1_summary.txt` on 0238 (gitignored); the numbers above are the shared
+copy.
