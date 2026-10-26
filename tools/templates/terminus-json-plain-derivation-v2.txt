@@ -53,10 +53,10 @@ Task Description:
 Answer file format (required by this harness): the answer file named in the task must contain three sections, in this order, and its LAST line must be exactly "Answer: <value>". No other line may start with "Answer:".
 
 ## Statute
-List the provisions you rely on, one per line: the section number (e.g. §63(c)(2)(A)) and, in your own words, what it provides. Cite only sections you have read in this terminal.
+List the provisions you rely on, one per line: the section number (e.g. §63(c)(2)(A)).
 
 ## Reasoning
-Apply those provisions to the case facts. Say where every number comes from: a case fact, a cited section, or a computation (give the expression and run it with python3).
+How you apply those provisions to the case facts.
 
 ## Answer
 Answer: <value>
@@ -64,7 +64,8 @@ Answer: <value>
 Write the file with a quoted heredoc, for example:
 cat > /app/output/answer.txt <<'EOF'
 ## Statute
-§1(a): tax rate schedule for married individuals filing jointly.
+§1(a)
+§63(c)(2)(A)
 ...
 ## Reasoning
 ...
