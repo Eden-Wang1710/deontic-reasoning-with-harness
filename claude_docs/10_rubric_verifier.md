@@ -425,7 +425,25 @@ on average. The budget is consumed by **generated** tokens, and run-2 generates 
 them: the record template makes the solver `grep -n` / `sed -n` each provision and write the
 file in several heredocs (3 → 10 steps to the first claim), the verifier walks the uploaded
 trajectory with its own commands (5.7 steps per round instead of 3.3), and the index packet
-saves prompt tokens per call but not calls. A numeric trial now spends ≈780 s reaching the
+saves prompt tokens per call but not calls. Per-episode breakdown of the solver's time before the first claim (LLM latency including
+thinking, all 35 numeric trials, from `episode-*/debug.json`) ✅ 2026-10-26:
+
+| Episode type (by its commands) | run-1 episodes/trial · s/trial | run-2 episodes/trial · s/trial |
+|---|---|---|
+| `cat` the whole statute | 1.1 · 34 | 1.0 · 18 |
+| `grep -n` / `sed -n` on the statute | 1.0 · 92 | **6.5 · 546** |
+| `python3` computation | 0.4 · 105 | 1.0 · 157 |
+| write the answer file | 1.0 · 236 | 1.0 · 115 |
+| re-read the answer file (`cat` / `tail`) | 0.1 · 11 | 1.5 · 20 |
+| total before the first claim | ≈490 | ≈860 |
+
+The extra ≈370 s is the `grep`/`sed` row: the template's "quote verbatim with section and
+line numbers; find them with `grep -n` / `sed -n`; do not cite from memory" makes the solver
+locate every provision it cites in its own short episode, and each episode carries its own
+thinking (≈84 s median). Writing the long file itself got *cheaper* (236 → 115 s), because
+the reasoning that run-1 did inside the write episode moved into the search episodes. After
+a report the same pattern repeats (3–4 search episodes, then a full rewrite of the file).
+A numeric trial now spends ≈780 s reaching the
 first claim, ≈300 s per verifier round, and ≈300 s per repair round, which fits two rounds in
 1,800 s only when nothing is flagged. The 1,800 s wall clock is the binding constraint of
 this design, not the verifier's judgement.
