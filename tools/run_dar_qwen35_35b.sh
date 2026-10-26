@@ -36,7 +36,8 @@
 #   SUBSET=all tools/run_dar_qwen35_35b.sh direct                       # all 173 tasks
 #
 # SUBSET (default "sara") selects subdomains by task-name glob:
-#   sara = sara-numeric + sara-binary (decision 2026-10-15: only SARA for now), all = no filter
+#   sara = sara-numeric + sara-binary (decision 2026-10-15: only SARA for now), numeric / binary =
+#   one SARA subdomain (smoke tests), all = no filter
 #
 # Settings (decided 2026-10-15, see claude_docs/05 decision log):
 #   agent terminus-2, 4 concurrent trials, agent timeout 600 s x 3,
@@ -47,8 +48,10 @@ FRAMING="${1:?framing: direct | zeroshot | fewshot}"; shift || true
 SUBSET="${SUBSET:-sara}"
 case "$SUBSET" in
   sara) INCLUDE="--include-task-name '*-sara-numeric-*' --include-task-name '*-sara-binary-*'" ;;
+  numeric) INCLUDE="--include-task-name '*-sara-numeric-*'" ;;
+  binary)  INCLUDE="--include-task-name '*-sara-binary-*'" ;;
   all)  INCLUDE="" ;;
-  *) echo "unknown SUBSET=$SUBSET (sara|all)" >&2; exit 1 ;;
+  *) echo "unknown SUBSET=$SUBSET (sara|numeric|binary|all)" >&2; exit 1 ;;
 esac
 MODEL_INFO='{"max_input_tokens": 49152, "max_output_tokens": 16384, "max_tokens": 65536, "input_cost_per_token": 0.0, "output_cost_per_token": 0.0}'
 AGENT="${AGENT:-t2}"

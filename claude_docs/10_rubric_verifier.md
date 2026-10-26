@@ -328,4 +328,33 @@ before run-2 (owner's instruction); the §8 run log records which.
 
 ### 8.1 Run log
 
-(filled in as runs complete)
+**Prefix caching** ✅ 2026-10-26 06:23: server restarted with `--enable-prefix-caching`; the
+same 6,696-token prompt sent twice took 4.0 s then 0.3 s, and the log reported a 47 % hit
+rate after the pair. vLLM accepts the flag for this model ("Mamba cache mode 'align'",
+experimental).
+
+**Smoke test 1** (`verify2-smoke`, 1 binary + 1 numeric, 06:24–07:00) ✅. Mechanics all
+worked: the solver wrote the three-section answer file in both trials (quotes with section
+and line numbers, a `Reasoning` section, `Answer:` last); the verifier's first message was
+2.2 kchars (index) instead of 14–21 kchars; the verifier read the uploaded trajectory file
+with `grep -n` / `sed -n` (12 of 39 commands in the numeric round 1) and filled `facts` and
+`quoted_lines`. Binary trial (same §2(b)(2)(C) pattern that produced a right→wrong flip in
+run-1): round 1 flagged the (B) nonresident-alien exception as unchecked; the solver read
+§2(b)(2)(B), added it to the record with "the facts do not state Alice was a nonresident
+alien, so the exception does not apply", kept Entailment (correct), round 2 all YES. Numeric
+trial (tax-case-93, "Bob is Alice's father, no income", gold 102150): answer 102546 both
+rounds, wrong as in both earlier runs. Two skill defects visible:
+
+1. The fact ledger listed "Bob has no income in 2015 → UNUSED" in both rounds and round 2
+   even suggested "verify under §151(b) dependency rules", yet provision selection was YES
+   both times and the solver finished. The lead was surfaced but not turned into a verdict.
+2. Four of five round-1 unresolved items were line-number corrections for quotes that were
+   verbatim and a few lines off; the solver spent its first repair round fixing line numbers.
+   Round-1 verifier cost 328 s / 39 commands, agent time 1,465 s in total.
+
+Skill v2 amended before the full run (no code change): an `UNUSED` fact about money, work,
+relationship, household, support, age or residency makes rubric 4 `NO` or `UNKNOWN` with an
+unresolved item, after the verifier has grepped the file for that kind of fact; line-number
+slips on verbatim quotes go in `evidence` only; the trajectory file is stated to be complete
+(the verifier had read a capped `sed` output as "the file is truncated"). Re-smoked on one
+numeric task before the full run (below).

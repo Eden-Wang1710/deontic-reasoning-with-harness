@@ -79,7 +79,9 @@ Every reply is exactly one JSON object and nothing else:
 - A trajectory index: one line per solver step with the commands it ran, the size of the
   terminal output it saw and whether that output was truncated. The full trajectory (every
   analysis, command and observation, exactly as the solver saw it) is at the path given in
-  the index header; read it with `grep -n` / `sed -n` when a rubric needs it.
+  the index header; read it with `grep -n` / `sed -n` when a rubric needs it. The file is
+  complete; only *your* command output is capped at a few thousand bytes, so read it in
+  narrow ranges rather than concluding that the file is truncated.
 - On a second or later round: your previous report and whether the answer file changed.
 
 ## Procedure
@@ -131,6 +133,12 @@ the rule file or the case facts?*
   the instruction, (b) a figure from a quoted provision, or (c) derived by a stated
   computation whose inputs are themselves (a) or (b). A number with none of these sources,
   or a (b) that is not in the quoted text, is a violation.
+- A cited line number that is off by a few lines while the quoted text is verbatim and
+  present nearby is **not** a violation: mention the correct lines in `evidence` and move
+  on; never list it under `unresolved`. The violations are quotes whose text is not in the
+  file, altered text or numbers, and section numbers that do not match the text quoted
+  (e.g. the standard deduction text labelled with a section that does not exist, or with a
+  section that in the file says something else).
 - `YES`: every quote is verbatim and every number traces back. `NO`: name the quote or number
   and where it appears. `UNKNOWN`: a figure might be derived, but the derivation is not shown.
 
@@ -168,8 +176,18 @@ Do it as a ledger, not as an impression, and put the ledger in the report (`fact
   report "the facts do not state X" unless the file makes X decisive and the facts contradict
   it or leave the conclusion open.
 - Read the sections yourself where the record does not show the check.
-- `YES`: every fact is consumed or justifiably unused, and every applied provision has its
-  conditions met by named facts. `NO`: an engaged provision was never considered, or a
+- **An `UNUSED` fact decides the verdict.** If any fact about money paid or received, work
+  or employment, a relationship, who lives with or supports whom, age, disability or
+  residency is `UNUSED`, this rubric cannot be `YES`: `grep -n` the file for the kind of fact
+  (e.g. `dependent`, `father|parent|child`, `wages|employer|employment`, `household`,
+  `support`, `age|65`) before you report, and then either cite the section that engages the
+  fact (`NO`, with an unresolved item naming the fact and the section) or state what you
+  searched and found nothing (`UNKNOWN`, with an unresolved item asking the solver to check
+  the same sections). "The solver did not mention it" and "it is probably irrelevant" are
+  not findings.
+- `YES`: every fact is consumed or justifiably unused (you searched the file and found no
+  section that engages it), and every applied provision has its conditions met by named
+  facts. `NO`: an engaged provision was never considered, or a
   condition was treated as met without a supporting fact, or an exception or limitation that
   the facts trigger was not applied. `UNKNOWN`: the record does not show the check and you
   could not complete it within budget. In the evidence, name the fact and the section, not
