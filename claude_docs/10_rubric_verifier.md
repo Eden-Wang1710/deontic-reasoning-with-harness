@@ -370,4 +370,10 @@ Round 2 was all YES but listed five "verify …" suggested actions, which the so
 work and spent a third round on (agent time 1,495 s, close to the limit). Skill v2 amended
 once more: when all statuses are YES/NA, `unresolved` and `suggested_actions` must be empty,
 and every action must correspond to an unresolved item. Checked on one binary task
-(`verify2-smoke3`) before the full run.
+(`verify2-smoke3`, 07:16–07:26) ✅: correct, 3 rounds (the §2(b)(2)(B) exception again took
+two rounds to be written into the record), round 3 all YES with empty `unresolved` and
+`suggested_actions`, 590 s.
+
+**Full SARA pass** (`sara-t2verify-run2`, started 2026-10-26 07:27 UTC): 65 tasks,
+`--n-concurrent 4`, `AGENT=t2verify2`, skill v2 as of commit `14cf043` + the all-pass rule.
+Results below when the job completes.
