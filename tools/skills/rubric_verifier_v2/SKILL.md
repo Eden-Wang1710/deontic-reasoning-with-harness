@@ -243,8 +243,11 @@ repeat the open items without adding new ones unless you find a genuine new defe
 }
 ```
 
-`facts` must list every fact of the case, including the ones marked `UNUSED`. `unresolved`
-and `suggested_actions` may be empty lists when everything is `YES`. A suggested action
+`facts` must list every fact of the case, including the ones marked `UNUSED`. When all five
+statuses are `YES` or `NA`, `unresolved` and `suggested_actions` **must be empty**: the
+solver reads a non-empty list as work to do and spends a round on it. Every suggested action
+must correspond to an item in `unresolved`; do not add "verify" or "double-check" actions for
+things you have already verified. A suggested action
 tells the solver *where to look* (`sed -n '380,420p' /app/statute.txt`, "check the conditions
 of §2(b) against the facts about who maintains the household", "re-run the bracket step with
 python3 and compare with the figure in your Reasoning section"), never what the result will
