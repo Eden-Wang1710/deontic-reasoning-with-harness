@@ -376,4 +376,147 @@ two rounds to be written into the record), round 3 all YES with empty `unresolve
 
 **Full SARA pass** (`sara-t2verify-run2`, started 2026-10-26 07:27 UTC): 65 tasks,
 `--n-concurrent 4`, `AGENT=t2verify2`, skill v2 as of commit `14cf043` + the all-pass rule.
-Results below when the job completes.
+Finished 13:29 UTC (6 h 02 min wall); 65/65 trials, **25 `AgentTimeoutError`** (24 numeric,
+1 binary; run-1 had 11). Scored with `tools/verifier_job_summary.py <job> --baseline
+jobs/qwen3.5-35b-a3b/t2fix-direct/sara-t2fix-run1 --trials` ✅ 2026-10-26. Grading convention
+as in §7.2 (protocol number first, file-graded in brackets).
+
+### 8.2 Run-2 results
+
+#### Accuracy, per task against the baseline and run-1 (same 65 tasks, one draw each)
+
+| Subdomain | n | run-2 | run-1 (§7.2) | baseline `sara-t2fix-run1` | vs baseline: gained / lost / of lost by timeout |
+|---|---|---|---|---|---|
+| sara-numeric | 35 | **5 (0.143)** [file-graded 13 (0.371)] | 10 (0.286) [13 (0.371)] | 7 (0.200) | 5 / 7 / 6 (cases 71, 73, 93, 95, 51, 85) |
+| sara-binary | 30 | **24 (0.800)**, macro-F1 0.824 [file-graded 25] | 24 (0.800) | 27 (0.900) | 0 / 3 / 1 (EpQMpQr) |
+
+Gained numeric cases: 2, 15, 67, 69, 84 (all wrong in the baseline). By file the numeric
+score equals run-1 (13/35); the protocol score halves because 8 trials with the correct
+answer in the file ran out of time (run-1: 3). Accuracy at DAR's 600 s limit: numeric 0/35,
+binary 11/30.
+
+#### Where the 24 numeric timeouts happened
+
+| Phase at 1,800 s | trials | answer file correct | wrong | no answer file |
+|---|---|---|---|---|
+| before the first completion claim | 8 | 1 (case 49) | 3 (6, 83, 47; file without the three sections, still being written) | 4 (10, 93, 94, 51) |
+| after ≥1 verifier round (repairing or waiting for the next report) | 16 | 7 (71, 91: repaired wrong→right by the verifier; 44, 70, 73, 75, 95: **right at the first claim**, still in repair rounds) | 9 (18, 29, 35, 56, 58, 61, 64, 85, 97) | 0 |
+
+So five first-claim-correct numeric answers and two verifier repairs were lost to the clock.
+With those seven, numeric would be 12/35 (0.343) under the protocol.
+
+#### Time budget: where the 1,800 s went (medians, trials that reached a first claim)
+
+| | run-1 numeric | run-2 numeric | run-1 binary | run-2 binary |
+|---|---|---|---|---|
+| solver steps before the first claim | 3 | **10** | 5 | 9 |
+| solver completion tokens before the first claim | 8.1k | **13.0k** | 2.6k | 4.2k |
+| solver time to the first claim (verifier excluded) | 525 s | **782 s** | 164 s | 253 s |
+| total solver completion tokens per trial | 10.8k | 18.7k | 3.5k | 5.5k |
+| verifier steps per round (mean) | 3.3 | 5.7 | 2.2 | 4.4 |
+| verifier time per trial (mean) | 471 s | 594 s | 258 s | 368 s |
+| verifier prompt tokens per trial (mean) | 84k | 114k | 40k | 65k |
+| agent time, finished trials (median) | 1,119 s | 1,490 s | 442 s | 696 s |
+
+Prefix caching worked as a cache (hit rate 82.5–83.3 % cumulative over the run, 0 % in
+run-1) but did not change the generation rate: the vLLM log gives 16.0 generated tok/s per
+request before the restart (all earlier runs) and 17.7 after it, at 3.4 concurrent requests
+on average. The budget is consumed by **generated** tokens, and run-2 generates more of
+them: the record template makes the solver `grep -n` / `sed -n` each provision and write the
+file in several heredocs (3 → 10 steps to the first claim), the verifier walks the uploaded
+trajectory with its own commands (5.7 steps per round instead of 3.3), and the index packet
+saves prompt tokens per call but not calls. A numeric trial now spends ≈780 s reaching the
+first claim, ≈300 s per verifier round, and ≈300 s per repair round, which fits two rounds in
+1,800 s only when nothing is flagged. The 1,800 s wall clock is the binding constraint of
+this design, not the verifier's judgement.
+
+#### What the verifier changed within a trial
+
+| Subdomain | claimed | correct at first claim | finished | final acc (finished) | answer changed | wrong→right | right→wrong |
+|---|---|---|---|---|---|---|---|
+| sara-numeric | 27 | **10/27 (0.370)**; run-1 6/29 (0.207) | 11 | 5/11 (0.455); first claim 5/11 | 5 finished + 5 timed out | 1 finished (15) + 2 in file (71, 91) | 1 (74) |
+| sara-binary | 30 | 25/30 (0.833); run-1 25/30 | 29 | 24/29 | 2 | 1 (jLVuqeY) | 1 (cRx4awy) |
+
+Rounds: numeric 1 round in 1 trial, 2 in 10 (finished trials); binary 1 in 19, 2 in 9, 3 in
+1. The solver chose *continue* after 10 of 21 numeric and 11 of 40 binary reports; never
+finished with commands; no confidence turn (disabled). Every round returned a report except
+case 29 round 1 (empty `report` object); no context-length failures.
+
+**The record raised first-claim accuracy** (numeric 0.207 → 0.370 over claimed trials, the
+only comparison not distorted by timeouts): the solver's own fact ledger in the Reasoning
+section maps facts to provisions before any verifier sees it (smoke test 2 showed the
+mechanism on case 93). Cases 2, 44, 67, 69, 70, 73, 75, 84, 95 were right at the first claim,
+of which the baseline had none right. Record compliance: 57 of the 61 answer files have the
+three sections with `Answer:` last; the 4 others are timeouts before the first claim.
+
+**Verifier repairs and damages, run-2**:
+
+- 15 (wrong→right, finished): round 1 reported "Bob (born 1951, 66 in 2017) is UNUSED;
+  §63(f)(1)(B) allows the aged additional amount" and that the §152 citations pointed at §63
+  lines; the solver added the $600 aged amount, 5628 → 5460. The UNUSED-fact rule did what it
+  was written for.
+- 71 (wrong→right in file, timed out): round 1 reported §151(d)(3) phase-out never checked
+  against the §68(b) threshold with AGI $965,454; the solver applied it, 354888 → 356472, then
+  timed out before confirming. 91 (wrong→right in file, timed out): same pattern (245271 →
+  247432), the report's lead (§3301 FUTA on agricultural wages, with a python command to
+  compute it) was wrong, but the solver's re-read on the way fixed the phase-out instead.
+- 74 (right→wrong, finished): round 1 marked "Alice was a patient at Johns Hopkins" UNUSED
+  and pointed at §3306 line 345 ("services performed by a patient in a hospital" — a FUTA
+  wage exclusion) as "excludes income"; the solver subtracted the $200, 4525 → 4469; round 2
+  all YES. The UNUSED-fact rule fired on a fact that engages no income-tax provision, and the
+  verifier supplied the wrong provision for it. Same failure class as case 56 in run-1.
+- jLVuqeY (binary s152-c-2-neg, wrong→right): the verifier held for three rounds that
+  §152(c)(2) defines "individual bears a relationship **to the taxpayer**", directional, while
+  the solver's record asserted symmetry; round 3 the solver reversed to Contradiction (gold).
+- cRx4awy (binary s3306-c-1-pos, right→wrong): the verifier called Bob's citizenship "a
+  decisive fact for §3306(c)(1)(B) never checked"; the solver re-read, found citizenship
+  "NOT SPECIFIED", and flipped Entailment → Contradiction. Exactly the presupposed-condition
+  failure (run-1 akzbtTQ, JBnGGhw) that the skill v2 rule "an entailment question does not
+  fail on a condition the statement presupposes" was meant to stop; the rule did not reach
+  this report. Round 2 then wrote "marked UNUSED but correctly checked as NOT SPECIFIED" and
+  passed the wrong answer.
+- Wrong→wrong changes: 63, 78, 90 (finished), 18, 29, 58 (timed out). 90: round 1 correctly
+  flagged the head-of-household standard deduction ($18,000 at line 429, not $12,000) but
+  also questioned the friend-as-dependent; the solver fixed the deduction and kept the
+  dependent, 94354 → 91978 (gold 96641).
+
+**Verifier behaviour vs. skill v2 rules** (57 round-1 reports):
+
+- *Point, do not solve*: figures absent from the solver's answer file appear in 7 of 26
+  numeric round-1 reports (run-1: 16 of 52), 4 of them statute thresholds ($300,000,
+  $20,000, $18,000, $275,000) and at most 3 computed values. `suggested_actions` still
+  contained `python3` commands in 8 of 57 reports (case 91: "compute 6 % employment tax and
+  add it to income tax").
+- *UNUSED-fact rule*: fired in 14 of 57 reports; one repair (15), one damage (74), the rest
+  led to re-reads without an answer change.
+- *All-pass ⇒ empty actions*: held in every round (0 violations; run-2 smoke 2 had shown the
+  opposite).
+- *Reply format*: in 9 of 85 rounds the verifier nested its whole reply inside `report`
+  (`{"analysis", "commands", "report": {"analysis", "commands", "report": {...}}}`);
+  `_render_report` then passed the raw JSON to the solver (rubric content intact, format
+  not). `verifier_job_summary.py` now unwraps this; the renderer does not (a harness change,
+  left for the owner's decision).
+- *Rubric score as confidence*: round-1 score (1 − notYES/5) AUROC 0.65 numeric (n = 11
+  finished), 0.62 binary (n = 29); last-round statuses saturated (29/29 binary and 9/11
+  numeric all YES/NA). Same reading as run-1 §7.2 point 4.
+
+**Reading** (✅ measured, 🔶 interpretation):
+
+1. ✅ The derivation record helps the *solver* more than the verifier: first-claim accuracy
+   on numeric rose from 0.21 to 0.37, with no verifier involvement before that point.
+2. ✅ The verifier loop's net effect on finished numeric trials was zero in run-2 (1 repair,
+   1 damage) against +5 in run-1, and the two further repairs it did make (71, 91) were lost
+   to the clock along with five first-claim-correct answers. 🔶 With a 3,600 s wall clock,
+   or with the verifier's trajectory reading dropped in favour of the record alone, the
+   file-graded number (13/35) is what the protocol number would approach.
+3. ✅ Both damages (74, cRx4awy) are the verifier asserting a provision or condition the case
+   does not engage, phrased with enough confidence that the solver complied; the skill's
+   presupposed-condition rule and the "grep the file first" step did not prevent them.
+   🔶 The solver treats any `NO` as an instruction; a report that distinguished "I could
+   not verify" from "this is wrong" might be complied with less.
+4. ✅ Prefix caching removed prefill cost (83 % hit) but the budget is generation-bound;
+   the record and the trajectory walk roughly doubled the tokens generated per trial.
+
+Raw per-trial records: `outputs/verifier_run2_trials.json` and
+`outputs/verifier_run2_summary.txt` on 0238 (gitignored); the numbers above are the shared
+copy. No run-3 parameters are decided; the owner reviews this section first.

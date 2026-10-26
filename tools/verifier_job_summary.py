@@ -99,7 +99,12 @@ def load_verifier_trial(tdir: str) -> dict:
                 and bool(lines) and lines[-1].lower().startswith("answer:")
             )
         statuses = {}
-        for item in (r.get("report") or {}).get("rubrics", []) or []:
+        report = r.get("report") or {}
+        # Some verifier replies wrap the whole reply object inside "report"
+        # ({"analysis", "commands", "report": {...}}); unwrap to the rubrics.
+        while isinstance(report, dict) and "rubrics" not in report and isinstance(report.get("report"), dict):
+            report = report["report"]
+        for item in (report.get("rubrics", []) if isinstance(report, dict) else []) or []:
             if isinstance(item, dict) and item.get("name"):
                 statuses[item["name"]] = str(item.get("status", "UNKNOWN")).upper()
         out["rounds"].append(
