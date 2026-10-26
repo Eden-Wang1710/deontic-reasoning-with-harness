@@ -358,3 +358,16 @@ unresolved item, after the verifier has grepped the file for that kind of fact; 
 slips on verbatim quotes go in `evidence` only; the trajectory file is stated to be complete
 (the verifier had read a capped `sed` output as "the file is truncated"). Re-smoked on one
 numeric task before the full run (below).
+
+**Smoke test 2** (`verify2-smoke2`, the same numeric task 93, 06:50–07:15) ✅. With the
+record template the solver got it right at the **first** claim (102150): its own fact ledger
+in the Reasoning section mapped "Bob is Alice's father" to §152(d)(2)(C) and "Bob has no
+income" to §152(d)(1)(B), i.e. the dependency the two earlier runs never considered. Round 1
+(7 steps, 43 commands, 244 s) still flagged four items, among them the sensible "check the
+qualifying-child test (§152(c)) before treating Bob as a qualifying relative" and the
+pointless "line 182 is the §2 header"; the solver addressed them without changing the answer.
+Round 2 was all YES but listed five "verify …" suggested actions, which the solver treated as
+work and spent a third round on (agent time 1,495 s, close to the limit). Skill v2 amended
+once more: when all statuses are YES/NA, `unresolved` and `suggested_actions` must be empty,
+and every action must correspond to an unresolved item. Checked on one binary task
+(`verify2-smoke3`) before the full run.
