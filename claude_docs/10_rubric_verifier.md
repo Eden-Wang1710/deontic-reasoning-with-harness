@@ -570,3 +570,23 @@ per trial.
 Raw per-trial records: `outputs/verifier_run2_trials.json` and
 `outputs/verifier_run2_summary.txt` on 0238 (gitignored); the numbers above are the shared
 copy. No run-3 parameters are decided; the owner reviews this section first.
+
+## 9. Run-3: section-number record, four-step verifier, 2 concurrent (owner's decisions 2026-10-26)
+
+Decided after §8.2. All switchable by kwargs; `AGENT=t2verify3` in `tools/run_dar_qwen35_35b.sh`
+sets them. Run-1 and run-2 stay reproducible (`t2verify`, `t2verify2`).
+
+| Change | Mechanism | Why (from §8.2) |
+|---|---|---|
+| **Answer file lists sections only** (`derivation_template=tools/templates/terminus-json-plain-derivation-v2.txt`) | `## Statute`: "List the provisions you rely on, one per line: the section number (e.g. §63(c)(2)(A))." `## Reasoning`: "How you apply those provisions to the case facts." `## Answer` with `Answer:` last. Nothing else is asked (no quotes, no line numbers, no number provenance, no python requirement). | The verbatim-quote + line-number requirement made the solver locate every citation in its own thinking-bearing episode: 1.0 → 6.5 `grep`/`sed` episodes and ≈370 s more per numeric trial before the first claim. The record's benefit (first-claim accuracy 0.21 → 0.37) comes from naming the provisions, which the trimmed format keeps. |
+| **Skill v3** (`tools/skills/rubric_verifier_v3/SKILL.md`, 14 kchars) with **`verifier_max_steps=4`** | A fixed plan, one command step per phase, several commands per step: (1) locate: section map, one `grep` for the cited sections on the rule file and one on the trajectory file, one keyword `grep` for the kinds of `UNUSED` facts; (2) read the cited and the engaged sections; (3) `python3` re-run of the solver's stated computations; (4) report. Later rounds: at most one command step, only the previously unresolved items. Rubric definitions rewritten for a record without quotes (coverage = cited sections exist and were displayed; grounding = each cited section says what Reasoning uses it for and every number traces). Report: one-sentence evidence, `unused_facts` instead of the full ledger, ≤ 3 actions, all-pass ⇒ empty lists, no nesting of the reply inside `report`. | Verifier time is its own generation (59 ms/token): numeric round 1 used 7 steps (12/27 hit the 8-step limit), 34 commands, 6.3k tokens, 374 s; round 2 still 80 % of that; 109 re-`cat`s of the answer file and 65 repeated commands. |
+| **`NO` vs `UNKNOWN`** | Skill: `NO` only for a violation checked against the file; a lead is `UNKNOWN`. An `UNUSED` fact becomes `NO` only with a section that is engaged by the fact *and* changes a quantity or status the question asks about (named in the evidence); "the facts do not state X" is never a `NO` on an entailment task. Harness decision text adds one sentence: "A NO is a violation the verifier checked against the rule file; an UNKNOWN is something it could not verify, a lead rather than an instruction." | Both run-2 damages (74: a FUTA wage exclusion asserted as an income exclusion; cRx4awy: citizenship "never checked" on an entailment task) were leads written as `NO`, and the solver complied with every `NO`. |
+| **Renderer unwraps nested replies** | `_render_report` descends into `report.report` when the reply object was nested. Formatting only; no checking logic. | 9 of 85 run-2 rounds reached the solver as raw JSON. |
+| **`--n-concurrent 2`** (`N_CONCURRENT`, default 2 for `t2verify3`) | Run-script variable. | Per-request generation 29/24/20/16 tok/s at 1/2/3/4 running requests (aggregate 29 → 65); the wall clock is per trial. |
+| Unchanged | t2fix base, T 0.7, solver and verifier thinking on, 3 rounds, no solver thinking in the packet, index packet, no confidence, 1,800 s wall clock, 65 SARA tasks, prefix caching on, no new controls. Disabling the verifier's thinking was rejected by the owner (a change of method, not of efficiency). | |
+
+Job: `jobs/qwen3.5-35b-a3b/t2verify-direct/sara-t2verify-run3`. Smoke test on the same two
+tasks as §8.1 (tax-case-93, s2-b-2-c-pos) first; after the smoke test no code or skill
+change before the full run.
+
+### 9.1 Run log
