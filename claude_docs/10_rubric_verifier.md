@@ -421,7 +421,13 @@ With those seven, numeric would be 12/35 (0.343) under the protocol.
 Prefix caching worked as a cache (hit rate 82.5–83.3 % cumulative over the run, 0 % in
 run-1) but did not change the generation rate: the vLLM log gives 16.0 generated tok/s per
 request before the restart (all earlier runs) and 17.7 after it, at 3.4 concurrent requests
-on average. The budget is consumed by **generated** tokens, and run-2 generates more of
+on average. A least-squares fit of solver-call latency on prompt and completion tokens
+(`episode-*/debug.json`, R² = 1.00 in both runs) gives 0.31 ms per prompt token + 59 ms per
+completion token in run-1 and **0.02 ms** per prompt token + 58 ms per completion token in
+run-2: the cache made prompt tokens ≈15× cheaper, but a 6–9k-token prompt only ever cost
+2–3 s per call, against ≈60 s per 1k generated tokens. The run-1 diagnosis in §7.2 that
+verifier prefill starved the solvers was therefore overstated ✅ 2026-10-26: the budget is
+consumed by **generated** tokens, and run-2 generates more of
 them: the record template makes the solver `grep -n` / `sed -n` each provision and write the
 file in several heredocs (3 → 10 steps to the first claim), the verifier walks the uploaded
 trajectory with its own commands (5.7 steps per round instead of 3.3), and the index packet
