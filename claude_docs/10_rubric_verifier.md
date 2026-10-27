@@ -590,3 +590,33 @@ tasks as §8.1 (tax-case-93, s2-b-2-c-pos) first; after the smoke test no code o
 change before the full run.
 
 ### 9.1 Run log
+
+**Smoke test 1** (`verify3-smoke`, tax-case-93 + s2-b-2-c-pos, 2026-10-26 23:51 – 2026-10-27
+00:12 UTC, 2 concurrent) ✅ mechanics, with two findings:
+
+- Both answers correct (102150; Entailment). The solver's `## Statute` now lists section
+  numbers only (five lines on the numeric task) and its pre-claim path was `cat`, four short
+  `head`/`grep`/`sed` steps, one `python`-free reasoning step, the heredoc and a `cat` check:
+  LLM time before the claim ≈ 490 s, of which 164 + 115 s are the two reasoning episodes.
+- The verifier followed the four-step plan: step 1 = section map + one `grep -E` for the
+  five cited sections on the statute and one on the trajectory file + one keyword `grep`;
+  step 2 = four `sed` ranges; step 3 = `python3` phase-out re-run + two more `sed`; then the
+  closing prompt. 12 commands, 5 calls, 4.4k completion tokens, **150 s** (run-2 numeric
+  round 1: 374 s). Binary: 2 steps, 5 commands, 138 s, all YES/NA, empty lists.
+- **Finding 1 (fixed, `0f3eac1`):** in the forced closing reply the verifier put rubric 1
+  inside `rubrics` and rubrics 2–5 as top-level keys of `report`; `_render_report` showed the
+  solver only rubric 1 ("YES"), so the solver finished without seeing four `NO`s, among them
+  the correct catch that `§151(c)(2)(C)` (the solver's label for the $3,000 standard
+  deduction, which is §63(c)(2)(C)) does not exist. The renderer and the summary script now
+  also read rubric entries from top-level keys, and the closing prompt restates the schema.
+  Formatting only; no checking logic.
+- **Finding 2 (not a v3 issue):** the numeric trial's agent time was 1,268 s although its
+  LLM calls sum to ≈640 s: the first call after `cat statute.txt` ran into the 16,384-token
+  output cap (`job.log`: "hit max_tokens limit"), ≈550 s at 30 tok/s, and Harbor retried.
+  Long thinking at T 0.7 is model variance seen in all runs (run-1 case 2: one 1,681 s
+  episode); the cap stays as decided in `05` §8.
+- Noted for later, not changed: rubric 4's `NO` on the numeric task ("Bob not being a
+  qualifying child of another taxpayer is not in the case facts") is a lead written as a
+  violation on a numeric task; v3's "never a `NO`" rule covers entailment tasks only.
+
+Re-smoked after the fix (`verify3-smoke2`, same two tasks, started 00:20 UTC).
