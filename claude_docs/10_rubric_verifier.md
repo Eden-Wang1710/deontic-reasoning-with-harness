@@ -680,4 +680,97 @@ smoke of v3 where the verifier turned a wrong first answer into a right one. Age
 
 **Full run** `sara-t2verify-run3` started 2026-10-27 04:08 UTC (65 SARA tasks, 2 concurrent,
 3 rounds, 4 verifier steps, 1,800 s wall clock, skill v3 at `d9a7f7a`, harness at
-`96dc4ec`).
+`96dc4ec`). Finished 12:48 UTC (8 h 40 min; 5 `AgentTimeoutError`, no other exception).
+Per-trial records: `outputs/verifier_run3_trials.json` (gitignored). Summary command:
+`python3 tools/verifier_job_summary.py <run3> --baseline <t2fix-run1> --trials`.
+
+### 9.2 Run-3 results
+
+#### Accuracy, per task against the baseline and run-2 (same 65 tasks, one draw each)
+
+| Subdomain | n | run-3 protocol (timeouts wrong) | run-3 file-graded | run-2 | baseline `sara-t2fix-run1` | vs baseline: gained / lost / of lost by timeout | vs run-2: gained / lost |
+|---|---|---|---|---|---|---|---|
+| sara-numeric | 35 | **14 (0.400)** | 16 (0.457) | 5 (0.143) [13] | 7 (0.200) | 10 / 3 / 2 | 4 / 3 |
+| sara-binary | 30 | **24 (0.800)**, macro-F1 0.796 | 24 | 24 (0.800) [25] | 27 (0.900) | 0 / 3 / 0 | 2 / 3 |
+
+Timeouts: 5, all numeric (run-2: 25, of them 24 numeric). Accuracy at DAR's 600 s limit:
+numeric 1/35, binary 20/30 (run-2: 0 and 11). Numeric protocol accuracy is twice the
+baseline's and, for the first time on the terminus harness, inside the CI of prompt-based
+direct reasoning (0.435, CI 0.34–0.54; §8.2). Gained numeric cases vs the baseline: 44, 49,
+63, 67, 69, 71, 75, 84, 91, 97; lost: 51 (timeout), 74, 85 (timeout with the right answer
+in the file). Binary lost vs baseline: 7dqenKF, 8BhCBj7, qFBeAYp (all `pos` tasks answered
+Contradiction after a verifier round).
+
+#### Time budget (run-2 → run-3; medians unless stated)
+
+| | numeric run-2 | numeric run-3 | binary run-2 | binary run-3 |
+|---|---|---|---|---|
+| solver steps before the first claim | 10 | **6** | 9 | 6 |
+| solver completion tokens before the first claim | 13.0k | **11.2k** | 4.2k | 3.2k |
+| wall time to the first claim | 782 s | 726 s | 253 s | 375 s |
+| verifier steps per round (mean) | 5.7 | **3.3** | 4.4 | 2.7 |
+| verifier commands per round 1 (mean) | 34 | 11.9 | — | 7.7 |
+| verifier time per round 1 | 374 s | **296 s** | — | 207 s |
+| verifier time per round 2 | ≈300 s | 165 s | — | 91 s |
+| verifier rounds per trial (mean) | 1.9 (finished) | 2.2 | 1.4 | 1.4 |
+| verifier time per trial (mean) | 594 s | 565 s | 368 s | 312 s |
+| verifier prompt tokens per trial (mean) | 114k | 83k | 65k | 37k |
+| verifier completion tokens per trial (mean) | — | 14.2k | — | 7.4k |
+| agent time per trial, finished | 1,490 s | **1,256 s** | 696 s | **425 s** |
+
+The section-number record cut the solver's pre-claim path from 10 steps back to 6 (run-1,
+no record: 3), and the four-step plan cut a numeric verifier round 1 from 374 s to 296 s
+(commands 34 → 12). The verifier's cost per trial fell less (594 → 565 s) because trials now
+survive to more rounds (2.2 per numeric trial). The wall time to the first claim includes
+Harbor retries after 16k-token overruns and is not strictly the run-2 measure (LLM time).
+
+#### Verifier effect on answers
+
+| Subdomain | correct at first claim | finished | final acc (finished) | answer changed | wrong→right | right→wrong |
+|---|---|---|---|---|---|---|
+| sara-numeric | 10/30 finished (0.333); over all 35: 10 (0.286); run-2 10/27 claimed (0.370) | 30 | 14/30 (0.467) | 15 | 7 (44, 49, 63, 71, 91, 97; 85 in file, timed out) | 3 (2, 15, 74) |
+| sara-binary | 27/30 (0.900); run-2 25/30 | 30 | 24/30 | 3 | 0 | 3 (7dqenKF, 8BhCBj7, qFBeAYp) |
+
+Net verifier effect: numeric **+4** (run-2: 0 on finished trials), binary **−3** (run-2: 0).
+The three binary damages are all Entailment → Contradiction flips on `pos` tasks; in
+8BhCBj7 both reports were all-YES and the solver still rewrote its answer during the
+"continue" turn. The numeric first-claim accuracy over all trials (0.286) is below run-2's
+over claimed trials (0.370): the trimmed record (section numbers, no quotes) kept less of
+run-2's first-claim benefit, while the time it saved is what turned timeouts into answers.
+
+#### Verifier mechanics (119 rounds: numeric 77, binary 42)
+
+- Every round returned a report; no context-length failure. 46 rounds used all four steps
+  and reported through the closing prompt, all 46 successfully. 8 rounds had a parse failure
+  (the closing-retry path of `96dc4ec`); all 8 were rescued, 0 reports lost.
+- `rubrics` listed all five rubrics in 87/119 rounds (numeric 55/77, binary 32/42); the
+  rest listed a subset (finding from smoke 4), the renderer printed what was there.
+- Later rounds ignored the "at most one command step" rule: rounds > 1 used 4 steps in 23,
+  3 in 17, 2 in 6, 1 in 6, 0 in 2.
+- "Section does not exist" claims: 7, in two trials; six are right (e.g. §151(d)(7),
+  §151(c)(7) do not exist), one is wrong (§63(c)(7) exists: "Special rules for taxable years
+  2018 through 2025"). Finding 3's false-absence pattern (nested cites grepped literally) did
+  not recur.
+- Timeouts (5, all numeric) all fell after ≥ 1 verifier round, in repair or waiting for the
+  next report: 85 and 6 with the right answer already in the file; 58, 51, 90 wrong.
+- Rubric statuses on numeric round 1 are mostly `NO` on correct and wrong trials alike
+  (statute coverage NO 10/14 correct vs 8/16 wrong); rubric score AUROC 0.42 on round 1,
+  0.50 on the last round (binary 0.74 / 0.58). The rubric report does not separate right
+  from wrong numeric answers; it only names leads.
+
+**Reading** (✅ measured, 🔶 interpretation):
+
+1. ✅ Run-3 is the first terminus configuration that beats the no-verifier baseline on the
+   protocol numeric score (0.400 vs 0.200) without losing the binary score to timeouts
+   (0.800, same as run-2; baseline 0.900). 🔶 Most of the gain over run-2 is time: 20 fewer
+   timeouts, same file-graded ceiling (16 vs 13).
+2. ✅ The verifier's net effect is +4 on numeric and −3 on binary. 🔶 On binary the solver's
+   first claim (0.900) is as good as the baseline; every verifier round there is a chance to
+   talk it out of a right answer, so binary rounds should be the cheapest possible.
+3. ✅ The skill's later-round budget and five-rubric schema are not followed reliably by the
+   Qwen verifier; the harness-side tolerance (renderer, parser, retry) is what kept every
+   round reporting.
+4. 🔶 Numeric is still at the CI's low edge of prompt-based direct (0.435) and 5 trials ran out
+   of clock with 2 right answers in the file; the 1,800 s clock, not the verifier, now sets
+   the numeric ceiling.
+
