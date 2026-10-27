@@ -646,4 +646,22 @@ that would have hit every numeric task, so no full run was started:
 - Verifier cost per round: 168 / 168 / 283 s, 5 calls each; solver agent time 1,450 s total
   (under the 1,800 s wall clock), binary 323 s.
 
-Re-smoked after the fixes (`verify3-smoke3`, same two tasks, started 03:40 UTC).
+**Smoke test 3** (`verify3-smoke3`, same two tasks, 03:23 – 03:41 UTC). Finding 3's fix
+works: step 1 was `grep -n -E '^§(1|63|151|68)\.'` on the statute and
+`'statute.txt|^§(1|63|151|68)\.'` on the trajectory, step 2 read the four blocks, step 3
+re-ran the phase-out in `python3`; the verifier found a real error (§151(d)(3)(B) says
+2 percentage points per $2,500, the solver used 1 %) and the `UNUSED` father fact → §152.
+Binary: one round, 9 commands, 119 s, correct. But the numeric round produced **no report**:
+
+- **Finding 5 (fixed, `96dc4ec`, harness mechanics):** the forced closing reply put a stray
+  `]` after every rubric entry (`{"name": ...}\n    ],\n    "statute_coverage": {...}`), so
+  it did not parse; the round was rendered to the solver as "No report", the solver claimed
+  completion and finished wrong (102348 vs 102150, the §151(d)(3)(B) error uncorrected).
+  The closing prompt is now followed by one retry that names the bracket problem; a second
+  failure falls through to the existing no-report path. The Qwen verifier has now
+  malformed the forced closing reply in two of three numeric smokes (smoke 1: rubrics as
+  top-level keys; smoke 3: stray brackets), so this path needs the retry.
+- Solver agent time 1,089 s for one verifier round of 157 s: one solver call hit the
+  16,384-token cap again (`job.log`, finding 2).
+
+Re-smoked after the fix (`verify3-smoke4`, same two tasks, started 03:50 UTC).
