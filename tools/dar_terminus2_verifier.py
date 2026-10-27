@@ -123,6 +123,9 @@ def _parse_confidence(text: str) -> float | None:
     return None
 
 
+_INVALID_ESCAPE = re.compile(r'\\(?!["\\/bfnrtu])')
+
+
 def _extract_json_object(text: str) -> dict | None:
     """Parse the first balanced top-level JSON object in ``text`` (tolerates prose around it)."""
     if not text:
@@ -149,10 +152,16 @@ def _extract_json_object(text: str) -> dict | None:
             elif ch == "}":
                 depth -= 1
                 if depth == 0:
+                    chunk = text[start : i + 1]
                     try:
-                        obj = json.loads(text[start : i + 1])
+                        obj = json.loads(chunk)
                     except json.JSONDecodeError:
-                        break
+                        # Models write shell patterns such as grep 'a\|b' inside JSON
+                        # strings; double every backslash that is not a JSON escape.
+                        try:
+                            obj = json.loads(_INVALID_ESCAPE.sub(r"\\\\", chunk))
+                        except json.JSONDecodeError:
+                            break
                     return obj if isinstance(obj, dict) else None
         start = text.find("{", start + 1)
     return None
@@ -425,7 +434,8 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 observation = (
                     "Your response could not be parsed as a single JSON object. Reply with "
                     'exactly one JSON object with the fields "analysis", "commands" and '
-                    '"report".'
+                    '"report". A common cause is a backslash that JSON does not allow, '
+                    "such as grep 'a\\|b': double it or use grep -E 'a|b'."
                 )
                 self._append_verifier_step(vsteps, resp, [], observation)
                 prompt = observation

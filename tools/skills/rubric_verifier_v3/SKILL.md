@@ -65,6 +65,9 @@ Every reply is exactly one JSON object and nothing else:
   kept between commands; use absolute paths). Keep reads narrow: `grep -n` to locate, then
   `sed -n 'a,bp'` for at most ~120 lines at a time. Use `python3 -c '...'` for arithmetic.
   Output longer than a few thousand bytes is truncated, so do not `cat` whole files.
+  Inside a JSON string a backslash must be doubled, so prefer patterns without
+  backslashes: `grep -n -E 'a|b'`, never `grep 'a\|b'` (an unescaped `\|` makes the whole
+  reply unparseable and wastes the step).
 - `report`: `null` while you are still checking. When you are done, fill it in (schema below)
   and set `"commands": []`. `report` is the object that contains `rubrics`; never put
   `analysis` or `commands` inside it.
@@ -96,15 +99,26 @@ deduction, anything described as employment or labour — and for each fact whet
 the kinds of the `UNUSED` facts (e.g. `dependent`, `father|parent|child`,
 `wages|employer|employment`, `household`, `support`, `age|65`, `citizen|resident`).
 
+**How the rule file is numbered.** A section starts with a header line such as
+`§152. Dependent defined`; its subsections are nested lines below it, `(d)`, then `(2)`,
+then `(C)`, each indented under the previous one. A cite such as `§152(d)(2)(C)` names the
+`(C)` line under `(2)` under `(d)` inside the `§152.` block. The literal string
+`§152(d)(2)(C)` occurs nowhere in the file and nowhere in the solver's terminal output, so
+its absence from a grep is not evidence of anything. Locate a cite by grepping the header
+(`grep -n -E '^§(152|63)\.'`) and then reading the block; a cite does not exist only when
+the nested label is missing inside that block.
+
 **Step 1 — Locate.** In one step:
 - `grep -n '^§'` (or the file's heading pattern) on the rule file for the section map;
-- one `grep -n -E` on the rule file with the cited section numbers, and the same pattern on
-  the trajectory file (did each cited section exist, and did it appear in the solver's
-  terminal?);
+- `grep -n -E '^§(1|63|152)\.'` on the rule file with the cited section numbers, and on the
+  trajectory file `grep -n -E 'statute.txt|^§(1|63|152)\.'` (which ranges of the rule file
+  the solver displayed, and whether each cited section header appeared in its terminal);
 - one `grep -n -i -E` on the rule file with the keywords for the `UNUSED` facts.
 
 **Step 2 — Read.** `sed -n` each cited section (ranges from the section map, ≤ 120 lines
-each) and each section that the keyword search points at for an `UNUSED` fact.
+each) and each section that the keyword search points at for an `UNUSED` fact. Confirm the
+nested label of each cite inside its block, and whether that part of the block falls in a
+range the solver displayed (step 1).
 
 **Step 3 — Check.** Re-run the solver's stated computations with its stated inputs in
 `python3`; read any remaining condition or exception you still need for rubric 4.
@@ -123,10 +137,10 @@ as complete (a failure the solver noticed and retried successfully is not a viol
 ### 2. Statute coverage
 
 *Did the rule text the solver relies on, and the rule text the facts engage, reach the
-solver?* From step 1: every section under `## Statute` exists in the file and appeared in the
-solver's terminal output (a section that is cited but never displayed came from memory, not
-from the file); every section that an `UNUSED` fact engages (rubric 4) appeared at least once.
-`NO` names the section.
+solver?* From steps 1–2: every section under `## Statute` exists in the file (header present,
+nested label present in the block) and appeared in the solver's terminal output (a section
+that is cited but never displayed came from memory, not from the file); every section that an
+`UNUSED` fact engages (rubric 4) appeared at least once. `NO` names the section.
 
 ### 3. Grounded reasoning
 
