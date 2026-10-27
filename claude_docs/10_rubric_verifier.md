@@ -664,4 +664,20 @@ Binary: one round, 9 commands, 119 s, correct. But the numeric round produced **
 - Solver agent time 1,089 s for one verifier round of 157 s: one solver call hit the
   16,384-token cap again (`job.log`, finding 2).
 
-Re-smoked after the fix (`verify3-smoke4`, same two tasks, started 03:50 UTC).
+**Smoke test 4** (`verify3-smoke4`, same two tasks, 03:43 – 04:05 UTC) ✅ clean, both
+correct. No parse failure, no `max_tokens` hit, every report rendered in full, the closing
+retry was never needed. Binary: one round, 3 steps, 120 s, all YES/NA. Numeric: the solver's
+first answer used a $6,350 standard deduction and ignored Bob; round 1 (3 steps, 128 s)
+listed those as unresolved items, round 2 (4 steps, 401 s, 12k completion tokens) caught a
+mislabelled cite, round 3 (112 s) was all YES, final answer 102150 — the first numeric
+smoke of v3 where the verifier turned a wrong first answer into a right one. Agent time
+1,265 s, under the wall clock.
+
+- Noted, not changed: the round-1 report (a voluntary report after 3 steps, not the forced
+  closing) listed only rubric 1 in `rubrics` and put the findings under `unresolved`; the
+  solver still acted on them. Rubric-list completeness per round will be counted in the
+  run-3 analysis.
+
+**Full run** `sara-t2verify-run3` started 2026-10-27 04:08 UTC (65 SARA tasks, 2 concurrent,
+3 rounds, 4 verifier steps, 1,800 s wall clock, skill v3 at `d9a7f7a`, harness at
+`96dc4ec`).
