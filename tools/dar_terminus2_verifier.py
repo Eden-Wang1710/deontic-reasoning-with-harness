@@ -465,7 +465,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             closing = (
                 "You have used all command steps. Reply now with exactly one JSON object "
                 'whose "report" field is filled in from the evidence you already have, '
-                'and "commands": [].'
+                'and "commands": []. "report" must follow the schema in your instructions: '
+                'a "rubrics" list with all five rubrics (name, status, evidence), then '
+                '"unused_facts", "quoted_lines", "unresolved" and "suggested_actions".'
             )
             try:
                 resp = await call(closing)
@@ -772,6 +774,14 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         ):
             report = report["report"]
         rubrics = report.get("rubrics")
+        # Tolerate rubric entries written as top-level keys of "report"
+        # ({"rubrics": [...], "statute_coverage": {"status": ..}, ...}).
+        if isinstance(rubrics, list):
+            listed = {r.get("name") for r in rubrics if isinstance(r, dict)}
+            for name in RUBRIC_LABELS:
+                entry = report.get(name)
+                if name not in listed and isinstance(entry, dict) and "status" in entry:
+                    rubrics = rubrics + [{"name": name, **entry}]
         if isinstance(rubrics, list):
             for i, r in enumerate(rubrics, 1):
                 if not isinstance(r, dict):

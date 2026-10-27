@@ -30,6 +30,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from dar_job_summary import load_trial, macro_f1  # noqa: E402
 from verbalized_confidence import auroc, brier, ece, kuiper, selective  # noqa: E402
 
+RUBRIC_NAMES = (
+    "tool_call_integrity", "statute_coverage", "grounded_reasoning",
+    "provision_selection", "tool_assisted_computation",
+)
+
 RUBRICS = [
     "tool_call_integrity",
     "statute_coverage",
@@ -104,7 +109,14 @@ def load_verifier_trial(tdir: str) -> dict:
         # ({"analysis", "commands", "report": {...}}); unwrap to the rubrics.
         while isinstance(report, dict) and "rubrics" not in report and isinstance(report.get("report"), dict):
             report = report["report"]
-        for item in (report.get("rubrics", []) if isinstance(report, dict) else []) or []:
+        items = list((report.get("rubrics", []) if isinstance(report, dict) else []) or [])
+        if isinstance(report, dict):
+            listed = {it.get("name") for it in items if isinstance(it, dict)}
+            for name in RUBRIC_NAMES:
+                entry = report.get(name)
+                if name not in listed and isinstance(entry, dict) and "status" in entry:
+                    items.append({"name": name, **entry})
+        for item in items:
             if isinstance(item, dict) and item.get("name"):
                 statuses[item["name"]] = str(item.get("status", "UNKNOWN")).upper()
         out["rounds"].append(
