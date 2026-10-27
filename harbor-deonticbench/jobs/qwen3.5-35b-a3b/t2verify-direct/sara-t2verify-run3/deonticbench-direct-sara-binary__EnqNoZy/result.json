@@ -1,0 +1,139 @@
+{
+    "id": "86888b25-9edf-4a50-8670-00a65679e69c",
+    "task_name": "deonticbench-direct-sara-binary-s3306-b-10-b-neg",
+    "trial_name": "deonticbench-direct-sara-binary__EnqNoZy",
+    "trial_uri": "file:///home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness/harbor-deonticbench/jobs/qwen3.5-35b-a3b/t2verify-direct/sara-t2verify-run3/deonticbench-direct-sara-binary__EnqNoZy",
+    "task_id": {
+        "path": "datasets/deonticbench-direct/deonticbench-direct-sara-binary-s3306-b-10-b-neg"
+    },
+    "source": "deonticbench-direct",
+    "task_checksum": "58c459932462692e00b0bfdd52de1dce75b2d5c2ffd3372837a58e43bb249c39",
+    "config": {
+        "task": {
+            "path": "datasets/deonticbench-direct/deonticbench-direct-sara-binary-s3306-b-10-b-neg",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": "deonticbench-direct"
+        },
+        "trial_name": "deonticbench-direct-sara-binary__EnqNoZy",
+        "trials_dir": "jobs/qwen3.5-35b-a3b/t2verify-direct/sara-t2verify-run3",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": 3.0,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": null,
+            "import_path": "dar_terminus2_verifier:Terminus2RubricVerifier",
+            "model_name": "hosted_vllm/qwen3.5-35b-a3b",
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {
+                "derivation_record": true,
+                "report_confidence": false,
+                "packet_mode": "index",
+                "derivation_template": "/home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness/tools/templates/terminus-json-plain-derivation-v2.txt",
+                "skill_path": "/home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness/tools/skills/rubric_verifier_v3/SKILL.md",
+                "verifier_max_steps": 4,
+                "api_base": "http://172.17.0.1:9009/v1",
+                "llm_kwargs": {
+                    "api_key": "token-abc123"
+                },
+                "model_info": {
+                    "max_input_tokens": 49152,
+                    "max_output_tokens": 16384,
+                    "max_tokens": 65536,
+                    "input_cost_per_token": 0.0,
+                    "output_cost_per_token": 0.0
+                }
+            },
+            "env": {}
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "suppress_override_warnings": false,
+            "mounts_json": null,
+            "env": {},
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "job_id": "d49360c0-ab2f-4212-a52f-bca087bc5886"
+    },
+    "agent_info": {
+        "name": "terminus-2-rubric-verifier",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "qwen3.5-35b-a3b",
+            "provider": "hosted_vllm"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 88645,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 15498,
+        "cost_usd": null,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 8,
+            "api_request_times_msec": [
+                10405.301570892334,
+                13035.590648651123,
+                8342.53454208374,
+                41583.33945274353,
+                14759.106874465942,
+                309913.6962890625,
+                26737.6127243042,
+                6863.7731075286865,
+                75403.73134613037,
+                10244.901418685913,
+                23067.75403022766,
+                19455.06191253662,
+                31970.794200897217,
+                16397.36032485962
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-10-27T05:19:11.622200Z",
+    "finished_at": "2026-10-27T05:29:44.951832Z",
+    "environment_setup": {
+        "started_at": "2026-10-27T05:19:11.623017Z",
+        "finished_at": "2026-10-27T05:19:13.756918Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-10-27T05:19:13.756957Z",
+        "finished_at": "2026-10-27T05:19:15.659830Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-10-27T05:19:15.659943Z",
+        "finished_at": "2026-10-27T05:29:33.782507Z"
+    },
+    "verifier": {
+        "started_at": "2026-10-27T05:29:33.921578Z",
+        "finished_at": "2026-10-27T05:29:34.299411Z"
+    }
+}

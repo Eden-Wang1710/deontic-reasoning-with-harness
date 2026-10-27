@@ -1,0 +1,12 @@
+
+
+{
+  "analysis": "I've now gathered all the necessary information from the statute. I need to determine Alice's filing status, calculate her taxable income, and compute her tax. Key findings:\n\n1. **Filing Status**: Alice is unmarried (no spouse mentioned). She may qualify as Head of Household under §2(b) if she maintains a household for her dependent father Bob.\n\n2. **Bob as Dependent**: Under §152(d), a qualifying relative must: (A) have qualifying relationship (father - §152(d)(2)(C)), (B) have no income (not mentioned, so assumed zero), and (D) not be a qualifying child. Bob qualifies as Alice's dependent.\n\n3. **Head of Household Requirements** (§2(b)(1)): Alice must (1) not be married, (2) maintain a household as principal place of abode for her dependent father for more than half the year, and (3) furnish over half the household costs (Alice pays 75%). Alice qualifies.\n\n4. **Tax Calculation** (§1(b)): Head of household with taxable income between $29,600 and $76,400.\n\n5. **Exemption Phaseout** (§151(d)(3)): Doesn't apply since AGI ($67,285) < applicable amount ($250,000 for unmarried).\n\n6. **Itemized Deduction Limitation** (§68): Doesn't apply since AGI < applicable amount ($250,000).",
+  "plan": "Calculate Alice's tax:\n1. Gross Income: $67,285\n2. Itemized Deductions: $17,817\n3. Personal Exemptions: $4,000 (2 × $2,000 for Alice and Bob)\n4. Taxable Income: $67,285 - $17,817 - $4,000 = $45,468\n5. Tax (§1(b)(ii)): $4,440 + 28% × ($45,468 - $29,600) = $4,440 + 28% × $15,868\n\nVerify with Python and write the answer.",
+  "commands": [
+    {
+      "keystrokes": "python3 -c \"\ngross_income = 67285\nitemized_deductions = 17817\nexemptions = 4000  # 2 exemptions of $2000 each\ntaxable_income = gross_income - itemized_deductions - exemptions\nprint(f'Taxable Income: {taxable_income}')\n\n# Head of Household tax (§1(b)(ii))\n# $4,440 plus 28% of excess over $29,600\nbase_tax = 4440\nexcess = taxable_income - 29600\ntax = base_tax + 0.28 * excess\nprint(f'Base Tax: {base_tax}')\nprint(f'Excess: {excess}')\nprint(f'Tax: {tax}')\nprint(f'Rounded: {round(tax)}')\n\"\n",
+      "duration": 1.0
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+New Terminal Output:
+
+root@50df73ea0d72:/app# mkdir -p /app/output
+root@50df73ea0d72:/app# python3 -c "
+> # Alice's gross income
+> gross_income = 87319
+>
+> # Personal exemption and standard deduction for unmarried individual
+> personal_exemption = 2000
+> standard_deduction = 6300
+>
+> # Taxable income
+> taxable_income = gross_income - personal_exemption - standard_deduction
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation for unmarried individual (§1(c))
+> # (iii) $12,107, plus 31% of the excess over $53,500 if taxable income is over $53,500 but not over $115,000
+> base_tax = 12107
+> excess = taxable_income - 53500
+> tax_on_excess = excess * 0.31
+> total_tax = base_tax + tax_on_excess
+> print(f'Base tax: {base_tax}')
+> print(f'Excess over 53500: {excess}')
+> print(f'Tax on excess: {tax_on_excess}')
+> print(f'Total tax: {total_tax}')
+> print(f'Rounded: {round(total_tax)}')
+> "
+Taxable income: 79019
+Base tax: 12107
+Excess over 53500: 25519
+Tax on excess: 7910.89
+Total tax: 20017.89
+Rounded: 20018
+root@50df73ea0d72:/app#

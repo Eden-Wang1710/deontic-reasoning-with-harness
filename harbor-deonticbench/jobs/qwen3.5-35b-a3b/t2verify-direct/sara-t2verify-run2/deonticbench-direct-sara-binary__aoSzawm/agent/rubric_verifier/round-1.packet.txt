@@ -1,0 +1,76 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Charlie is Bob's father since April 15th, 2014. Alice married Charlie on October 12th, 1992.
+
+
+**Question:**
+Alice bears a relationship to Bob under section 152(d)(2)(F).
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+Section 152(d)(2) Relationship (lines 168-188):
+
+"For purposes of paragraph (1)(A), an individual bears a relationship to the taxpayer described in this paragraph if the individual is any of the following with respect to the taxpayer:
+
+        (A) A child or a descendant of a child.
+
+        (B) A brother, sister, stepbrother, or stepsister.
+
+        (C) The father or mother, or an ancestor of either.
+
+        (D) A stepfather or stepmother.
+
+        (E) A son or daughter of a brother or sister of the taxpayer.
+
+        (F) A brother or sister of the father or mother of the taxpayer.
+
+        (G) A son-in-law, daughter-in-law, father-in-law, mother-in-law, brother-in-law, or sister-in-law.
+
+        (H) An individual (other than an individual who at any time during the taxable year was the spouse, determined without regard to section 7703, of the taxpayer) who, for the taxable year of the taxpayer, has the same principal place of abode as the taxpayer and is a member of the taxpayer's household."
+
+## Reasoning
+
+1. The claim asks whether "Alice bears a relationship to Bob under section 152(d)(2)(F)".
+
+2. Section 152(d)(2)(F) states that an individual (Bob) bears a relationship to a taxpayer (Alice) if Bob is "A brother or sister of the father or mother of the taxpayer."
+
+3. From the case facts:
+   - Charlie is Bob's father (line: "Charlie is Bob's father since April 15th, 2014")
+   - Alice married Charlie (line: "Alice married Charlie on October 12th, 1992")
+
+4. Therefore, Bob is Charlie's son, and Alice is Charlie's wife. This makes Bob Alice's stepson (a child of Alice's spouse).
+
+5. For the relationship in 152(d)(2)(F) to apply, Bob would need to be "a brother or sister of the father or mother of Alice" - meaning Bob would need to be a sibling of Alice's parent.
+
+6. Bob is Charlie's son, not a sibling of Alice's parent. There is no evidence in the facts that Bob is a brother or sister of Alice's father or mother.
+
+7. The relationship described in 152(d)(2)(F) does not apply because Bob is not a brother or sister of Alice's parent.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '152' /app/statute.txt | output 1010 bytes
+step 3 | sed -n '95,250p' /app/statute.txt | output 7915 bytes
+step 4 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 2337 bytes
+step 5 | cat /app/output/answer.txt | output 2213 bytes
+step 6 | tail -1 /app/output/answer.txt | output 123 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

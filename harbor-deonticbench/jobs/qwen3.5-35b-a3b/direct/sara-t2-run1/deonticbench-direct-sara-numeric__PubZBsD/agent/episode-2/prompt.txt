@@ -1,0 +1,59 @@
+New Terminal Output:
+
+root@c9d8294a9c4a:/app# mkdir -p /app/output
+root@c9d8294a9c4a:/app# cat << 'EOF'
+> Calculating Alice's 2017 tax:
+>
+> 1. Filing Status: Married filing jointly (married since Feb 3, 2017, file jointly)
+>
+> 2. Gross Income: $133,200 (Alice) + $44,311 (Bob) = $177,511
+>
+> 3. Standard Deduction (§162):
+>    - Base for married filing jointly: $8,800
+>    - Additional for blind (Alice has been blind since 2014): $600
+>    - Total standard deduction: $9,400
+>
+> 4. Personal Exemptions (§151):
+>    - Taxpayer (Alice): $2,000
+>    - Spouse (Bob): $2,000
+>    - Charlie: Not a dependent (earned $4,525 from work, exceeds $4,050 gross income test for qualifying relative)
+>    - Total exemptions: $4,000
+>
+> 5. Taxable Income:
+>    $177,511 - $9,400 - $4,000 = $164,111
+>
+> 6. Tax Calculation (§1(a)(iii)):
+>    - $20,165 + 31% of ($164,111 - $89,150)
+>    - $20,165 + 31% of $74,961
+>    - $20,165 + $23,237.91
+>    - $43,402.91 → rounds to $43,403
+> EOF
+Calculating Alice's 2017 tax:
+
+1. Filing Status: Married filing jointly (married since Feb 3, 2017, file jointly)
+
+2. Gross Income: $133,200 (Alice) + $44,311 (Bob) = $177,511
+
+3. Standard Deduction (§162):
+   - Base for married filing jointly: $8,800
+   - Additional for blind (Alice has been blind since 2014): $600
+   - Total standard deduction: $9,400
+
+4. Personal Exemptions (§151):
+   - Taxpayer (Alice): $2,000
+   - Spouse (Bob): $2,000
+   - Charlie: Not a dependent (earned $4,525 from work, exceeds $4,050 gross income test for qualifying relative)
+   - Total exemptions: $4,000
+
+5. Taxable Income:
+   $177,511 - $9,400 - $4,000 = $164,111
+
+6. Tax Calculation (§1(a)(iii)):
+   - $20,165 + 31% of ($164,111 - $89,150)
+   - $20,165 + 31% of $74,961
+   - $20,165 + $23,237.91
+   - $43,402.91 → rounds to $43,403
+root@c9d8294a9c4a:/app# echo 'Answer: 43403' > /app/output/answer.txt
+root@c9d8294a9c4a:/app# cat /app/output/answer.txt
+Answer: 43403
+root@c9d8294a9c4a:/app#

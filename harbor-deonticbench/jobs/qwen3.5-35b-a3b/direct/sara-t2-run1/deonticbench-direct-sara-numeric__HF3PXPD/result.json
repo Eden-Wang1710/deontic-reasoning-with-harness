@@ -1,0 +1,123 @@
+{
+    "id": "50224118-b8b4-4ba2-877d-b17f2aef5b4a",
+    "task_name": "deonticbench-direct-sara-numeric-tax-case-94",
+    "trial_name": "deonticbench-direct-sara-numeric__HF3PXPD",
+    "trial_uri": "file:///home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness/harbor-deonticbench/jobs/qwen3.5-35b-a3b/direct/sara-t2-run1/deonticbench-direct-sara-numeric__HF3PXPD",
+    "task_id": {
+        "path": "datasets/deonticbench-direct/deonticbench-direct-sara-numeric-tax-case-94"
+    },
+    "source": "deonticbench-direct",
+    "task_checksum": "5d9c087809ba33f8fd0524cfdf630e35256105cb1cc9665532077b125b389913",
+    "config": {
+        "task": {
+            "path": "datasets/deonticbench-direct/deonticbench-direct-sara-numeric-tax-case-94",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": "deonticbench-direct"
+        },
+        "trial_name": "deonticbench-direct-sara-numeric__HF3PXPD",
+        "trials_dir": "jobs/qwen3.5-35b-a3b/direct/sara-t2-run1",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": 3.0,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": "terminus-2",
+            "import_path": null,
+            "model_name": "hosted_vllm/qwen3.5-35b-a3b",
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {
+                "api_base": "http://172.17.0.1:9009/v1",
+                "llm_kwargs": {
+                    "api_key": "token-abc123"
+                },
+                "model_info": {
+                    "max_input_tokens": 49152,
+                    "max_output_tokens": 16384,
+                    "max_tokens": 65536,
+                    "input_cost_per_token": 0.0,
+                    "output_cost_per_token": 0.0
+                }
+            },
+            "env": {}
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "suppress_override_warnings": false,
+            "mounts_json": null,
+            "env": {},
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "job_id": "f231a09c-d908-4b84-bd41-09248807ba16"
+    },
+    "agent_info": {
+        "name": "terminus-2",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "qwen3.5-35b-a3b",
+            "provider": "hosted_vllm"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 14573,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 14363,
+        "cost_usd": null,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 4,
+            "api_request_times_msec": [
+                18157.0782661438,
+                1093605.731010437,
+                142169.00038719177,
+                174081.91680908203
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 0.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-10-16T00:59:44.251301Z",
+    "finished_at": "2026-10-16T01:23:51.618543Z",
+    "environment_setup": {
+        "started_at": "2026-10-16T00:59:44.253493Z",
+        "finished_at": "2026-10-16T00:59:46.317223Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-10-16T00:59:46.317258Z",
+        "finished_at": "2026-10-16T00:59:48.276221Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-10-16T00:59:48.276273Z",
+        "finished_at": "2026-10-16T01:23:40.321430Z"
+    },
+    "verifier": {
+        "started_at": "2026-10-16T01:23:40.480312Z",
+        "finished_at": "2026-10-16T01:23:40.918754Z"
+    }
+}

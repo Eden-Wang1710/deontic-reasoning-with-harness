@@ -1,0 +1,53 @@
+New Terminal Output:
+
+root@3bda134076d4:/app# python3 << 'EOF'
+> # Case facts
+> gross_income = 311510
+>
+> # Standard deduction for unmarried (any other case)
+> standard_deduction = 3000
+>
+> # Personal exemption amount
+> exemption_amount_base = 2000
+>
+> # Phaseout calculation
+> # AGI exceeds $250,000 (for unmarried under §68(b)(1)(C))
+> applicable_amount = 250000
+> agi = gross_income  # Assuming no adjustments to get from gross to AGI
+> excess = agi - applicable_amount
+>
+> # Number of $2,500 increments (or fraction thereof)
+> import math
+> num_increments = math.ceil(excess / 2500)
+> print(f"Excess AGI: ${excess}")
+> print(f"Increments: {num_increments}")
+>
+> # Applicable percentage = 2% per increment
+> cap = min(100, 2 * num_increments)
+> print(f"Phaseout percentage: {cap}%")
+>
+> # Reduced exemption amount
+> exemption = exemption_amount_base * (1 - cap/100)
+> print(f"Exemption after phaseout: ${exemption}")
+>
+> # Taxable income
+> total_deductions = standard_deduction + exemption
+> taxable_income = gross_income - total_deductions
+> print(f"Total deductions: ${total_deductions}")
+> print(f"Taxable income: ${taxable_income}")
+>
+> # Tax calculation under §1(c) for unmarried
+> # (v) $79,772, plus 39.6% of the excess over $250,000 if over $250,000
+> tax = 79772 + 0.396 * (taxable_income - 250000)
+> print(f"Tax: ${tax}")
+> print(f"Rounded: ${round(tax)}")
+> EOF
+Excess AGI: $61510
+Increments: 25
+Phaseout percentage: 50%
+Exemption after phaseout: $1000.0
+Total deductions: $4000.0
+Taxable income: $307510.0
+Tax: $102545.96
+Rounded: $102546
+root@3bda134076d4:/app#

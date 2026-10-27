@@ -1,0 +1,194 @@
+New Terminal Output:
+
+root@9aaaffa9e76f:/app# cat > /app/output/answer.txt <<'EOF'
+> ## Statute
+>
+> **§1. Tax imposed** (lines 1-17)
+>
+i> (a) Married individuals filing joint returns and surviving spouses
+>
+> There is hereby imposed on the taxable income of-
+>
+a>     (1) every married individual (as defined in section 7703) who makes a single return jointly with his spouse, and
+>
+>     (2) every surviving spouse (as defined in section 2(a)),
+>
+.> a tax determined in accordance with the following:
+>
+>     (i) 15% of taxable income if the taxable income is not over $36,900;
+>     (ii) $5,535, plus 28% of the excess over $36,900 if the taxable income is over $36,900 but not over $89,150;
+>     (iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;
+>     (iv) $35,928.50, plus 36% of the excess over $140,000 if the taxable income is over $140,000 but not over $250,000;
+>     (v) $75,528.50, plus 39.6% of the excess over $250,000 if the taxable income is over $250,000.
+>
+> **§151. Allowance of deductions for personal exemptions** (lines 57-94)
+>
+5> (d) Exemption amount
+>
+o>     (1) In general
+>
+0>     Except as otherwise provided in this subsection, the term "exemption amount" means $2,000.
+>
+>     (3) Phaseout
+>
+>         (A) In general
+>
+>         In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exemptio
+n amount shall be reduced by the applicable percentage.
+>
+>         (B) Applicable percentage
+>
+
+>         For purposes of subparagraph (A), the term "applicable percentage" means 2 percentage points for each $2,500 (or fraction thereof) by which the taxpay
+er's adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b). In the case of a married individual filing a separa
+te return, the preceding sentence shall be applied by substituting "$1,250" for "$2,500". In no event shall the applicable percentage exceed 100 percent.
+>
+a> **§152. Standard deduction** (lines 372-388)
+>
+p> (c) Standard deduction
+>
+ > For purposes of this subtitle-
+>
+e>     (2) Basic standard deduction
+>
+>     For purposes of paragraph (1), the basic standard deduction is-
+>
+>         (A) 200 percent of the dollar amount in effect under subparagraph (C) for the taxable year in the case of-
+>
+>             (i) a joint return, or
+>
+>             (ii) a surviving spouse (as defined in section 2(a)),
+>
+>         (B) $4,400 in the case of a head of household (as defined in section 2(b)), or
+>
+>         (C) $3,000 in any other case.
+>
+> **§68. Overall limitation on itemized deductions** (lines 475-494)
+>
+> (b) Applicable amount
+>
+->     (1) In general
+>
+->     For purposes of this section, the term "applicable amount" means-
+>
+W>         (A) $300,000 in the case of a joint return or a surviving spouse (as defined in section 2(a)),
+>
+3> **§3301. Rate of tax** (lines 245-250)
+>
+> There is hereby imposed on every employer (as defined in section 3306(a)) for each calendar year an excise tax, with respect to having individuals in his empl
+oy, equal to 6 percent of the total wages (as defined in section 3306(b)) paid by such employer during the calendar year with respect to employment (as defined
+in section 3306(c)).
+>
+ > **§3306. Definitions** (lines 251-329)
+>
+$> (a) Employer
+>
+$>     (2) Agricultural labor
+>
+n>     In the case of agricultural labor, the term "employer" means, with respect to any calendar year, any person who-
+>
+>         (A) during the calendar year or the preceding calendar year paid wages of $20,000 or more for agricultural labor, or
+>
+>         (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at l
+east 5 individuals in employment in agricultural labor for some portion of the day.
+>
+> (b) Wages
+>
+> For purposes of this chapter, the term "wages" means all remuneration for employment, including the cash value of all remuneration (including benefits) paid i
+n any medium other than cash; except that such term shall not include-
+>
+>     (1) that part of the remuneration which, after remuneration (other than remuneration referred to in the succeeding paragraphs of this subsection) equal to
+ $7,000 with respect to employment has been paid to an individual by an employer during any calendar year, is paid to such individual by such employer during su
+ch calendar year;
+>
+> ## Reasoning
+>
+> **Step 1: Determine filing status**
+> Alice files a joint return with her spouse. Per §1(a), the tax brackets for "Married individuals filing joint returns" apply.
+>
+> **Step 2: Calculate income tax**
+>
+> **Step 2a: Standard deduction**
+> Per §152(c)(2)(A), the basic standard deduction for a joint return is 200% of the amount in §152(c)(2)(C), which is $3,000.
+> Standard deduction = 200% × $3,000 = $6,000
+>
+> **Step 2b: Exemption phaseout**
+> Per §151(d)(1), the exemption amount is $2,000 per exemption.
+> Alice and spouse each get one exemption: 2 × $2,000 = $4,000
+>
+> Per §151(d)(3)(A) and §68(b)(A), the applicable amount for joint returns is $300,000.
+> Alice's gross income is $684,642.
+>
+> Excess AGI = $684,642 - $300,000 = $384,642
+>
+> Per §151(d)(3)(B), the applicable percentage is 2 percentage points for each $2,500 (or fraction thereof).
+> Number of $2,500 fractions = ceiling($384,642 / $2,500) = ceiling(153.8568) = 154
+> Applicable percentage = 154 × 2% = 308%
+>
+> Per §151(d)(3)(B), the applicable percentage cannot exceed 100%.
+> Therefore, exemption amount = $4,000 × 100% = $0 (fully phased out)
+>
+> **Step 2c: Taxable income**
+> Taxable income = Gross income - Standard deduction - Exemptions
+> Taxable income = $684,642 - $6,000 - $0 = $678,642
+>
+> **Step 2d: Tax calculation**
+> Per §1(a)(v), since taxable income ($678,642) is over $250,000:
+> Income tax = $75,528.50 + 39.6% × ($678,642 - $250,000)
+> Income tax = $75,528.50 + 0.396 × $428,642
+> Income tax = $75,528.50 + $169,742.23
+> Income tax = $245,270.73
+>
+> **Step 3: Calculate employment tax for agricultural labor**
+>
+> **Step 3a: Determine if Alice is an employer**
+> Per §3306(a)(2)(B), an agricultural labor employer is one who "on each of some 10 days during the calendar year...employed at least 5 individuals in employmen
+t in agricultural labor."
+>
+> Alice's employment schedule:
+> - Jan 24: 5 workers (Bob, Cameron, Dan, Emily, Fred)
+> - Mar 3: 5 workers
+> - Mar 19: 5 workers
+> - Apr 2: 5 workers
+> - May 9: 5 workers
+> - Oct 15: 5 workers
+> - Nov 8: 5 workers
+> - Nov 22: 5 workers
+> - Dec 1: 5 workers
+> - Dec 3: 5 workers
+>
+> Alice employed 5 workers on 10 different days, meeting the threshold in §3306(a)(2)(B).
+>
+> **Step 3b: Calculate total wages**
+> Per §3306(b), wages mean all remuneration for employment.
+> Worker counts from payment schedule:
+> - Bob: 10 occasions
+> - Cameron: 11 occasions
+> - Dan: 9 occasions
+> - Emily: 10 occasions
+> - Fred: 9 occasions
+> - George: 8 occasions
+>
+> Total occasions = 10 + 11 + 9 + 10 + 9 + 8 = 57
+> Wage per occasion = $632
+> Total wages = 57 × $632 = $36,024
+>
+> **Step 3c: Calculate taxable wages**
+> Per §3306(b)(1), wages exclude only remuneration AFTER $7,000 is paid to an individual.
+> Since no worker earned more than $7,000 (max was Cameron with 11 × $632 = $6,952), all wages are taxable.
+> Taxable wages = $36,024
+>
+> **Step 3d: Employment tax calculation**
+> Per §3301, the excise tax is 6% of total wages.
+> Employment tax = 6% × $36,024 = $2,161.44
+>
+> **Step 4: Total tax**
+> Total tax = Income tax + Employment tax
+> Total tax = $245,270.73 + $2,161.44 = $247,432.17
+>
+> Rounded to the nearest dollar: $247,432
+>
+> ## Answer
+> Answer: 247432
+> EOF
+root@9aaaffa9e76f:/app#

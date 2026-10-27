@@ -1,0 +1,24 @@
+
+
+{
+  "analysis": "I need to read the statute carefully to understand the tax rules and apply them to Alice's situation. The statute contains tax brackets for different filing statuses, exemption rules, and standard deduction rules.",
+  "plan": "1. First, analyze Alice's filing status based on §7703 - she may qualify as 'head of household' under §7703(b) since she maintains a household for her child Charlie and her spouse Bob has a different residence.\n2. Determine her deductions: standard deduction for head of household ($18,000 per §151(d)(7)(B)) and exemptions for herself and Charlie ($2,000 each per §151(d)(1)).\n3. Calculate taxable income and apply the appropriate tax bracket from §1(b).\n4. Write the answer to the output file.",
+  "commands": [
+    {
+      "keystrokes": "mkdir -p /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat << 'EOF'\nAnalysis of Alice's 2019 Tax Situation:\n\n1. FILING STATUS:\n- Alice is married (married 2012)\n- Under §7703(b), Alice is NOT considered married because:\n  (a) She maintains a household that is Charlie's principal place of abode for >1/2 the year\n  (b) She furnishes over 1/2 the household costs (home \"maintained by Alice\")\n  (c) Bob has a different principal place of abode (not in household during last 6 months)\n- Alice is entitled to claim Charlie as a dependent (son, age 2, lived with her all year)\n- Therefore: Alice files as HEAD OF HOUSEHOLD\n\n2. DEDUCTIONS:\n- Standard deduction for head of household: $18,000 (§151(d)(7)(B))\n- Exemption for taxpayer: $2,000 (§151(d)(1))\n- Exemption for dependent Charlie: $2,000 (§151(c))\n- Total deductions: $18,000 + $4,000 = $22,000\n\n3. TAXABLE INCOME:\n- Gross income: $73,124\n- Taxable income: $73,124 - $22,000 = $51,124\n\n4. TAX CALCULATION (§1(b) - Head of Households):\n- Taxable income $51,124 is over $29,600 but not over $76,400\n- Tax = $4,440 + 28% of excess over $29,600\n- Excess = $51,124 - $29,600 = $21,524\n- 28% of $21,524 = $6,026.72\n- Total tax = $4,440 + $6,026.72 = $10,466.72\n- Rounded to whole number: $10,467\nEOF\n",
+      "duration": 0.2
+    },
+    {
+      "keystrokes": "echo 'Answer: 10467' > /app/output/answer.txt\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/output/answer.txt\n",
+      "duration": 0.1
+    }
+  ]
+}

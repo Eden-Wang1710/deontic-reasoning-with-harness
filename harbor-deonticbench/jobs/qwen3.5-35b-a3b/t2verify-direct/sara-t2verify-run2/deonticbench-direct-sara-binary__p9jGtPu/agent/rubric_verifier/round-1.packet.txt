@@ -1,0 +1,59 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob got married on Feb 3rd, 1992. Alice and Bob have a child, Charlie, born October 9th, 2000. Alice died on July 9th, 2014. From 2004 to 2019, Bob furnished the costs of maintaining the home where he and Charlie lived during that time. Bob is entitled to a deduction for Charlie under section 151(c) for the years 2015 to 2019.
+
+
+**Question:**
+Section 2(b)(1)(B) applies to Bob in 2018.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+Section 2(b)(1)(B) (lines 220-221):
+"(B) maintains a household which constitutes for such taxable year the principal place of abode of the father or mother of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such father or mother under section 151."
+
+## Reasoning
+
+The question asks whether section 2(b)(1)(B) applies to Bob in 2018.
+
+Section 2(b)(1)(B) requires that the taxpayer maintains a household for the principal place of abode of the taxpayer's "father or mother" and is entitled to a deduction for such father or mother under section 151.
+
+The case facts state:
+- Charlie is Bob's child, born October 9th, 2000
+- Bob is entitled to a deduction for Charlie under section 151(c) for the years 2015 to 2019
+
+Charlie is Bob's son, not his father or mother. Therefore, section 2(b)(1)(B) does not apply to Bob in 2018.
+
+The claim that "Section 2(b)(1)(B) applies to Bob in 2018" is false because Charlie (the dependent for whom Bob claims a deduction) is Bob's son, not his father or mother as required by section 2(b)(1)(B).
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n 'section 2' /app/statute.txt | head -50 | output 992 bytes
+step 3 | grep -n '^§2' /app/statute.txt | output 141 bytes
+step 4 | sed -n '182,250p' /app/statute.txt | output 4314 bytes
+step 5 | grep -n '(B)' /app/statute.txt | grep -A1 -B1 'father or mother' | output 1436 bytes
+step 6 | sed -n '215,225p' /app/statute.txt | output 876 bytes
+step 7 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1304 bytes
+step 8 | cat /app/output/answer.txt | output 1209 bytes
+step 9 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

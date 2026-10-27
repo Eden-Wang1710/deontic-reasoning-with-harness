@@ -1,0 +1,16 @@
+
+
+{
+  "analysis": "I found section 152 which defines dependents. A qualifying child must: (1) bear a relationship (brother qualifies under 152(c)(2)(B)), (2) have the same principal place of abode for more than half the year, (3) be younger than the taxpayer and less than 25 years old, and (4) not file a joint return. Bob (born Jan 31, 2014, so 1 year old in 2015) meets all these requirements as Alice's brother living with her.",
+  "plan": "Now I need to determine Alice's filing status and calculate tax:\n1. Alice is unmarried (no spouse mentioned)\n2. She maintains a household for Bob who is her qualifying child/dependent - this qualifies her as HEAD OF HOUSEHOLD under section 2(b)\n3. Standard deduction for head of household is $4,400 (section 152(2)(B))\n4. Personal exemptions: $2,000 for Alice + $2,000 for Bob = $4,000 (section 151)\n5. Taxable income = $260,932 - $4,400 - $4,000 = $252,532\n6. For head of household with taxable income over $250,000, tax = $77,485 + 39.6% of excess over $250,000\n\nLet me calculate: $77,485 + 0.396 × ($252,532 - $250,000) = $77,485 + 0.396 × $2,532 = $77,485 + $1,002.67 = $78,487.67, rounded to $78,488",
+  "commands": [
+    {
+      "keystrokes": "echo 'Answer: 78488' > /app/output/answer.txt\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/output/answer.txt\n",
+      "duration": 0.1
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice was paid $200 in March 2017 for services performed at Johns Hopkins Hospital. Alice was a patient at Johns Hopkins Hospital from March 15th, 2017 to April 2nd, 2017. In 2017, Alice was also paid $31220 in remuneration. Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§63(e)(10)(B) - Exclusion of service performed by a patient of a hospital
+§1(c)(ii) - Tax rates for unmarried individuals
+§63(c)(2)(C) - Basic standard deduction for unmarried individuals
+§151(d)(1) - Exemption amount
+
+## Reasoning
+Alice's gross income consists of:
+- $200 for services performed at Johns Hopkins Hospital - EXCLUDED under §63(e)(10)(B) because Alice was a patient of such hospital
+- $31,220 in remuneration
+Total gross income = $31,220 (the $200 patient service income is excluded)
+
+Alice is an unmarried individual (not married, not head of household, not surviving spouse).
+
+Standard deduction (§63(c)(2)(C)): $3,000 for unmarried individuals
+Personal exemption (§151(d)(1)): $2,000
+
+Taxable income = Gross income - Standard deduction - Personal exemption
+Taxable income = $31,220 - $3,000 - $2,000 = $26,220
+
+Under §1(c)(ii), for unmarried individuals with taxable income over $22,100 but not over $53,500:
+Tax = $3,315 + 28% of excess over $22,100
+Excess = $26,220 - $22,100 = $4,120
+28% of $4,120 = $1,153.60
+Tax = $3,315 + $1,153.60 = $4,468.60
+
+Rounded to whole dollar: $4,469
+
+## Answer
+Answer: 4469
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '6350\|12700\|9350\|18650\|standard' /app/statute.txt | output 1469 bytes
+step 3 | sed -n '386,397p' /app/statute.txt | output 520 bytes
+step 4 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1151 bytes
+step 5 | cat /app/output/answer.txt | output 1039 bytes
+step 6 | (no commands) | output 2046 bytes | task_complete claimed
+step 7 | sed -n '340,360p' /app/statute.txt | output 973 bytes
+step 8 | sed -n '1,50p' /app/statute.txt | output 3374 bytes
+step 9 | sed -n '52,90p' /app/statute.txt | output 2405 bytes
+step 10 | sed -n '378,400p' /app/statute.txt | output 972 bytes
+step 11 | python3 -c "gross=31220; std_ded=3000; exempt=2000; taxable=gross-std_ded-exempt; excess=taxable-221 | output 335 bytes
+step 12 | cat > /app/output/answer.txt <<'EOF' | output 1310 bytes
+step 13 | cat /app/output/answer.txt | output 1241 bytes
+step 14 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file contains all three required sections with final Answer line; trajectory shows commands ran without unhandled failures.
+2. Statute coverage: NO. Cited sections §1(c) and §151(d)(1) never appeared in solver's terminal output (only §63 displayed via sed 386-397); §63(e)(10)(B) at line 345 (patient service exclusion) never searched.
+3. Grounded reasoning: NO. Tax rates from §1(c), exemption $2,000 from §151(d)(1), and standard deduction $3,000 from §63(c)(2)(C) came from memory, not from displayed sections in trajectory.
+4. Provision selection and application: NO. Fact 'patient at Johns Hopkins Hospital' engages §63(e)(10)(B) at line 345 which excludes such services from gross income; solver never checked this provision or its conditions.
+5. Tool-assisted computation: NO. No python3, bc, or awk commands in trajectory; solver performed arithmetic in prose within Reasoning section.
+Unresolved:
+- Read §63(e)(10)(B) at line 345 to check if patient hospital services are excluded from gross income
+- Re-read §1(c) and §151(d)(1) from statute file to verify rates and exemption amounts
+- Use python3 for arithmetic steps instead of prose calculation
+Suggested next actions:
+- sed -n '340,360p' /app/statute.txt to read §63(e)(10)(B)
+- sed -n '1,50p' /app/statute.txt to read §1(c) tax rates
+- sed -n '52,90p' /app/statute.txt to read §151(d)(1) exemption amount

@@ -1,0 +1,121 @@
+{
+  "round": 2,
+  "answer": "## Statute\n\nFrom \u00a73306(a)(1)(B) (line 261):\n\n\"(B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least one individual in employment for some portion of the day.\"\n\n## Reasoning\n\nSection 3306(a)(1)(B) defines an \"employer\" as a person who, \"on each of some 10 days during the calendar year... each day being in a different calendar week, employed at least one individual in employment for some portion of the day.\"\n\nAlice employed Bob on the following dates in 2017:\n- Jan 24, Feb 4, Mar 3, Mar 18, Apr 1, May 9, Oct 14, Oct 25, Nov 8, Nov 22, Dec 1, Dec 2\n\nUsing Python to calculate ISO week numbers:\n\n```python\nfrom datetime import date\ndates = [\n    date(2017, 1, 24),  # Week 4\n    date(2017, 2, 4),   # Week 5\n    date(2017, 3, 3),   # Week 9\n    date(2017, 3, 18),  # Week 11\n    date(2017, 4, 1),   # Week 13\n    date(2017, 5, 9),   # Week 19\n    date(2017, 10, 14), # Week 41\n    date(2017, 10, 25), # Week 43\n    date(2017, 11, 8),  # Week 45\n    date(2017, 11, 22), # Week 47\n    date(2017, 12, 1),  # Week 48\n    date(2017, 12, 2)   # Week 48\n]\nunique_weeks = set(d.isocalendar()[1] for d in dates)\n# Result: 11 unique weeks (4, 5, 9, 11, 13, 19, 41, 43, 45, 47, 48)\n```\n\nComputation: len(unique_weeks) = 11\n\nThe statute requires 10 days in 10 different calendar weeks. Alice employed Bob on 11 different calendar weeks, which exceeds the 10-week threshold. Therefore, Section 3306(a)(1)(B) applies to Alice for the year 2017.\n\n## Answer\nAnswer: Entailment",
+  "answer_changed": true,
+  "report": {
+    "rubrics": [
+      {
+        "name": "tool_call_integrity",
+        "status": "YES",
+        "evidence": "Step 9 corrected line number; answer file contains all required sections and final Answer line."
+      },
+      {
+        "name": "statute_coverage",
+        "status": "YES",
+        "evidence": "Line 261 quote matches statute file; section \u00a73306(a)(1)(B) appeared in step 3 terminal output."
+      },
+      {
+        "name": "grounded_reasoning",
+        "status": "YES",
+        "evidence": "Quote verbatim (line 261); all 12 dates and week counts trace to facts or Python computation."
+      },
+      {
+        "name": "provision_selection",
+        "status": "YES",
+        "evidence": "All 12 employment dates used; \u00a73306(a)(1)(B) conditions checked against 11 unique weeks computed."
+      },
+      {
+        "name": "tool_assisted_computation",
+        "status": "YES",
+        "evidence": "Python code executed; independent verification confirms 11 unique weeks (4,5,9,11,13,19,41,43,45,47,48)."
+      }
+    ],
+    "facts": [
+      {
+        "fact": "Jan 24, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 4"
+      },
+      {
+        "fact": "Feb 4, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 5"
+      },
+      {
+        "fact": "Mar 3, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 9"
+      },
+      {
+        "fact": "Mar 18, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 11"
+      },
+      {
+        "fact": "Apr 1, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 13"
+      },
+      {
+        "fact": "May 9, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 19"
+      },
+      {
+        "fact": "Oct 14, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 41"
+      },
+      {
+        "fact": "Oct 25, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 43"
+      },
+      {
+        "fact": "Nov 8, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 45"
+      },
+      {
+        "fact": "Nov 22, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 47"
+      },
+      {
+        "fact": "Dec 1, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 48"
+      },
+      {
+        "fact": "Dec 2, 2017 employment",
+        "used_by": "\u00a73306(a)(1)(B) week 48"
+      }
+    ],
+    "quoted_lines": [
+      "261"
+    ],
+    "unresolved": [],
+    "suggested_actions": []
+  },
+  "report_text": "VERIFICATION REPORT (round 2 of 3)\n1. Tool-call integrity: YES. Step 9 corrected line number; answer file contains all required sections and final Answer line.\n2. Statute coverage: YES. Line 261 quote matches statute file; section \u00a73306(a)(1)(B) appeared in step 3 terminal output.\n3. Grounded reasoning: YES. Quote verbatim (line 261); all 12 dates and week counts trace to facts or Python computation.\n4. Provision selection and application: YES. All 12 employment dates used; \u00a73306(a)(1)(B) conditions checked against 11 unique weeks computed.\n5. Tool-assisted computation: YES. Python code executed; independent verification confirms 11 unique weeks (4,5,9,11,13,19,41,43,45,47,48).",
+  "steps_used": 1,
+  "parse_failures": 0,
+  "context_exceeded": false,
+  "commands": [
+    {
+      "step": 1,
+      "command": "cat /app/output/answer.txt",
+      "output": "## Statute\n\nFrom \u00a73306(a)(1)(B) (line 261):\n\n\"(B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least one individual in employment for some portion of the day.\"\n\n## Reasoning\n\nSection 3306(a)(1)(B) defines an \"employer\" as a person who, \"on each of some 10 days during the calendar year... each day being in a different calendar week, employed at least one individual in employment for some portion of the day.\"\n\nAlice employed Bob on the following dates in 2017:\n- Jan 24, Feb 4, Mar 3, Mar 18, Apr 1, May 9, Oct 14, Oct 25, Nov 8, Nov 22, Dec 1, Dec 2\n\nUsing Python to calculate ISO week numbers:\n\n```python\nfrom datetime import date\ndates = [\n    date(2017, 1, 24),  # Week 4\n    date(2017, 2, 4),   # Week 5\n    date(2017, 3, 3),   # Week 9\n    date(2017, 3, 18),  # Week 11\n    date(2017, 4, 1),   # Week 13\n    date(2017, 5, 9),   # Week 19\n    date(2017, 10, 14), # Week 41\n    date(2017, 10, 25), # Week 43\n    date(2017, 11, 8),  # Week 45\n    date(2017, 11, 22), # Week 47\n    date(2017, 12, 1),  # Week 48\n    date(2017, 12, 2)   # Week 48\n]\nunique_weeks = set(d.isocalendar()[1] for d in dates)\n# Result: 11 unique weeks (4, 5, 9, 11, 13, 19, 41, 43, 45, 47, 48)\n```\n\nComputation: len(unique_weeks) = 11\n\nThe statute requires 10 days in 10 different calendar weeks. Alice employed Bob on 11 different calendar weeks, which exceeds the 10-week threshold. Therefore, Section 3306(a)(1)(B) applies to Alice for the year 2017.\n\n## Answer\nAnswer: Entailment\n"
+    },
+    {
+      "step": 1,
+      "command": "sed -n '259,261p' /app/statute.txt",
+      "output": "        (A) during the calendar year or the preceding calendar year paid wages of $1,500 or more, or\n\n        (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least one individual in employment for some portion of the day.\n"
+    },
+    {
+      "step": 1,
+      "command": "grep -n 'on each of some 10 days' /app/statute.txt",
+      "output": "261:        (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least one individual in employment for some portion of the day.\n271:        (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least 5 individuals in employment in agricultural labor for some portion of the day.\n321:            (ii) on each of some 10 days during the calendar year or the preceding calendar year, each day being in a different calendar week, employed in agricultural labor (including labor performed by an alien referred to in subparagraph (B)) for some portion of the day (whether or not at the same moment of time) 5 or more individuals; and\n"
+    },
+    {
+      "step": 1,
+      "command": "python3 -c \"from datetime import date; dates=[date(2017,1,24),date(2017,2,4),date(2017,3,3),date(2017,3,18),date(2017,4,1),date(2017,5,9),date(2017,10,14),date(2017,10,25),date(2017,11,8),date(2017,11,22),date(2017,12,1),date(2017,12,2)]; unique_weeks=set(d.isocalendar()[1] for d in dates); print(len(unique_weeks), sorted(unique_weeks))\"",
+      "output": "11 [4, 5, 9, 11, 13, 19, 41, 43, 45, 47, 48]\n"
+    }
+  ],
+  "packet_chars": 6364,
+  "prompt_tokens": 14167,
+  "completion_tokens": 2010,
+  "n_llm_calls": 2,
+  "elapsed_sec": 119.69094347953796,
+  "trajectory_file": "trajectory.verifier-round-2.json"
+}

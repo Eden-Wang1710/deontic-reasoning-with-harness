@@ -1,0 +1,67 @@
+New Terminal Output:
+
+root@64159eec4fb1:/app# sed -n '151,195p' /app/statute.txt
+    The term "qualifying relative" means, with respect to any taxpayer for any taxable year, an individual-
+
+        (A) who bears a relationship to the taxpayer described in paragraph (2),
+
+        (B) who has no income for the calendar year in which such taxable year begins, and
+
+        (D) who is not a qualifying child of such taxpayer or of any other taxpayer for any taxable year beginning in the calendar year in which such taxable ye
+ar begins.
+
+    (2) Relationship
+
+    For purposes of paragraph (1)(A), an individual bears a relationship to the taxpayer described in this paragraph if the individual is any of the following w
+ith respect to the taxpayer:
+
+        (A) A child or a descendant of a child.
+
+        (B) A brother, sister, stepbrother, or stepsister.
+
+        (C) The father or mother, or an ancestor of either.
+
+        (D) A stepfather or stepmother.
+
+        (E) A son or daughter of a brother or sister of the taxpayer.
+
+        (F) A brother or sister of the father or mother of the taxpayer.
+
+        (G) A son-in-law, daughter-in-law, father-in-law, mother-in-law, brother-in-law, or sister-in-law.
+
+        (H) An individual (other than an individual who at any time during the taxable year was the spouse, determined without regard to section 7703, of the ta
+xpayer) who, for the taxable year of the taxpayer, has the same principal place of abode as the taxpayer and is a member of the taxpayer's household.
+
+
+---
+
+§2. Definitions and special rules
+
+(a) Definition of surviving spouse
+
+    (1) In general
+
+    For purposes of section 1, the term "surviving spouse" means a taxpayer-
+
+        (A) whose spouse died during either of the two years immediately preceding the taxable year, and
+
+        (B) who maintains as his home a household which constitutes for the taxable year the principal place of abode (as a member of such household) of a depen
+dent (i) who (within the meaning of section 152) is a son, stepson, daughter, or stepdaughter of the taxpayer, and (ii) with respect to whom the taxpayer is ent
+itled to a deduction for the taxable year under section 151.
+
+    For purposes of this paragraph, an individual shall be considered as maintaining a household only if over half of the cost of maintaining the household duri
+ng the taxable year is furnished by such individual.
+
+root@64159eec4fb1:/app# grep -n 'adjusted gross\|AGI' /app/statute.txt
+82:        In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exempti
+on amount shall be reduced by the applicable percentage.
+86:        For purposes of subparagraph (A), the term "applicable percentage" means 2 percentage points for each $2,500 (or fraction thereof) by which the taxpa
+yer's adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b). In the case of a married individual filing a separ
+ate return, the preceding sentence shall be applied by substituting "$1,250" for "$2,500". In no event shall the applicable percentage exceed 100 percent.
+366:In the case of an individual who does not elect to itemize his deductions for the taxable year, for purposes of this subtitle, the term "taxable income" mea
+ns adjusted gross income, minus-
+436:    (1) the deductions allowable in arriving at adjusted gross income, and
+475:In the case of an individual whose adjusted gross income exceeds the applicable amount, the amount of the itemized deductions otherwise allowable for the ta
+xable year shall be reduced by the lesser of-
+477:    (1) 3 percent of the excess of adjusted gross income over the applicable amount, or
+root@64159eec4fb1:/app#

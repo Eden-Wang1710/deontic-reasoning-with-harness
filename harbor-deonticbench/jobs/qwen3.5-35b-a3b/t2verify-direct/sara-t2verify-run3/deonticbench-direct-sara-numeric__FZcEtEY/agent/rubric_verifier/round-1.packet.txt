@@ -1,0 +1,59 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob got married on Aug 6th, 2010. Their son Charlie was born February 2nd, 2012. Alice and Bob were legally separated under a decree of divorce on March 2nd, 2015. In 2017, Alice and Charlie live in a house maintained by Alice. Alice's gross income for the year 2017 is $9560. Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(b) - Tax rates for heads of households (15% on income up to $29,600)
+§63(c)(2)(B) - Basic standard deduction for head of household ($4,400)
+§151(b) - Exemption for taxpayer ($2,000)
+§151(c) - Exemption for dependents ($2,000)
+§7703(a)(2) - Individual legally separated under decree of divorce not considered married
+
+## Reasoning
+Alice was legally separated under a decree of divorce on March 2, 2015, so under §7703(a)(2) she is not considered married in 2017.
+
+Alice maintains a household for her son Charlie (born 2012, under 19) for more than half the year and furnishes over half the cost. Charlie has no gross income and is not a dependent of another taxpayer. Alice qualifies as head of household under §2(b) and as the parent claiming Charlie as a dependent under §152.
+
+Alice's income calculation:
+- Gross income: $9,560
+- Standard deduction (head of household per §63(c)(2)(B)): $4,400
+- Personal exemptions: $4,000 ($2,000 for Alice under §151(b) + $2,000 for Charlie under §151(c))
+- Taxable income: $9,560 - $4,400 - $4,000 = $1,160
+
+Under §1(b), head of households with taxable income not over $29,600 pay 15% of taxable income.
+
+Tax: $1,160 × 15% = $174
+
+## Answer
+Answer: 174
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -A 20 "§2(b)" /app/statute.txt | head -40; grep -B 5 -A 30 "§63(c)(2)" /app/statute.txt | output 188 bytes
+step 3 | grep -n "Head" /app/statute.txt; grep -n "2017" /app/statute.txt; grep -n "standard" /app/statute.txt | output 1939 bytes
+step 4 | sed -n '378,420p' /app/statute.txt; sed -n '1,100p' /app/statute.txt | output 7579 bytes
+step 5 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 2690 bytes
+step 6 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

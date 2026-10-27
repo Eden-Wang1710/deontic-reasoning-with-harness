@@ -1,0 +1,16 @@
+
+
+{
+  "analysis": "I can see the qualifying child rules in §152(c). Bob is Alice's brother (relationship in 152(c)(2)(B)), lives with her (152(c)(1)(B)), and is 2 years old in 2016 so under 25 (152(c)(1)(C)). Now I need to find the standard deduction rules.",
+  "plan": "Search for 'standard deduction' to find the relevant section and understand what deduction Alice can claim.",
+  "commands": [
+    {
+      "keystrokes": "grep -n 'standard deduction' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '160,200p' /app/statute.txt\n",
+      "duration": 0.5
+    }
+  ]
+}

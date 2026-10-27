@@ -1,0 +1,63 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice's gross income in 2015 is $395276. Alice is allowed itemized deductions of $4571, $1973 and $15271.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c)(v)
+§63(c)
+§68(a)
+§68(b)(1)(C)
+§151(b)
+§151(d)(3)
+
+## Reasoning
+Alice's gross income is $395,276. Her total itemized deductions are $4,571 + $1,973 + $15,271 = $21,815.
+
+Under §68(a), since Alice's AGI ($395,276) exceeds the applicable amount of $250,000 for unmarried individuals (§68(b)(1)(C)), her itemized deductions must be reduced. The reduction is the lesser of:
+- 3% of excess AGI: 0.03 × ($395,276 - $250,000) = $4,358.28
+- 80% of itemized deductions: 0.80 × $21,815 = $17,452
+
+The lesser is $4,358.28, so reduced itemized deductions = $21,815 - $4,358.28 = $17,456.72.
+
+Under §151(d)(3), personal exemptions phase out when AGI exceeds the applicable amount. The phaseout percentage = ($395,276 - $250,000) / $25,000 = 581%, which exceeds 100%, so Alice's personal exemption is completely phased out.
+
+Taxable income = $395,276 - $17,456.72 = $377,819.28.
+
+Under §1(c)(v), for taxable income over $250,000 for unmarried individuals: Tax = $79,772 + 39.6% × ($377,819.28 - $250,000)
+= $79,772 + 0.396 × $127,819.28
+= $79,772 + $50,616.43
+= $130,388.43
+
+Rounded to whole number: $130,388
+
+## Answer
+Answer: 130388
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1531 bytes
+step 3 | cat /app/output/answer.txt | output 1249 bytes
+step 4 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

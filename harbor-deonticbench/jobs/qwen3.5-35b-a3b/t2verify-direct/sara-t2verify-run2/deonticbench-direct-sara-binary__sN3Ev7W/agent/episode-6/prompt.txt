@@ -1,0 +1,27 @@
+New Terminal Output:
+
+root@2e60e12812c9:/app# python3 -c "
+> # Calculate days from January 1, 2019 to November 3, 2019
+> # 2019 is not a leap year
+> jan = 31
+> feb = 28
+> mar = 31
+> apr = 30
+> may = 31
+> jun = 30
+> jul = 31
+> aug = 31
+> sep = 30
+> oct = 31
+> nov = 3  # through Nov 3
+> days_together = jan + feb + mar + apr + may + jun + jul + aug + sep + oct + nov
+> print(f'Days Bob lived with Alice in 2019: {days_together}')
+> print(f'Days in 2019: 365')
+> print(f'More than half required: {365/2}')
+> print(f'Residency met (more than half): {days_together > 365/2}')
+> "
+Days Bob lived with Alice in 2019: 307
+Days in 2019: 365
+More than half required: 182.5
+Residency met (more than half): True
+root@2e60e12812c9:/app#

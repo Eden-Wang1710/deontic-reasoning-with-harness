@@ -1,0 +1,63 @@
+{
+    "task": {
+        "path": "datasets/deonticbench-direct/deonticbench-direct-sara-binary-s3306-c-2-neg",
+        "git_url": null,
+        "git_commit_id": null,
+        "name": null,
+        "ref": null,
+        "overwrite": false,
+        "download_dir": null,
+        "source": "deonticbench-direct"
+    },
+    "trial_name": "deonticbench-direct-sara-binary__cZ7nYoD",
+    "trials_dir": "jobs/qwen3.5-35b-a3b/t2fix-direct/sara-t2fix-run1",
+    "timeout_multiplier": 1.0,
+    "agent_timeout_multiplier": 3.0,
+    "verifier_timeout_multiplier": null,
+    "agent_setup_timeout_multiplier": null,
+    "environment_build_timeout_multiplier": null,
+    "agent": {
+        "name": null,
+        "import_path": "dar_terminus2_local:Terminus2TruthfulMarker",
+        "model_name": "hosted_vllm/qwen3.5-35b-a3b",
+        "override_timeout_sec": null,
+        "override_setup_timeout_sec": null,
+        "max_timeout_sec": null,
+        "kwargs": {
+            "api_base": "http://172.17.0.1:9009/v1",
+            "llm_kwargs": {
+                "api_key": "token-abc123"
+            },
+            "model_info": {
+                "max_input_tokens": 49152,
+                "max_output_tokens": 16384,
+                "max_tokens": 65536,
+                "input_cost_per_token": 0.0,
+                "output_cost_per_token": 0.0
+            }
+        },
+        "env": {}
+    },
+    "environment": {
+        "type": "docker",
+        "import_path": null,
+        "force_build": false,
+        "delete": true,
+        "override_cpus": null,
+        "override_memory_mb": null,
+        "override_storage_mb": null,
+        "override_gpus": null,
+        "suppress_override_warnings": false,
+        "mounts_json": null,
+        "env": {},
+        "kwargs": {}
+    },
+    "verifier": {
+        "override_timeout_sec": null,
+        "max_timeout_sec": null,
+        "env": {},
+        "disable": false
+    },
+    "artifacts": [],
+    "job_id": "996896b8-0a35-4974-a03a-22157bde3866"
+}

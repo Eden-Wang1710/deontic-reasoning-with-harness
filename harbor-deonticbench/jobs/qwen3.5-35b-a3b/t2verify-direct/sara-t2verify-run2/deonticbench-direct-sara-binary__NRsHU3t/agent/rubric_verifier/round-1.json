@@ -1,0 +1,87 @@
+{
+  "round": 1,
+  "answer": "## Statute\n\nQuote from \u00a71(a) at lines 1-18:\n\n\"\u00a71. Tax imposed\n\n(a) Married individuals filing joint returns and surviving spouses\n\nThere is hereby imposed on the taxable income of-\n\n    (1) every married individual (as defined in section 7703) who makes a single return jointly with his spouse, and\n\n    (2) every surviving spouse (as defined in section 2(a)),\n\na tax determined in accordance with the following:\n\n    (i) 15% of taxable income if the taxable income is not over $36,900;\n    (ii) $5,535, plus 28% of the excess over $36,900 if the taxable income is over $36,900 but not over $89,150;\n    (iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;\n    (iv) $35,928.50, plus 36% of the excess over $140,000 if the taxable income is over $140,000 but not over $250,000;\"\n\n## Reasoning\n\n1. Alice is a surviving spouse (case fact).\n\n2. Under \u00a71(a)(2) at line 9, every surviving spouse (as defined in section 2(a)) is subject to the tax determined in accordance with the provisions in \u00a71(a).\n\n3. Alice's taxable income is $236,422 (case fact), which is over $140,000 but not over $250,000.\n\n4. Under \u00a71(a)(iv) at line 16, the tax is \"$35,928.50, plus 36% of the excess over $140,000\" for taxable income over $140,000 but not over $250,000.\n\n5. Calculation:\n   - Base amount: $35,928.50 (from \u00a71(a)(iv) line 16)\n   - Excess: $236,422 - $140,000 = $96,422 (case fact minus threshold)\n   - 36% of excess: 0.36 \u00d7 $96,422 = $34,711.92\n   - Total tax: $35,928.50 + $34,711.92 = $70,640.42\n\n6. The calculated tax of $70,640.42 rounds to $70,640, which matches the claimed amount.\n\n## Answer\nAnswer: Entailment",
+  "answer_changed": null,
+  "report": {
+    "rubrics": [
+      {
+        "name": "tool_call_integrity",
+        "status": "YES",
+        "evidence": "Answer file has three sections and Answer line; step 4 (sed -n 1,20p) displayed \u00a71 fully after step 1 truncation."
+      },
+      {
+        "name": "statute_coverage",
+        "status": "YES",
+        "evidence": "Quote at lines 1-18 matches \u00a71(a) in statute; \u00a71(a)(iv) at line 16 was displayed in step 4 output."
+      },
+      {
+        "name": "grounded_reasoning",
+        "status": "YES",
+        "evidence": "All quoted text is verbatim; taxable income $236,422 and surviving spouse status from case facts; base $35,928.50 and 36% from \u00a71(a)(iv)."
+      },
+      {
+        "name": "provision_selection",
+        "status": "YES",
+        "evidence": "Both facts (surviving spouse, income $236,422) used; \u00a71(a)(iv) conditions (over $140,000 but not over $250,000) checked against income fact."
+      },
+      {
+        "name": "tool_assisted_computation",
+        "status": "YES",
+        "evidence": "Step 2 used python3; computed values (Excess: 96422, 36%: 34711.92, Total: 70640.42) reproduce from stated inputs."
+      }
+    ],
+    "facts": [
+      {
+        "fact": "Alice is a surviving spouse for the year 2017",
+        "used_by": "\u00a71(a)(2)"
+      },
+      {
+        "fact": "Alice's taxable income for the year 2017 is $236422",
+        "used_by": "\u00a71(a)(iv)"
+      }
+    ],
+    "quoted_lines": [
+      "1-18",
+      "16"
+    ],
+    "unresolved": [],
+    "suggested_actions": []
+  },
+  "report_text": "VERIFICATION REPORT (round 1 of 3)\n1. Tool-call integrity: YES. Answer file has three sections and Answer line; step 4 (sed -n 1,20p) displayed \u00a71 fully after step 1 truncation.\n2. Statute coverage: YES. Quote at lines 1-18 matches \u00a71(a) in statute; \u00a71(a)(iv) at line 16 was displayed in step 4 output.\n3. Grounded reasoning: YES. All quoted text is verbatim; taxable income $236,422 and surviving spouse status from case facts; base $35,928.50 and 36% from \u00a71(a)(iv).\n4. Provision selection and application: YES. Both facts (surviving spouse, income $236,422) used; \u00a71(a)(iv) conditions (over $140,000 but not over $250,000) checked against income fact.\n5. Tool-assisted computation: YES. Step 2 used python3; computed values (Excess: 96422, 36%: 34711.92, Total: 70640.42) reproduce from stated inputs.",
+  "steps_used": 3,
+  "parse_failures": 0,
+  "context_exceeded": false,
+  "commands": [
+    {
+      "step": 1,
+      "command": "grep -n '^\u00a71' /app/statute.txt | head -5",
+      "output": "1:\u00a71. Tax imposed\n52:\u00a7151. Allowance of deductions for personal exemptions\n95:\u00a7152. Dependent defined\n"
+    },
+    {
+      "step": 1,
+      "command": "sed -n '1,20p' /app/statute.txt | grep -n '(iv)'",
+      "output": "16:    (iv) $35,928.50, plus 36% of the excess over $140,000 if the taxable income is over $140,000 but not over $250,000;\n"
+    },
+    {
+      "step": 2,
+      "command": "python3 -c \"base = 35928.50; excess = 236422 - 140000; rate = 0.36; tax = base + (excess * rate); print(f'Excess: {excess}, 36%: {excess*rate:.2f}, Total: {tax:.2f}')\"",
+      "output": "Excess: 96422, 36%: 34711.92, Total: 70640.42\n"
+    },
+    {
+      "step": 3,
+      "command": "sed -n '1,20p' /app/statute.txt",
+      "output": "\u00a71. Tax imposed\n\n(a) Married individuals filing joint returns and surviving spouses\n\nThere is hereby imposed on the taxable income of-\n\n    (1) every married individual (as defined in section 7703) who makes a single return jointly with his spouse, and\n\n    (2) every surviving spouse (as defined in section 2(a)),\n\na tax determined in accordance with the following:\n\n    (i) 15% of taxable income if the taxable income is not over $36,900;\n    (ii) $5,535, plus 28% of the excess over $36,900 if the taxable income is over $36,900 but not over $89,150;\n    (iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;\n    (iv) $35,928.50, plus 36% of the excess over $140,000 if the taxable income is over $140,000 but not over $250,000;\n    (v) $75,528.50, plus 39.6% of the excess over $250,000 if the taxable income is over $250,000.\n\n(b) Heads of households\n\n"
+    },
+    {
+      "step": 3,
+      "command": "grep -n 'surviving spouse\\|taxable income\\|250,000' /app/statute.txt | head -10",
+      "output": "3:(a) Married individuals filing joint returns and surviving spouses\n5:There is hereby imposed on the taxable income of-\n9:    (2) every surviving spouse (as defined in section 2(a)),\n13:    (i) 15% of taxable income if the taxable income is not over $36,900;\n14:    (ii) $5,535, plus 28% of the excess over $36,900 if the taxable income is over $36,900 but not over $89,150;\n15:    (iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;\n16:    (iv) $35,928.50, plus 36% of the excess over $140,000 if the taxable income is over $140,000 but not over $250,000;\n17:    (v) $75,528.50, plus 39.6% of the excess over $250,000 if the taxable income is over $250,000.\n21:There is hereby imposed on the taxable income of every head of a household (as defined in section 2(b)) a tax determined in accordance with the following:\n23:    (i) 15% of taxable income if the taxable income is not over $29,600;\n"
+    }
+  ],
+  "packet_chars": 3360,
+  "prompt_tokens": 22879,
+  "completion_tokens": 5839,
+  "n_llm_calls": 4,
+  "elapsed_sec": 345.35644936561584,
+  "trajectory_file": "trajectory.verifier-round-1.json"
+}

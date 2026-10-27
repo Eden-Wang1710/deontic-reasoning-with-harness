@@ -1,0 +1,163 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice got married on June 2nd, 2006. Alice files a joint return with her spouse for 2017. Alice's and her spouse's gross income for the year 2017 is $684642. They take the standard deduction in 2017.
+Alice has employed Bob, Cameron, Dan, Emily, Fred and George for agricultural labor on various occasions during the year 2017:
+- Jan 24: Bob, Cameron, Dan, Emily and Fred
+- Feb 4: Bob, Cameron and Fred
+- Mar 3: Bob, Cameron, Dan, Emily and Fred
+- Mar 19: Cameron, Dan, Emily, Fred and George
+- Apr 2: Bob, Cameron, Dan, Fred and George
+- May 9: Cameron, Dan, Emily, Fred and George
+- Oct 15: Bob, Cameron, Dan, Emily and George
+- Oct 25: Bob, Emily, Fred and George
+- Nov 8: Bob, Cameron, Emily, Fred and George
+- Nov 22: Bob, Cameron, Dan, Emily and Fred
+- Dec 1: Bob, Cameron, Dan, Emily and George
+- Dec 3: Bob, Cameron, Dan, Emily and George
+Alice has paid each $632 on each occasion.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+**§1. Tax imposed** (lines 1-17)
+
+(a) Married individuals filing joint returns and surviving spouses
+
+There is hereby imposed on the taxable income of-
+
+    (1) every married individual (as defined in section 7703) who makes a single return jointly with his spouse, and
+
+    (2) every surviving spouse (as defined in section 2(a)),
+
+a tax determined in accordance with the following:
+
+    (i) 15% of taxable income if the taxable income is not over $36,900;
+    (ii) $5,535, plus 28% of the excess over $36,900 if the taxable income is over $36,900 but not over $89,150;
+    (iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;
+    (iv) $35,928.50, plus 36% of the excess over $140,000 if the taxable income is over $140,000 but not over $250,000;
+    (v) $75,528.50, plus 39.6% of the excess over $250,000 if the taxable income is over $250,000.
+
+**§151. Allowance of deductions for personal exemptions** (lines 57-94)
+
+(d) Exemption amount
+
+    (1) In general
+
+    Except as otherwise provided in this subsection, the term "exemption amount" means $2,000.
+
+    (3) Phaseout
+
+        (A) In general
+
+        In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exemption amount shall be reduced by the applicable percentage.
+
+        (B) Applicable percentage
+
+        For purposes of subparagraph (A), the term "applicable percentage" means 2 percentage points for each $2,500 (or fraction thereof) by which the taxpayer's adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b). In the case of a married individual filing a separate return, the preceding sentence shall be applied by substituting "$1,250" for "$2,500". In no event shall the applicable percentage exceed 100 percent.
+
+**§152. Standard deduction** (lines 372-388)
+
+(c) Standard deduction
+
+For purposes of this subtitle-
+
+    (2) Basic standard deduction
+
+    For purposes of paragraph (1), the basic standard deduction is-
+
+        (A) 200 percent of the dollar amount in effect under subparagraph (C) for the taxable year in the case of-
+
+            (i) a joint return, or
+
+            (ii) a surviving spouse (as defined in section 2(a)),
+
+        (B) $4,400 in the case of a head of household (as defined in section 2(b)), or
+
+        (C) $3,000 in any other case.
+
+**§68. Overall limitation on itemized deductions** (lines 475-494)
+
+(b) Applicable amount
+
+    (1) In general
+
+    For purposes of this section, the term "applicable amount" means-
+
+        (A) $300,000 in the case of a joint return or a surviving spouse (as defined in section 2(a)),
+
+## Reasoning
+
+**Step 1: Determine filing status**
+Alice files a joint return with her spouse. Per §1(a), the tax brackets for "Married individuals filing joint returns" apply.
+
+**Step 2: Calculate standard deduction**
+Per §152(c)(2)(A), the basic standard deduction for a joint return is 200% of the amount in §152(c)(2)(C), which is $3,000.
+Standard deduction = 200% × $3,000 = $6,000
+
+**Step 3: Calculate exemption phaseout**
+Per §151(d)(1), the exemption amount is $2,000 per exemption.
+Alice and spouse each get one exemption: 2 × $2,000 = $4,000
+
+Per §151(d)(3)(A) and §68(b)(A), the applicable amount for joint returns is $300,000.
+Alice's gross income is $684,642.
+
+Excess AGI = $684,642 - $300,000 = $384,642
+
+Per §151(d)(3)(B), the applicable percentage is 2 percentage points for each $2,500 (or fraction thereof).
+Number of $2,500 fractions = ceiling($384,642 / $2,500) = ceiling(153.8568) = 154
+Applicable percentage = 154 × 2% = 308%
+
+Per §151(d)(3)(B), the applicable percentage cannot exceed 100%.
+Therefore, exemption amount = $4,000 × 100% = $0 (fully phased out)
+
+**Step 4: Calculate taxable income**
+Taxable income = Gross income - Standard deduction - Exemptions
+Taxable income = $684,642 - $6,000 - $0 = $678,642
+
+**Step 5: Calculate tax**
+Per §1(a)(v), since taxable income ($678,642) is over $250,000:
+Tax = $75,528.50 + 39.6% × ($678,642 - $250,000)
+Tax = $75,528.50 + 0.396 × $428,642
+Tax = $75,528.50 + $169,742.23
+Tax = $245,270.73
+
+Rounded to the nearest dollar: $245,271
+
+The agricultural labor information (employees Bob, Cameron, Dan, Emily, Fred, George) is not relevant to Alice's personal income tax calculation under these statutes.
+
+## Answer
+Answer: 245271
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n 'Married individuals filing joint' /app/statute.txt | head -5; grep -n 'exemption amount.*means' /app/statute.txt; grep -n 'Standard deduction' /app/statute.txt | head -10; grep -n 'applicable amount.*joint' /app/statute.txt | output 706 bytes
+step 3 | sed -n '1,30p' /app/statute.txt; sed -n '370,410p' /app/statute.txt; sed -n '70,100p' /app/statute.txt; sed -n '1,5p' /app/statute.txt | output 5254 bytes
+step 4 | sed -n '550,600p' /app/statute.txt | output 105 bytes
+step 5 | grep -n '68.*b\|applicable amount' /app/statute.txt | output 1190 bytes
+step 6 | sed -n '485,510p' /app/statute.txt | output 1299 bytes
+step 7 | mkdir -p /app/output; python3 -c " | output 1138 bytes
+step 8 | cat > /app/output/answer.txt <<'EOF' | output 4742 bytes
+step 9 | cat /app/output/answer.txt; tail -1 /app/output/answer.txt | output 4615 bytes
+step 10 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

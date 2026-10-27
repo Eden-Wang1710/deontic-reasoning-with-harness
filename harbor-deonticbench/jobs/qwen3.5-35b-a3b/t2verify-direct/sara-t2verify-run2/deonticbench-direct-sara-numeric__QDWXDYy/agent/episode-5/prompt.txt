@@ -1,0 +1,32 @@
+New Terminal Output:
+
+root@e6b2d72ea504:/app# python3 -c "
+> agi = 718791
+> applicable_amount = 250000
+> excess = agi - applicable_amount
+> print(f'AGI: {agi}')
+> print(f'Applicable amount: {applicable_amount}')
+> print(f'Excess: {excess}')
+>
+> # Count $2,500 fractions (rounding up for fractions)
+> import math
+> fractions = math.ceil(excess / 2500)
+> print(f'Number of $2,500 fractions (ceiling): {fractions}')
+>
+> phaseout_pct = fractions * 2
+> print(f'Phaseout percentage: {phaseout_pct}%')
+> print(f'Capped at 100%: {min(phaseout_pct, 100)}%')
+>
+> # Exemption amount = $2,000 * (1 - phaseout/100)
+> base_exemption = 2000
+> exemption = base_exemption * (1 - min(phaseout_pct, 100)/100)
+> print(f'Exemption amount: ${exemption}')
+> "
+AGI: 718791
+Applicable amount: 250000
+Excess: 468791
+Number of ,500 fractions (ceiling): 188
+Phaseout percentage: 376%
+Capped at 100%: 100%
+Exemption amount:
+root@e6b2d72ea504:/app#

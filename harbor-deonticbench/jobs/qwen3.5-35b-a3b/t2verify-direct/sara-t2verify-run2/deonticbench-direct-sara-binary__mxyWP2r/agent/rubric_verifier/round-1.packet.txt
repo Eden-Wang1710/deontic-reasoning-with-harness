@@ -1,0 +1,59 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has a brother, Bob, who was born January 31st, 2014.
+
+
+**Question:**
+Bob bears a relationship to Alice under section 152(c)(2)(A).
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+§152(c)(2)(A) at line 138:
+"(A) a child of the taxpayer or a descendant of such a child, or"
+
+§152(c)(2)(B) at line 140:
+"(B) a brother, sister, stepbrother, or stepsister of the taxpayer or a descendant of any such relative."
+
+## Reasoning
+
+The case facts state that Bob is Alice's brother (born January 31st, 2014).
+
+Section 152(c)(2)(A) defines a qualifying relationship as: "a child of the taxpayer or a descendant of such a child."
+
+Section 152(c)(2)(B) defines a qualifying relationship as: "a brother, sister, stepbrother, or stepsister of the taxpayer or a descendant of any such relative."
+
+Bob bears a relationship to Alice as her brother. This relationship falls under section 152(c)(2)(B), not section 152(c)(2)(A).
+
+The claim states "Bob bears a relationship to Alice under section 152(c)(2)(A)." Since Bob is Alice's brother (not her child or descendant of her child), this claim is false.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '152' /app/statute.txt | head -30 | output 1021 bytes
+step 3 | sed -n '95,150p' /app/statute.txt | output 2255 bytes
+step 4 | grep -n '152(c)(2)(A)' /app/statute.txt; sed -n '120,130p' /app/statute.txt | output 560 bytes
+step 5 | sed -n '125,140p' /app/statute.txt | output 936 bytes
+step 6 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1146 bytes
+step 7 | cat /app/output/answer.txt; tail -1 /app/output/answer.txt | output 1126 bytes
+step 8 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

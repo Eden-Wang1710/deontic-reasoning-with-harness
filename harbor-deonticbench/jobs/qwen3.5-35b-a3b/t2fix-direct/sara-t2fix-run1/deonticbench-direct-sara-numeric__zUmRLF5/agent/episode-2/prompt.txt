@@ -1,0 +1,48 @@
+New Terminal Output:
+
+root@6ef4c6f6b02a:/app# grep -n 'surviving spouse' /app/statute.txt
+3:(a) Married individuals filing joint returns and surviving spouses
+9:    (2) every surviving spouse (as defined in section 2(a)),
+29:(c) Unmarried individuals (other than surviving spouses and heads of households)
+31:There is hereby imposed on the taxable income of every individual (other than a surviving spouse as defined in section 2(a) or the head of a household as def
+ined in section 2(b)) who is not a married individual (as defined in section 7703) a tax determined in accordance with the following:
+184:(a) Definition of surviving spouse
+188:    For purposes of section 1, the term "surviving spouse" means a taxpayer-
+198:    Notwithstanding paragraph (1), for purposes of section 1 a taxpayer shall not be considered to be a surviving spouse-
+208:    An individual shall be considered a head of a household if, and only if, such individual is not married at the close of his taxable year, is not a survi
+ving spouse (as defined in subsection (a)), and either-
+392:            (ii) a surviving spouse (as defined in section 2(a)),
+462:    In the case of an individual who is not married and is not a surviving spouse, paragraphs (1) and (2) shall be applied by substituting "$750" for "$600"
+.
+487:        (A) $300,000 in the case of a joint return or a surviving spouse (as defined in section 2(a)),
+491:        (C) $250,000 in the case of an individual who is not married and who is not a surviving spouse or head of household, and
+root@6ef4c6f6b02a:/app# grep -n '152' /app/statute.txt
+64:An exemption of the exemption amount for each individual who is a dependent (as defined in section 152) of the taxpayer for the taxable year.
+95:§152. Dependent defined
+192:        (B) who maintains as his home a household which constitutes for the taxable year the principal place of abode (as a member of such household) of a d
+ependent (i) who (within the meaning of section 152) is a son, stepson, daughter, or stepdaughter of the taxpayer, and (ii) with respect to whom the taxpayer is
+ entitled to a deduction for the taxable year under section 151.
+212:            (i) a qualifying child of the individual (as defined in section 152(c)), but not if such child-
+216:                (II) is not a dependent of such individual by reason of section 152(b)(2) or
+240:        (B) by reason of an individual who would not be a dependent for the taxable year but for subparagraph (H) of section 152(d)(2).
+root@6ef4c6f6b02a:/app# sed -n '2,20p' /app/statute.txt
+
+(a) Married individuals filing joint returns and surviving spouses
+
+There is hereby imposed on the taxable income of-
+
+    (1) every married individual (as defined in section 7703) who makes a single return jointly with his spouse, and
+
+    (2) every surviving spouse (as defined in section 2(a)),
+
+a tax determined in accordance with the following:
+
+    (i) 15% of taxable income if the taxable income is not over $36,900;
+    (ii) $5,535, plus 28% of the excess over $36,900 if the taxable income is over $36,900 but not over $89,150;
+    (iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;
+    (iv) $35,928.50, plus 36% of the excess over $140,000 if the taxable income is over $140,000 but not over $250,000;
+    (v) $75,528.50, plus 39.6% of the excess over $250,000 if the taxable income is over $250,000.
+
+(b) Heads of households
+
+root@6ef4c6f6b02a:/app#

@@ -1,0 +1,16 @@
+
+
+{
+  "analysis": "I found the correct standard deduction for Head of Household is $4,400 (not $9,100). Bob was born Jan 31, 2014, so in 2015 he was about 1 year old. I need to check the age requirement for qualifying child in §152(c)(3) and verify dependency. Then recalculate tax with correct standard deduction.",
+  "plan": "1. Read §152(c)(3) for age requirements for qualifying child\n2. Use python3 to recalculate taxable income and tax with correct standard deduction ($4,400)\n3. Update answer file with correct calculation",
+  "commands": [
+    {
+      "keystrokes": "sed -n '130,150p' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "python3 -c \"\ngross_income = 260932\nstandard_deduction = 4400  # Head of Household\nexemptions = 2000 + 2000  # Alice + Bob\ntaxable_income = gross_income - standard_deduction - exemptions\nprint(f'Taxable income: {taxable_income}')\n# Head of Household: over 127500 but not over 250000\nbase = 33385\nexcess = taxable_income - 127500\ntax = base + 0.36 * excess\nprint(f'Tax: {round(tax)}')\n\"\n",
+      "duration": 0.5
+    }
+  ]
+}

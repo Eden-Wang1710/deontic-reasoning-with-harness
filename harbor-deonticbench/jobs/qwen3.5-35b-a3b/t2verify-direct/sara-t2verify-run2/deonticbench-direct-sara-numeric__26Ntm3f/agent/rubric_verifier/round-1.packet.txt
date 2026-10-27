@@ -1,0 +1,73 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob have been married since Feb 3rd, 2017. Alice was born March 2nd, 1950 and Bob was born March 3rd, 1955. Bob's gross income for the year 2019 is $113580. Alice and Bob file jointly in 2019, and take the standard deduction. Alice had no income in 2019.
+
+
+**Question:**
+How much tax does Bob have to pay in 2019?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+§1(a)(iii) (lines 15): "(iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;"
+
+§152(b)(2)(C) and §152(g)(7) (line 430): "(ii) by substituting "$12,000" for "$3,000" in subparagraph (C)."
+
+§152(f)(1) (line 444): "The taxpayer shall be entitled to an additional amount of $600-"
+
+§151(d)(3) (line 90): "In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026, the term "exemption amount" means zero."
+
+## Reasoning
+
+1. **Filing status**: Alice and Bob are married (married since Feb 3, 2017) and file jointly in 2019. They are subject to §1(a) tax rates for married individuals filing joint returns.
+
+2. **Standard deduction**: Under §152(b)(2)(C) and §152(g)(7), the standard deduction for married filing jointly in 2019 (taxable year beginning after Dec 31, 2017) is $12,000.
+
+3. **Additional standard deduction for age**: Alice was born March 2, 1950, so she is 69 years old in 2019 (over 65). Under §152(f)(1), she is entitled to an additional standard deduction of $600. Bob was born March 3, 1955, so he is 64 years old (not over 65).
+
+   Total standard deduction = $12,000 + $600 = $12,600
+
+4. **Personal exemptions**: Under §151(d)(3), for taxable years beginning after December 31, 2017 and before January 1, 2026, the exemption amount is zero. Therefore, no personal exemptions are allowed in 2019.
+
+5. **Taxable income calculation**:
+   - Gross income = $113,580 (Bob's income) + $0 (Alice's income) = $113,580
+   - Taxable income = $113,580 - $12,600 - $0 = $100,980
+
+6. **Tax calculation**: Taxable income of $100,980 falls in the bracket "over $89,150 but not over $140,000" under §1(a)(iii).
+   - Tax = $20,165 + 31% × ($100,980 - $89,150)
+   - Tax = $20,165 + 0.31 × $11,830
+   - Tax = $20,165 + $3,667.30
+   - Tax = $23,832.30
+
+   Rounded to whole dollar: $23,832
+
+## Answer
+Answer: 23832
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | python3 << 'EOF' | output 2152 bytes
+step 3 | grep -n '15% of taxable income if the taxable income is not over $36,900' /app/statute.txt; grep -n '5,535, plus 28% of the excess over $36,900' /app/statute.txt; grep -n '20,165, plus 31% of the excess over $89,150' /app/statute.txt; grep -n 'exemption amount means $2,000' /app/statute.txt; grep -n '\$12,000' /app/statute.txt; grep -n 'additional amount of $600' /app/statute.txt | output 1100 bytes
+step 4 | grep -n 'exemption amount' /app/statute.txt; grep -n 'An exemption of the exemption amount for the taxpayer' /app/statute.txt; sed -n '1,20p' /app/statute.txt | output 2836 bytes
+step 5 | python3 << 'EOF' | output 1689 bytes
+step 6 | mkdir -p /app/output; cat > /app/output/answer.txt << 'EOF' | output 2144 bytes
+step 7 | cat /app/output/answer.txt | output 2025 bytes
+step 8 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

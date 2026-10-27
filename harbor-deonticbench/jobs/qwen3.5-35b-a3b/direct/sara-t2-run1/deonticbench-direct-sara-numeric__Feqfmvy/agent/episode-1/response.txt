@@ -1,0 +1,16 @@
+
+
+{
+  "analysis": "I need to read the statute carefully and calculate Alice's tax. The statute contains tax brackets for different filing statuses, personal exemptions rules, itemized deduction phaseout rules, and marital status determination rules.",
+  "plan": "1. Analyze Alice's situation:\n   - Married (married Jan 12, 2016) but files separately (not joint return)\n   - Gross income: $567,192\n   - Itemized deductions: $100,206\n   - Husband has no income\n   - Brother Bob lives with parents (not Alice), so not her dependent\n2. Determine filing status: Married filing separately (§1(d))\n3. Calculate exemptions: Alice + spouse = 2 exemptions ($4,000 before phaseout)\n4. Apply exemption phaseout (§151): AGI exceeds $250,000 threshold by $317,192, phaseout is 100%, so exemptions = $0\n5. Apply itemized deduction phaseout (§68): Reduction = min(3% of excess AGI, 80% of deductions) = min($9,515.76, $80,164.80) = $9,515.76\n6. Allowable itemized deductions = $100,206 - $9,515.76 = $90,690.24\n7. Taxable income = $567,192 - $90,690.24 = $476,501.76\n8. Calculate tax using §1(d) brackets for income over $125,000",
+  "commands": [
+    {
+      "keystrokes": "mkdir -p /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "python3 -c \"\n# Alice's tax calculation\nAGI = 567192\nitemized_deductions = 100206\n\n# Filing status: Married filing separately\n# Itemized deduction phaseout (§68)\napplicable_amount = 250000  # for individual/not married/not surviving spouse\nexcess_agi = AGI - applicable_amount\nreduction_1 = 0.03 * excess_agi  # 3% of excess\nreduction_2 = 0.80 * itemized_deductions  # 80% of deductions\nreduction = min(reduction_1, reduction_2)\nallowable_deductions = itemized_deductions - reduction\nprint(f'Reduction: {reduction}')\nprint(f'Allowable deductions: {allowable_deductions}')\n\n# Taxable income\ntaxable_income = AGI - allowable_deductions  # exemptions phased out to 0\nprint(f'Taxable income: {taxable_income}')\n\n# Tax calculation for married filing separately (§1(d))\n# Over $125,000: $17,964.25 + 39.6% of excess over $125,000\ntax = 17964.25 + 0.396 * (taxable_income - 125000)\nprint(f'Tax: {tax}')\nprint(f'Rounded: {round(tax)}')\n\"\n",
+      "duration": 1.0
+    }
+  ]
+}

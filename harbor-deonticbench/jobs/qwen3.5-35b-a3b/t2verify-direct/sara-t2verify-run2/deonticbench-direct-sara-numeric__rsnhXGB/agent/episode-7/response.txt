@@ -1,0 +1,16 @@
+
+
+{
+  "analysis": "I found that §152(b)(1) defines head of household status. Charlie could make Alice a head of household since he's her father and retired (no income). I need to find the section that lists deductions from gross income to calculate AGI, and then compute the tax.",
+  "plan": "I need to find the section defining deductions from gross income (often §62 or similar). Then I'll calculate Alice's AGI, taxable income, and tax liability.",
+  "commands": [
+    {
+      "keystrokes": "grep -n '^§62\\|^§162\\|^§212\\|^§213\\|^§401' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '180,220p' /app/statute.txt\n",
+      "duration": 0.5
+    }
+  ]
+}

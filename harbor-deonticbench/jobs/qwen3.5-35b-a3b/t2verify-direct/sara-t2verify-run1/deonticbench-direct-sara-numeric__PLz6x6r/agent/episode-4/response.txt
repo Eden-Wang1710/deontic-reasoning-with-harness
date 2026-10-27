@@ -1,0 +1,13 @@
+
+
+{
+  "analysis": "The verification report correctly points out that I missed applying the personal exemption from §151. According to §151(d)(1), the exemption amount is $2,000 for an unmarried taxpayer. This needs to be subtracted from gross income to calculate taxable income.",
+  "plan": "Recalculate with the $2,000 personal exemption:\n1. Gross income: $395,276\n2. Itemized deductions: $21,815\n3. Pease reduction: $4,358.28 (3% of excess over $250k)\n4. Allowable itemized deductions: $17,456.72\n5. Personal exemption: $2,000\n6. Total deductions: $19,456.72\n7. Taxable income: $375,819.28\n8. Tax: $79,772 + 39.6% × ($375,819.28 - $250,000)",
+  "commands": [
+    {
+      "keystrokes": "python3 << 'EOF'\n# Alice's tax calculation for 2015 - corrected with personal exemption\n\n# Facts\ngross_income = 395276\nitemized_deductions = 4571 + 1973 + 15271  # $21,815\npersonal_exemption = 2000  # §151(d)(1)\n\n# Filing status: Unmarried individual\n# Applicable amount for unmarried: $250,000 (section 68(b)(1)(C))\napplicable_amount = 250000\n\n# Pease limitation (section 68)\nexcess_agi = gross_income - applicable_amount  # 145276\nreduction1 = excess_agi * 0.03  # 4358.28\nreduction2 = itemized_deductions * 0.80  # 17452\n\npease_reduction = min(reduction1, reduction2)  # 4358.28\nallowable_itemized = itemized_deductions - pease_reduction  # 17456.72\n\n# Taxable income: gross - allowable itemized - personal exemption\ntaxable_income = gross_income - allowable_itemized - personal_exemption  # 375819.28\n\n# Tax calculation for unmarried individuals (section 1(c))\n# (v) $79,772, plus 39.6% of the excess over $250,000\nbase_tax = 79772\nexcess_over_250k = taxable_income - 250000  # 125819.28\ntax = base_tax + (excess_over_250k * 0.396)\n\nprint(f\"Gross income: ${gross_income}\")\nprint(f\"Itemized deductions: ${itemized_deductions}\")\nprint(f\"Pease reduction: ${pease_reduction}\")\nprint(f\"Allowable itemized: ${allowable_itemized}\")\nprint(f\"Personal exemption: ${personal_exemption}\")\nprint(f\"Taxable income: ${taxable_income}\")\nprint(f\"Tax: ${tax}\")\nprint(f\"Rounded tax: {round(tax)}\")\nEOF\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+}

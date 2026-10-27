@@ -1,0 +1,29 @@
+New Terminal Output:
+
+root@d0cb9408f557:/app# python3 -c "
+> total_income = 133200 + 44311
+> standard_deduction = 6000 + 600  # basic joint + blind
+> exemptions = 2000 * 2  # Alice and Bob only, Charlie has income so not dependent
+> taxable_income = total_income - standard_deduction - exemptions
+> print(f'Total income: {total_income}')
+> print(f'Standard deduction: {standard_deduction}')
+> print(f'Exemptions: {exemptions}')
+> print(f'Taxable income: {taxable_income}')
+> # Tax bracket: over $140,000 but not over $250,000
+> base_tax = 35928.50
+> excess = taxable_income - 140000
+> tax = base_tax + 0.36 * excess
+> print(f'Base tax: {base_tax}')
+> print(f'Excess over 140000: {excess}')
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+Total income: 177511
+Standard deduction: 6600
+Exemptions: 4000
+Taxable income: 166911
+Base tax: 35928.5
+Excess over 140000: 26911
+Tax: 45616.46
+Rounded: 45616
+root@d0cb9408f557:/app#

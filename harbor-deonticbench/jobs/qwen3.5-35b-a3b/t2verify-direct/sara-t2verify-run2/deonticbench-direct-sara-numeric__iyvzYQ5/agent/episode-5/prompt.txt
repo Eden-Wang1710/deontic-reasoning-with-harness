@@ -1,0 +1,49 @@
+New Terminal Output:
+
+root@03468af7d399:/app# python3 -c "
+> # Case facts
+> alice_income = 36266
+> # Ages in 2017
+> alice_age = 2017 - 1950  # Born March 2, 1950
+> bob_age = 2017 - 1951    # Born March 3, 1951
+> print(f'Alice age in 2017: {alice_age}')
+> print(f'Bob age in 2017: {bob_age}')
+> print(f'Alice over 65: {alice_age >= 65}')
+>
+> # Exemptions (§151(d)(1) exemption amount = $2000)
+> # §151(b): taxpayer + spouse exemption if spouse has no income
+> exemption_amount = 2000
+> taxpayer_exemption = exemption_amount
+> spouse_exemption = exemption_amount  # Bob has no income
+>
+> # Standard Deduction (§152(c)(4)(C))
+> # Basic for 'any other case' = $3000
+> basic_std_ded = 3000
+> # Additional for aged (§152(f)(1)(A)) = $600
+> additional_std_ded = 600 if alice_age >= 65 else 0
+> total_std_ded = basic_std_ded + additional_std_ded
+>
+> # Taxable Income
+> taxable_income = alice_income - taxpayer_exemption - spouse_exemption - total_std_ded
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation (§1(d) - Married filing separately)
+> # Bracket: over $18,450 but not over $44,575
+> # $2,767.50 + 28% of excess over $18,450
+> if taxable_income <= 18450:
+>     tax = 0.15 * taxable_income
+> elif taxable_income <= 44575:
+>     tax = 2767.50 + 0.28 * (taxable_income - 18450)
+> else:
+>     tax = 10082.50 + 0.31 * (taxable_income - 44575)
+>
+> print(f'Tax: {tax}')
+> print(f'Tax rounded: {round(tax)}')
+> "
+Alice age in 2017: 67
+Bob age in 2017: 66
+Alice over 65: True
+Taxable income: 28666
+Tax: 5627.9800000000005
+Tax rounded: 5628
+root@03468af7d399:/app#

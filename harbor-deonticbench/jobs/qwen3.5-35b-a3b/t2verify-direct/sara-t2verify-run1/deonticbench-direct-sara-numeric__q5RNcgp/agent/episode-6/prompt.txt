@@ -1,0 +1,155 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+
+root@7523beced158:/app# grep -n 'standard deduction\|exemption\|charitable\|itemized' /app/statute.txt | head -50
+52:§151. Allowance of deductions for personal exemptions
+56:In the case of an individual, the exemptions provided by this section shall be allowed as deductions in computing taxable income.
+60:An exemption of the exemption amount for the taxpayer; and an additional exemption of the exemption amount for the spouse of the taxpayer if a joint return i
+s not made by the taxpayer and his spouse, and if the spouse, for the calendar year in which the taxable year of the taxpayer begins, has no gross income and is
+ not the dependent of another taxpayer.
+62:(c) Additional exemption for dependents
+64:An exemption of the exemption amount for each individual who is a dependent (as defined in section 152) of the taxpayer for the taxable year.
+72:    Except as otherwise provided in this subsection, the term "exemption amount" means $2,000.
+76:    In the case of an individual with respect to whom a deduction under this section is allowable to another taxpayer for a taxable year beginning in the cal
+endar year in which the individual's taxable year begins, the exemption amount applicable to such individual for such individual's taxable year shall be zero.
+82:        In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exempti
+on amount shall be reduced by the applicable percentage.
+90:    In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026, the term "exemption amount" means zero.
+362:Except as provided in subsection (b), for purposes of this subtitle, the term "taxable income" means gross income minus the deductions allowed by this chapt
+er (other than the standard deduction).
+368:    (1) the standard deduction, and
+370:    (2) the deduction for personal exemptions provided in section 151.
+378:    Except as otherwise provided in this subsection, the term "standard deduction" means the sum of-
+380:        (A) the basic standard deduction, and
+382:        (B) the additional standard deduction.
+384:    (2) Basic standard deduction
+386:    For purposes of paragraph (1), the basic standard deduction is-
+398:    (3) Additional standard deduction for aged and blind
+400:    For purposes of paragraph (1), the additional standard deduction is the sum of each additional amount to which the taxpayer is entitled under subsection
+ (f).
+402:    (5) Limitation on basic standard deduction in the case of certain dependents
+404:    In the case of an individual with respect to whom a deduction under section 151 is allowable to another taxpayer for a taxable year beginning in the cal
+endar year in which the individual's taxable year begins, the basic standard deduction applicable to such individual for such individual's taxable year shall no
+t exceed the greater of-
+410:    (6) Certain individuals, etc., not eligible for standard deduction
+420:    the standard deduction shall be zero.
+434:For purposes of this subtitle, the term "itemized deductions" means the deductions allowable under this chapter other than-
+438:    (2) the deduction for personal exemptions provided by section 151.
+448:        (B) for the spouse of the taxpayer if the spouse has attained age 65 before the close of the taxable year and an additional exemption is allowable t
+o the taxpayer for such spouse under section 151(b).
+456:        (B) for the spouse of the taxpayer if the spouse is blind as of the close of the taxable year and an additional exemption is allowable to the taxpay
+er for such spouse under section 151(b).
+471:§68. Overall limitation on itemized deductions
+475:In the case of an individual whose adjusted gross income exceeds the applicable amount, the amount of the itemized deductions otherwise allowable for the ta
+xable year shall be reduced by the lesser of-
+479:    (2) 80 percent of the amount of the itemized deductions otherwise allowable for such taxable year.
+root@7523beced158:/app# sed -n '250,350p' /app/statute.txt
+
+§3306. Definitions
+
+(a) Employer
+
+    (1) In general
+
+    The term "employer" means, with respect to any calendar year, any person who-
+
+        (A) during the calendar year or the preceding calendar year paid wages of $1,500 or more, or
+
+        (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at lea
+st one individual in employment for some portion of the day.
+
+    For purposes of this paragraph, there shall not be taken into account any wages paid to, or employment of, an employee performing domestic services referred
+ to in paragraph (3).
+
+    (2) Agricultural labor
+
+    In the case of agricultural labor, the term "employer" means, with respect to any calendar year, any person who-
+
+        (A) during the calendar year or the preceding calendar year paid wages of $20,000 or more
+[... output limited to 10000 bytes; 985 interior bytes omitted ...]
+e term "wages" means all remuneration for employment, including the cash value of all remuneration (including benefits) paid in
+any medium other than cash; except that such term shall not include-
+
+    (1) that part of the remuneration which, after remuneration (other than remuneration referred to in the succeeding paragraphs of this subsection) equal to $
+7,000 with respect to employment has been paid to an individual by an employer during any calendar year, is paid to such individual by such employer during such
+ calendar year;
+
+    (2) the amount of any payment (including any amount paid by an employer for insurance or annuities, or into a fund, to provide for any such payment) made to
+, or on behalf of, an employee or any of his dependents under a plan or system established by an employer which makes provision for his employees generally (or
+for his employees generally and their dependents) or for a class or classes of his employees (or for a class or classes of his employees and their dependents),
+on account of-
+
+        (A) sickness or accident disability, or
+
+        (C) death;
+
+    (7) remuneration paid in any medium other than cash to an employee for service not in the course of the employer's trade or business;
+
+    (10) any payment or series of payments by an employer to an employee or any of his dependents which is paid-
+
+        (A) upon or after the termination of an employee's employment relationship because of (i) death, or (ii) retirement for disability, and
+
+        (B) under a plan established by the employer which makes provision for his employees generally or a class or classes of his employees (or for such emplo
+yees or class or classes of employees and their dependents),
+
+    other than any such payment or series of payments which would have been paid if the employee's employment relationship had not been so terminated;
+
+    (11) remuneration for agricultural labor paid in any medium other than cash;
+
+    (15) any payment made by an employer to a survivor or the estate of a former employee after the calendar year in which such employee died;
+
+(c) Employment
+
+For purposes of this chapter, the term "employment" means any service, of whatever nature,
+
+    (A) performed by an employee for the person employing him, irrespective of the citizenship or residence of either, within the United States, and
+
+    (B) performed outside the United States (except in a contiguous country with which the United States has an agreement relating to unemployment compensation)
+ by a citizen of the United States as an employee of an American employer, except-
+
+    (1) agricultural labor unless-
+
+        (A) such labor is performed for a person who-
+
+            (i) during the calendar year or the preceding calendar year paid remuneration in cash of $20,000 or more to individuals employed in agricultural lab
+or (including labor performed by an alien referred to in subparagraph (B)), or
+
+            (ii) on each of some 10 days during the calendar year or the preceding calendar year, each day being in a different calendar week, employed in agric
+ultural labor (including labor performed by an alien referred to in subparagraph (B)) for some portion of the day (whether or not at the same moment of time) 5
+or more individuals; and
+
+        (B) such labor is not agricultural labor performed by an individual who is an alien admitted to the United States to perform agricultural labor pursuant
+ to sections 214(c) and 101(a)(15)(H) of the Immigration and Nationality Act.
+
+    (2) domestic service in a private home, local college club, or local chapter of a college fraternity or sorority unless performed for a person who paid cash
+ remuneration of $1,000 or more to individuals employed in such domestic service in the calendar year or the preceding calendar year;
+
+    (5)
+
+        (A) service performed by an individual in the employ of his son, daughter, or spouse;
+
+        (B) service performed by a child under the age of 21 in the employ of his father or mother;
+
+    (6) service performed in the employ of the United States Government
+
+    (7) service performed in the employ of a State, or any political subdivision thereof.
+
+    (10)
+
+        (A) service performed in the employ of a school, college, or university, if such service is performed
+
+            (i) by a student who is enrolled and is regularly attending classes at such school, college, or university, or
+
+            (ii) by the spouse of such a student, or
+
+        (B) service performed in the employ of a hospital, if such service is performed by a patient of such hospital;
+
+    (11) service performed in the employ of a foreign government (including service as a consular or other officer or employee or a nondiplomatic representative
+);
+
+    (13) service performed as a student nurse in the employ of a hospital or a nurses' training school by an individual who is enrolled and is regularly attendi
+ng classes in a nurses' training school;
+
+root@7523beced158:/app#

@@ -1,0 +1,70 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob were married from Feb 3rd, 1997 to Oct 30th, 2001. Alice's gross income for the year 2014 is $718791 and she takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2014?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c) - Tax imposed on unmarried individuals
+§63(c)(2)(C) - Basic standard deduction for unmarried individuals
+§151(d)(1) - Exemption amount of $2,000
+§151(d)(3)(B) - Phaseout of exemption amount
+§68(b)(1)(C) - Applicable amount of $250,000 for unmarried individuals
+
+## Reasoning
+1. Alice is unmarried (divorced in 2001), so filing status is "unmarried individual" under §1(c).
+
+2. Standard deduction under §63(c)(2)(C) for unmarried individuals is $3,000.
+
+3. Personal exemption under §151(d)(1) is $2,000, but subject to phaseout.
+
+4. Under §68(b)(1)(C), applicable amount for unmarried individuals is $250,000.
+
+5. Under §151(d)(3)(B), applicable percentage = 2% × (number of $2,500 increments by which AGI exceeds applicable amount, rounded up).
+   - AGI = $718,791
+   - Excess = $718,791 - $250,000 = $468,791
+   - Increments = $468,791 / $2,500 = 187.5164, rounded up to 188
+   - Applicable percentage = 188 × 2% = 376%
+   - Since 376% > 100%, exemption is completely phased out ($0)
+
+6. Taxable income = $718,791 - $3,000 - $0 = $715,791
+
+7. Tax under §1(c)(v) for taxable income over $250,000:
+   - $79,772 + 39.6% × ($715,791 - $250,000)
+   - $79,772 + 39.6% × $465,791
+   - $79,772 + $184,453.24
+   - $264,225.24, rounded to $264,225
+
+## Answer
+Answer: 264225
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -A5 '63(c)(2)(C)' /app/statute.txt; grep -A10 '63(c)(2)(B)' /app/statute.txt | output 175 bytes
+step 3 | grep -n 'standard deduction' /app/statute.txt | head -20 | output 1464 bytes
+step 4 | sed -n '378,410p' /app/statute.txt | output 1558 bytes
+step 5 | sed -n '420,480p' /app/statute.txt; sed -n '480,520p' /app/statute.txt | output 4605 bytes
+step 6 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1513 bytes
+step 7 | cat /app/output/answer.txt | output 1394 bytes
+step 8 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

@@ -1,0 +1,51 @@
+New Terminal Output:
+
+root@7f6c884d942c:/app# python3 << 'PYEOF'
+> # Alice's 2017 Tax Calculation
+> # Filing Status: Married Filing Separately
+> # Gross Income: $117,192
+> # Standard Deduction: $0 (nonresident alien)
+> # Personal Exemption: $2,000
+>
+> gross_income = 117192
+> standard_deduction = 0
+> personal_exemption = 2000
+> taxable_income = gross_income - standard_deduction - personal_exemption
+>
+> print(f"Gross Income: ${gross_income}")
+> print(f"Standard Deduction: ${standard_deduction}")
+> print(f"Personal Exemption: ${personal_exemption}")
+> print(f"Taxable Income: ${taxable_income}")
+>
+> # Tax calculation for married filing separately (§1(d))
+> # (i) 15% of taxable income if not over $18,450
+> # (ii) $2,767.50, plus 28% of excess over $18,450 if over $18,450 but not over $44,575
+> # (iii) $10,082.50, plus 31% of excess over $44,575 if over $44,575 but not over $70,000
+> # (iv) $17,964.25, plus 36% of excess over $70,000 if over $70,000 but not over $125,000
+> # (v) $37,764.25, plus 39.6% of excess over $125,000 if over $125,000
+>
+> tax = 0
+> if taxable_income <= 18450:
+>     tax = 0.15 * taxable_income
+> elif taxable_income <= 44575:
+>     tax = 2767.50 + 0.28 * (taxable_income - 18450)
+> elif taxable_income <= 70000:
+>     tax = 10082.50 + 0.31 * (taxable_income - 44575)
+> elif taxable_income <= 125000:
+>     tax = 17964.25 + 0.36 * (taxable_income - 70000)
+> else:
+>     tax = 37764.25 + 0.396 * (taxable_income - 125000)
+>
+> print(f"\nTax Calculation:")
+> print(f"Tax: ${tax:.2f}")
+> print(f"Rounded: ${round(tax)}")
+> PYEOF
+Gross Income: $117192
+Standard Deduction: $0
+Personal Exemption: $2000
+Taxable Income: $115192
+
+Tax Calculation:
+Tax: $34233.37
+Rounded: $34233
+root@7f6c884d942c:/app#

@@ -1,0 +1,47 @@
+{
+  "round": 2,
+  "answer": "Answer: 101393",
+  "answer_changed": false,
+  "report": {
+    "rubrics": [
+      {
+        "name": "tool_call_integrity",
+        "status": "YES",
+        "evidence": "All commands in trajectory ran without error; no failed or truncated results were treated as complete."
+      },
+      {
+        "name": "statute_coverage",
+        "status": "YES",
+        "evidence": "Solver retrieved \u00a72(a) lines 182-220, \u00a72(b) lines 208-244, \u00a7151 lines 1-120, and \u00a7152 lines 120-165 covering all provisions used."
+      },
+      {
+        "name": "grounded_reasoning",
+        "status": "YES",
+        "evidence": "All citations (\u00a72(a)(1)(A), \u00a72(b)(1), \u00a7151(d)(5), \u00a71(c)) trace to the statute file; no external knowledge used."
+      },
+      {
+        "name": "provision_selection",
+        "status": "YES",
+        "evidence": "Each fact checked against named provisions: Alice's 2014 death vs \u00a72(a)(1)(A) 2-year rule; Charlie as friend vs \u00a7152(c) qualifying child; 2018 year vs \u00a7151(d)(5) exemption rule."
+      },
+      {
+        "name": "tool_assisted_computation",
+        "status": "YES",
+        "evidence": "Python3 executed tax calculation with \u00a71(c) brackets; output 101393 matches answer file."
+      }
+    ],
+    "unresolved": [],
+    "suggested_actions": []
+  },
+  "report_text": "VERIFICATION REPORT (round 2 of 3)\n1. Tool-call integrity: YES. All commands in trajectory ran without error; no failed or truncated results were treated as complete.\n2. Statute coverage: YES. Solver retrieved \u00a72(a) lines 182-220, \u00a72(b) lines 208-244, \u00a7151 lines 1-120, and \u00a7152 lines 120-165 covering all provisions used.\n3. Grounded reasoning: YES. All citations (\u00a72(a)(1)(A), \u00a72(b)(1), \u00a7151(d)(5), \u00a71(c)) trace to the statute file; no external knowledge used.\n4. Provision selection and application: YES. Each fact checked against named provisions: Alice's 2014 death vs \u00a72(a)(1)(A) 2-year rule; Charlie as friend vs \u00a7152(c) qualifying child; 2018 year vs \u00a7151(d)(5) exemption rule.\n5. Tool-assisted computation: YES. Python3 executed tax calculation with \u00a71(c) brackets; output 101393 matches answer file.",
+  "steps_used": 0,
+  "parse_failures": 0,
+  "context_exceeded": false,
+  "commands": [],
+  "packet_chars": 34984,
+  "prompt_tokens": 13162,
+  "completion_tokens": 996,
+  "n_llm_calls": 1,
+  "elapsed_sec": 66.46801805496216,
+  "trajectory_file": "trajectory.verifier-round-2.json"
+}

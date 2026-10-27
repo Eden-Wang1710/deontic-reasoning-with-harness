@@ -1,0 +1,61 @@
+New Terminal Output:
+
+root@a3d2b1f00250:/app# mkdir -p /app/output
+root@a3d2b1f00250:/app# python3 << 'EOF'
+ax = base_tax + (excess_over_250k * 0.396)
+
+print(f"Gross income: ${gross_income}")
+print(f"Total itemized deductions: ${itemized_deductions}")
+print(f"Pease reduction: ${pease_reduction}")
+print(f"Allowable deductions: ${allowable_deductions}")
+print(f"Taxable income: ${taxable_income}")
+print(f"Tax: ${tax}")
+print(f"Rounded tax: {round(tax)}")
+EOF
+> # Alice's tax calculation for 2015
+>
+> # Facts
+> gross_income = 395276
+> itemized_deductions = 4571 + 1973 + 15271  # $21,815
+>
+> # Filing status: Unmarried individual (Alice is referred to as a single person)
+> # Applicable amount for unmarried: $250,000 (section 68(b)(1)(C))
+> applicable_amount = 250000
+>
+> # Pease limitation (section 68)
+> # Reduction = lesser of:
+> # (1) 3% of excess AGI over applicable amount
+> # (2) 80% of itemized deductions
+>
+> excess_agi = gross_income - applicable_amount  # 145276
+> reduction1 = excess_agi * 0.03  # 4358.28
+> reduction2 = itemized_deductions * 0.80  # 17452
+>
+> pease_reduction = min(reduction1, reduction2)  # 4358.28
+> allowable_deductions = itemized_deductions - pease_reduction  # 17456.72
+>
+> # Taxable income
+> taxable_income = gross_income - allowable_deductions  # 377819.28
+>
+> # Tax calculation for unmarried individuals (section c)
+> # (v) $79,772, plus 39.6% of the excess over $250,000 if taxable income > $250,000
+> base_tax = 79772
+> excess_over_250k = taxable_income - 250000  # 127819.28
+> tax = base_tax + (excess_over_250k * 0.396)
+>
+> print(f"Gross income: ${gross_income}")
+> print(f"Total itemized deductions: ${itemized_deductions}")
+> print(f"Pease reduction: ${pease_reduction}")
+> print(f"Allowable deductions: ${allowable_deductions}")
+> print(f"Taxable income: ${taxable_income}")
+> print(f"Tax: ${tax}")
+> print(f"Rounded tax: {round(tax)}")
+> EOF
+Gross income: $395276
+Total itemized deductions: $21815
+Pease reduction: $4358.28
+Allowable deductions: $17456.72
+Taxable income: $377819.28
+Tax: $130388.43488000002
+Rounded tax: 130388
+root@a3d2b1f00250:/app#

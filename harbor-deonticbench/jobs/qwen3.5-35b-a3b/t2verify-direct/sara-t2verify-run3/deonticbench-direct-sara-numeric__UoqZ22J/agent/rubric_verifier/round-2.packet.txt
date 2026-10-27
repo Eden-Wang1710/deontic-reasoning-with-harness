@@ -1,0 +1,63 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice's gross income for the year 2017 is $22895. In 2017, Alice takes the standard deduction. Alice has a son, Bob, who has the same principal place of abode as her in 2017 and is not married.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(b)(i)
+§2(b)(1)
+§63(c)(2)(B)
+§151(b)
+§151(c)
+## Reasoning
+Alice's gross income is $22,895. She qualifies as head of household under §2(b)(1) because she is unmarried (not stated as married), and maintains a household where her son Bob has principal place of abode for more than half the year, and Bob is not married. The standard deduction for head of household under §63(c)(2)(B) is $4,400. Alice is entitled to a $2,000 personal exemption under §151(b) and a $2,000 exemption for her dependent Bob under §151(c), totaling $4,000 in exemptions. Her taxable income is $22,895 - $4,400 - $4,000 = $14,495. Under §1(b)(i), the tax for head of household with taxable income not over $29,600 is 15% of taxable income. Tax = $14,495 × 0.15 = $2,174.25, which rounds to $2,174.
+## Answer
+Answer: 2174
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 1746 bytes
+step 3 | (no commands) | output 2239 bytes | task_complete claimed
+step 4 | grep -n 'head of household' /app/statute.txt | head -20; sed -n '395,410p' /app/statute.txt; sed -n '185,210p' /app/statute.txt | output 3329 bytes
+step 5 | sed -n '385,400p' /app/statute.txt; sed -n '200,230p' /app/statute.txt; python3 -c "gross=22895; std_ded=4400; exemptions=4000; taxable=gross-std_ded-exemptions; tax=taxabl | output 3264 bytes
+step 6 | cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 1829 bytes
+step 7 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: NO. Answer file has all three sections and final Answer line, but trajectory shows no retry after truncated cat output (step 1 output was truncated with 17347 bytes omitted).
+2. Statute coverage: NO. §63(c)(2)(A) cited but $4,400 for head of household is in §63(c)(2)(B) per lines 402-404; trajectory only shows one truncated cat command, so solver may have relied on memory.
+3. Grounded reasoning: NO. Lines 402-404 show $4,400 is in §63(c)(2)(B), not §63(c)(2)(A) as solver claims in Reasoning; this section number mismatch is a violation.
+4. Provision selection and application: NO. §2(b)(192-194) requires taxpayer maintains household and furnishes over half cost - facts say nothing about who maintains household or furnishes cost; solver assumes head of household status without checking these conditions.
+5. Tool-assisted computation: NO. Trajectory grep for python3/bc/awk returned exit code 1 (no matches); computation was done in prose, not with a tool.
+Unresolved:
+- Check §63(c)(2)(B) for correct standard deduction section and value for head of household
+- Check §2(b)(192-194) conditions for head of household: who maintains household and who furnishes over half cost
+- Re-run computation with python3 or bc instead of prose
+- Check §152(b)(2) for married dependents exception given Bob is unmarried
+Suggested next actions:
+- sed -n '400,410p' /app/statute.txt to verify §63(c)(2)(B) standard deduction
+- sed -n '190,200p' /app/statute.txt to check head of household maintenance conditions
+- python3 -c 'print(22895-4400-4000)' to re-run income calculation with tool

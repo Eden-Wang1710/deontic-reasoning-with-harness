@@ -1,0 +1,20 @@
+
+
+{
+  "analysis": "I've read the statute. It contains tax brackets for different filing statuses (§1), personal exemptions (§151), standard deduction (§152), and marital status rules (§7703). I need to determine Alice's filing status, calculate her taxable income, and compute her tax liability.",
+  "plan": "I'll analyze the case facts: Alice is unmarried (no mention of marriage), has gross income of $210,204, paid $45,252 to Bob for work (deductible business expense), paid retirement fund for Bob and health insurance for Charlie (Charlie is retired father, likely a dependent). I need to find the standard deduction amount for unmarried individuals and exemption amounts, then calculate tax.",
+  "commands": [
+    {
+      "keystrokes": "grep -n 'Unmarried individuals' /app/statute.txt | head -5\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "grep -n 'standard deduction' /app/statute.txt | head -10\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "grep -n 'exemption amount' /app/statute.txt | head -10\n",
+      "duration": 0.5
+    }
+  ]
+}

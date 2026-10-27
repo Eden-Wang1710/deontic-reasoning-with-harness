@@ -1,0 +1,87 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has a brother, Bob, who was born January 31st, 2014 and has always lived at his parents' place. In 2016, Alice's gross income was $567192. Alice got married on Jan 12, 2016. Her husband had no income in 2016. Alice does not file a joint return. Alice has itemized deductions of $100206.
+
+
+**Question:**
+How much tax does Alice have to pay in 2016?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(d)
+§1(d)(v)
+§151(b)
+§152
+§63(c)
+§68(a)(1)
+§68(b)(1)(D)
+§7703(a)(1)
+
+## Reasoning
+1. Marital status: Under §7703(a)(1), marital status is determined at the close of the taxable year. Alice married on Jan 12, 2016, so she is married at year-end.
+
+2. Filing status: Alice does not file a joint return. Under §1(d), she files as "married individuals filing separate returns".
+
+3. Dependent: Bob lives with his parents, not Alice. Under §152(c)(1)(B), a qualifying child must have the same principal place of abode as the taxpayer. Bob fails this test, so Alice cannot claim him as a dependent.
+
+4. Personal exemptions: Under §151(b), Alice gets one exemption for herself and one for her spouse (who has no income and is not a dependent of another). Total: 2 exemptions × $2,000 = $4,000.
+
+5. AGI: $567,192 - $4,000 = $563,192
+
+6. Itemized deductions phaseout under §68: AGI ($563,192) exceeds the applicable amount for MFS ($150,000 under §68(b)(1)(D) = 1/2 of $300,000). Excess = $413,192. 3% of excess = $12,395.76. 80% of itemized deductions = $80,164.80. The lesser is $12,395.76. Deductible itemized = $100,206 - $12,395.76 = $87,810.24.
+
+7. Taxable income: $563,192 - $87,810.24 = $475,381.76
+
+8. Tax under §1(d)(v): For taxable income over $125,000: $37,764.25 + 39.6% of excess over $125,000.
+   Excess = $475,381.76 - $125,000 = $350,381.76
+   Tax = $37,764.25 + 0.396 × $350,381.76 = $37,764.25 + $138,751.18 = $176,515.43
+   Rounded to whole number: $176,515
+
+## Answer
+Answer: 176515
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | cat > /app/output/answer.txt <<'EOF' | output 1546 bytes
+step 3 | cat /app/output/answer.txt | output 1477 bytes
+step 4 | (no commands) | output 1913 bytes | task_complete claimed
+step 5 | sed -n '471,503p' /app/statute.txt | output 1365 bytes
+step 6 | sed -n '95,181p' /app/statute.txt | output 3706 bytes
+step 7 | cat /app/output/answer.txt | output 1477 bytes
+step 8 | (no commands) | output 1238 bytes | task_complete claimed
+step 9 | sed -n '1,80p' /app/statute.txt | output 4755 bytes
+step 10 | python3 -c "taxable_income = 472381.76; base_tax = 37764.25; excess = taxable_income - 125000; tax = | output 428 bytes
+step 11 | cat > /app/output/answer.txt <<'EOF' | output 1694 bytes
+step 12 | python3 -c "agi = 567192 - 4000; applicable = 300000/2; excess = agi - applicable; reduction = min(0 | output 883 bytes
+step 13 | cat > /app/output/answer.txt <<'EOF' | output 1694 bytes
+step 14 | cat /app/output/answer.txt | output 1624 bytes
+step 15 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 3 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 2 of 3)
+1. Tool-call integrity: YES. Answer file has all three sections (Statute, Reasoning, Answer) and final Answer: line; cat command ran in step 1
+Unresolved:
+- §1(d)(v) threshold is $125,000 for MFS not $250,000 - re-run tax computation with correct threshold
+- No python3/bc/awk commands in trajectory - computations done in prose without tool execution
+Suggested next actions:
+- sed -n '1,150p' /app/statute.txt to read §1(d) tax brackets for MFS
+- python3 -c 'print(37764.25 + 0.396 * (472381.76 - 125000))' to re-run tax with $125,000 threshold
+- Use python3 or bc for all future calculations instead of prose

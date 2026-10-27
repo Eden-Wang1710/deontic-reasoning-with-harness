@@ -1,0 +1,98 @@
+{
+    "job_name": "verify3-smoke4",
+    "jobs_dir": "jobs/qwen3.5-35b-a3b/t2verify-direct",
+    "n_attempts": 1,
+    "timeout_multiplier": 1.0,
+    "agent_timeout_multiplier": 3.0,
+    "verifier_timeout_multiplier": null,
+    "agent_setup_timeout_multiplier": null,
+    "environment_build_timeout_multiplier": null,
+    "debug": false,
+    "n_concurrent_trials": 2,
+    "quiet": false,
+    "retry": {
+        "max_retries": 0,
+        "include_exceptions": null,
+        "exclude_exceptions": [
+            "VerifierTimeoutError",
+            "RewardFileNotFoundError",
+            "AgentTimeoutError",
+            "VerifierOutputParseError",
+            "RewardFileEmptyError"
+        ],
+        "wait_multiplier": 1.0,
+        "min_wait_sec": 1.0,
+        "max_wait_sec": 60.0
+    },
+    "environment": {
+        "type": "docker",
+        "import_path": null,
+        "force_build": false,
+        "delete": true,
+        "override_cpus": null,
+        "override_memory_mb": null,
+        "override_storage_mb": null,
+        "override_gpus": null,
+        "suppress_override_warnings": false,
+        "mounts_json": null,
+        "env": {},
+        "kwargs": {}
+    },
+    "verifier": {
+        "override_timeout_sec": null,
+        "max_timeout_sec": null,
+        "env": {},
+        "disable": false
+    },
+    "metrics": [],
+    "agents": [
+        {
+            "name": null,
+            "import_path": "dar_terminus2_verifier:Terminus2RubricVerifier",
+            "model_name": "hosted_vllm/qwen3.5-35b-a3b",
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {
+                "derivation_record": true,
+                "report_confidence": false,
+                "packet_mode": "index",
+                "derivation_template": "/home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness/tools/templates/terminus-json-plain-derivation-v2.txt",
+                "skill_path": "/home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness/tools/skills/rubric_verifier_v3/SKILL.md",
+                "verifier_max_steps": 4,
+                "api_base": "http://172.17.0.1:9009/v1",
+                "llm_kwargs": {
+                    "api_key": "token-abc123"
+                },
+                "model_info": {
+                    "max_input_tokens": 49152,
+                    "max_output_tokens": 16384,
+                    "max_tokens": 65536,
+                    "input_cost_per_token": 0.0,
+                    "output_cost_per_token": 0.0
+                }
+            },
+            "env": {}
+        }
+    ],
+    "datasets": [
+        {
+            "path": "datasets/deonticbench-direct",
+            "name": null,
+            "version": null,
+            "ref": null,
+            "registry_url": null,
+            "registry_path": null,
+            "overwrite": false,
+            "download_dir": null,
+            "task_names": [
+                "*-sara-numeric-*",
+                "*-sara-binary-*"
+            ],
+            "exclude_task_names": null,
+            "n_tasks": 2
+        }
+    ],
+    "tasks": [],
+    "artifacts": []
+}

@@ -1,0 +1,100 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob have been married since Feb 3rd, 2017. Alice was born March 2nd, 1950 and Bob was born March 3rd, 1955. Bob's gross income for the year 2019 is $113580. Alice and Bob file jointly in 2019, and take the standard deduction. Alice had no income in 2019.
+
+
+**Question:**
+How much tax does Bob have to pay in 2019?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+§1(a)(iii) (line 15): "(iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;"
+
+§63(c)(7)(ii) (line 430): "(ii) by substituting "$12,000" for "$3,000" in subparagraph (C)."
+
+§63(f)(1)(B) (line 448): "(B) for the spouse of the taxpayer if the spouse has attained age 65 before the close of the taxable year and an additional exemption is allowable to the taxpayer for such spouse under section 151(b)."
+
+§151(b) (line 60): "An exemption of the exemption amount for the taxpayer; and an additional exemption of the exemption amount for the spouse of the taxpayer if a joint return is not made by the taxpayer and his spouse, and if the spouse, for the calendar year in which the taxable year of the taxpayer begins, has no gross income and is not the dependent of another taxpayer."
+
+§151(d)(5) (line 90): "In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026, the term "exemption amount" means zero."
+
+## Reasoning
+
+1. **Filing status**: Alice and Bob are married and file jointly in 2019. They are subject to §1(a) tax rates for married individuals filing joint returns.
+
+2. **Standard deduction**: Under §63(c)(2)(C) and §63(c)(7)(ii), the basic standard deduction for married filing jointly in 2019 (taxable year beginning after Dec 31, 2017) is $12,000.
+
+3. **Additional standard deduction for age**: Under §63(f)(1)(B), an additional $600 for the spouse over 65 is allowed only if "an additional exemption is allowable to the taxpayer for such spouse under section 151(b)". However, §151(b) states that an additional exemption for the spouse is allowed only if "a joint return is not made by the taxpayer and his spouse". Since Alice and Bob file jointly, no additional exemption is allowable for the spouse under §151(b). Therefore, Alice does NOT qualify for the additional $600 standard deduction under §63(f)(1)(B).
+
+   Total standard deduction = $12,000
+
+4. **Personal exemptions**: Under §151(d)(5), for taxable years beginning after December 31, 2017 and before January 1, 2026, the exemption amount is zero. Therefore, no personal exemptions are allowed in 2019.
+
+5. **Taxable income calculation**:
+   - Gross income = $113,580 (Bob's income) + $0 (Alice's income) = $113,580
+   - Taxable income = $113,580 - $12,000 - $0 = $101,580
+
+6. **Tax calculation**: Taxable income of $101,580 falls in the bracket "over $89,150 but not over $140,000" under §1(a)(iii).
+   - Tax = $20,165 + 31% × ($101,580 - $89,150)
+   - Tax = $20,165 + 0.31 × $12,430
+   - Tax = $20,165 + $3,853.30
+   - Tax = $24,018.30
+
+   Rounded to whole dollar: $24,018
+
+## Answer
+Answer: 24018
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | python3 << 'EOF' | output 2152 bytes
+step 3 | grep -n '15% of taxable income if the taxable income is not over $36,900' /app/statute.txt; grep -n '5,535, plus 28% of the excess over $36,900' /app/statute.txt; grep -n '20,165, plus 31% of the excess over $89,150' /app/statute.txt; grep -n 'exemption amount means $2,000' /app/statute.txt; grep -n '\$12,000' /app/statute.txt; grep -n 'additional amount of $600' /app/statute.txt | output 1100 bytes
+step 4 | grep -n 'exemption amount' /app/statute.txt; grep -n 'An exemption of the exemption amount for the taxpayer' /app/statute.txt; sed -n '1,20p' /app/statute.txt | output 2836 bytes
+step 5 | python3 << 'EOF' | output 1689 bytes
+step 6 | mkdir -p /app/output; cat > /app/output/answer.txt << 'EOF' | output 2144 bytes
+step 7 | cat /app/output/answer.txt | output 2025 bytes
+step 8 | (no commands) | output 2399 bytes | task_complete claimed
+step 9 | sed -n '358,462p' /app/statute.txt | output 4381 bytes
+step 10 | sed -n '55,95p' /app/statute.txt | output 2353 bytes
+step 11 | python3 << 'EOF' | output 2434 bytes
+step 12 | grep -n 'substituting "\$12,000" for "\$3,000"' /app/statute.txt; grep -n 'an additional exemption is allowable to the taxpayer for such spouse' /app/statute.txt; grep -n 'a joint return is not made' /app/statute.txt | output 1188 bytes
+step 13 | cat > /app/output/answer.txt << 'EOF' | output 2877 bytes
+step 14 | cat /app/output/answer.txt | output 2799 bytes
+step 15 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: NO. Step 1 cat /app/statute.txt output was truncated (17347 bytes omitted); trajectory shows solver proceeded without verifying all content was visible.
+2. Statute coverage: NO. Solver cites §152 for standard deduction provisions at lines 430, 444, but §152 is 'Dependent defined' starting at line 95. Standard deduction rules are in §63 (lines 358-462), which never appeared in trajectory output.
+3. Grounded reasoning: NO. Section numbers do not match quoted text: §152(b)(2)(C), §152(g)(7), §152(f)(1) are cited but these lines (430, 444) are in §63, not §152. Quoted text exists but section attribution is incorrect.
+4. Provision selection and application: NO. Fact ledger: Alice's age (69), Bob's age (64), filing status, gross income all marked USED. However, governing provision §63 for standard deduction was never read. The age-based additional deduction condition in §63(f) was never checked against the file.
+5. Tool-assisted computation: YES. python3 command in step 5 executed tax calculation. Re-run: 20165 + 0.31*(100980-89150) = 23832.3 matches solver's intermediate and final figures.
+Unresolved:
+- Rewrite statute citations: standard deduction provisions are in §63, not §152
+- Read §63 (lines 358-462) to verify standard deduction rules and age-based additional deduction conditions
+- Verify §151(d)(3) line 90 exemption amount zero applies to joint filers
+- Confirm Alice qualifies for additional $600 deduction under §63(f)(1)(B) - requires checking if exemption is allowable to taxpayer for spouse
+Suggested next actions:
+- sed -n '358,462p' /app/statute.txt to read §63 standard deduction provisions
+- grep -n '§63(f)' /app/statute.txt to find aged/blind additional amounts section
+- Check §151(b) conditions for spouse exemption to verify §63(f)(1)(B) eligibility
+- python3 -c 'print(20165 + 0.31*(100980-89150))' to verify tax calculation reproduces

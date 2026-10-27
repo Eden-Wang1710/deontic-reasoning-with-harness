@@ -1,0 +1,57 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has paid $4512 to Bob for work done from Feb 1st, 2005 to Sep 2nd, 2005. In 2005, Alice was paid $133200. Alice is allowed itemized deductions of $2939 and $8744.
+
+
+**Question:**
+How much tax does Alice have to pay in 2005?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c) - Tax for unmarried individuals
+§63(c) - Itemized deductions
+§151(d)(1) - Exemption amount of $2,000
+
+## Reasoning
+Alice is an unmarried individual (she paid Bob for work, not a marital relationship), so §1(c) applies.
+
+Gross income: $133,200
+Itemized deductions: $2,939 + $8,744 = $11,683
+Personal exemption (single, no dependents): $2,000
+
+Taxable income = $133,200 - $11,683 - $2,000 = $119,517
+
+Since $119,517 is over $115,000 but not over $250,000, under §1(c)(iv):
+Tax = $31,172 + 36% × ($119,517 - $115,000)
+Tax = $31,172 + 36% × $4,517
+Tax = $31,172 + $1,626.12
+Tax = $32,798.12
+
+Rounded to whole number: $32,798
+
+## Answer
+Answer: 32798
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 870 bytes
+step 3 | cat /app/output/answer.txt | output 767 bytes
+step 4 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

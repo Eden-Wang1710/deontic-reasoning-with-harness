@@ -1,0 +1,103 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Bob, Alice's father, has the same principal place of abode as Alice since 2012, and has had no income since. Alice's gross income for the year 2015 is $102268. Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§2(b)(1) - Definition of head of household
+§2(b)(1)(B) - Father/mother as qualifying person
+§2(b)(1) - Household cost condition (over half furnished by taxpayer)
+§152(d) - Qualifying relative
+§152(d)(1)(B) - No income requirement for qualifying relative
+§151(b) - Taxpayer exemption
+§151(c) - Dependent exemption
+§151(d)(1) - Exemption amount
+§63(c)(2)(B) - Basic standard deduction for head of household
+§1(b)(iii) - Tax rate for head of household
+
+## Reasoning
+Alice is unmarried. She maintains a household with her father Bob since 2012.
+
+**Head of Household Status (§2(b))**:
+- Alice is not married at close of taxable year (unmarried)
+- Bob has the same principal place of abode as Alice (same household since 2012)
+- Bob is Alice's father - qualifies under §2(b)(1)(B)
+- Bob has NO income since 2012, so he cannot furnish over half the household cost; therefore Alice furnishes over half
+- Bob qualifies as Alice's dependent under §152(d) (qualifying relative - father with no income)
+- Alice is entitled to deduction for Bob under §151(c)
+
+**Deductions**:
+- Standard deduction: $4,400 (§63(c)(2)(B) - head of household)
+- Personal exemption for Alice: $2,000 (§151(b), §151(d)(1))
+- Personal exemption for Bob (dependent): $2,000 (§151(c), §151(d)(1))
+- Total deductions: $8,400
+
+**Taxable Income**:
+$102,268 - $8,400 = $93,868
+
+**Tax Calculation (§1(b)(iii))**:
+For head of household with taxable income over $76,400 but not over $127,500:
+Tax = $17,544 + 31% × ($93,868 - $76,400)
+Tax = $17,544 + 31% × $17,468
+Tax = $17,544 + $5,415.08 = $22,959.08
+
+Rounding to whole dollar: $22,959
+
+## Answer
+Answer: 22959
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | cat /app/statute.txt | output 10071 bytes, truncated (17348 bytes omitted)
+step 3 | head -200 /app/statute.txt | output 10069 bytes, truncated (395 bytes omitted)
+step 4 | tail -n +200 /app/statute.txt | head -200 | output 10070 bytes, truncated (1686 bytes omitted)
+step 5 | grep -n 'standard deduction' /app/statute.txt | output 1453 bytes
+step 6 | sed -n '360,450p' /app/statute.txt | output 3613 bytes
+step 7 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1560 bytes
+step 8 | cat /app/output/answer.txt | output 1439 bytes
+step 9 | (no commands) | output 1706 bytes | task_complete claimed
+step 10 | sed -n '180,220p' /app/statute.txt | output 2777 bytes
+step 11 | python3 -c 'print(17544 + 0.31 * (93868 - 76400))' | output 130 bytes
+step 12 | cat > /app/output/answer.txt <<'EOF' | output 1842 bytes
+step 13 | cat /app/output/answer.txt | output 1749 bytes
+step 14 | (no commands) | output 1896 bytes | task_complete claimed
+step 15 | sed -n '208,230p' /app/statute.txt | output 1817 bytes
+step 16 | cat /app/output/answer.txt | output 1749 bytes
+step 17 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 3 of 3 ===
+Answer file changed since the previous round: no
+Previous report:
+VERIFICATION REPORT (round 2 of 3)
+1. Tool-call integrity: YES. Answer file has all three sections plus Answer line; trajectory shows python3 command ran in step 11 without unreported failures
+2. Statute coverage: YES. §2(b) header and subsections appeared in trajectory step 10 (sed -n '180,220p' on statute.txt)
+3. Grounded reasoning: YES. Tax calculation uses figures from §1(b)(iii) rate table and stated taxable income; python3 output 22959.08 matches Reasoning section
+4. Provision selection and application: NO. §2(b)(1) condition that taxpayer furnishes over half household cost is not in case facts; solver inferred from Bob's 'no income' which is not a supported fact per rubric 4
+5. Tool-assisted computation: YES. Step 11 ran python3 -c 'print(17544 + 0.31 * (93868 - 76400))' and reproduced 22959.08
+Unresolved:
+- §2(b)(1) household cost condition: facts do not state who furnished over half household cost; cannot verify this condition is met
+- Check if any exception or limitation in §2(b)(1) applies to the facts
+Suggested next actions:
+- sed -n '180,220p' /app/statute.txt to review §2(b)(1) conditions
+- Check case facts for explicit statement about who furnished over half household cost
+- Verify if §2(a)(1) household cost maintenance rule applies to §2(b)(1) head of household

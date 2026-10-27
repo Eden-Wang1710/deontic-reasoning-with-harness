@@ -1,0 +1,25 @@
+New Terminal Output:
+
+root@68e7e1f20f8f:/app# python3 -c "
+> gross_income = 67285
+> itemized_deductions = 17817
+> exemptions = 4000  # 2 exemptions of $2000 each
+> taxable_income = gross_income - itemized_deductions - exemptions
+> print(f'Taxable Income: {taxable_income}')
+>
+> # Head of Household tax (§1(b)(ii))
+> # $4,440 plus 28% of excess over $29,600
+> base_tax = 4440
+> excess = taxable_income - 29600
+> tax = base_tax + 0.28 * excess
+> print(f'Base Tax: {base_tax}')
+> print(f'Excess: {excess}')
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+Taxable Income: 45468
+Base Tax: 4440
+Excess: 15868
+Tax: 8883.04
+Rounded: 8883
+root@68e7e1f20f8f:/app#

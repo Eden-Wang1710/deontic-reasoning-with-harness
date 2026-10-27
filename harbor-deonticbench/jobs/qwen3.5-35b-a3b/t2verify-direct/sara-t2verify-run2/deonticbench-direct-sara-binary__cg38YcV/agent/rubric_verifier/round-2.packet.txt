@@ -1,0 +1,116 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has employed Bob, Cameron, Dan, Emily, Fred and George for agricultural labor on various occasions during the year 2017: - Jan 24: Bob, Cameron, Dan, Emily and Fred - Feb 4: Bob, Cameron and Fred - Mar 3: Bob, Cameron, Dan, Emily and Fred - Mar 18: Cameron, Dan, Emily, Fred and George - Apr 1: Bob, Cameron, Dan, Fred and George - May 9: Cameron, Dan, Emily, Fred and George - Oct 14: Bob, Cameron, Dan, Emily and George - Oct 25: Bob, Emily, Fred and George - Nov 8: Bob, Cameron, Emily, Fred and George - Nov 22: Bob, Cameron, Dan, Emily and Fred - Dec 1: Bob, Cameron, Dan, Emily and George - Dec 2: Bob, Cameron, Dan, Emily and George
+
+
+**Question:**
+Section 3306(a)(2)(B) applies to Alice for the year 2017.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+Section 3306(a)(2)(B) (§3306. Definitions, lines 267-271):
+
+"In the case of agricultural labor, the term "employer" means, with respect to any calendar year, any person who-
+
+    (A) during the calendar year or the preceding calendar year paid wages of $20,000 or more for agricultural labor, or
+
+    (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least 5 individuals in employment in agricultural labor for some portion of the day."
+
+## Reasoning
+
+Section 3306(a)(2)(B) defines when a person is an "employer" for agricultural labor purposes. The condition requires that the person employed at least 5 individuals in agricultural labor on each of some 10 days during the calendar year, with each day being in a different calendar week.
+
+Applying the facts to this provision:
+
+1. All 12 employment dates in 2017 when Alice employed agricultural workers:
+   - Jan 24: 5 workers (Bob, Cameron, Dan, Emily, Fred) - MEETS 5-worker threshold
+   - Feb 4: 3 workers (Bob, Cameron, Fred) - DOES NOT MEET 5-worker threshold (excluded from count)
+   - Mar 3: 5 workers (Bob, Cameron, Dan, Emily, Fred) - MEETS 5-worker threshold
+   - Mar 18: 5 workers (Cameron, Dan, Emily, Fred, George) - MEETS 5-worker threshold
+   - Apr 1: 5 workers (Bob, Cameron, Dan, Fred, George) - MEETS 5-worker threshold
+   - May 9: 5 workers (Cameron, Dan, Emily, Fred, George) - MEETS 5-worker threshold
+   - Oct 14: 5 workers (Bob, Cameron, Dan, Emily, George) - MEETS 5-worker threshold
+   - Oct 25: 3 workers (Bob, Emily, Fred, George) - DOES NOT MEET 5-worker threshold (excluded from count)
+   - Nov 8: 5 workers (Bob, Cameron, Emily, Fred, George) - MEETS 5-worker threshold
+   - Nov 22: 5 workers (Bob, Cameron, Dan, Emily, Fred) - MEETS 5-worker threshold
+   - Dec 1: 5 workers (Bob, Cameron, Dan, Emily, George) - MEETS 5-worker threshold
+   - Dec 2: 5 workers (Bob, Cameron, Dan, Emily, George) - MEETS 5-worker threshold
+
+2. Dates with at least 5 workers (10 dates):
+   - Jan 24, Mar 3, Mar 18, Apr 1, May 9, Oct 14, Nov 8, Nov 22, Dec 1, Dec 2
+
+3. Computation of unique calendar weeks (using ISO week numbers):
+
+```python
+from datetime import date
+dates_with_5plus = [
+    date(2017, 1, 24), date(2017, 3, 3), date(2017, 3, 18),
+    date(2017, 4, 1), date(2017, 5, 9), date(2017, 10, 14),
+    date(2017, 11, 8), date(2017, 11, 22), date(2017, 12, 1),
+    date(2017, 12, 2)
+]
+weeks = set(d.isocalendar()[1] for d in dates_with_5plus)
+print(len(weeks))  # Output: 9
+```
+
+4. Result: There are 10 dates with 5+ workers, but they fall in only 9 different calendar weeks (Dec 1 and Dec 2 are in the same calendar week, week 48 of 2017).
+
+5. Since Section 3306(a)(2)(B) requires 10 different calendar weeks and Alice only has 9, the condition is NOT met.
+
+Therefore, Section 3306(a)(2)(B) does NOT apply to Alice for the year 2017.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '3306' /app/statute.txt | output 471 bytes
+step 3 | sed -n '251,350p' /app/statute.txt | output 6956 bytes
+step 4 | python3 << 'EOF' | output 3896 bytes
+step 5 | grep -n 'Agricultural labor' /app/statute.txt | output 147 bytes
+step 6 | sed -n '265,275p' /app/statute.txt | output 965 bytes
+step 7 | mkdir -p /app/output; cat > /app/output/answer.txt << 'EOF' | output 2619 bytes
+step 8 | cat /app/output/answer.txt | output 2468 bytes
+step 9 | (no commands) | output 2306 bytes | task_complete claimed
+step 10 | sed -n '267,271p' /app/statute.txt | output 592 bytes
+step 11 | cat > /app/output/answer.txt << 'EOF' | output 3165 bytes
+step 12 | cat /app/output/answer.txt | output 3053 bytes
+step 13 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: NO. Step 1 output was truncated (17347 bytes omitted) but solver did not acknowledge this in the trajectory and proceeded as if full file was read.
+2. Statute coverage: YES. Section 3306(a)(2)(B) text was displayed in step 6 (sed -n '265,275p'). Quote is present though line numbers cited (265-271) are slightly off from actual (267-271).
+3. Grounded reasoning: YES. Quote text is verbatim from statute. All numbers in reasoning trace to either case facts or quoted provision. Line number discrepancy is minor and noted.
+4. Provision selection and application: NO. Two case facts (Feb 4 and Oct 25, each with only 3 workers) are not mentioned in the answer file. All 12 employment dates should be accounted for, including those that don't meet the 5-worker threshold.
+5. Tool-assisted computation: YES. Python code was used and reproduces: 10 dates with 5+ workers yield 9 unique calendar weeks.
+Unresolved:
+- Step 1 truncation: check if full statute was read (grep -n '3306' /app/statute.txt to verify section location)
+- Feb 4 fact not addressed: verify this date has only 3 workers and is correctly excluded from the 10-day count
+- Oct 25 fact not addressed: verify this date has only 3 workers and is correctly excluded from the 10-day count
+- Quote line numbers: cite correct lines 267-271 instead of 265-271 in Statute section
+Suggested next actions:
+- sed -n '267,271p' /app/statute.txt to verify correct line numbers for agricultural labor provision
+- grep -n 'Feb 4\|Oct 25' /app/output/answer.txt to confirm these dates are not mentioned
+- Add Feb 4 and Oct 25 to the facts list in Reasoning with explanation that they had fewer than 5 workers
+- Update quote line numbers in ## Statute section from 265-271 to 267-271
+- Check trajectory step 1 analysis to see if truncation was acknowledged

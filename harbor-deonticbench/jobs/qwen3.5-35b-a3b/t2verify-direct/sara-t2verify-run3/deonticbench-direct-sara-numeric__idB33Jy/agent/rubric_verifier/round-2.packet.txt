@@ -1,0 +1,81 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has paid $4512 to Bob for work done from Feb 1st, 2005 to Sep 2nd, 2005. In 2005, Alice was paid $133200. Alice is allowed itemized deductions of $2939 and $8744.
+
+
+**Question:**
+How much tax does Alice have to pay in 2005?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c) - Tax for unmarried individuals
+§63(d) - Itemized deductions
+§151(d)(1) - Exemption amount of $2,000
+§3301 - Excise tax on employers (FUTA)
+§3306(a)(1) - Definition of employer
+
+## Reasoning
+Alice is an unmarried individual (she paid Bob for work, not a marital relationship), so §1(c) applies.
+
+**Income Tax Calculation:**
+Gross income: $133,200
+Itemized deductions (per §63(d)): $2,939 + $8,744 = $11,683
+Personal exemption (per §151(d)(1)): $2,000
+
+Taxable income = $133,200 - $11,683 - $2,000 = $119,517
+
+Since $119,517 is over $115,000 but not over $250,000, under §1(c)(iv):
+Income tax = $31,172 + 36% × ($119,517 - $115,000)
+Income tax = $31,172 + 36% × $4,517
+Income tax = $31,172 + $1,626.12 = $32,798.12
+
+**FUTA Tax Calculation:**
+Alice paid Bob $4,512 for work. Under §3306(a)(1), Alice is an employer (wages > $1,500).
+Under §3301, FUTA tax = 6% of total wages.
+FUTA tax = 6% × $4,512 = $270.72
+
+**Total Tax:**
+$32,798 (income tax, rounded) + $271 (FUTA tax, rounded) = $33,069
+
+## Answer
+Answer: 33069
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 870 bytes
+step 3 | cat /app/output/answer.txt | output 767 bytes
+step 4 | (no commands) | output 1448 bytes | task_complete claimed
+step 5 | grep -n '63' /app/statute.txt | head -50 | output 144 bytes
+step 6 | cat /app/statute.txt | head -200 | output 10069 bytes, truncated (401 bytes omitted)
+step 7 | cat /app/statute.txt | head -400 | tail -200 | output 10070 bytes, truncated (1757 bytes omitted)
+step 8 | cat /app/statute.txt | head -600 | tail -200 | output 8820 bytes
+step 9 | python3 -c " | output 877 bytes
+step 10 | cat > /app/output/answer.txt <<'EOF' | output 1216 bytes
+step 11 | cat /app/output/answer.txt | output 1143 bytes
+step 12 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has all three sections and final Answer line; step 1 output was truncated but solver noticed and proceeded with visible content
+2. Statute coverage: NO. §63(c) cited in answer file but never displayed in solver's terminal output (trajectory shows only §1 and §151 were displayed)
+3. Grounded reasoning: NO. Solver labels §63(c) as 'Itemized deductions' but §63(c) in statute (line 372) is 'Standard deduction'; itemized deductions are in §63(d)
+4. Provision selection and application: UNKNOWN. $4512 payment to Bob for work is UNUSED fact; need to search §3306 and related employment sections to determine if employment tax applies
+5. Tool-assisted computation: NO. All computations in reasoning were done in prose (31172 + 36% × 4517) without python3/bc/awk tool execution

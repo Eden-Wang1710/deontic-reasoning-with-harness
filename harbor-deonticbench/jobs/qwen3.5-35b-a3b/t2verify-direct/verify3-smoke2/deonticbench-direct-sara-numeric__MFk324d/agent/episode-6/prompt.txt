@@ -1,0 +1,72 @@
+New Terminal Output:
+
+root@828673c60e72:/app# python3 << 'PYEOF'
+> # Given facts
+> gross_income = 311510
+>
+> # Bob qualifies as qualifying relative (§152(d)):
+> # - Father relationship (§152(d)(2)(C))
+> # - No income (§152(d)(1)(B))
+> # - Not a qualifying child (§152(d)(1)(D))
+>
+> # Alice qualifies as head of household (§2(b)(1)(B)):
+> # - Not married, not surviving spouse
+> # - Maintains household for father who is dependent
+>
+> # Standard deduction for HOH (§63(c)(2)(B))
+> standard_deduction = 4400
+>
+> # Exemption amount (§151(d)(1))
+> exemption_amount_base = 2000
+>
+> # AGI = gross income - personal exemption
+> # Phaseout applies when AGI > $250,000 (§68(b)(1)(C))
+> # Applicable percentage = 2% per $2,500 over threshold
+>
+> # Iterative calculation:
+> # Let E = exemption amount per person (after phaseout)
+> # AGI = 311510 - E (Alice's personal exemption)
+> # Phaseout % = 0.02 * ceil((AGI - 250000) / 2500)
+> # E = 2000 * (1 - phaseout %)
+>
+> # Solving: Let P be phaseout percentage
+> # E = 2000 * (1 - P)
+> # AGI = 311510 - 2000*(1-P) = 309510 + 2000*P
+> # P = 0.02 * ceil((309510 + 2000*P - 250000) / 2500)
+> # P = 0.02 * ceil((59510 + 2000*P) / 2500)
+>
+> # Try P = 0.50 (50%):
+> # AGI = 309510 + 1000 = 310510
+> # (310510 - 250000) / 2500 = 60510 / 2500 = 24.204
+> # ceil(24.204) = 25
+> # P = 0.02 * 25 = 0.50 ✓
+>
+> P = 0.50  # phaseout percentage
+> E = exemption_amount_base * (1 - P)  # $1000 per exemption
+>
+> # Total exemptions: Alice + Bob = $2000
+> total_exemptions = 2 * E
+>
+> # Taxable income = gross - standard deduction - exemptions
+> taxable_income = gross_income - standard_deduction - total_exemptions
+>
+> # Tax for HOH over $250,000 (§1(b)(v))
+> # $77,485 + 39.6% of excess over $250,000
+> tax = 77485 + 0.396 * (taxable_income - 250000)
+>
+> print(f"Gross income: ${gross_income}")
+> print(f"Standard deduction (HOH): ${standard_deduction}")
+> print(f"Exemption per person (after phaseout): ${E}")
+> print(f"Total exemptions: ${total_exemptions}")
+> print(f"Taxable income: ${taxable_income}")
+> print(f"Tax: ${tax}")
+> print(f"Rounded: ${round(tax)}")
+> PYEOF
+Gross income: $311510
+Standard deduction (HOH): $4400
+Exemption per person (after phaseout): $1000.0
+Total exemptions: $2000.0
+Taxable income: $305110.0
+Tax: $99308.56
+Rounded: $99309
+root@828673c60e72:/app#

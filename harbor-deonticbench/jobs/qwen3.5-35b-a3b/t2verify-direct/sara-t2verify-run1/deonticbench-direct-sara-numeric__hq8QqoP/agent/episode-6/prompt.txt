@@ -1,0 +1,41 @@
+New Terminal Output:
+
+root@acd1626f7adf:/app# sed -n '130,150p' /app/statute.txt
+
+        (E) who has not filed a joint return (other than only for a claim of refund) with the individual's spouse for the taxable year beginning in the calendar
+ year in which the taxable year of the taxpayer begins.
+
+    (2) Relationship
+
+    For purposes of paragraph (1)(A), an individual bears a relationship to the taxpayer described in this paragraph if such individual is-
+
+        (A) a child of the taxpayer or a descendant of such a child, or
+
+        (B) a brother, sister, stepbrother, or stepsister of the taxpayer or a descendant of any such relative.
+
+    (3) Age requirements
+
+    For purposes of paragraph (1)(C), an individual meets the requirements of this paragraph if such individual is younger than the taxpayer claiming such indiv
+idual as a qualifying child and is less than 25 years old at the end of the taxable year.
+
+(d) Qualifying relative
+
+For purposes of this section-
+
+    (1) In general
+
+root@acd1626f7adf:/app# python3 -c "
+> gross_income = 260932
+> standard_deduction = 4400  # Head of Household
+> exemptions = 2000 + 2000  # Alice + Bob
+> taxable_income = gross_income - standard_deduction - exemptions
+> print(f'Taxable income: {taxable_income}')
+> # Head of Household: over 127500 but not over 250000
+> base = 33385
+> excess = taxable_income - 127500
+> tax = base + 0.36 * excess
+> print(f'Tax: {round(tax)}')
+> "
+Taxable income: 252532
+Tax: 78397
+root@acd1626f7adf:/app#

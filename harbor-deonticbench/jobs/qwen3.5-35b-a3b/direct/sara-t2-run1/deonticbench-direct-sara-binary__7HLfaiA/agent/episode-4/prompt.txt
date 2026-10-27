@@ -1,0 +1,55 @@
+New Terminal Output:
+
+root@8f62b2103025:/app# python3 << 'EOF'
+> from datetime import datetime, timedelta
+>
+> # 2017 calendar - Jan 1, 2017 was a Sunday
+> # Weeks run Sunday-Saturday
+>
+> dates = [
+>     ("Jan 24", 1, 24),
+>     ("Feb 4", 2, 4),
+>     ("Mar 3", 3, 3),
+>     ("Mar 18", 3, 18),
+>     ("Apr 1", 4, 1),
+>     ("May 9", 5, 9),
+>     ("Oct 14", 10, 14),
+>     ("Oct 25", 10, 25),
+>     ("Nov 8", 11, 8),
+>     ("Nov 22", 11, 22),
+>     ("Dec 1", 12, 1),
+>     ("Dec 2", 12, 2),
+> ]
+>
+> # Calculate ISO week numbers
+> for name, m, d in dates:
+>     dt = datetime(2017, m, d)
+>     iso_cal = dt.isocalendar()
+>     print(f"{name}: ISO week {iso_cal[1]}, day of week: {iso_cal[2]}")
+>
+> # Count unique weeks
+> weeks = set()
+> for name, m, d in dates:
+>     dt = datetime(2017, m, d)
+>     iso_cal = dt.isocalendar()
+>     weeks.add((iso_cal[0], iso_cal[1]))
+>
+> print(f"\nUnique weeks: {len(weeks)}")
+> print(f"Weeks: {sorted(weeks)}")
+> EOF
+Jan 24: ISO week 4, day of week: 2
+Feb 4: ISO week 5, day of week: 6
+Mar 3: ISO week 9, day of week: 5
+Mar 18: ISO week 11, day of week: 6
+Apr 1: ISO week 13, day of week: 6
+May 9: ISO week 19, day of week: 2
+Oct 14: ISO week 41, day of week: 6
+Oct 25: ISO week 43, day of week: 3
+Nov 8: ISO week 45, day of week: 3
+Nov 22: ISO week 47, day of week: 3
+Dec 1: ISO week 48, day of week: 5
+Dec 2: ISO week 48, day of week: 6
+
+Unique weeks: 11
+Weeks: [(2017, 4), (2017, 5), (2017, 9), (2017, 11), (2017, 13), (2017, 19), (2017, 41), (2017, 43), (2017, 45), (2017, 47), (2017, 48)]
+root@8f62b2103025:/app#

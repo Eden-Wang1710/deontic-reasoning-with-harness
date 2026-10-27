@@ -1,0 +1,135 @@
+{
+    "id": "23ca57fa-4272-42d4-95ba-f46a7f122d32",
+    "task_name": "deonticbench-direct-sara-numeric-tax-case-93",
+    "trial_name": "deonticbench-direct-sara-numeric__YNsJoaD",
+    "trial_uri": "file:///home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness/harbor-deonticbench/jobs/qwen3.5-35b-a3b/t2verify-direct/sara-t2verify-run1/deonticbench-direct-sara-numeric__YNsJoaD",
+    "task_id": {
+        "path": "datasets/deonticbench-direct/deonticbench-direct-sara-numeric-tax-case-93"
+    },
+    "source": "deonticbench-direct",
+    "task_checksum": "bc75970bd4c951e6cfab930a422e47bc45e0fd4dc69e939adb1ba0b979e5a2c1",
+    "config": {
+        "task": {
+            "path": "datasets/deonticbench-direct/deonticbench-direct-sara-numeric-tax-case-93",
+            "git_url": null,
+            "git_commit_id": null,
+            "name": null,
+            "ref": null,
+            "overwrite": false,
+            "download_dir": null,
+            "source": "deonticbench-direct"
+        },
+        "trial_name": "deonticbench-direct-sara-numeric__YNsJoaD",
+        "trials_dir": "jobs/qwen3.5-35b-a3b/t2verify-direct/sara-t2verify-run1",
+        "timeout_multiplier": 1.0,
+        "agent_timeout_multiplier": 3.0,
+        "verifier_timeout_multiplier": null,
+        "agent_setup_timeout_multiplier": null,
+        "environment_build_timeout_multiplier": null,
+        "agent": {
+            "name": null,
+            "import_path": "dar_terminus2_verifier:Terminus2RubricVerifier",
+            "model_name": "hosted_vllm/qwen3.5-35b-a3b",
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {
+                "api_base": "http://172.17.0.1:9009/v1",
+                "llm_kwargs": {
+                    "api_key": "token-abc123"
+                },
+                "model_info": {
+                    "max_input_tokens": 49152,
+                    "max_output_tokens": 16384,
+                    "max_tokens": 65536,
+                    "input_cost_per_token": 0.0,
+                    "output_cost_per_token": 0.0
+                }
+            },
+            "env": {}
+        },
+        "environment": {
+            "type": "docker",
+            "import_path": null,
+            "force_build": false,
+            "delete": true,
+            "override_cpus": null,
+            "override_memory_mb": null,
+            "override_storage_mb": null,
+            "override_gpus": null,
+            "suppress_override_warnings": false,
+            "mounts_json": null,
+            "env": {},
+            "kwargs": {}
+        },
+        "verifier": {
+            "override_timeout_sec": null,
+            "max_timeout_sec": null,
+            "env": {},
+            "disable": false
+        },
+        "artifacts": [],
+        "job_id": "33c16fd3-c80f-418a-b880-65a525254c82"
+    },
+    "agent_info": {
+        "name": "terminus-2-rubric-verifier",
+        "version": "2.0.0",
+        "model_info": {
+            "name": "qwen3.5-35b-a3b",
+            "provider": "hosted_vllm"
+        }
+    },
+    "agent_result": {
+        "n_input_tokens": 124630,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 15051,
+        "cost_usd": null,
+        "rollout_details": [],
+        "metadata": {
+            "n_episodes": 7,
+            "api_request_times_msec": [
+                15300.972700119019,
+                353752.39300727844,
+                39690.603494644165,
+                37888.57650756836,
+                20738.433361053467,
+                28062.387228012085,
+                49682.82699584961,
+                45742.1088218689,
+                62099.33638572693,
+                54010.64944267273,
+                25804.598808288574,
+                25892.179250717163,
+                62094.69127655029,
+                16049.781799316406,
+                67994.80199813843,
+                14891.737937927246
+            ],
+            "summarization_count": 0
+        }
+    },
+    "verifier_result": {
+        "rewards": {
+            "reward": 1.0
+        }
+    },
+    "exception_info": null,
+    "started_at": "2026-10-26T01:05:13.556440Z",
+    "finished_at": "2026-10-26T01:20:56.487621Z",
+    "environment_setup": {
+        "started_at": "2026-10-26T01:05:13.573720Z",
+        "finished_at": "2026-10-26T01:05:15.973681Z"
+    },
+    "agent_setup": {
+        "started_at": "2026-10-26T01:05:15.973693Z",
+        "finished_at": "2026-10-26T01:05:17.476507Z"
+    },
+    "agent_execution": {
+        "started_at": "2026-10-26T01:05:17.476540Z",
+        "finished_at": "2026-10-26T01:20:45.210950Z"
+    },
+    "verifier": {
+        "started_at": "2026-10-26T01:20:45.360806Z",
+        "finished_at": "2026-10-26T01:20:45.767308Z"
+    }
+}

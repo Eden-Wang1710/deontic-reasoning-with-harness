@@ -1,0 +1,31 @@
+New Terminal Output:
+
+root@bcdc28f949ca:/app# python3 -c "
+> # Income tax calculation
+> gross_income = 133200
+> itemized_deductions = 2939 + 8744  # 11683
+> personal_exemption = 2000
+> taxable_income = gross_income - itemized_deductions - personal_exemption
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation for unmarried individual
+> # §1(c)(iv): 36% bracket for income over 115000
+> base_tax = 31172
+> excess = taxable_income - 115000
+> income_tax = base_tax + 0.36 * excess
+> print(f'Income tax: {income_tax}')
+>
+> # FUTA tax calculation
+> # §3301: 6% excise tax on employers
+> wages = 4512
+> futa_tax = 0.06 * wages
+> print(f'FUTA tax: {futa_tax}')
+>
+> total_tax = round(income_tax) + round(futa_tax)
+> print(f'Total tax: {total_tax}')
+> "
+Taxable income: 119517
+Income tax: 32798.12
+FUTA tax: 270.71999999999997
+Total tax: 33069
+root@bcdc28f949ca:/app#

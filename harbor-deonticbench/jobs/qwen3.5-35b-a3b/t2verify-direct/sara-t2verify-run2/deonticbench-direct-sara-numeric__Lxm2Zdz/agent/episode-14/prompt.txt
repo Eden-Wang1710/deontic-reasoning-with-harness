@@ -1,0 +1,80 @@
+New Terminal Output:
+
+root@9aaaffa9e76f:/app# python3 -c "
+> from collections import Counter
+>
+> # Payment schedule (date: workers)
+> payments = [
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred'],      # Jan 24 - 5 workers
+>     ['Bob', 'Cameron', 'Fred'],                       # Feb 4 - 3 workers
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred'],      # Mar 3 - 5 workers
+>     ['Cameron', 'Dan', 'Emily', 'Fred', 'George'],   # Mar 19 - 5 workers
+>     ['Bob', 'Cameron', 'Dan', 'Fred', 'George'],     # Apr 2 - 5 workers
+>     ['Cameron', 'Dan', 'Emily', 'Fred', 'George'],   # May 9 - 5 workers
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'George'],    # Oct 15 - 5 workers
+>     ['Bob', 'Emily', 'Fred', 'George'],              # Oct 25 - 4 workers
+>     ['Bob', 'Cameron', 'Emily', 'Fred', 'George'],   # Nov 8 - 5 workers
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred'],      # Nov 22 - 5 workers
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'George'],    # Dec 1 - 5 workers
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'George'],    # Dec 3 - 5 workers
+> ]
+>
+> wage_per_occasion = 632
+>
+> # Count days with 5+ workers (for §3306(a)(2)(B) threshold)
+> days_with_5_plus = sum(1 for workers in payments if len(workers) >= 5)
+> print(f'Days with 5+ workers: {days_with_5_plus}')
+>
+> # Check if Alice is an employer under §3306(a)(2)
+> print(f'Is Alice an agricultural labor employer? {days_with_5_plus >= 10}')
+>
+> # Count total worker occurrences
+> worker_counts = Counter()
+> for workers in payments:
+>     for w in workers:
+>         worker_counts[w] += 1
+>
+> print(f'Worker occurrences: {dict(worker_counts)}')
+>
+> # Calculate total wages and taxable wages
+> # Per §3306(b)(1): wages exclude remuneration after \$7000 paid to an individual
+> total_wages = 0
+> taxable_wages = 0
+> for worker, count in worker_counts.items():
+>     worker_total = count * wage_per_occasion
+>     total_wages += worker_total
+>     # Apply \$7000 exclusion
+>     taxable = max(0, worker_total - 7000)
+>     taxable_wages += taxable
+>     print(f'{worker}: {count} occasions x \${wage_per_occasion} = \${worker_total}, taxable = \${taxable}')
+>
+> print(f'Total wages: \${total_wages}')
+> print(f'Taxable wages (after \$7000 exclusion): \${taxable_wages}')
+>
+> # 6% employment tax per §3301
+> employment_tax = taxable_wages * 0.06
+> print(f'Employment tax (6%): \${employment_tax}')
+>
+> # Income tax from before
+> income_tax = 245270.73
+> total_tax = income_tax + employment_tax
+> print(f'Income tax: \${income_tax}')
+> print(f'Total tax: \${total_tax}')
+> print(f'Rounded total tax: {round(total_tax)}')
+> "
+Days with 5+ workers: 10
+Is Alice an agricultural labor employer? True
+Worker occurrences: {'Bob': 10, 'Cameron': 11, 'Dan': 9, 'Emily': 10, 'Fred': 9, 'George': 8}
+Bob: 10 occasions x $632 = $6320, taxable = $0
+Cameron: 11 occasions x $632 = $6952, taxable = $0
+Dan: 9 occasions x $632 = $5688, taxable = $0
+Emily: 10 occasions x $632 = $6320, taxable = $0
+Fred: 9 occasions x $632 = $5688, taxable = $0
+George: 8 occasions x $632 = $5056, taxable = $0
+Total wages: $36024
+Taxable wages (after $7000 exclusion): $0
+Employment tax (6%): $0.0
+Income tax: $245270.73
+Total tax: $245270.73
+Rounded total tax: 245271
+root@9aaaffa9e76f:/app#

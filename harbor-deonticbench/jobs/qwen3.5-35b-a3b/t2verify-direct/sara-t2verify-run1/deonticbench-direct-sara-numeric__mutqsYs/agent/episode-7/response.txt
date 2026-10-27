@@ -1,0 +1,12 @@
+
+
+{
+  "analysis": "Found §63. The basic standard deduction for 'any other case' (unmarried individuals) is $3,000, not $6,300 as I incorrectly assumed. I need to:\n1. Calculate total agricultural workers (count from the 12 dates)\n2. Calculate excise tax (6% of total wages)\n3. Recalculate income tax with correct $3,000 standard deduction\n4. Sum both taxes",
+  "plan": "1. Count total workers: 5+3+5+5+5+5+5+4+5+5+5+5 = 57 workers\n2. Total wages = 57 × $550 = $31,350\n3. Excise tax = $31,350 × 0.06 = $1,881\n4. Income tax: taxable income = $567,192 - $3,000 - $2,000 = $562,192\n5. Apply tax brackets for unmarried (section 1(c))\n6. Use python3 for precise calculation",
+  "commands": [
+    {
+      "keystrokes": "python3 -c \"\n# Count workers per date\nworkers = [5, 3, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5]\ntotal_workers = sum(workers)\nprint(f'Total workers: {total_workers}')\n\n# Calculate wages and excise tax\nwage_per_worker = 550\ntotal_wages = total_workers * wage_per_worker\nexcise_tax = total_wages * 0.06\nprint(f'Total wages: {total_wages}')\nprint(f'Excise tax (6%): {excise_tax}')\n\n# Income tax calculation\ngross_income = 567192\nstandard_deduction = 3000  # unmarried per §63(2)(C)\npersonal_exemption = 2000\ntaxable_income = gross_income - standard_deduction - personal_exemption\nprint(f'Taxable income: {taxable_income}')\n\n# Section 1(c) tax for unmarried\nif taxable_income > 250000:\n    base_tax = 79772\n    excess = taxable_income - 250000\n    income_tax = base_tax + (excess * 0.396)\n    print(f'Income tax: {income_tax}')\n\ntotal_tax = excise_tax + income_tax\nprint(f'Total tax: {total_tax}')\nprint(f'Rounded: {round(total_tax)}')\n\"\n",
+      "duration": 1.0
+    }
+  ]
+}

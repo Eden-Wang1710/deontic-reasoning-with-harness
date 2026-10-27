@@ -1,0 +1,23 @@
+New Terminal Output:
+
+root@6bacd8969a57:/app# python3 -c "
+> income = 304598
+> # Single filer tax brackets from §1(c)
+> if income <= 22100:
+>     tax = income * 0.15
+> elif income <= 53500:
+>     tax = 3315 + (income - 22100) * 0.28
+> elif income <= 115000:
+>     tax = 12107 + (income - 53500) * 0.31
+> elif income <= 250000:
+>     tax = 31172 + (income - 115000) * 0.36
+> else:
+>     tax = 79772 + (income - 250000) * 0.396
+> print(f'Taxable income: {income}')
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+Taxable income: 304598
+Tax: 101392.808
+Rounded: 101393
+root@6bacd8969a57:/app#

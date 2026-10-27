@@ -1,0 +1,21 @@
+
+
+{
+  "analysis": "I've read the statute. I need to determine Alice's filing status, calculate her taxable income, and compute her tax for 2017. Key facts: Alice was divorced March 2015, so in 2017 she's unmarried. She maintains a household with her son Charlie (born Feb 2012, so 5 years old in 2017). Alice's gross income is $9,560 and she takes the standard deduction.",
+  "plan": "1. Determine filing status: Alice is unmarried (divorced in 2015) and maintains a household with a qualifying child (Charlie), so she qualifies as head of household under §2(b).\n2. Calculate exemptions: Alice gets $2,000 for herself + $2,000 for Charlie as dependent (Charlie's exemption is $0 since he's a dependent). Total: $4,000.\n3. Standard deduction for head of household: $6,350.\n4. Taxable income = $9,560 - $6,350 - $4,000 = -$790, which means $0 taxable income.\n5. Tax on $0 taxable income = $0.",
+  "commands": [
+    {
+      "keystrokes": "mkdir -p /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "echo 'Answer: 0' > /app/output/answer.txt\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/output/answer.txt\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

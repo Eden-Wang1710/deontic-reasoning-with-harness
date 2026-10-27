@@ -1,0 +1,41 @@
+New Terminal Output:
+
+root@7523beced158:/app# python3 -c "
+> gross_income = 567192
+> charitable_deduction = 59850
+> agi = gross_income - charitable_deduction
+> print(f'AGI: {agi}')
+>
+> # Standard deduction for surviving spouse (200% of $3,000)
+> standard_deduction = 2 * 3000
+> print(f'Standard deduction: {standard_deduction}')
+>
+> # Personal exemptions
+> # Alice: full exemption amount
+> alice_exemption = 2000
+> # Charlie: limited to greater of $500 or earned income ($1200)
+> charlie_exemption = max(500, 1200)
+> print(f'Charlie exemption (limited): {charlie_exemption}')
+>
+> total_exemptions = alice_exemption + charlie_exemption
+> print(f'Total exemptions: {total_exemptions}')
+>
+> taxable_income = agi - standard_deduction - total_exemptions
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation for surviving spouse
+> # Bracket (v): $75,528.50 + 39.6% of excess over $250,000
+> base_tax = 75528.50
+> excess = taxable_income - 250000
+> tax = base_tax + 0.396 * excess
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+AGI: 507342
+Standard deduction: 6000
+Charlie exemption (limited): 1200
+Total exemptions: 3200
+Taxable income: 498142
+Tax: 173792.73200000002
+Rounded: 173793
+root@7523beced158:/app#

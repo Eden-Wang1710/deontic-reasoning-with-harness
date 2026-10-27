@@ -1,0 +1,26 @@
+New Terminal Output:
+
+root@076dc9bf0f8b:/app# python3 -c "
+> gross_income = 65400 + 56400  # Alice + Bob
+> standard_deduction = 2 * 3000  # 200% of $3,000 for joint return
+> exemptions = 3 * 2000  # Alice, Bob, Charlie as dependent
+> taxable_income = gross_income - standard_deduction - exemptions
+> print(f'Gross income: {gross_income}')
+> print(f'Standard deduction: {standard_deduction}')
+> print(f'Exemptions: {exemptions}')
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax bracket: over $89,150 but not over $140,000
+> # $20,165 + 31% of excess over $89,150
+> excess = taxable_income - 89150
+> tax = 20165 + 0.31 * excess
+> print(f'Excess over $89,150: {excess}')
+> print(f'Tax: {tax}')
+> "
+Gross income: 121800
+Standard deduction: 6000
+Exemptions: 6000
+Taxable income: 109800
+Excess over 9,150: 20650
+Tax: 26566.5
+root@076dc9bf0f8b:/app#

@@ -1,0 +1,50 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob got married on Feb 3rd, 1992. Alice died on July 9th, 2014.
+
+
+**Question:**
+Section 2(b)(2)(C) applies to Bob in 2014.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§2(b)(2)(C)
+
+## Reasoning
+Section 2(b)(2)(C) states: "a taxpayer shall be considered as married at the close of his taxable year if his spouse (other than a spouse described in subparagraph (B)) died during the taxable year."
+
+The facts are:
+- Alice and Bob got married on Feb 3rd, 1992
+- Alice (Bob's spouse) died on July 9th, 2014
+
+Since Alice died on July 9th, 2014, which is during the taxable year 2014, Section 2(b)(2)(C) applies to Bob in 2014. The provision's condition is satisfied: Bob's spouse died during the taxable year.
+
+## Answer
+Answer: Entailment
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '2(b)' /app/statute.txt | head -50 | output 844 bytes
+step 3 | grep -n '§2' /app/statute.txt | output 140 bytes
+step 4 | sed -n '182,300p' /app/statute.txt | output 7913 bytes
+step 5 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 760 bytes
+step 6 | cat /app/output/answer.txt | output 676 bytes
+step 7 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

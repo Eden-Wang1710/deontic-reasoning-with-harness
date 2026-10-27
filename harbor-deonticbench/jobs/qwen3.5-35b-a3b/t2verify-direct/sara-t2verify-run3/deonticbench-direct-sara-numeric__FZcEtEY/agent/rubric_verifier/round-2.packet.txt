@@ -1,0 +1,94 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob got married on Aug 6th, 2010. Their son Charlie was born February 2nd, 2012. Alice and Bob were legally separated under a decree of divorce on March 2nd, 2015. In 2017, Alice and Charlie live in a house maintained by Alice. Alice's gross income for the year 2017 is $9560. Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(b) - Tax rates for heads of households (15% on income up to $29,600)
+§2(b) - Definition of head of household
+§63(c)(2)(B) - Basic standard deduction for head of household ($4,400)
+§151(b) - Exemption for taxpayer ($2,000)
+§151(c) - Exemption for dependents ($2,000)
+§152(c) - Definition of qualifying child
+§7703(a)(2) - Individual legally separated under decree of divorce not considered married
+
+## Reasoning
+Alice was legally separated under a decree of divorce on March 2, 2015, so under §7703(a)(2) she is not considered married in 2017.
+
+Under §2(b), Alice qualifies as head of household because:
+- She is not married at the close of 2017 (divorced 2015)
+- She is not a surviving spouse
+- She maintains a household that is Charlie's principal place of abode for more than half the year
+- She furnishes over half the cost of maintaining the household
+
+Charlie qualifies as Alice's dependent under §152(c) as a qualifying child:
+- Relationship: Charlie is Alice's child
+- Same principal place of abode for more than half the year (they live together)
+- Age requirement: Charlie was born Feb 2, 2012, so he was 5 in 2017 (under 25)
+- Not filing a joint return (a 5-year-old cannot file)
+
+Charlie has no gross income (not mentioned in facts), satisfying §152(d)(1)(B) for qualifying relative if needed.
+
+Alice's income calculation:
+- Gross income: $9,560
+- Standard deduction (head of household per §63(c)(2)(B)): $4,400
+- Personal exemptions: $4,000 ($2,000 for Alice under §151(b) + $2,000 for Charlie under §151(c))
+- Taxable income: $9,560 - $4,400 - $4,000 = $1,160
+
+Under §1(b), head of households with taxable income not over $29,600 pay 15% of taxable income.
+
+Tax: $1,160 × 15% = $174
+
+## Answer
+Answer: 174
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -A 20 "§2(b)" /app/statute.txt | head -40; grep -B 5 -A 30 "§63(c)(2)" /app/statute.txt | output 188 bytes
+step 3 | grep -n "Head" /app/statute.txt; grep -n "2017" /app/statute.txt; grep -n "standard" /app/statute.txt | output 1939 bytes
+step 4 | sed -n '378,420p' /app/statute.txt; sed -n '1,100p' /app/statute.txt | output 7579 bytes
+step 5 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 2690 bytes
+step 6 | (no commands) | output 1852 bytes | task_complete claimed
+step 7 | grep -n '§2' /app/statute.txt | head -20; grep -n '§152' /app/statute.txt; sed -n '100,200p' /app/statute.txt | output 4910 bytes
+step 8 | sed -n '182,260p' /app/statute.txt | output 4554 bytes
+step 9 | python3 -c "gross=9560; std_ded=4400; exemptions=4000; taxable=gross-std_ded-exemptions; tax=taxable; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 4011 bytes
+step 10 | tail -1 /app/output/answer.txt | output 113 bytes
+step 11 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has all three sections (## Statute, ## Reasoning, ## Answer) and final Answer: 174 line present
+2. Statute coverage: NO. §2(b) and §152 referenced in Reasoning for head of household and dependent status but not listed in Statute section
+3. Grounded reasoning: NO. Charlie's gross income stated as zero in Reasoning but not provided in case facts; cannot verify from statute or facts
+4. Provision selection and application: UNKNOWN. Charlie's income condition for §152(d)(1)(B) not checked against facts; searched §152 but Charlie's income not in case facts
+5. Tool-assisted computation: NO. No python3/bc/awk commands found in trajectory; calculations appear to be done in prose
+Unresolved:
+- Add §2(b) and §152 to Statute section and verify they were displayed in trajectory
+- Verify Charlie's income status from facts or search statute for income requirements
+- Re-run computation with python3 or bc instead of prose
+Suggested next actions:
+- grep -n '§2(b)' /app/statute.txt to verify head of household conditions
+- grep -n '§152' /tmp/rubric_verifier/trajectory.txt to check if section was displayed
+- python3 -c 'print(9560-4400-4000)' to verify taxable income computation

@@ -1,0 +1,12 @@
+
+
+{
+  "analysis": "I now have the full statute. I need to analyze Alice's tax situation based on the facts provided. Key information from the statute: tax brackets for different filing statuses (§1), personal exemptions (§151), standard deduction (§63), and head of household definition (§2).",
+  "plan": "Let me calculate Alice's tax:\n1. Determine filing status: Alice is unmarried with a dependent father Charlie, so she qualifies as Head of Household (§2(b))\n2. Calculate AGI: Gross income is $210,204\n3. Standard deduction for head of household: $4,400 (§63(c)(2)(B))\n4. Personal exemptions: Alice + Charlie (qualifying relative - father with no income per §152(d)) = $4,000\n5. Taxable income = $210,204 - $4,400 - $4,000 = $201,804\n6. Apply head of household tax brackets (§1(b))",
+  "commands": [
+    {
+      "keystrokes": "python3 << 'EOF'\n# Alice's tax calculation\n\n# Facts\ngross_income = 210204  # Alice's gross income\n\n# Filing status: Head of Household (unmarried, has dependent father Charlie)\n# Standard deduction for head of household: $4,400\nstandard_deduction = 4400\n\n# Personal exemptions: Alice + Charlie (qualifying relative)\n# Bob is NOT a dependent - no qualifying relationship stated\nexemption_amount = 2000  # per §151(d)(1)\ntotal_exemptions = 2 * exemption_amount  # Alice + Charlie\n\n# Taxable income = AGI - standard deduction - exemptions\ntaxable_income = gross_income - standard_deduction - total_exemptions\nprint(f\"Taxable income: ${taxable_income}\")\n\n# Head of household tax brackets (§1(b)):\n# - 15% if not over $29,600\n# - $4,440 + 28% of excess over $29,600 if over $29,600 but not over $76,400\n# - $17,544 + 31% of excess over $76,400 if over $76,400 but not over $127,500\n# - $33,385 + 36% of excess over $127,500 if over $127,500 but not over $250,000\n# - $77,485 + 39.6% of excess over $250,000 if over $250,000\n\ntaxable_income = 201804\n\nif taxable_income <= 29600:\n    tax = 0.15 * taxable_income\nelif taxable_income <= 76400:\n    tax = 4440 + 0.28 * (taxable_income - 29600)\nelif taxable_income <= 127500:\n    tax = 17544 + 0.31 * (taxable_income - 76400)\nelif taxable_income <= 250000:\n    tax = 33385 + 0.36 * (taxable_income - 127500)\nelse:\n    tax = 77485 + 0.396 * (taxable_income - 250000)\n\nprint(f\"Tax: ${tax}\")\nprint(f\"Rounded: ${round(tax)}\")\nEOF\n",
+      "duration": 1.0
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Bob is Alice's father. Alice's gross income in 2015 is $311510. Bob has no income in 2015. Alice takes the standard deduction in 2015.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c)
+§1(c)(v)
+§63(b)(2)(C)
+§151(b)
+§151(d)(1)
+§151(d)(3)
+§68(b)(1)(C)
+
+## Reasoning
+Alice is an unmarried individual, so her filing status falls under §1(c). Her gross income of $311,510 exceeds the applicable amount of $250,000 under §68(b)(1)(C), triggering the exemption phaseout under §151(d)(3).
+
+The phaseout calculation: AGI exceeds the threshold by $61,510 ($311,510 - $250,000). The applicable percentage is 25% (1% for each $2,500 or fraction thereof: $61,510 ÷ $2,500 = 24.604, rounded up to 25 increments).
+
+Her personal exemption is reduced by 25%: $2,000 × (1 - 0.25) = $1,500.
+
+Her taxable income is calculated as:
+Gross income ($311,510) - Standard deduction ($3,000 under §63(b)(2)(C)) - Personal exemption ($1,500) = $307,010.
+
+Under §1(c)(v), the tax is $79,772 plus 39.6% of the excess over $250,000:
+$79,772 + (0.396 × $57,010) = $79,772 + $22,575.96 = $102,347.96.
+
+Rounded to the nearest dollar: $102,348.
+
+## Answer
+Answer: 102348
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -A 10 '§63(b)' /app/statute.txt | output 108 bytes
+step 3 | grep -n 'standard deduction' /app/statute.txt | output 1453 bytes
+step 4 | sed -n '386,400p' /app/statute.txt | output 741 bytes
+step 5 | sed -n '425,460p' /app/statute.txt | output 1659 bytes
+step 6 | sed -n '300,340p' /app/statute.txt | output 2692 bytes
+step 7 | grep -n '151(d)' /app/statute.txt | output 104 bytes
+step 8 | grep -n 'exemption amount' /app/statute.txt | output 1397 bytes
+step 9 | cat > /app/output/answer.txt <<'EOF' | output 1142 bytes
+step 10 | cat /app/output/answer.txt | output 1080 bytes
+step 11 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

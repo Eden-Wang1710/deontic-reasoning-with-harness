@@ -1,0 +1,36 @@
+New Terminal Output:
+
+root@0105ee93a5a4:/app# cat /app/output/answer.txt
+## Statute
+§2(a) - definition of surviving spouse
+§63(c)(2)(A) - standard deduction
+§63(d) - itemized deductions
+§68 - overall limitation on itemized deductions
+§151 - personal exemptions
+§1(a) - tax rates for married individuals filing joint returns and surviving spouses
+
+## Reasoning
+1. Filing Status: Alice is a surviving spouse for 2017. Bob died in 2016 (one of the two preceding years), Alice maintained a household for dependent Charlie in
+ 2017, and Charlie is her qualifying child (born 2004, under age 19, lived with her all year).
+
+2. AGI: $567,192 (gross income for 2017; charitable contribution is an itemized deduction, not above-the-line)
+
+3. Itemized Deductions: Alice donated $59,850 to charity. Under §68, itemized deductions are reduced by the lesser of:
+   - 3% of excess AGI over $300,000 (surviving spouse threshold): 0.03 × $267,192 = $8,015.76
+   - 80% of itemized deductions: 0.80 × $59,850 = $47,880
+   Net itemized deductions = $59,850 - $8,015.76 = $51,834.24
+
+4. Personal Exemptions: Alice gets exemption for herself and Charlie (2 exemptions × $2,000 = $4,000). However, under §151(d)(3), exemptions are phased out by 2
+% per $2,500 (or fraction) that AGI exceeds $300,000. With $267,192 excess, that's 107 increments = 214% phaseout, exceeding 100%, so exemptions = $0.
+
+5. Taxable Income: $567,192 - $51,834.24 - $0 = $515,357.76
+
+6. Tax Calculation (§1(a)): For taxable income over $250,000:
+   Tax = $75,528.50 + 39.6% × ($515,357.76 - $250,000)
+   Tax = $75,528.50 + 0.396 × $265,357.76
+   Tax = $75,528.50 + $105,081.67 = $180,610.17
+   Rounded to whole dollar: $180,610
+
+## Answer
+Answer: 180610
+root@0105ee93a5a4:/app#

@@ -1,0 +1,42 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Charlie is Alice's father since April 15th, 2014. Bob is Charlie's brother since October 12th, 1992.
+
+
+**Question:**
+Alice bears a relationship to Bob under section 152(d)(2)(D) for the year 2018.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§152(d)(2)(D)
+
+## Reasoning
+Section 152(d)(2)(D) defines a qualifying relative relationship as being a "stepfather or stepmother" of the taxpayer. The facts state that Charlie is Alice's father and Bob is Charlie's brother. This makes Bob Alice's uncle (her father's brother), not her stepfather. Therefore, Alice does not bear a relationship to Bob under section 152(d)(2)(D), which only covers stepfather/stepmother relationships.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n "§152" /app/statute.txt; grep -n "152(d)" /app/statute.txt | output 329 bytes
+step 3 | sed -n '95,250p' /app/statute.txt | output 7915 bytes
+step 4 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 1182 bytes
+step 5 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

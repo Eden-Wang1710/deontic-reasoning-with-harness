@@ -1,0 +1,94 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+In 2017, Alice was paid $433320 in remuneration. Alice and Bob got married on Jan 1st, 2015. Bob's gross income for 2017 is $532134. Alice and Bob file a joint return for the year 2017 and take the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(a)(1)(v)
+§63(c)(2)(A)(i)
+§63(c)(2)(C)
+§151(d)(1)
+§151(d)(3)(A)
+§151(d)(3)(B)
+
+## Reasoning
+
+1. Combined Gross Income: Alice ($433,320) + Bob ($532,134) = $965,454
+
+2. Standard Deduction (§63(c)(2)(A)(i) and §63(c)(2)(C)):
+   - Basic amount for singles: $3,000
+   - Joint return: 200% × $3,000 = $6,000
+
+3. Personal Exemption Phaseout (§151(d)(3)):
+   - Threshold (§68(b)(1)(A)): $300,000 for joint returns
+   - Excess AGI: $965,454 - $300,000 = $665,454
+   - Portions of $2,500: ceil(665,454 / 2,500) = 267
+   - Applicable percentage (§151(d)(3)(B)): 2 percentage points × 267 = 534%
+   - Capped at 100% (§151(d)(3)(B))
+   - Exemption reduction: $2,000 × 100% = $2,000 per exemption
+   - Net exemption: $0 per person (fully phased out)
+   - Total exemption deduction = $0
+
+4. Taxable Income: $965,454 - $6,000 - $0 = $959,454
+
+5. Tax Calculation (§1(a)(1)(v)):
+   - Taxable income over $250,000
+   - Base tax: $75,528.50
+   - Excess over $250,000: $959,454 - $250,000 = $709,454
+   - Additional tax: $709,454 × 39.6% = $280,943.784
+   - Total tax: $75,528.50 + $280,943.784 = $356,472.284
+
+6. Rounded to whole dollar: $356,472
+
+## Answer
+Answer: 356472
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1468 bytes
+step 3 | cat /app/output/answer.txt | output 1259 bytes
+step 4 | (no commands) | output 2249 bytes | task_complete claimed
+step 5 | sed -n '386,392p' /app/statute.txt; sed -n '82,87p' /app/statute.txt; grep -A 5 'Section not to apply' /app/statute.txt; python3 -c " | output 3111 bytes
+step 6 | cat > /app/output/answer.txt <<'EOF' | output 1367 bytes
+step 7 | cat /app/output/answer.txt | output 1281 bytes
+step 8 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has all three sections (## Statute, ## Reasoning, ## Answer) ending with Answer: 356868; trajectory shows commands ran without noted failures
+2. Statute coverage: NO. Cited subsections §1(a)(1)(v), §63(c)(2)(B), §151(d)(3)(A)-(B), §68(b)(1)(A) appear only as headers (§1, §151, §68) in trajectory lines 74, 127, 238 not the specific subsections
+3. Grounded reasoning: NO. Standard deduction stated as $5,000 but §63(c)(2)(A)(i) shows 200% × $3,000 = $6,000 for joint; phaseout percentage stated as 1% per $2,500 but §151(d)(3)(B) says 2 percentage points
+4. Provision selection and application: NO. §68 cited for phaseout threshold but §68 applies to itemized deductions per §63(a) not standard deduction; §151(d)(3)(B) 100% cap on applicable percentage not applied
+5. Tool-assisted computation: NO. Reasoning shows arithmetic in prose; trajectory index shows no python3/bc/awk commands for the calculations
+Unresolved:
+- Read §63(c)(2)(A)(i) for correct standard deduction amount for married filing jointly
+- Read §151(d)(3)(B) for correct applicable percentage rate (2 percentage points per $2,500)
+- Read §151(d)(3)(B) final clause for 100% cap on applicable percentage
+- Read §68(f) to confirm §68 does not apply to taxable years after 2017
+- Re-run all computation steps with python3 using stated inputs and formulas
+Suggested next actions:
+- sed -n '386,392p' /app/statute.txt
+- sed -n '82,87p' /app/statute.txt
+- python3 -c "import math; portions = math.ceil((965454 - 300000) / 2500); print(f'portions: {portions}, percentage: {min(portions * 2, 100)}%')"

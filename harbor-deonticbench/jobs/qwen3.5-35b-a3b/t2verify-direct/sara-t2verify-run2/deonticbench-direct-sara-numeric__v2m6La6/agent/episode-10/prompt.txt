@@ -1,0 +1,94 @@
+New Terminal Output:
+
+root@802e72514c0c:/app# python3 << 'EOF'
+haseout
+exemptions_after_phaseout = max(0, 6000 * (100 - phaseout_pct) / 100)
+print(f"Exemptions after phaseout: ${exemptions_after_phaseout}")
+
+# Itemized deduction limitation (§68)
+# Reduction = lesser of 3% of excess or 80% of itemized deductions
+reduction_3pct = 0.03 * excess_agi
+reduction_80pct = 0.80 * itemized_deductions
+reduction = min(reduction_3pct, reduction_80pct)
+net_itemized = itemized_deductions - reduction
+print(f"Itemized deduction reduction: ${reduction}")
+print(f"Net itemized deductions: ${net_itemized}")
+
+# Taxable income
+taxable_income = AGI - net_itemized - exemptions_after_phaseout
+print(f"Taxable income: ${taxable_income}")
+
+# Tax calculation for MFS (§1(d)(v))
+# Over $125,000: $37,764.25 + 39.6% of excess over $125,000
+base_tax = 37764.25
+tax_bracket_threshold = 125000
+rate = 0.396
+tax = base_tax + rate * (taxable_income - tax_bracket_threshold)
+print(f"Tax (MFS §1(d)(v)): ${tax}")
+print(f"Tax rounded: ${round(tax)}")
+EOF
+> # Alice's 2016 Tax Calculation
+>
+> # Facts
+> AGI = 567192
+> itemized_deductions = 100206
+> exemption_amount = 2000
+>
+> # Filing status: Married Filing Separately (MFS)
+> # Standard deduction: $0 (itemizes and spouse itemizes) - §162(c)(6)(A)
+>
+> # Personal exemptions (§151)
+> # - Alice: $2,000 (§151(b))
+> # - Husband: $2,000 (§151(b) - no joint return, no income, not dependent of another)
+> # - Bob: $2,000 (§151(c) - qualifying child per §152(c))
+> # Total exemptions = $6,000
+>
+> # Exemption Phaseout (§151(d)(3))
+> # Applicable amount for MFS: $150,000 (§68(b)(1)(D) - half of $300,000)
+> # Phaseout rate: 2% per $1,250 (§151(d)(3)(B))
+> # Max phaseout: 100%
+>
+> applicable_amount_mfs = 150000
+> excess_agi = AGI - applicable_amount_mfs
+> num_increments = (excess_agi + 1249) // 1250  # ceiling division
+> phaseout_pct = min(100, num_increments * 2)
+> print(f"Excess AGI over threshold: ${excess_agi}")
+> print(f"Number of $1,250 increments (ceiling): {num_increments}")
+> print(f"Phaseout percentage: {phaseout_pct}%")
+>
+> # Exemptions after phaseout
+> exemptions_after_phaseout = max(0, 6000 * (100 - phaseout_pct) / 100)
+> print(f"Exemptions after phaseout: ${exemptions_after_phaseout}")
+>
+> # Itemized deduction limitation (§68)
+> # Reduction = lesser of 3% of excess or 80% of itemized deductions
+> reduction_3pct = 0.03 * excess_agi
+> reduction_80pct = 0.80 * itemized_deductions
+> reduction = min(reduction_3pct, reduction_80pct)
+> net_itemized = itemized_deductions - reduction
+> print(f"Itemized deduction reduction: ${reduction}")
+> print(f"Net itemized deductions: ${net_itemized}")
+>
+> # Taxable income
+> taxable_income = AGI - net_itemized - exemptions_after_phaseout
+> print(f"Taxable income: ${taxable_income}")
+>
+> # Tax calculation for MFS (§1(d)(v))
+> # Over $125,000: $37,764.25 + 39.6% of excess over $125,000
+> base_tax = 37764.25
+> tax_bracket_threshold = 125000
+> rate = 0.396
+> tax = base_tax + rate * (taxable_income - tax_bracket_threshold)
+> print(f"Tax (MFS §1(d)(v)): ${tax}")
+> print(f"Tax rounded: ${round(tax)}")
+> EOF
+Excess AGI over threshold: $417192
+Number of $1,250 increments (ceiling): 334
+Phaseout percentage: 100%
+Exemptions after phaseout: $0
+Itemized deduction reduction: $12515.76
+Net itemized deductions: $87690.24
+Taxable income: $479501.76
+Tax (MFS §1(d)(v)): $178146.94696
+Tax rounded: $178147
+root@802e72514c0c:/app#

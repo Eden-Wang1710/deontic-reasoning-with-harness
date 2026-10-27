@@ -1,0 +1,99 @@
+{
+    "job_name": "sara-kira-rerun9",
+    "jobs_dir": "jobs/qwen3.5-35b-a3b/kira-direct",
+    "n_attempts": 1,
+    "timeout_multiplier": 1.0,
+    "agent_timeout_multiplier": 3.0,
+    "verifier_timeout_multiplier": null,
+    "agent_setup_timeout_multiplier": null,
+    "environment_build_timeout_multiplier": null,
+    "debug": false,
+    "n_concurrent_trials": 4,
+    "quiet": false,
+    "retry": {
+        "max_retries": 0,
+        "include_exceptions": null,
+        "exclude_exceptions": [
+            "VerifierOutputParseError",
+            "VerifierTimeoutError",
+            "RewardFileEmptyError",
+            "AgentTimeoutError",
+            "RewardFileNotFoundError"
+        ],
+        "wait_multiplier": 1.0,
+        "min_wait_sec": 1.0,
+        "max_wait_sec": 60.0
+    },
+    "environment": {
+        "type": "docker",
+        "import_path": null,
+        "force_build": false,
+        "delete": true,
+        "override_cpus": null,
+        "override_memory_mb": null,
+        "override_storage_mb": null,
+        "override_gpus": null,
+        "suppress_override_warnings": false,
+        "mounts_json": null,
+        "env": {},
+        "kwargs": {}
+    },
+    "verifier": {
+        "override_timeout_sec": null,
+        "max_timeout_sec": null,
+        "env": {},
+        "disable": false
+    },
+    "metrics": [],
+    "agents": [
+        {
+            "name": null,
+            "import_path": "dar_kira_local:AgentHarness",
+            "model_name": "hosted_vllm/qwen3.5-35b-a3b",
+            "override_timeout_sec": null,
+            "override_setup_timeout_sec": null,
+            "max_timeout_sec": null,
+            "kwargs": {
+                "api_base": "http://172.17.0.1:9009/v1",
+                "llm_kwargs": {
+                    "api_key": "token-abc123"
+                },
+                "model_info": {
+                    "max_input_tokens": 49152,
+                    "max_output_tokens": 16384,
+                    "max_tokens": 65536,
+                    "input_cost_per_token": 0.0,
+                    "output_cost_per_token": 0.0
+                }
+            },
+            "env": {}
+        }
+    ],
+    "datasets": [
+        {
+            "path": "datasets/deonticbench-direct",
+            "name": null,
+            "version": null,
+            "ref": null,
+            "registry_url": null,
+            "registry_path": null,
+            "overwrite": false,
+            "download_dir": null,
+            "task_names": [
+                "deonticbench-direct-sara-binary-s152-d-2-f-neg",
+                "deonticbench-direct-sara-binary-s3306-b-10-b-neg",
+                "deonticbench-direct-sara-binary-s2-b-2-c-pos",
+                "deonticbench-direct-sara-binary-s3306-a-1-b-pos",
+                "deonticbench-direct-sara-numeric-tax-case-73",
+                "deonticbench-direct-sara-numeric-tax-case-90",
+                "deonticbench-direct-sara-numeric-tax-case-69",
+                "deonticbench-direct-sara-numeric-tax-case-15",
+                "deonticbench-direct-sara-numeric-tax-case-63"
+            ],
+            "exclude_task_names": null,
+            "n_tasks": null
+        }
+    ],
+    "tasks": [],
+    "artifacts": []
+}

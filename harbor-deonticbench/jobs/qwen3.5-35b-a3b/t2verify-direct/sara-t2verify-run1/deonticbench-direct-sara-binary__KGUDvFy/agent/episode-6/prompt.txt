@@ -1,0 +1,51 @@
+New Terminal Output:
+
+root@51bb5a938321:/app# python3 -c "
+> import datetime
+>
+> # Dates in 2017 when Alice employed workers (all had 5+ workers)
+> dates = [
+>     '2017-01-24',  # 5 workers
+>     '2017-02-04',  # 5 workers
+>     '2017-03-03',  # 5 workers
+>     '2017-03-18',  # 5 workers
+>     '2017-04-01',  # 5 workers
+>     '2017-05-09',  # 5 workers
+>     '2017-10-14',  # 5 workers
+>     '2017-10-25',  # 6 workers
+>     '2017-11-08',  # 5 workers
+>     '2017-11-22',  # 5 workers
+>     '2017-12-01',  # 5 workers
+>     '2017-12-02',  # 5 workers
+> ]
+>
+> # Get ISO week numbers (calendar weeks)
+> weeks = set()
+> for d in dates:
+>     date = datetime.datetime.strptime(d, '%Y-%m-%d')
+>     iso_cal = date.isocalendar()
+>     # Use year-week tuple to identify calendar weeks
+>     weeks.add((iso_cal[0], iso_cal[1]))
+>     print(f'{d}: ISO week {iso_cal[1]}')
+>
+> print(f'\nTotal different calendar weeks: {len(weeks)}')
+> print(f'Section 3306(a)(2)(B) requires 10 days in different weeks with 5+ workers')
+> print(f'Result: {len(weeks)} >= 10? {len(weeks) >= 10}')
+> "
+2017-01-24: ISO week 4
+2017-02-04: ISO week 5
+2017-03-03: ISO week 9
+2017-03-18: ISO week 11
+2017-04-01: ISO week 13
+2017-05-09: ISO week 19
+2017-10-14: ISO week 41
+2017-10-25: ISO week 43
+2017-11-08: ISO week 45
+2017-11-22: ISO week 47
+2017-12-01: ISO week 48
+2017-12-02: ISO week 48
+
+Total different calendar weeks: 11
+Section 3306(a)(2)(B) requires 10 days in different weeks with 5+ workers
+Result: 11 >= 10? True
+root@51bb5a938321:/app#

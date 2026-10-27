@@ -1,0 +1,61 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Bob and Alice got married on Feb 3rd, 1992. Bob and Alice have a child, Charlie, born October 9th, 2000. Bob died on July 9th, 2014. From 2004 to 2019, Alice furnished the costs of maintaining the home where he and Charlie lived during that time. Alice's gross income for the year 2017 is $25561. Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§2(b) - Definition of head of household
+§152 - Definition of dependent (qualifying child)
+§151 - Personal exemptions
+§63 - Standard deduction
+§1(b) - Tax rates for head of households
+
+## Reasoning
+1. Filing Status: Alice's spouse Bob died on July 9, 2014. For 2017, Bob's death was more than 2 taxable years before (2015, 2016, 2017), so Alice does not qualify as a surviving spouse under §2(a).
+
+2. Head of Household: Under §2(b), Alice qualifies as head of household because:
+   - She maintains a household as principal place of abode for Charlie (her son)
+   - She furnished costs of maintaining the home from 2004 to 2019 (including 2017)
+   - Charlie is her dependent (qualifying child under §152: son, age 17 in 2017, lives with her >half year, she provides >half support)
+
+3. Standard Deduction: Under §63(c)(2)(B), head of household standard deduction is $4,400.
+
+4. Personal Exemptions: Under §151, Alice gets:
+   - $2,000 for herself (§151(b))
+   - $2,000 for Charlie as dependent (§151(c))
+   - Total: $4,000
+
+5. Taxable Income: $25,561 - $4,400 - $4,000 = $17,161
+
+6. Tax Calculation: Under §1(b)(i), head of household with taxable income not over $29,600:
+   Tax = 15% × $17,161 = $2,574.15 ≈ $2,574
+
+## Answer
+Answer: 2574
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 2745 bytes
+step 3 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

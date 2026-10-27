@@ -1,0 +1,34 @@
+New Terminal Output:
+
+root@d7b8d4383cc3:/app# python3 -c "
+> # Alice's tax calculation - corrected
+> AGI = 567192
+> itemized_deductions = 100206
+>
+> # Filing status: Married filing separately
+> # Itemized deduction phaseout (§68) - applicable amount is 1/2 of joint return
+> applicable_amount = 150000  # 1/2 of $300,000 for married filing separately (§68(b)(1)(D))
+> excess_agi = AGI - applicable_amount
+> reduction_1 = 0.03 * excess_agi  # 3% of excess
+> reduction_2 = 0.80 * itemized_deductions  # 80% of deductions
+> reduction = min(reduction_1, reduction_2)
+> allowable_deductions = itemized_deductions - reduction
+> print(f'Reduction: {reduction}')
+> print(f'Allowable deductions: {allowable_deductions}')
+>
+> # Taxable income (exemptions phased out to 0 due to high AGI)
+> taxable_income = AGI - allowable_deductions
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation for married filing separately (§1(d))
+> # Over $125,000: $17,964.25 + 39.6% of excess over $125,000
+> tax = 17964.25 + 0.396 * (taxable_income - 125000)
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+Reduction: 12515.76
+Allowable deductions: 87690.24
+Taxable income: 479501.76
+Tax: 158346.94696
+Rounded: 158347
+root@d7b8d4383cc3:/app#

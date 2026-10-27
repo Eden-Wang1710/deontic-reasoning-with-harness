@@ -1,0 +1,60 @@
+
+
+Looking at this task, I need to:
+1. Read the statute to understand tax rules
+2. Apply the rules to the case facts
+3. Calculate Alice's 2019 tax
+
+Let me analyze the statute and facts:
+
+**Key facts from the statute:**
+- For **Heads of Households** (§151(b)): Standard deduction is $18,000 for 2019 (under §152(d)(7))
+- Tax rates for Head of Household: 15% if taxable income not over $29,600
+- For **Single filers** (§151(c)): Standard deduction is $12,000 for 2019
+- Tax rates for Single: 15% if not over $22,100, then $3,315 + 28% of excess over $22,100
+
+**Analysis of filing status:**
+- Alice is unmarried (no spouse mentioned)
+- Bob (her nephew) lived with her in 2019
+- Charlie (Bob's parent) had a different principal place of abode
+- Alice maintains the house
+
+For Alice to qualify as **Head of Household**, Bob must be her dependent. Bob qualifies as Alice's dependent because:
+1. Relationship test: nephew qualifies as "child of taxpayer's parent"
+2. Gross income test: Bob had no income (< $2,000 exemption amount)
+3. Support test: Alice maintains the house where Bob lived
+
+Since Bob is Alice's dependent and lived with her, she qualifies as Head of Household.
+
+**Tax Calculation (Head of Household):**
+- Gross income: $34,510
+- Standard deduction: $18,000
+- Taxable income: $34,510 - $18,000 = $16,510
+
+Since $16,510 is under $29,600, tax = 15% × $16,510 = $2,476.50
+
+Rounding to nearest whole dollar: $2,477
+
+Let me write the answer to the file:
+
+```json
+{
+  "analysis": "I've analyzed the statute and case facts. Alice qualifies as Head of Household because her nephew Bob lived with her and she maintained the household. Bob qualifies as her dependent (relationship test met as nephew, gross income test met with no income, support test met since Alice maintains the house). With $34,510 gross income and $18,000 standard deduction for Head of Household, taxable income is $16,510. At 15% rate, tax = $2,476.50, which rounds to $2,477.",
+  "plan": "Create the output directory if needed and write the answer to /app/output/answer.txt",
+  "commands": [
+    {
+      "keystrokes": "mkdir -p /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "echo 'Answer: 2477' > /app/output/answer.txt\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/output/answer.txt\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": true
+}
+```

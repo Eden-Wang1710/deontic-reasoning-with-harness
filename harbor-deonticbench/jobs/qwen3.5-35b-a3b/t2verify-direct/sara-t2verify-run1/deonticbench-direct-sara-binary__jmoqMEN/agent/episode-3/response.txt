@@ -1,0 +1,16 @@
+
+
+{
+  "analysis": "The statute starts with §1 but references section 2(a) for the definition of 'surviving spouse'. The earlier output was truncated. I need to find the actual content of section 2 which defines surviving spouse.",
+  "plan": "Let me search for the actual section 2 definition in the file. I'll use grep to find lines containing '§2' or look for where the section 2 definition might be located.",
+  "commands": [
+    {
+      "keystrokes": "grep -n \"§2\" /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "grep -n \"^§2\\|^2\\. \" /app/statute.txt\n",
+      "duration": 0.5
+    }
+  ]
+}

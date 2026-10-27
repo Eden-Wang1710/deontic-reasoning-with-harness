@@ -1,0 +1,65 @@
+Previous response had warnings:
+WARNINGS: - Extra text detected before JSON object
+
+New Terminal Output:
+
+root@0105ee93a5a4:/app# python3 -c "
+ouse (§1(a))
+if taxable_income > 250000:
+    tax = 75528.50 + 0.396 * (taxable_income - 250000)
+else:
+    tax = taxable_income * 0.15
+print(f'Tax: {tax}')
+print(f'Rounded: {round(tax)}')
+"
+> agI = 567192
+> charity = 59850
+>
+> # §68 limitation for surviving spouse (applicable amount $300,000)
+> excess_agi = agI - 300000
+> reduction = min(0.03 * excess_agi, 0.80 * charity)
+> net_itemized = charity - reduction
+> print(f'AGI: {agI}')
+> print(f'Excess AGI over $300K: {excess_agi}')
+> print(f'Reduction: {reduction}')
+> print(f'Net itemized: {net_itemized}')
+>
+> # Exemptions phaseout (§151)
+> exemption_amount = 2000
+> num_exemptions = 2  # Alice + Charlie
+> base_exemptions = exemption_amount * num_exemptions
+> # Phaseout: 2% per $2500 or fraction
+> increments = -(-excess_agi // 2500)  # ceiling division
+> phaseout_pct = increments * 0.02
+> if phaseout_pct >= 1.0:
+>     exemptions = 0
+> else:
+>     exemptions = base_exemptions * (1 - phaseout_pct)
+> print(f'Base exemptions: {base_exemptions}')
+> print(f'Increments: {increments}')
+> print(f'Phaseout %: {phaseout_pct}')
+> print(f'Exemptions allowed: {exemptions}')
+>
+> taxable_income = agI - net_itemized - exemptions
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation for surviving spouse (§1(a))
+> if taxable_income > 250000:
+>     tax = 75528.50 + 0.396 * (taxable_income - 250000)
+> else:
+>     tax = taxable_income * 0.15
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+AGI: 567192
+Excess AGI over 00K: 267192
+Reduction: 8015.759999999999
+Net itemized: 51834.24
+Base exemptions: 4000
+Increments: 107
+Phaseout %: 2.14
+Exemptions allowed: 0
+Taxable income: 515357.76
+Tax: 180610.17296
+Rounded: 180610
+root@0105ee93a5a4:/app#

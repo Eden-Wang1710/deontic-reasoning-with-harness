@@ -1,0 +1,38 @@
+New Terminal Output:
+
+root@b0958cd6b281:/app# python3 -c "
+> import datetime
+>
+> # 2017 dates when Alice employed Bob
+> dates = [
+>     (1, 24), (2, 4), (3, 3), (3, 18), (4, 1), (5, 9),
+>     (10, 14), (10, 25), (11, 8), (11, 22), (12, 1), (12, 2)
+> ]
+>
+> weeks = set()
+> for month, day in dates:
+>     d = datetime.date(2017, month, day)
+>     # ISO week number
+>     week = d.isocalendar()[1]
+>     print(f'{month:02d}/{day:02d} ({d.strftime(\"%A\")}) - Week {week}')
+>     weeks.add(week)
+>
+> print(f'\nTotal different calendar weeks: {len(weeks)}')
+> print(f'At least 10 weeks? {len(weeks) >= 10}')
+> "
+01/24 (Tuesday) - Week 4
+02/04 (Saturday) - Week 5
+03/03 (Friday) - Week 9
+03/18 (Saturday) - Week 11
+04/01 (Saturday) - Week 13
+05/09 (Tuesday) - Week 19
+10/14 (Saturday) - Week 41
+10/25 (Wednesday) - Week 43
+11/08 (Wednesday) - Week 45
+11/22 (Wednesday) - Week 47
+12/01 (Friday) - Week 48
+12/02 (Saturday) - Week 48
+
+Total different calendar weeks: 11
+At least 10 weeks? True
+root@b0958cd6b281:/app#

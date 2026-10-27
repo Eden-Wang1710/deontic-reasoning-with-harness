@@ -1,0 +1,77 @@
+New Terminal Output:
+
+root@a876eacd75c9:/app# python3 << 'EOF'
+ons = 0  # fully phased out
+taxable_income = combined_income - standard_deduction - total_exemptions
+print(f"Taxable income: ${taxable_income}")
+
+# Tax calculation (§1(a)(v))
+# $75,528.50 + 39.6% of excess over $250,000
+base_tax = 75528.50
+excess_over_250k = taxable_income - 250000
+tax_rate = 0.396
+joint_tax = base_tax + (excess_over_250k * tax_rate)
+print(f"Joint tax: ${joint_tax}")
+
+# Alice's share (half of joint)
+alice_tax = joint_tax / 2
+print(f"Alice's tax: ${alice_tax}")
+print(f"Alice's tax (rounded): ${round(alice_tax)}")
+EOF
+> # Given facts
+> alice_income = 433320
+> bob_income = 532134
+> combined_income = alice_income + bob_income
+>
+> # Standard deduction for joint return (§63(c)(2)(A)(i))
+> # 200% of $3,000 = $6,000
+> standard_deduction = 6000
+>
+> # Personal exemptions (§151)
+> exemption_amount = 2000
+> num_exemptions = 2  # taxpayer + spouse
+>
+> # Phaseout calculation (§151(d)(3))
+> # For joint filers, applicable amount = $150,000 (half of $300,000 in §68(b))
+> applicable_amount = 150000
+> agi_excess = combined_income - applicable_amount
+>
+> # Number of $2,500 fractions (rounding up for "fraction thereof")
+> import math
+> num_fractions = math.ceil(agi_excess / 2500)
+> applicable_percentage = min(100, num_fractions * 2)  # capped at 100%
+>
+> print(f"AGI: ${combined_income}")
+> print(f"AGI excess over threshold: ${agi_excess}")
+> print(f"Number of $2,500 fractions: {num_fractions}")
+> print(f"Applicable percentage: {applicable_percentage}%")
+> print(f"Exemption phaseout: {'Full' if applicable_percentage == 100 else 'Partial'}")
+>
+> # Taxable income
+> total_exemptions = 0  # fully phased out
+> taxable_income = combined_income - standard_deduction - total_exemptions
+> print(f"Taxable income: ${taxable_income}")
+>
+> # Tax calculation (§1(a)(v))
+> # $75,528.50 + 39.6% of excess over $250,000
+> base_tax = 75528.50
+> excess_over_250k = taxable_income - 250000
+> tax_rate = 0.396
+> joint_tax = base_tax + (excess_over_250k * tax_rate)
+> print(f"Joint tax: ${joint_tax}")
+>
+> # Alice's share (half of joint)
+> alice_tax = joint_tax / 2
+> print(f"Alice's tax: ${alice_tax}")
+> print(f"Alice's tax (rounded): ${round(alice_tax)}")
+> EOF
+AGI: $965454
+AGI excess over threshold: $815454
+Number of $2,500 fractions: 327
+Applicable percentage: 100%
+Exemption phaseout: Full
+Taxable income: $959454
+Joint tax: $356472.284
+Alice's tax: $178236.142
+Alice's tax (rounded): $178236
+root@a876eacd75c9:/app#

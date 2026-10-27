@@ -1,0 +1,49 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has a son, Bob, who was born January 31st, 2014.
+
+
+**Question:**
+Alice bears a relationship to Bob under section 152(c)(2).
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§152(c)(2)(A)
+
+## Reasoning
+Section 152(c)(2) defines when an individual bears a relationship to a taxpayer for purposes of being a qualifying child. Under §152(c)(2)(A), an individual bears a relationship to the taxpayer if such individual is "a child of the taxpayer or a descendant of such a child."
+
+The case facts state that Alice has a son Bob. This means Bob is the child of Alice (the taxpayer), not the other way around.
+
+The claim states "Alice bears a relationship to Bob under section 152(c)(2)." However, under the statute, Bob (the child) bears a relationship to Alice (the taxpayer), not Alice bearing a relationship to Bob. For Alice to bear a relationship to Bob under §152(c)(2), Alice would need to be Bob's child or descendant, which she is not.
+
+The direction of the relationship in the claim is reversed from what the statute defines.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '§152' /app/statute.txt | output 131 bytes
+step 3 | sed -n '95,200p' /app/statute.txt | output 4820 bytes
+step 4 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1088 bytes
+step 5 | cat /app/output/answer.txt | output 1004 bytes
+step 6 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

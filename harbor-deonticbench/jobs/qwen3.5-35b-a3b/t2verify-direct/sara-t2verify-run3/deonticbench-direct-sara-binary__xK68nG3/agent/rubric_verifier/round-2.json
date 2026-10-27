@@ -1,0 +1,55 @@
+{
+  "round": 2,
+  "answer": "## Statute\n\u00a73306(c)(2)\n\n## Reasoning\nSection 3306(c)(2) provides that domestic service in a private home is excluded from the definition of 'employment' UNLESS the person paid cash remuneration of $1,000 or more to individuals employed in such domestic service in the calendar year or preceding calendar year.\n\nIn this case, Alice paid wages of $3200 to Bob for domestic service done in her home from Feb 1st, 2017 to Sep 2nd, 2017. Since $3200 exceeds the $1,000 threshold specified in \u00a73306(c)(2), the exception does not apply, meaning this domestic service is considered 'employment' under the statute.\n\nTherefore, Section 3306(c)(2) applies to Alice employing Bob for the year 2017.\n\n## Answer\nAnswer: Entailment",
+  "answer_changed": false,
+  "report": {
+    "rubrics": [
+      {
+        "name": "tool_call_integrity",
+        "status": "YES",
+        "evidence": "All three sections and Answer line present; no failed/truncated steps treated as complete."
+      },
+      {
+        "name": "statute_coverage",
+        "status": "YES",
+        "evidence": "\u00a73306(c)(2) exists and appeared in solver's terminal output via sed command."
+      },
+      {
+        "name": "grounded_reasoning",
+        "status": "YES",
+        "evidence": "$3200 from case facts, $1000 from \u00a73306(c)(2); reasoning derives from these stated inputs."
+      },
+      {
+        "name": "provision_selection",
+        "status": "YES",
+        "evidence": "Domestic service and cash remuneration threshold conditions addressed; location facts not engaged by statute."
+      },
+      {
+        "name": "tool_assisted_computation",
+        "status": "YES",
+        "evidence": "Trajectory Step 7 includes `python3 -c 'print(3200 > 1000)'` as suggested."
+      }
+    ],
+    "unused_facts": [
+      {
+        "fact": "Baltimore, Maryland, USA",
+        "searched": "Maryland|Baltimore|location|jurisdiction",
+        "section": "none found"
+      }
+    ],
+    "quoted_lines": [],
+    "unresolved": [],
+    "suggested_actions": []
+  },
+  "report_text": "VERIFICATION REPORT (round 2 of 3)\n1. Tool-call integrity: YES. All three sections and Answer line present; no failed/truncated steps treated as complete.\n2. Statute coverage: YES. \u00a73306(c)(2) exists and appeared in solver's terminal output via sed command.\n3. Grounded reasoning: YES. $3200 from case facts, $1000 from \u00a73306(c)(2); reasoning derives from these stated inputs.\n4. Provision selection and application: YES. Domestic service and cash remuneration threshold conditions addressed; location facts not engaged by statute.\n5. Tool-assisted computation: YES. Trajectory Step 7 includes `python3 -c 'print(3200 > 1000)'` as suggested.",
+  "steps_used": 0,
+  "parse_failures": 0,
+  "context_exceeded": false,
+  "commands": [],
+  "packet_chars": 3368,
+  "prompt_tokens": 4970,
+  "completion_tokens": 10132,
+  "n_llm_calls": 1,
+  "elapsed_sec": 995.3596103191376,
+  "trajectory_file": "trajectory.verifier-round-2.json"
+}

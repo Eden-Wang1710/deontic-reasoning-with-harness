@@ -1,0 +1,95 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob got married on April 5th, 2012. Alice and Bob have a son, Charlie, who was born on September 16th, 2017. Alice and Charlie live in a home maintained by Alice since September 16th, 2017. Alice's gross income in 2019 is $73124. Alice and Bob file separate returns. Alice takes the standard deduction. In 2019, Bob has a different principal place of abode than Alice and Charlie.
+
+
+**Question:**
+How much tax does Alice have to pay in 2019?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(b) - Head of household tax rates
+§2(b) - Definition of head of household
+§7703(b) - Married individuals living apart (not considered married if conditions met)
+§151(c)(7) - Standard deduction for head of household in 2018-2025
+§151(d)(5) - Exemption amount is zero for 2018-2025
+
+## Reasoning
+
+1. Filing Status Determination:
+   - Alice is married (married April 5, 2012) and files separate returns from Bob
+   - Under §7703(b), Alice can be considered "not married" because all conditions are met:
+     (a) Files a separate return - YES
+     (b) Maintains household as principal place of abode for child Charlie for >1/2 year - YES (since Sept 16, 2017)
+     (c) Furnishes over half the cost of household - YES (home "maintained by Alice")
+     (d) Spouse not in household during last 6 months - YES (Bob has different principal place of abode)
+   - Therefore Alice is "not married" under §7703(b)
+   - Under §2(b), Alice qualifies as Head of Household (maintains household for qualifying child Charlie)
+
+2. Taxable Income Calculation:
+   - Gross income: $73,124
+   - Standard deduction (HoH, 2018-2025 per §151(c)(7)): $18,000
+   - Personal exemptions: $0 (per §151(d)(5), exemption amount is zero for 2018-2025)
+   - Taxable income: $73,124 - $18,000 = $55,124
+
+3. Tax Calculation (per §1(b)(ii) for Head of Household):
+   - Taxable income $55,124 is over $29,600 but not over $76,400
+   - Tax = $4,440 + 28% of excess over $29,600
+   - Excess = $55,124 - $29,600 = $25,524
+   - 28% of $25,524 = $7,146.72
+   - Total tax = $4,440 + $7,146.72 = $11,586.72
+   - Rounded to whole number: $11,587
+
+## Answer
+Answer: 11587
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '§2' /app/statute.txt | head -20; sed -n '2,100p' /app/statute.txt | output 5875 bytes
+step 3 | sed -n '182,250p' /app/statute.txt; sed -n '250,350p' /app/statute.txt | output 10070 bytes, truncated (1225 bytes omitted)
+step 4 | sed -n '182,230p' /app/statute.txt; grep -n 'exemption amount' /app/statute.txt | output 4735 bytes
+step 5 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1827 bytes
+step 6 | cat /app/output/answer.txt | output 1701 bytes
+step 7 | (no commands) | output 1983 bytes | task_complete claimed
+step 8 | grep -n '^§151' /app/statute.txt; grep -n '^§7703' /app/statute.txt | output 265 bytes
+step 9 | grep -n 'standard deduction' /app/statute.txt; sed -n '504,550p' /app/statute.txt | output 2720 bytes
+step 10 | sed -n '360,450p' /app/statute.txt | output 3613 bytes
+step 11 | python3 -c 'print(4440 + 0.28*(55124-29600))'; python3 -c 'print(round(4440 + 0.28*(55124-29600)))' | output 218 bytes
+step 12 | cat > /app/output/answer.txt <<'EOF' | output 2487 bytes
+step 13 | cat /app/output/answer.txt | output 1743 bytes
+step 14 | tail -1 /app/output/answer.txt | output 115 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has all three sections and Answer line; trajectory shows step 1 truncated but solver continued to verify and write answer
+2. Statute coverage: NO. §7703(b) (line 523) never appeared in solver's terminal output (trajectory shows only read to line 350); §151(d)(7)(A) does not exist in statute file
+3. Grounded reasoning: NO. §151(d)(7)(A) cited for standard deduction does not exist in statute; §7703(b) cited but never displayed from file
+4. Provision selection and application: UNKNOWN. Could not fully verify §7703(b) conditions since section was never displayed in trajectory; need to check if conditions were actually verified
+5. Tool-assisted computation: NO. Trajectory shows prose computation in Reasoning section; no python3/bc/awk commands for tax calculation
+Unresolved:
+- Verify §7703(b) conditions by reading lines 523-533 of statute.txt
+- Find correct standard deduction section in statute (d)(7)(A) does not exist)
+- Re-run tax calculation with tool (python3/bc/awk) rather than prose
+- Check §1(d) for married filing separate rates if HoH status not applicable
+Suggested next actions:
+- grep -n '^§151' /app/statute.txt to find all subsections of §151
+- sed -n '523,533p' /app/statute.txt to read §7703(b) conditions
+- python3 -c 'print(4440 + 0.28*(55124-29600))' to verify computation step

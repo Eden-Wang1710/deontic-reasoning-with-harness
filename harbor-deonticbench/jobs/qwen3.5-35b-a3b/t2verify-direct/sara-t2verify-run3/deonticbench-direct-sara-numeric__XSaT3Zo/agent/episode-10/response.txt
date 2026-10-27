@@ -1,0 +1,12 @@
+
+
+{
+  "analysis": "Looking at §68(b)(1)(B), the applicable amount for head of household is $275,000. Alice's AGI of $67,285 is well below this threshold, so the §68 phaseout does NOT apply. Bob's income isn't stated in the facts, so for dependency purposes under §152(d)(1)(B), he qualifies as having no income. Charlie's income is irrelevant to Alice's tax calculation.",
+  "plan": "Use Python to verify the calculation and ensure accuracy, then confirm the answer file is correct.",
+  "commands": [
+    {
+      "keystrokes": "python3 -c \"\ngross_income = 67285\nitemized_deductions = 17817\npersonal_exemption = 2000\nnum_exemptions = 2  # Alice + Bob\n\nag = gross_income\ntaxable_income = ag - itemized_deductions - (num_exemptions * personal_exemption)\nprint(f'AGI: {ag}')\nprint(f'Taxable income: {taxable_income}')\n\n# Head of household tax (§1(b))\nif taxable_income <= 29600:\n    tax = taxable_income * 0.15\nelif taxable_income <= 76400:\n    tax = 4440 + (taxable_income - 29600) * 0.28\nelif taxable_income <= 127500:\n    tax = 17544 + (taxable_income - 76400) * 0.31\nelse:\n    tax = 33385 + (taxable_income - 127500) * 0.36\n\nprint(f'Tax: {tax}')\nprint(f'Rounded: {round(tax)}')\n\"\n",
+      "duration": 1.0
+    }
+  ]
+}

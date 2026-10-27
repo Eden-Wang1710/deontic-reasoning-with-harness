@@ -1,0 +1,10 @@
+def compose_prompt_source(statutes: str, case: Dict) -> str:
+    return (
+        f"Statutes:\n{statutes}\n\n"
+        f"Case: {case['text']}\n\n"
+        f"Question: {case['question']}\n\n"
+        "Answer the question based on the case and statutes above. "
+        "Your answer should be a dollar figure. "
+        "Indicate your answer using \\boxed{}"
+        " Think step-by-step before answering."
+    )

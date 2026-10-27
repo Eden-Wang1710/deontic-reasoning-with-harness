@@ -1,0 +1,66 @@
+New Terminal Output:
+
+root@64159eec4fb1:/app# python3 << 'EOF'
+65, plus 31% of the excess over $89,150 if taxable income is over $89,150 but not over $140,000
+if taxable_income <= 36900:
+    tax = taxable_income * 0.15
+elif taxable_income <= 89150:
+    tax = 5535 + 0.28 * (taxable_income - 36900)
+elif taxable_income <= 140000:
+    tax = 20165 + 0.31 * (taxable_income - 89150)
+elif taxable_income <= 250000:
+    tax = 35928.50 + 0.36 * (taxable_income - 140000)
+else:
+    tax = 75528.50 + 0.396 * (taxable_income - 250000)
+
+print(f"Tax calculated: ${tax}")
+print(f"Tax (rounded): ${round(tax)}")
+EOF
+> # Case Facts
+> alice_income = 133200
+> bob_income = 44311
+>
+> # Combined gross income
+> gross_income = alice_income + bob_income
+> print(f"Combined gross income: ${gross_income}")
+>
+> # Standard deduction: $3,000 × 200% = $6,000 for joint + $600 for blind
+> basic_std = 3000 * 2  # 200% of $3,000
+> blind_add = 600
+> standard_deduction = basic_std + blind_add
+> print(f"Standard deduction: ${standard_deduction} (${basic_std} basic + ${blind_add} blind)")
+>
+> # Personal exemptions: $2,000 each for Alice and Bob
+> # Charlie is NOT a dependent (has income from work)
+> exemption_amount = 2000  # 2017 exemption amount
+> num_exemptions = 2  # Alice and Bob only
+> personal_exemptions = exemption_amount * num_exemptions
+> print(f"Personal exemptions: ${personal_exemptions} (${exemption_amount} × 2)")
+>
+> # Taxable income = AGI - standard deduction - personal exemptions
+> taxable_income = gross_income - standard_deduction - personal_exemptions
+> print(f"Taxable income: ${taxable_income}")
+>
+> # Tax calculation for MFJ (Section 1(a))
+> # (iii) $20,165, plus 31% of the excess over $89,150 if taxable income is over $89,150 but not over $140,000
+> if taxable_income <= 36900:
+>     tax = taxable_income * 0.15
+> elif taxable_income <= 89150:
+>     tax = 5535 + 0.28 * (taxable_income - 36900)
+> elif taxable_income <= 140000:
+>     tax = 20165 + 0.31 * (taxable_income - 89150)
+> elif taxable_income <= 250000:
+>     tax = 35928.50 + 0.36 * (taxable_income - 140000)
+> else:
+>     tax = 75528.50 + 0.396 * (taxable_income - 250000)
+>
+> print(f"Tax calculated: ${tax}")
+> print(f"Tax (rounded): ${round(tax)}")
+> EOF
+Combined gross income: $177511
+Standard deduction: $6600 ($6000 basic + $600 blind)
+Personal exemptions: $4000 ($2000 × 2)
+Taxable income: $166911
+Tax calculated: $45616.46
+Tax (rounded): $45616
+root@64159eec4fb1:/app#

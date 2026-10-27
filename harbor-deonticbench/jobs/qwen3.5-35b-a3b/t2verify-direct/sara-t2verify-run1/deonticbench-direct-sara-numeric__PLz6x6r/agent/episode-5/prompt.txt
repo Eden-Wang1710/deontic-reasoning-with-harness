@@ -1,0 +1,49 @@
+New Terminal Output:
+
+root@a3d2b1f00250:/app# python3 << 'EOF'
+> # Alice's tax calculation for 2015 - corrected with personal exemption
+>
+> # Facts
+> gross_income = 395276
+> itemized_deductions = 4571 + 1973 + 15271  # $21,815
+> personal_exemption = 2000  # §151(d)(1)
+>
+> # Filing status: Unmarried individual
+> # Applicable amount for unmarried: $250,000 (section 68(b)(1)(C))
+> applicable_amount = 250000
+>
+> # Pease limitation (section 68)
+> excess_agi = gross_income - applicable_amount  # 145276
+> reduction1 = excess_agi * 0.03  # 4358.28
+> reduction2 = itemized_deductions * 0.80  # 17452
+>
+> pease_reduction = min(reduction1, reduction2)  # 4358.28
+> allowable_itemized = itemized_deductions - pease_reduction  # 17456.72
+>
+> # Taxable income: gross - allowable itemized - personal exemption
+> taxable_income = gross_income - allowable_itemized - personal_exemption  # 375819.28
+>
+> # Tax calculation for unmarried individuals (section 1(c))
+> # (v) $79,772, plus 39.6% of the excess over $250,000
+> base_tax = 79772
+> excess_over_250k = taxable_income - 250000  # 125819.28
+> tax = base_tax + (excess_over_250k * 0.396)
+>
+> print(f"Gross income: ${gross_income}")
+> print(f"Itemized deductions: ${itemized_deductions}")
+> print(f"Pease reduction: ${pease_reduction}")
+> print(f"Allowable itemized: ${allowable_itemized}")
+> print(f"Personal exemption: ${personal_exemption}")
+> print(f"Taxable income: ${taxable_income}")
+> print(f"Tax: ${tax}")
+> print(f"Rounded tax: {round(tax)}")
+> EOF
+Gross income: $395276
+Itemized deductions: $21815
+Pease reduction: $4358.28
+Allowable itemized: $17456.72
+Personal exemption: $2000
+Taxable income: $375819.28
+Tax: $129596.43488000002
+Rounded tax: 129596
+root@a3d2b1f00250:/app#

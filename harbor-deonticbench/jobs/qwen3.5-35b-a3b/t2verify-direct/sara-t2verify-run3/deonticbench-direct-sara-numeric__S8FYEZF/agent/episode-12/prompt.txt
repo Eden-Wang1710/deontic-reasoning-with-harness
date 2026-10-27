@@ -1,0 +1,14 @@
+New Terminal Output:
+
+root@f90c55597373:/app# python3 -c "agi=264215; std=3000; base_exemptions=4000; phaseout_pct=0.12; reduced_exemptions=base_exemptions*(1-phaseout_pct); taxable=
+agi-std-reduced_exemptions; print(f'Taxable income: {taxable}')"
+Taxable income: 257695.0
+root@f90c55597373:/app# python3 -c "taxable=257695; base_tax=79772; excess=taxable-250000; rate=0.396; total=base_tax+excess*rate; print(f'Excess: {excess}')
+> print(f'Additional tax: {excess*rate}')
+> print(f'Total tax: {total}')
+> print(f'Rounded: {round(total)}')"
+Excess: 7695
+Additional tax: 3047.2200000000003
+Total tax: 82819.22
+Rounded: 82819
+root@f90c55597373:/app#

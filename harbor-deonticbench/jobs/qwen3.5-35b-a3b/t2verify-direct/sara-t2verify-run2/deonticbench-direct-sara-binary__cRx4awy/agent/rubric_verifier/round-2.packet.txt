@@ -1,0 +1,103 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has paid $3200 to Bob for agricultural labor done from Feb 1st, 2017 to Sep 2nd, 2017, in Caracas, Venezuela. Alice is an American employer.
+
+
+**Question:**
+Section 3306(c)(1) applies to Alice employing Bob for the year 2017.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+Section 3306(c) (lines 307-327):
+
+"(c) Employment
+
+For purposes of this chapter, the term 'employment' means any service, of whatever nature,
+
+    (A) performed by an employee for the person employing him, irrespective of the citizenship or residence of either, within the United States, and
+
+    (B) performed outside the United States (except in a contiguous country with which the United States has an agreement relating to unemployment compensation) by a citizen of the United States as an employee of an American employer, except-
+
+    (1) agricultural labor unless-
+
+        (A) such labor is performed for a person who-
+
+            (i) during the calendar year or the preceding calendar year paid remuneration in cash of $20,000 or more to individuals employed in agricultural labor (including labor performed by an alien referred to in subparagraph (B)), or
+
+            (ii) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed in agricultural labor (including labor performed by an alien referred to in subparagraph (B)) for some portion of the day (whether or not at the same moment of time) 5 or more individuals; and
+
+        (B) such labor is not agricultural labor performed by an individual who is an alien admitted to the United States to perform agricultural labor pursuant to sections 214(c) and 101(a)(15)(H) of the Immigration and Nationality Act."
+
+## Reasoning
+
+1. Case facts:
+   - Alice paid Bob $3,200 for agricultural labor (case fact)
+   - The labor was performed Feb 1st to Sep 2nd, 2017 (case fact)
+   - Alice is an American employer (case fact)
+   - Location: Caracas, Venezuela (outside the United States) (case fact)
+   - Bob's citizenship: NOT SPECIFIED in the case facts
+
+2. Section 3306(c)(B) (lines 312-314) requires that for services performed outside the United States to be considered "employment", the employee must be "a citizen of the United States as an employee of an American employer."
+
+3. Section 3306(c)(1) (lines 315-327) provides an exception for agricultural labor, but this exception only applies to services that already qualify under Section 3306(c)(B) - meaning Bob must be a US citizen.
+
+4. The case facts do NOT specify that Bob is a citizen of the United States.
+
+5. Since Bob's citizenship is not established as a US citizen, Section 3306(c)(B) does not apply, and therefore Section 3306(c)(1) cannot apply either.
+
+6. The claim that "Section 3306(c)(1) applies to Alice employing Bob for the year 2017" is FALSE because the prerequisite condition (Bob being a US citizen) is not met.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '3306' /app/statute.txt | output 471 bytes
+step 3 | sed -n '251,350p' /app/statute.txt | output 6956 bytes
+step 4 | sed -n '287,310p' /app/statute.txt | output 1778 bytes
+step 5 | grep -n 'agricultural labor unless' /app/statute.txt | output 162 bytes
+step 6 | sed -n '315,330p' /app/statute.txt | output 1424 bytes
+step 7 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 2306 bytes
+step 8 | cat /app/output/answer.txt | output 2186 bytes
+step 9 | tail -1 /app/output/answer.txt | output 1975 bytes | task_complete claimed
+step 10 | sed -n '310,330p' /app/statute.txt | output 1820 bytes
+step 11 | sed -n '305,320p' /app/statute.txt | output 1084 bytes
+step 12 | sed -n '307,330p' /app/statute.txt | output 1927 bytes
+step 13 | cat > /app/output/answer.txt <<'EOF' | output 2868 bytes
+step 14 | cat /app/output/answer.txt | output 2783 bytes
+step 15 | tail -1 /app/output/answer.txt | output 123 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Step 1 was truncated but solver correctly re-searched for Section 3306; all commands ran and returned expected output (trajectory steps 1-9 complete).
+2. Statute coverage: NO. Quote cites lines 315-325 but preamble at 310-314 (establishing US citizen requirement for non-US labor) was never displayed in trajectory; lines 310-314 never appeared in any terminal output.
+3. Grounded reasoning: NO. Quote at 315-325 is verbatim but missing context; $3,200 and $20,000 are from statute, but reasoning omits the US citizen condition that determines applicability.
+4. Provision selection and application: NO. Bob's citizenship is a decisive fact for §3306(c)(1)(B) (lines 310-314) but was never checked; the $20,000 threshold check is irrelevant if Bob is not a US citizen.
+5. Tool-assisted computation: YES. python3 -c 'print(3200 < 20000)' was used in step 7; computation reproduces from stated inputs.
+Unresolved:
+- Check §3306(c)(1) preamble at lines 310-314 for US citizen requirement
+- Verify whether Bob is a citizen of the United States in the case facts
+- Re-read Section 3306(c)(1) starting at line 310 to capture full provision structure
+Suggested next actions:
+- sed -n '310,314p' /app/statute.txt to see the US citizen condition
+- grep -n 'citizen\|citizenship' /app/statute.txt to find all citizenship references
+- Check case facts for any statement about Bob's citizenship status

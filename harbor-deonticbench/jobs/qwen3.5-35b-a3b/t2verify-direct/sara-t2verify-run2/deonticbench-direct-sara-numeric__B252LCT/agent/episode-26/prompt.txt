@@ -1,0 +1,69 @@
+New Terminal Output:
+
+root@b1a365908fbf:/app# cat /app/output/answer.txt
+## Statute
+
+Section 7703(a)(2) (line 510): "an individual legally separated from his spouse under a decree of divorce or of separate maintenance shall not be considered as
+married."
+
+Section 2(b)(1) (line 204): "An individual shall be considered a head of a household if, and only if, such individual is not married at the close of his taxable
+ year, is not a surviving spouse (as defined in subsection (a)), and either-
+
+        (A) maintains as his home a household which constitutes for more than one-half of such taxable year the principal place of abode, as a member of such ho
+usehold, of-
+
+            (i) a qualifying child of the individual (as defined in section 152(c)), but not if such child-"
+
+Section 151(c) (line 64): "An exemption of the exemption amount for each individual who is a dependent (as defined in section 152) of the taxpayer for the taxab
+le year."
+
+Section 151(d)(1) (line 72): "Except as otherwise provided in this subsection, the term 'exemption amount' means $2,000."
+
+Section 152(b)(2) (line 113): "An individual shall not be treated as a dependent of a taxpayer under subsection (a) if such individual has made a joint return w
+ith the individual's spouse for the taxable year beginning in the calendar year in which the taxable year of the taxpayer begins."
+
+Section 152(c)(1) (line 123): "The term 'qualifying child' means, with respect to any taxpayer for any taxable year, an individual-"
+
+Section 152(c)(2)(A) (line 135): "an individual bears a relationship to the taxpayer described in this paragraph if such individual is-"
+
+Section 152(c)(3) (line 143): "an individual meets the requirements of this paragraph if such individual is younger than the taxpayer claiming such individual a
+s a qualifying child and is less than 25 years old at the end of the taxable year."
+
+Section 63(c)(2)(B) (line 394): "the basic standard deduction is-(B) $4,400 in the case of a head of household (as defined in section 2(b))"
+
+Section 1(b)(i) (line 23): "15% of taxable income if the taxable income is not over $29,600;"
+
+## Reasoning
+
+1. Filing Status: Alice was legally separated under a decree of divorce on March 2nd, 2015. Under §7703(a)(2), line 510, "an individual legally separated from h
+is spouse under a decree of divorce or of separate maintenance shall not be considered as married." Therefore, Alice is "not married" for tax purposes in 2017.
+
+2. Head of Household: Alice qualifies as head of household under §2(b)(1), line 204 because:
+   - She is not married (divorced in 2015 per §7703(a)(2))
+   - Charlie is her qualifying child
+   - Charlie is her child (§152(c)(2)(A), line 135)
+   - Charlie has the same principal place of abode as Alice for more than half the year ("Alice and Charlie live in a house maintained by Alice")
+   - Charlie is 5 years old in 2017 (born Feb 2, 2012), meeting the age requirement of <25 years (§152(c)(3), line 143)
+   - Charlie has not filed a joint return (so §152(b)(2), line 113 does not disqualify him)
+
+3. Standard Deduction: As a head of household, Alice's basic standard deduction is $4,400 (§63(c)(2)(B), line 394).
+
+4. Personal Exemptions: Alice gets:
+   - $2,000 for herself (§151(d)(1), line 72)
+   - $2,000 for Charlie as a dependent (§151(c), line 64; §151(d)(1), line 72)
+   - Total exemptions: $4,000
+
+5. Taxable Income Computation:
+   - Gross income: $9,560 (given fact)
+   - Less standard deduction: $4,400 (§63(c)(2)(B), line 394)
+   - Less exemptions: $4,000 (§151(c), line 64; §151(d)(1), line 72)
+   - Taxable income = $9,560 - $4,400 - $4,000 = $1,160
+
+6. Tax Calculation:
+   - Taxable income of $1,160 is not over $29,600
+   - Tax rate: 15% (§1(b)(i), line 23)
+   - Tax = 15% × $1,160 = $174
+
+## Answer
+Answer: 174
+root@b1a365908fbf:/app#

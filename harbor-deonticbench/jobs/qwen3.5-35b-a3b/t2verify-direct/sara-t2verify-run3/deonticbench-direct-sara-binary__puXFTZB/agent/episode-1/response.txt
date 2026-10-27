@@ -1,0 +1,13 @@
+
+
+{
+  "analysis": "I need to read the statute and apply it to Alice's case. Alice is a surviving spouse with taxable income of $95,129 for 2017. The claim is that she pays $22,018 in taxes under section 1(a)(ii). I can see from the statute that §1(a) covers tax rates for married individuals filing jointly and surviving spouses.",
+  "plan": "Let me analyze which tax bracket Alice falls into and calculate her tax:\n- §1(a)(i): 15% if not over $36,900\n- §1(a)(ii): $5,535 + 28% of excess over $36,900 if over $36,900 but not over $89,150\n- §1(a)(iii): $20,165 + 31% of excess over $89,150 if over $89,150 but not over $140,000\n\nAlice's income is $95,129, which is over $89,150 but not over $140,000, so she falls under §1(a)(iii), NOT §1(a)(ii). Let me calculate the tax and verify the claim.",
+  "commands": [
+    {
+      "keystrokes": "python3 -c \"tax = 20165 + 0.31 * (95129 - 89150); print(f'Tax: {tax}')\"\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+}

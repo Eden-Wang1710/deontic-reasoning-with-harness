@@ -1,0 +1,87 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+In 2017, Alice was paid $33200. Alice and Bob have been married since Feb 3rd, 2017, and they file a joint return for 2017.
+
+
+**Question:**
+Section 63(c)(2)(A)(ii) applies to Alice in 2017.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+**Section 63(c)(2)(A)(ii) - Basic standard deduction for surviving spouse:**
+Line 387: "(ii) a surviving spouse (as defined in section 2(a)),"
+
+**Section 2(a)(1)(A) - Definition of surviving spouse:**
+Line 191: "(A) whose spouse died during either of the two years immediately preceding the taxable year, and"
+
+## Reasoning
+
+1. Section 63(c)(2)(A)(ii) establishes that the basic standard deduction applies to a "surviving spouse (as defined in section 2(a))."
+
+2. Section 2(a)(1)(A) defines "surviving spouse" as a taxpayer "whose spouse died during either of the two years immediately preceding the taxable year."
+
+3. For the 2017 taxable year, the two years immediately preceding are 2015 and 2016.
+
+4. Case facts: Alice and Bob have been married since Feb 3rd, 2017, and they file a joint return for 2017.
+
+5. Since Alice and Bob married in 2017, Bob could not have died in 2015 or 2016 (before they were married).
+
+6. Therefore, Alice does not meet the definition of "surviving spouse" in Section 2(a)(1)(A) because her spouse did not die during 2015 or 2016.
+
+7. Since Alice is not a surviving spouse, Section 63(c)(2)(A)(ii) does not apply to her.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '§63' /app/statute.txt | output 135 bytes
+step 3 | sed -n '358,450p' /app/statute.txt | output 3643 bytes
+step 4 | grep -n 'section 2' /app/statute.txt | head -20 | output 992 bytes
+step 5 | grep -n '§2' /app/statute.txt | output 140 bytes
+step 6 | sed -n '182,250p' /app/statute.txt | output 4314 bytes
+step 7 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 2925 bytes
+step 8 | cat /app/output/answer.txt | output 1953 bytes
+step 9 | tail -1 /app/output/answer.txt | output 123 bytes
+step 10 | (no commands) | output 1986 bytes | task_complete claimed
+step 11 | sed -n '378,400p' /app/statute.txt | output 972 bytes
+step 12 | sed -n '182,200p' /app/statute.txt | output 1219 bytes
+step 13 | cat > /app/output/answer.txt <<'EOF' | output 1569 bytes
+step 14 | cat /app/output/answer.txt | output 1296 bytes
+step 15 | tail -1 /app/output/answer.txt | output 123 bytes
+step 16 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has 3 sections with Answer line; trajectory steps 2-6 show grep/sed commands ran and displayed output
+2. Statute coverage: YES. Trajectory steps 3 and 6 show lines 358-450 and 182-250 displayed; all quoted provisions appeared in solver's output
+3. Grounded reasoning: NO. Lines 392-393 quote mismatch: file shows '(ii) a surviving spouse' but solver quotes '(A) the basic standard deduction, and (B) the additional standard deduction.' Lines 395-397 quote mismatch: file shows '(C) $3,000 in any other case' but solver quotes different text
+4. Provision selection and application: YES. Reasoning correctly identifies 63(c)(2)(A)(ii) applies to surviving spouse, correctly applies Section 2(a) definition to marriage fact (married 2017, not before 2015-2016)
+5. Tool-assisted computation: NA. Task is entailment question (Entailment/Contradiction) with no arithmetic required
+Unresolved:
+- Verify Section 63(c)(2)(A)(ii) quote: sed -n '392,393p' /app/statute.txt shows different text than in Statute section
+- Verify Section 63(c)(2)(A)(ii) quote: sed -n '395,397p' /app/statute.txt shows '(C) $3,000 in any other case' not quoted text
+- Rewrite Statute section with correct verbatim quotes from file
+Suggested next actions:
+- sed -n '384,395p' /app/statute.txt to see actual Section 63(c)(2)(A) text
+- sed -n '378,383p' /app/statute.txt to see actual Section 63(c)(1)(A)/(B) text
+- Rewrite ## Statute section with correct verbatim quotes and accurate line numbers

@@ -1,0 +1,64 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has a brother, Bob, who was born January 31st, 2014 and has always lived at his parents' place. In 2016, Alice's gross income was $567192. Alice got married on Jan 12, 2016. Her husband had no income in 2016. Alice does not file a joint return. Alice has itemized deductions of $100206.
+
+
+**Question:**
+How much tax does Alice have to pay in 2016?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(d)
+§151(b)
+§152
+§63(c)
+§68(a)(1)
+§68(b)(1)(D)
+§7703(a)(1)
+
+## Reasoning
+1. Marital status: Under §7703(a)(1), marital status is determined at the close of the taxable year. Alice married on Jan 12, 2016, so she is married at year-end.
+
+2. Filing status: Alice does not file a joint return. Under §1(d), she files as "married individuals filing separate returns".
+
+3. Dependent: Bob lives with his parents, not Alice. Alice cannot claim Bob as a dependent under §152.
+
+4. Personal exemptions: Under §151(b), Alice gets one exemption for herself and one for her spouse (who has no income and is not a dependent of another). Total: 2 exemptions × $2,000 = $4,000.
+
+5. AGI: $567,192 - $4,000 = $563,192
+
+6. Itemized deductions phaseout under §68: AGI ($563,192) exceeds the applicable amount for MFS ($250,000 under §68(b)(1)(D)). Excess = $313,192. 3% of excess = $9,395.76. 80% of itemized deductions = $80,164.80. The lesser is $9,395.76. Deductible itemized = $100,206 - $9,395.76 = $90,810.24.
+
+7. Taxable income: $563,192 - $90,810.24 = $472,381.76
+
+8. Tax under §1(d)(v): For taxable income over $250,000: $37,764.25 + 39.6% of excess over $250,000.
+   Excess = $472,381.76 - $250,000 = $222,381.76
+   Tax = $37,764.25 + 0.396 × $222,381.76 = $37,764.25 + $88,063.18 = $125,827.43
+   Rounded to whole number: $125,827
+
+## Answer
+Answer: 125827
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | cat > /app/output/answer.txt <<'EOF' | output 1546 bytes
+step 3 | cat /app/output/answer.txt | output 1477 bytes
+step 4 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

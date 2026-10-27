@@ -1,0 +1,49 @@
+New Terminal Output:
+
+root@3ebedc33072b:/app# python3 << 'EOF'
+> # Alice's tax calculation with personal exemption
+>
+> # Given facts
+> gross_income = 133200  # Alice was paid
+> itemized_deductions = 2939 + 8744  # Total itemized deductions = $11,683
+> personal_exemption = 2000  # §151(d)(1) exemption amount
+>
+> agi = gross_income
+>
+> # Check §68 phaseout - for unmarried individual, threshold is $250,000
+> phaseout_threshold = 250000
+> if agi > phaseout_threshold:
+>     excess = agi - phaseout_threshold
+>     reduction = min(0.03 * excess, 0.80 * itemized_deductions)
+>     itemized_deductions = max(0, itemized_deductions - reduction)
+>
+> # Taxable income = AGI - itemized deductions - personal exemption
+> taxable_income = agi - itemized_deductions - personal_exemption
+> print(f"AGI: ${agi}")
+> print(f"Itemized deductions: ${itemized_deductions}")
+> print(f"Personal exemption: ${personal_exemption}")
+> print(f"Taxable income: ${taxable_income}")
+>
+> # Tax brackets for unmarried individuals (§1(c))
+> taxable = taxable_income
+> if taxable <= 22100:
+>     tax = 0.15 * taxable
+> elif taxable <= 53500:
+>     tax = 3315 + 0.28 * (taxable - 22100)
+> elif taxable <= 115000:
+>     tax = 12107 + 0.31 * (taxable - 53500)
+> elif taxable <= 250000:
+>     tax = 31172 + 0.36 * (taxable - 115000)
+> else:
+>     tax = 79772 + 0.396 * (taxable - 250000)
+>
+> print(f"Tax: ${tax}")
+> print(f"Tax (rounded): ${round(tax)}")
+> EOF
+AGI: $133200
+Itemized deductions: $11683
+Personal exemption: $2000
+Taxable income: $119517
+Tax: $32798.12
+Tax (rounded): $32798
+root@3ebedc33072b:/app#

@@ -1,0 +1,98 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Bob is Alice and Charlie's father. Bob had no income in 2015. Alice's gross income in 2015 is $264215. Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c) - Tax for unmarried individuals
+§63(c)(2)(C) - Standard deduction for unmarried individuals
+§151(b) - Personal exemption for taxpayer
+§151(c) - Additional exemption for dependents
+§151(d)(1) - Exemption amount of $2,000
+§151(d)(3) - Phaseout of exemption amount
+§152(d)(1) - Qualifying relative definition
+§152(d)(2)(C) - Father qualifies as qualifying relative
+
+## Reasoning
+1. Filing Status: Alice is unmarried, so she falls under §1(c) for unmarried individuals.
+
+2. Standard Deduction: Under §63(c)(2)(C), the basic standard deduction for 'any other case' (unmarried individuals) is $3,000.
+
+3. Personal Exemptions: 
+   - Alice gets 1 personal exemption for herself under §151(b)
+   - Bob qualifies as Alice's dependent under §151(c) because:
+     - He is Alice's father (§152(d)(2)(C))
+     - He has no income (§152(d)(1)(B))
+     - He is not a qualifying child of anyone (§152(d)(1)(D))
+   - Base exemptions: 2 × $2,000 = $4,000 (§151(d)(1))
+
+4. Exemption Phaseout: Under §151(d)(3), the exemption amount is reduced when AGI exceeds $250,000 (§151(d)(3)(A)). Alice's AGI of $264,215 exceeds this by $14,215.
+
+5. Applicable Percentage: Under §151(d)(3)(B), the applicable percentage is 2% for each $2,500 (or fraction thereof). $14,215 ÷ $2,500 = 5.686, rounded up to 6, giving 6 × 2% = 12%.
+
+6. Reduced Exemptions: $4,000 × (1 - 0.12) = $3,520.
+
+7. Taxable Income: $264,215 - $3,000 - $3,520 = $257,695.
+
+8. Tax Calculation under §1(c)(v): For taxable income over $250,000, tax = $79,772 + 39.6% of excess over $250,000.
+   Excess = $257,695 - $250,000 = $7,695
+   Additional tax = $7,695 × 0.396 = $3,047.22
+   Total tax = $79,772 + $3,047.22 = $82,819.22
+
+9. Rounding to whole dollar: $82,819
+
+## Answer
+Answer: 82819
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 3283 bytes
+step 3 | grep -A5 'Basic standard deduction' /app/statute.txt | output 342 bytes
+step 4 | grep -A30 'Basic standard deduction' /app/statute.txt | head -50 | output 1512 bytes
+step 5 | cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 3284 bytes
+step 6 | (no commands) | output 2068 bytes | task_complete claimed
+step 7 | grep -n 'Qualifying relative' /app/statute.txt; grep -n '§152' /app/statute.txt | head -30 | output 241 bytes
+step 8 | sed -n '95,180p' /app/statute.txt | output 3705 bytes
+step 9 | sed -n '145,165p' /app/statute.txt; grep -n 'support' /app/statute.txt | head -20 | output 1028 bytes
+step 10 | cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 3771 bytes
+step 11 | (no commands) | output 1776 bytes | task_complete claimed
+step 12 | python3 -c "agi=264215; std=3000; base_exemptions=4000; phaseout_pct=0.12; reduced_exemptions=base_e; python3 -c "taxable=257695; base_tax=79772; excess=taxable-250000; rate=0.396; total=base_tax+excess | output 648 bytes
+step 13 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 3 of 3 ===
+Answer file changed since the previous round: no
+Previous report:
+VERIFICATION REPORT (round 2 of 3)
+1. Tool-call integrity: YES. Answer file has three required sections and final Answer: line; trajectory shows commands ran with output.
+2. Statute coverage: YES. §151 header appeared in cat output (trajectory line 128); §152(d) text displayed in steps 8-9 (sed -n 145,200p).
+3. Grounded reasoning: YES. All numbers match statute (§151(d)(1): $2,000; §151(d)(3)(A): $250,000; §152(d)(2)(C): father relationship).
+4. Provision selection and application: UNKNOWN. Charlie is UNUSED fact; need to check if Charlie's status affects Alice's exemption count or filing.
+5. Tool-assisted computation: NO. No python3/bc/awk commands in trajectory; all arithmetic done in prose (steps 5-7, 8-9).
+Unresolved:
+- Check if Charlie affects Alice's exemption count (could be another dependent)
+- Use a computation tool (python3/bc/awk) for arithmetic steps instead of prose
+- Verify §1(c)(v) tax brackets and rates in statute
+Suggested next actions:
+- sed -n '95,145p' /app/statute.txt | grep -n -A10 'Qualifying relative'
+- python3 -c 'print(264215-3000-3520)' to verify taxable income calculation
+- grep -n -A20 '^§1\.' /app/statute.txt | grep -A10 '250,000'

@@ -1,0 +1,132 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Bob is Alice's father. Alice's gross income in 2015 is $311510. Bob has no income in 2015. Alice takes the standard deduction in 2015.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+§1(c) Unmarried individuals tax brackets (lines 29-37):
+"There is hereby imposed on the taxable income of every individual (other than a surviving spouse as defined in section 2(a) or the head of a household as defined in section 2(b)) who is not a married individual (as defined in section 7703) a tax determined in accordance with the following:
+
+    (v) $79,772, plus 39.6% of the excess over $250,000 if the taxable income is over $250,000."
+
+§151(d)(1) Exemption amount (lines 72-75):
+"Except as otherwise provided in this subsection, the term 'exemption amount' means $2,000."
+
+§151(b) Taxpayer exemption (lines 60-62):
+"An exemption of the exemption amount for the taxpayer; and an additional exemption of the exemption amount for the spouse of the taxpayer if a joint return is not made by the taxpayer and his spouse, and if the spouse, for the calendar year in which the taxable year of the taxpayer begins, has no gross income and is not the dependent of another taxpayer."
+
+§151(c) Dependents exemption (lines 64-66):
+"An exemption of the exemption amount for each individual who is a dependent (as defined in section 152) of the taxpayer for the taxable year."
+
+§151(d)(3)(A) Phaseout (lines 82-84):
+"In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exemption amount shall be reduced by the applicable percentage."
+
+§151(d)(3)(B) Applicable percentage (lines 86-88):
+"For purposes of subparagraph (A), the term 'applicable percentage' means 2 percentage points for each $2,500 (or fraction thereof) by which the taxpayer's adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b)."
+
+§151(d)(3)(5) Special rules for taxable years 2018 through 2025 (lines 90-92):
+"In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026, the term 'exemption amount' means zero."
+
+§151(b) Additional standard deduction (lines 398-401):
+"For purposes of paragraph (1), the additional standard deduction is the sum of each additional amount to which the taxpayer is entitled under subsection (f)."
+
+§151(f)(1) Additional amounts for the aged (lines 413-419):
+"The taxpayer shall be entitled to an additional amount of $600-
+
+    (A) for himself if he has attained age 65 before the close of his taxable year, and
+
+    (B) for the spouse of the taxpayer if the spouse has attained age 65 before the close of the taxable year and an additional exemption is allowable to the taxpayer for such spouse under section 151(b)."
+
+§151(b)(2) Basic standard deduction (lines 384-396):
+"For purposes of paragraph (1), the basic standard deduction is-
+
+    (C) $3,000 in any other case."
+
+§68(b)(1)(C) Applicable amount for unmarried (lines 489-490):
+"$250,000 in the case of an individual who is not married and who is not a surviving spouse or head of household, and"
+
+§152(d)(2)(C) Qualifying relative - relationship (lines 182-183):
+"The father or mother, or an ancestor of either."
+
+## Reasoning
+
+Case facts:
+- Alice's gross income in 2015: $311,510
+- Bob (Alice's father) has no income in 2015
+- Alice takes the standard deduction in 2015
+- Alice is unmarried (not married, not surviving spouse, not head of household)
+
+1. Determine filing status: Alice is an unmarried individual under §1(c) (line 29).
+
+2. Basic standard deduction: Under §151(b)(2)(C) (line 396), the basic standard deduction for "any other case" (unmarried) is $3,000.
+
+3. Personal exemptions:
+   - Exemption amount under §151(d)(1) (line 72): $2,000 per exemption.
+   - Alice is entitled to one exemption for herself (§151(b)).
+   - Bob qualifies as Alice's dependent under §152(d)(2)(C) (line 182) as "the father or mother" of the taxpayer.
+   - Bob has no gross income, so Alice can claim him as a dependent (§151(c)).
+   - Total exemptions before phaseout: 2 × $2,000 = $4,000.
+
+4. Phaseout calculation (§151(d)(3)):
+   - Applicable amount for unmarried under §68(b)(1)(C) (line 489): $250,000.
+   - Alice's AGI: $311,510 (gross income equals AGI before exemptions).
+   - Excess over applicable amount: $311,510 - $250,000 = $61,510.
+   - Increments of $2,500: ceil($61,510 / $2,500) = 25.
+   - Applicable percentage under §151(d)(3)(B) (line 86): 25 × 2% = 50%.
+   - Reduced exemption amount: $2,000 × (1 - 0.50) = $1,000 per exemption.
+   - Total exemptions after phaseout: 2 × $1,000 = $2,000.
+
+5. Taxable income:
+   - Taxable income = Gross income - Standard deduction - Personal exemptions
+   - Taxable income = $311,510 - $3,000 - $2,000 = $306,510.
+
+6. Tax calculation (§1(c)(v) - line 36):
+   - For taxable income over $250,000: $79,772 plus 39.6% of excess over $250,000.
+   - Excess over $250,000: $306,510 - $250,000 = $56,510.
+   - Tax = $79,772 + (0.396 × $56,510) = $79,772 + $22,377.96 = $102,149.96.
+   - Rounded to whole number: $102,150.
+
+## Answer
+Answer: 102150
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n 'Unmarried individuals' /app/statute.txt; grep -n 'standard deduction' /app/statute.txt; grep -n 'exemption amount' /app/statute.txt | output 3085 bytes
+step 3 | sed -n '386,397p' /app/statute.txt; sed -n '29,48p' /app/statute.txt | output 2256 bytes
+step 4 | (no commands) | output 176 bytes
+step 5 | sed -n '36,44p' /app/statute.txt; sed -n '60,75p' /app/statute.txt | output 1607 bytes
+step 6 | sed -n '394,398p' /app/statute.txt; sed -n '384,397p' /app/statute.txt | output 797 bytes
+step 7 | python3 << 'EOF' | output 1301 bytes
+step 8 | sed -n '82,95p' /app/statute.txt; grep -n 'section 152' /app/statute.txt; sed -n '110,130p' /app/statute.txt | output 3046 bytes
+step 9 | sed -n '130,150p' /app/statute.txt; grep -n 'section 68' /app/statute.txt; sed -n '156,170p' /app/statute.txt | output 2441 bytes
+step 10 | sed -n '230,250p' /app/statute.txt; grep -n '68(b)' /app/statute.txt | output 1957 bytes
+step 11 | grep -n '§68' /app/statute.txt; sed -n '170,190p' /app/statute.txt | output 1060 bytes
+step 12 | sed -n '471,510p' /app/statute.txt | output 1806 bytes
+step 13 | python3 << 'EOF' | output 2392 bytes
+step 14 | mkdir -p /app/output; cat > /app/output/answer.txt << 'EOF' | output 8378 bytes
+step 15 | cat /app/output/answer.txt | output 5056 bytes
+step 16 | tail -5 /app/output/answer.txt; grep '^Answer:' /app/output/answer.txt | output 323 bytes
+step 17 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

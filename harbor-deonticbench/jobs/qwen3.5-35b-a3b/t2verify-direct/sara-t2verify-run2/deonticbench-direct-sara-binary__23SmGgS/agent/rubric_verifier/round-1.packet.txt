@@ -1,0 +1,55 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+In 2016, Alice's income was $567192. Alice is a head of household for the year 2016.
+
+
+**Question:**
+Section 68(b)(1)(C) applies to Alice in 2016.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+Section 68(b)(1)(C) at line 491:
+"(C) $250,000 in the case of an individual who is not married and who is not a surviving spouse or head of household, and"
+
+Section 68(b)(1)(B) at line 489:
+"(B) $275,000 in the case of a head of household (as defined in section 2(b)),"
+
+## Reasoning
+
+The facts state that Alice is a head of household for the year 2016.
+
+Section 68(b)(1)(C) explicitly defines its applicable amount as applying to "an individual who is not married and who is not a surviving spouse or head of household."
+
+Since Alice IS a head of household, she does not meet the criteria for §68(b)(1)(C). Instead, §68(b)(1)(B) applies to her, as it explicitly covers "a head of household."
+
+Therefore, §68(b)(1)(C) does not apply to Alice.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n "68" /app/statute.txt | head -30; grep -n "(1)(C)" /app/statute.txt; sed -n '68,75p' /app/statute.txt | output 1442 bytes
+step 3 | sed -n '471,520p' /app/statute.txt | output 2520 bytes
+step 4 | grep -n "head of household" /app/statute.txt; grep -n "not married and who is not a surviving spouse or head of household" /app/statute.txt | output 720 bytes
+step 5 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 1826 bytes
+step 6 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

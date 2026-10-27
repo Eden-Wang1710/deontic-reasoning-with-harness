@@ -1,0 +1,107 @@
+New Terminal Output:
+
+root@69c1033e4c34:/app# cat /app/output/answer.txt
+## Statute
+
+**Section 2(a) - Definition of surviving spouse (lines 184-197):**
+"(a) Definition of surviving spouse
+(1) In general
+For purposes of section 1, the term "surviving spouse" means a taxpayer-
+(A) whose spouse died during either of the two years immediately preceding the taxable year, and
+(B) who maintains as his home a household which constitutes for the taxable year the principal place of abode (as a member of such household) of a dependent (i)
+ who (within the meaning of section 152) is a son, stepson, daughter, or stepdaughter of the taxpayer, and (ii) with respect to whom the taxpayer is entitled to
+ a deduction for the taxable year under section 151."
+
+**Section 2(b) - Definition of head of household (lines 204-226):**
+"(b) Definition of head of household
+(1) In general
+An individual shall be considered a head of a household if, and only if, such individual is not married at the close of his taxable year, is not a surviving spo
+use (as defined in subsection (a)), and either-
+(A) maintains as his home a household which constitutes for more than one-half of such taxable year the principal place of abode, as a member of such household,
+ of-
+(ii) any other person who is a dependent of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such person under section 151, or
+For purposes of this paragraph, an individual shall be considered as maintaining a household only if over half of the cost of maintaining the household during t
+he taxable year is furnished by such individual."
+
+**Section 152(d) - Qualifying relative (lines 151-177):**
+"The term "qualifying relative" means, with respect to any taxpayer for any taxable year, an individual-
+(B) who has no income for the calendar year in which such taxable year begins, and
+(D) who is not a qualifying child of such taxpayer or of any other taxpayer for any taxable year beginning in the calendar year in which such taxable year begin
+s.
+(2) Relationship
+(H) An individual (other than an individual who at any time during the taxable year was the spouse, determined without regard to section 7703, of the taxpayer)
+who, for the taxable year of the taxpayer, has the same principal place of abode as the taxpayer and is a member of the taxpayer's household."
+
+**Section 151(d)(5) - Exemption amount for 2018-2025 (lines 97-98):**
+"(5) Special rules for taxable years 2018 through 2025
+In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026, the term "exemption amount" means zero."
+
+**Section 63(c)(2)(B) and (7) - Standard deduction (lines 393-422):**
+"(2) Basic standard deduction
+(B) $4,400 in the case of a head of household (as defined in section 2(b)), or
+(7) Special rules for taxable years 2018 through 2025
+In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026-
+Paragraph (2) shall be applied-
+(i) by substituting "$12,000" for "$4,400" in subparagraph (B)"
+
+**Section 1(b) - Tax rates for heads of households (lines 21-29):**
+"(b) Heads of households
+There is hereby imposed on the taxable income of every head of a household (as defined in section 2(b)) a tax determined in accordance with the following:
+(v) $77,485, plus 39.6% of the excess over $250,000 if the taxable income is over $250,000."
+
+## Reasoning
+
+**Step 1: Determine Bob's filing status for 2018**
+
+Alice died on July 9, 2014. For the 2018 tax year, Alice's death was 4 years prior, which exceeds the "two years immediately preceding the taxable year" require
+ment in section 2(a)(1)(A). Therefore, Bob does not qualify as a surviving spouse.
+
+Bob is unmarried at the close of 2018 (spouse died in 2014).
+
+**Step 2: Determine if Bob qualifies as head of household**
+
+Bob furnished the costs of maintaining the home where he and Charlie lived during 2015-2019. For 2018, Bob furnished over half the cost of maintaining the house
+hold.
+
+Charlie has no income and is not the qualifying child of any taxpayer. Under section 152(d), Charlie qualifies as a qualifying relative because:
+- Charlie has no income (section 152(d)(1)(B))
+- Charlie is not a qualifying child of any taxpayer (given in facts)
+- Charlie has the same principal place of abode as Bob and is a member of Bob's household (section 152(d)(2)(H))
+
+Therefore, Charlie is a dependent of Bob under section 151(c).
+
+Under section 2(b)(1)(A)(ii), Bob qualifies as head of household because he maintains a household that is the principal place of abode of Charlie, who is a depe
+ndent of Bob.
+
+**Step 3: Calculate taxable income**
+
+Bob's AGI: $304,598 (given in facts)
+
+Standard deduction for head of household in 2018: $12,000 (section 63(c)(7)(i))
+
+Exemption amount for 2018: $0 (section 151(d)(5))
+
+Taxable income = AGI - Standard deduction = $304,598 - $12,000 = $292,598
+
+**Step 4: Calculate tax**
+
+Taxable income of $292,598 is over $250,000, so under section 1(b)(v):
+Tax = $77,485 + 39.6% × ($292,598 - $250,000)
+
+Computation:
+
+python3 computation:
+>>> agi = 304598
+>>> standard_deduction = 12000
+>>> taxable_income = agi - standard_deduction
+>>> taxable_income
+292598
+>>> tax = 77485 + 0.396 * (taxable_income - 250000)
+>>> tax
+94353.808
+
+Rounded to whole number: 94354
+
+## Answer
+Answer: 94354
+root@69c1033e4c34:/app#

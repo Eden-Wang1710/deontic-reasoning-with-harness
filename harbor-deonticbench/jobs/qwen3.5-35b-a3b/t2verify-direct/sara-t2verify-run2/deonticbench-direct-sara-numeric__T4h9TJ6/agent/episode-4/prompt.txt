@@ -1,0 +1,20 @@
+New Terminal Output:
+
+root@2d0e9609bc6f:/app# mkdir -p /app/output
+root@2d0e9609bc6f:/app# python3 -c "
+> income = 117192
+> exemption = 2000
+> taxable_income = income - exemption
+> print(f'Gross income: {income}')
+> print(f'Exemption: {exemption}')
+> print(f'Taxable income: {taxable_income}')
+>
+> # Married filing separately bracket (iv): $17,964.25 + 36% of excess over $70,000
+> tax = 17964.25 + 0.36 * (taxable_income - 70000)
+> print(f'Tax: {tax}')
+> "
+Gross income: 117192
+Exemption: 2000
+Taxable income: 115192
+Tax: 34233.369999999995
+root@2d0e9609bc6f:/app#

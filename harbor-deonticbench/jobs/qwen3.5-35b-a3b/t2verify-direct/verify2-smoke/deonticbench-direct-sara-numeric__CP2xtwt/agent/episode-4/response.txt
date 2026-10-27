@@ -1,0 +1,20 @@
+
+
+{
+  "analysis": "I've read the statute. I need to find specific provisions and calculate Alice's 2015 tax. Key facts: Alice is unmarried, has gross income of $311,510, her father Bob has no income, and she takes the standard deduction. I need to determine her filing status, standard deduction, personal exemptions, and any phaseouts.",
+  "plan": "Let me get the exact line numbers for the relevant provisions: §1(c) for unmarried tax rates, §151 for exemptions, §162 for standard deduction, and §68(b) for phaseout thresholds. Then I'll calculate the tax.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '81,110p' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '370,410p' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '240,280p' /app/statute.txt\n",
+      "duration": 0.5
+    }
+  ]
+}

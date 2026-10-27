@@ -1,0 +1,43 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+In 2017, Alice was paid $33200. Alice and Bob have been married since Feb 3rd, 2017, and they file a joint return for 2017.
+
+
+**Question:**
+Section 63(c)(2)(A)(ii) applies to Alice in 2017.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§63(c)(2)(A)(ii) - The basic standard deduction is 200% of the dollar amount in effect under subparagraph (C) for the taxable year in the case of a surviving spouse (as defined in section 2(a)).
+
+## Reasoning
+Section 63(c)(2)(A)(ii) applies specifically to a "surviving spouse" as defined in section 2(a). A surviving spouse is a taxpayer whose spouse died during the taxable year. In this case, Alice and Bob have been married since Feb 3rd, 2017, and they file a joint return for 2017. Alice is married to Bob who is alive during the taxable year. Therefore, Alice is a married individual filing a joint return, not a surviving spouse. Section 63(c)(2)(A)(i) would apply to Alice (joint return), not 63(c)(2)(A)(ii). The claim that 63(c)(2)(A)(ii) applies to Alice is false.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '63' /app/statute.txt | head -50 | output 144 bytes
+step 3 | sed -n '358,$p' /app/statute.txt | output 6960 bytes
+step 4 | cat > /app/output/answer.txt <<'EOF' | output 952 bytes
+step 5 | cat /app/output/answer.txt | output 922 bytes
+step 6 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

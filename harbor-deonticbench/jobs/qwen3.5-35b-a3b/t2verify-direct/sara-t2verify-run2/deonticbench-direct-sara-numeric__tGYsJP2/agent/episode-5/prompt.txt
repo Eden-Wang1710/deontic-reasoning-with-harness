@@ -1,0 +1,27 @@
+New Terminal Output:
+
+root@01089a28cbf6:/app# python3 -c "
+> gross_income = 103272
+> standard_deduction = 6000  # 200% of 3000 for joint return
+> personal_exemptions = 4000  # 2000 for taxpayer + 2000 for spouse (who has no income)
+> taxable_income = gross_income - standard_deduction - personal_exemptions
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation for married filing jointly
+> # Over $89,150 but not over $140,000: $20,165 + 31% of excess over $89,150
+> base_tax = 20165
+> excess = taxable_income - 89150
+> tax = base_tax + 0.31 * excess
+> print(f'Base tax: {base_tax}')
+> print(f'Excess: {excess}')
+> print(f'Tax on excess: {0.31 * excess}')
+> print(f'Total tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+Taxable income: 93272
+Base tax: 20165
+Excess: 4122
+Tax on excess: 1277.82
+Total tax: 21442.82
+Rounded: 21443
+root@01089a28cbf6:/app#

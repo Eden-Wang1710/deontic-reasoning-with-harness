@@ -1,0 +1,37 @@
+New Terminal Output:
+
+root@ab70b7509483:/app# sed -n '245,250p' /app/statute.txt
+§3301. Rate of tax
+
+There is hereby imposed on every employer (as defined in section 3306(a)) for each calendar year an excise tax, with respect to having individuals in his employ
+, equal to 6 percent of the total wages (as defined in section 3306(b)) paid by such employer during the calendar year with respect to employment (as defined in
+ section 3306(c)).
+
+---
+
+root@ab70b7509483:/app# sed -n '251,270p' /app/statute.txt
+§3306. Definitions
+
+(a) Employer
+
+    (1) In general
+
+    The term "employer" means, with respect to any calendar year, any person who-
+
+        (A) during the calendar year or the preceding calendar year paid wages of $1,500 or more, or
+
+        (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at lea
+st one individual in employment for some portion of the day.
+
+    For purposes of this paragraph, there shall not be taken into account any wages paid to, or employment of, an employee performing domestic services referred
+ to in paragraph (3).
+
+    (2) Agricultural labor
+
+    In the case of agricultural labor, the term "employer" means, with respect to any calendar year, any person who-
+
+        (A) during the calendar year or the preceding calendar year paid wages of $20,000 or more for agricultural labor, or
+
+root@ab70b7509483:/app# python3 -c "print('Employer excise tax: 6% of $4512 =', round(4512 * 0.06))"
+Employer excise tax: 6% of 512 = 271
+root@ab70b7509483:/app#

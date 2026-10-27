@@ -1,0 +1,20 @@
+
+
+{
+  "analysis": "I found a critical rule: under §162(c)(6)(A), a married individual filing a separate return where either spouse itemizes deductions has a standard deduction of $0. Since Alice itemizes ($100,206), her standard deduction is $0. Now I need to verify the exemption phaseout applicable amount for married filing separately and check Bob's dependency status.",
+  "plan": "Let me view the applicable amount for exemption phaseout (§151(d)(3)(C)) and verify Bob's dependency status, then calculate the tax.",
+  "commands": [
+    {
+      "keystrokes": "grep -n 'applicable amount' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '86,92p' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '105,120p' /app/statute.txt\n",
+      "duration": 0.5
+    }
+  ]
+}

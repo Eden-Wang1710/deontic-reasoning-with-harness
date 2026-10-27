@@ -1,0 +1,49 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob got married on Feb 3rd, 1992. Alice and Bob have a child, Charlie, born October 9th, 2000. Alice died on July 9th, 2014. From 2004 to 2019, Bob furnished the costs of maintaining the home where he and Charlie lived during that time. Bob is entitled to a deduction for Charlie under section 151(c) for the years 2015 to 2019.
+
+
+**Question:**
+Section 2(b)(1)(B) applies to Bob in 2018.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§2(b)(1)(B) - requires maintaining household of taxpayer's father or mother
+
+## Reasoning
+Section 2(b)(1)(B) states that an individual shall be considered a head of household if they maintain a household which constitutes for the taxable year the principal place of abode of the **father or mother** of the taxpayer, if the taxpayer is entitled to a deduction for such father or mother under section 151.
+
+The facts state that Charlie is Bob's **child** (born October 9th, 2000), and Bob is entitled to a deduction for Charlie under section 151(c) for 2015-2019.
+
+Section 2(b)(1)(B) specifically requires maintaining a parent (father or mother), not a child. Charlie is Bob's child, not his father or mother. Therefore, §2(b)(1)(B) does not apply to Bob in 2018.
+
+The claim that §2(b)(1)(B) applies to Bob in 2018 is false - it contradicts the statute's requirements.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n "2(b)(1)(B)" /app/statute.txt; grep -n "2(b)(1)" /app/statute.txt; grep -n "§2" /app/statute.txt | output 261 bytes
+step 3 | sed -n '182,250p' /app/statute.txt | output 4314 bytes
+step 4 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1098 bytes
+step 5 | cat /app/output/answer.txt | output 1014 bytes
+step 6 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

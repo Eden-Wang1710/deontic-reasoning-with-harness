@@ -1,0 +1,36 @@
+New Terminal Output:
+
+root@51c88fe48f1c:/app# grep -n 'standard deduction' /app/statute.txt
+362:Except as provided in subsection (b), for purposes of this subtitle, the term "taxable income" means gross income minus the deductions allowed by this chapt
+er (other than the standard deduction).
+368:    (1) the standard deduction, and
+378:    Except as otherwise provided in this subsection, the term "standard deduction" means the sum of-
+380:        (A) the basic standard deduction, and
+382:        (B) the additional standard deduction.
+384:    (2) Basic standard deduction
+386:    For purposes of paragraph (1), the basic standard deduction is-
+398:    (3) Additional standard deduction for aged and blind
+400:    For purposes of paragraph (1), the additional standard deduction is the sum of each additional amount to which the taxpayer is entitled under subsection
+ (f).
+402:    (5) Limitation on basic standard deduction in the case of certain dependents
+404:    In the case of an individual with respect to whom a deduction under section 151 is allowable to another taxpayer for a taxable year beginning in the cal
+endar year in which the individual's taxable year begins, the basic standard deduction applicable to such individual for such individual's taxable year shall no
+t exceed the greater of-
+410:    (6) Certain individuals, etc., not eligible for standard deduction
+420:    the standard deduction shall be zero.
+root@51c88fe48f1c:/app# grep -n '§63' /app/statute.txt
+358:§63. Taxable income defined
+root@51c88fe48f1c:/app# sed -n '1,100p' /app/statute.txt | grep -n '15%\|28%\|31%'
+13:    (i) 15% of taxable income if the taxable income is not over $36,900;
+14:    (ii) $5,535, plus 28% of the excess over $36,900 if the taxable income is over $36,900 but not over $89,150;
+15:    (iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;
+23:    (i) 15% of taxable income if the taxable income is not over $29,600;
+24:    (ii) $4,440, plus 28% of the excess over $29,600 if the taxable income is over $29,600 but not over $76,400;
+25:    (iii) $17,544, plus 31% of the excess over $76,400 if the taxable income is over $76,400 but not over $127,500;
+33:    (i) 15% of taxable income if the taxable income is not over $22,100;
+34:    (ii) $3,315, plus 28% of the excess over $22,100 if the taxable income is over $22,100 but not over $53,500;
+35:    (iii) $12,107, plus 31% of the excess over $53,500 if the taxable income is over $53,500 but not over $115,000;
+43:    (i) 15% of taxable income if the taxable income is not over $18,450;
+44:    (ii) $2,767.50, plus 28% of the excess over $18,450 if the taxable income is over $18,450 but not over $44,575;
+45:    (iii) $10,082.50, plus 31% of the excess over $44,575 if the taxable income is over $44,575 but not over $70,000;
+root@51c88fe48f1c:/app#

@@ -1,0 +1,91 @@
+New Terminal Output:
+
+root@ed6e150abd4d:/app# python3 << 'EOF'
+> # Calculate worker-days
+> worker_days = [5, 3, 5, 5, 5, 5, 5, 4, 5, 5, 5, 5]
+> total_worker_days = sum(worker_days)
+> print(f"Total worker-days: {total_worker_days}")
+>
+> # Calculate total wages
+> wage_per_worker = 550
+> total_wages = total_worker_days * wage_per_worker
+> print(f"Total wages: ${total_wages}")
+>
+> # Calculate employer excise tax (6% per §3301)
+> excise_tax_rate = 0.06
+> excise_tax = total_wages * excise_tax_rate
+> print(f"Employer excise tax (6%): ${excise_tax}")
+>
+> # Calculate Alice's income tax
+> gross_income = 567192
+>
+> # Standard deduction for unmarried individual (not head of household): $3,000 per §63(c)(2)(C)
+> standard_deduction = 3000
+>
+> # Check exemption phaseout per §151(d)(3)
+> # Applicable amount for unmarried: $250,000 per §68(b)(1)(C)
+> agi = gross_income
+> threshold = 250000
+> excess = agi - threshold
+> print(f"AGI: ${agi}, Threshold: ${threshold}, Excess: ${excess}")
+>
+> # 2 percentage points for each $2,500 (or fraction thereof)
+> applicable_percentage = (excess / 2500) * 2
+> print(f"Applicable percentage: {applicable_percentage}%")
+>
+> # Capped at 100%
+> if applicable_percentage > 100:
+>     applicable_percentage = 100
+> print(f"Capped applicable percentage: {applicable_percentage}%")
+>
+> # Exemption amount is $2,000 per §151(d)(1)
+> exemption_amount = 2000
+>
+> # Reduced exemption
+> reduced_exemption = exemption_amount * (1 - applicable_percentage / 100)
+> print(f"Reduced exemption: ${reduced_exemption}")
+>
+> # If reduced to zero, taxable income is gross income minus standard deduction
+> if reduced_exemption <= 0:
+>     taxable_income = gross_income - standard_deduction
+>     personal_exemption = 0
+> else:
+>     taxable_income = gross_income - standard_deduction - reduced_exemption
+>     personal_exemption = reduced_exemption
+>
+> print(f"Personal exemption: ${personal_exemption}")
+> print(f"Taxable income: ${taxable_income}")
+>
+> # Income tax for unmarried individual per §1(c)
+> # (v) $79,772.50, plus 39.6% of the excess over $250,000 if taxable income is over $250,000
+> if taxable_income > 250000:
+>     income_tax = 79772.50 + 0.396 * (taxable_income - 250000)
+> elif taxable_income > 140000:
+>     income_tax = 35928.50 + 0.36 * (taxable_income - 140000)
+> elif taxable_income > 89150:
+>     income_tax = 20165 + 0.31 * (taxable_income - 89150)
+> elif taxable_income > 36900:
+>     income_tax = 5535 + 0.28 * (taxable_income - 36900)
+> else:
+>     income_tax = 0.15 * taxable_income
+>
+> print(f"Income tax: ${income_tax}")
+>
+> # Total tax
+> total_tax = income_tax + excise_tax
+> print(f"Total tax: ${total_tax}")
+> print(f"Rounded total tax: {round(total_tax)}")
+> EOF
+Total worker-days: 57
+Total wages: $31350
+Employer excise tax (6%): $1881.0
+AGI: $567192, Threshold: $250000, Excess: $317192
+Applicable percentage: 253.7536%
+Capped applicable percentage: 100%
+Reduced exemption: $0.0
+Personal exemption: $0
+Taxable income: $564192
+Income tax: $204192.532
+Total tax: $206073.532
+Rounded total tax: 206074
+root@ed6e150abd4d:/app#

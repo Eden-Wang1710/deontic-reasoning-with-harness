@@ -1,0 +1,73 @@
+{
+  "round": 1,
+  "answer": "Answer: Contradiction",
+  "answer_changed": null,
+  "report": {
+    "rubrics": [
+      {
+        "name": "tool_call_integrity",
+        "status": "YES",
+        "evidence": "All commands (cat, grep, sed, python3, echo) returned successfully with no errors or truncation affecting the reasoning."
+      },
+      {
+        "name": "statute_coverage",
+        "status": "YES",
+        "evidence": "Section 3306(a)(2)(B) at lines 267-271 was retrieved via sed -n '251,$p' | head -200 and shown in output."
+      },
+      {
+        "name": "grounded_reasoning",
+        "status": "YES",
+        "evidence": "All 12 employment dates and worker counts come from case facts; statute figures (10 days, 5 workers) from \u00a73306(a)(2)(B)."
+      },
+      {
+        "name": "provision_selection",
+        "status": "YES",
+        "evidence": "Solver correctly identified \u00a73306(a)(2)(B) agricultural labor provision and checked 9 unique weeks against the 10-day requirement."
+      },
+      {
+        "name": "tool_assisted_computation",
+        "status": "YES",
+        "evidence": "Python script computed ISO week numbers and unique week count, reproducing the 9-week result that determines the answer."
+      }
+    ],
+    "unresolved": [],
+    "suggested_actions": []
+  },
+  "report_text": "VERIFICATION REPORT (round 1 of 3)\n1. Tool-call integrity: YES. All commands (cat, grep, sed, python3, echo) returned successfully with no errors or truncation affecting the reasoning.\n2. Statute coverage: YES. Section 3306(a)(2)(B) at lines 267-271 was retrieved via sed -n '251,$p' | head -200 and shown in output.\n3. Grounded reasoning: YES. All 12 employment dates and worker counts come from case facts; statute figures (10 days, 5 workers) from \u00a73306(a)(2)(B).\n4. Provision selection and application: YES. Solver correctly identified \u00a73306(a)(2)(B) agricultural labor provision and checked 9 unique weeks against the 10-day requirement.\n5. Tool-assisted computation: YES. Python script computed ISO week numbers and unique week count, reproducing the 9-week result that determines the answer.",
+  "steps_used": 2,
+  "parse_failures": 0,
+  "context_exceeded": false,
+  "commands": [
+    {
+      "step": 1,
+      "command": "wc -l /app/statute.txt",
+      "output": "522 /app/statute.txt\n"
+    },
+    {
+      "step": 1,
+      "command": "grep -n \"\u00a73306\" /app/statute.txt",
+      "output": "251:\u00a73306. Definitions\n"
+    },
+    {
+      "step": 1,
+      "command": "sed -n '251,320p' /app/statute.txt",
+      "output": "\u00a73306. Definitions\n\n(a) Employer\n\n    (1) In general\n\n    The term \"employer\" means, with respect to any calendar year, any person who-\n\n        (A) during the calendar year or the preceding calendar year paid wages of $1,500 or more, or\n\n        (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least one individual in employment for some portion of the day.\n\n    For purposes of this paragraph, there shall not be taken into account any wages paid to, or employment of, an employee performing domestic services referred to in paragraph (3).\n\n    (2) Agricultural labor\n\n    In the case of agricultural labor, the term \"employer\" means, with respect to any calendar year, any person who-\n\n        (A) during the calendar year or the preceding calendar year paid wages of $20,000 or more for agricultural labor, or\n\n        (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least 5 individuals in employment in agricultural labor for some portion of the day.\n\n    (3) Domestic service\n\n    In the case of domestic service in a private home, local college club, or local chapter of a college fraternity or sorority, the term \"employer\" means, with respect to any calendar year, any person who during the calendar year or the preceding calendar year paid wages in cash of $1,000 or more for such service.\n\n    (4) Special rule\n\n    A person treated as an employer under paragraph (3) shall not be treated as an employer with respect to wages paid for any service other than domestic service referred to in paragraph (3) unless such person is treated as an employer under paragraph (1) or (2) with respect to such other service.\n\n(b) Wages\n\nFor purposes of this chapter, the term \"wages\" means all remuneration for employment, including the cash value of all remuneration (including benefits) paid in any medium other than cash; except that such term shall not include-\n\n    (1) that part of the remuneration which, after remuneration (other than remuneration referred to in the succeeding paragraphs of this subsection) equal to $7,000 with respect to employment has been paid to an individual by an employer during any calendar year, is paid to such individual by such employer during such calendar year;\n\n    (2) the amount of any payment (including any amount paid by an employer for insurance or annuities, or into a fund, to provide for any such payment) made to, or on behalf of, an employee or any of his dependents under a plan or system established by an employer which makes provision for his employees generally (or for his employees generally and their dependents) or for a class or classes of his employees (or for a class or classes of his employees and their dependents), on account of-\n\n        (A) sickness or accident disability, or\n\n        (C) death;\n\n    (7) remuneration paid in any medium other than cash to an employee for service not in the course of the employer's trade or business;\n\n    (10) any payment or series of payments by an employer to an employee or any of his dependents which is paid-\n\n        (A) upon or after the termination of an employee's employment relationship because of (i) death, or (ii) retirement for disability, and\n\n        (B) under a plan established by the employer which makes provision for his employees generally or a class or classes of his employees (or for such employees or class or classes of employees and their dependents),\n\n    other than any such payment or series of payments which would have been paid if the employee's employment relationship had not been so terminated;\n\n    (11) remuneration for agricultural labor paid in any medium other than cash;\n\n    (15) any payment made by an employer to a survivor or the estate of a former employee after the calendar year in which such employee died;\n\n(c) Employment\n\nFor purposes of this chapter, the term \"employment\" means any service, of whatever nature,\n\n    (A) performed by an employee for the person employing him, irrespective of the citizenship or residence of either, within the United States, and\n\n    (B) performed outside the United States (except in a contiguous country with which the United States has an agreement relating to unemployment compensation) by a citizen of the United States as an employee of an American employer, except-\n\n    (1) agricultural labor unless-\n\n        (A) such labor is performed for a person who-\n\n            (i) during the calendar year or the preceding calendar year paid remuneration in cash of $20,000 or more to individuals employed in agricultural labor (including labor performed by an alien referred to in subparagraph (B)), or\n\n"
+    },
+    {
+      "step": 2,
+      "command": "grep -c \"\u00a73306\" /app/statute.txt",
+      "output": "1\n"
+    },
+    {
+      "step": 2,
+      "command": "grep -n \"agricultural labor\" /app/statute.txt | head -20",
+      "output": "267:    In the case of agricultural labor, the term \"employer\" means, with respect to any calendar year, any person who-\n269:        (A) during the calendar year or the preceding calendar year paid wages of $20,000 or more for agricultural labor, or\n271:        (B) on each of some 10 days during the calendar year or during the preceding calendar year, each day being in a different calendar week, employed at least 5 individuals in employment in agricultural labor for some portion of the day.\n303:    (11) remuneration for agricultural labor paid in any medium other than cash;\n315:    (1) agricultural labor unless-\n319:            (i) during the calendar year or the preceding calendar year paid remuneration in cash of $20,000 or more to individuals employed in agricultural labor (including labor performed by an alien referred to in subparagraph (B)), or\n321:            (ii) on each of some 10 days during the calendar year or the preceding calendar year, each day being in a different calendar week, employed in agricultural labor (including labor performed by an alien referred to in subparagraph (B)) for some portion of the day (whether or not at the same moment of time) 5 or more individuals; and\n323:        (B) such labor is not agricultural labor performed by an individual who is an alien admitted to the United States to perform agricultural labor pursuant to sections 214(c) and 101(a)(15)(H) of the Immigration and Nationality Act.\n"
+    }
+  ],
+  "packet_chars": 31915,
+  "prompt_tokens": 39309,
+  "completion_tokens": 2218,
+  "n_llm_calls": 3,
+  "elapsed_sec": 140.80961108207703,
+  "trajectory_file": "trajectory.verifier-round-1.json"
+}

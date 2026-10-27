@@ -1,0 +1,69 @@
+New Terminal Output:
+
+root@51c1b5827160:/app# python3 -c "
+> import datetime
+>
+> dates = [
+>     ('Jan 24', datetime.date(2017, 1, 24), 5),
+>     ('Feb 4', datetime.date(2017, 2, 4), 3),
+>     ('Mar 3', datetime.date(2017, 3, 3), 5),
+>     ('Mar 18', datetime.date(2017, 3, 18), 5),
+>     ('Apr 1', datetime.date(2017, 4, 1), 5),
+>     ('May 9', datetime.date(2017, 5, 9), 5),
+>     ('Oct 14', datetime.date(2017, 10, 14), 5),
+>     ('Oct 25', datetime.date(2017, 10, 25), 4),
+>     ('Nov 8', datetime.date(2017, 11, 8), 5),
+>     ('Nov 22', datetime.date(2017, 11, 22), 5),
+>     ('Dec 1', datetime.date(2017, 12, 1), 5),
+>     ('Dec 2', datetime.date(2017, 12, 2), 5),
+> ]
+>
+> print('Day analysis:')
+> for name, date, count in dates:
+>     week = date.isocalendar()[1]
+>     weekday = date.strftime('%A')
+>     print(f'{name}: {count} workers, Week {week}, {weekday}')
+>
+> print()
+> print('Days with 5+ workers in different weeks:')
+> different_weeks = set()
+> for name, date, count in dates:
+>     if count >= 5:
+>         week = date.isocalendar()[1]
+>         if week not in different_weeks:
+>             different_weeks.add(week)
+>             print(f'  {name}: Week {week}')
+>
+> print(f'\nTotal days with 5+ workers in different weeks: {len(different_weeks)}')
+> print(f'Statute requires: 10 days')
+> print(f'Section 3306(a)(2)(B) applies: {len(different_weeks) >= 10}')
+> "
+Day analysis:
+Jan 24: 5 workers, Week 4, Tuesday
+Feb 4: 3 workers, Week 5, Saturday
+Mar 3: 5 workers, Week 9, Friday
+Mar 18: 5 workers, Week 11, Saturday
+Apr 1: 5 workers, Week 13, Saturday
+May 9: 5 workers, Week 19, Tuesday
+Oct 14: 5 workers, Week 41, Saturday
+Oct 25: 4 workers, Week 43, Wednesday
+Nov 8: 5 workers, Week 45, Wednesday
+Nov 22: 5 workers, Week 47, Wednesday
+Dec 1: 5 workers, Week 48, Friday
+Dec 2: 5 workers, Week 48, Saturday
+
+Days with 5+ workers in different weeks:
+  Jan 24: Week 4
+  Mar 3: Week 9
+  Mar 18: Week 11
+  Apr 1: Week 13
+  May 9: Week 19
+  Oct 14: Week 41
+  Nov 8: Week 45
+  Nov 22: Week 47
+  Dec 1: Week 48
+
+Total days with 5+ workers in different weeks: 9
+Statute requires: 10 days
+Section 3306(a)(2)(B) applies: False
+root@51c1b5827160:/app#

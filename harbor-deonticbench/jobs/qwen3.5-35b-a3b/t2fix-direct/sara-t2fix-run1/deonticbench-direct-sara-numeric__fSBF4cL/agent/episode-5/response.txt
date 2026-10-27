@@ -1,0 +1,20 @@
+
+
+{
+  "analysis": "I have read the statute and found the key sections. I need to determine Alice's filing status, calculate her taxable income, and apply the appropriate tax brackets. The statute shows:\n\n1. Head of household definition (§2(b)(1)(B)): An unmarried individual who maintains a household for their parent qualifies as head of household if entitled to claim them as a dependent.\n\n2. Standard deduction (§151(c)(2)(B)): $4,400 for head of household, $3,000 for other cases.\n\n3. Personal exemptions (§151(d)(1)): $2,000 per exemption (for 2017, before the 2018-2025 zero exemption period).\n\n4. Tax brackets (§1(b)): Head of household rates are different from single rates.",
+  "plan": "Alice is unmarried and maintains a household where her mother Dorothy lives. Dorothy has no income mentioned, so she qualifies as a dependent (qualifying relative). Alice qualifies as head of household.\n\nCalculation:\n- Gross income: $197,407\n- Standard deduction (head of household): $4,400\n- Personal exemptions: $4,000 ($2,000 for Alice + $2,000 for Dorothy)\n- Taxable income: $197,407 - $4,400 - $4,000 = $189,007\n\nTax for head of household with taxable income $189,007:\n- Base: $33,385 (for income over $127,500)\n- Plus 36% of excess over $127,500: 0.36 × $61,507 = $22,142.52\n- Total: $55,527.52, rounded to $55,528",
+  "commands": [
+    {
+      "keystrokes": "mkdir -p /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "echo 'Answer: 55528' > /app/output/answer.txt\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/output/answer.txt\n",
+      "duration": 0.1
+    }
+  ]
+}

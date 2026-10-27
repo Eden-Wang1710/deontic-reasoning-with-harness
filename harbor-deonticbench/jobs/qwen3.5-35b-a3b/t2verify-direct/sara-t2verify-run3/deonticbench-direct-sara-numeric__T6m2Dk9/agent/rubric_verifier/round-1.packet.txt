@@ -1,0 +1,66 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice got married on May 30th, 2014. Alice files a joint return with her spouse for 2017 and they take the standard deduction. Alice's gross income for the year 2017 is $103272 while her spouse had no income. Alice has paid $3200 to her brother Bob for work done from Feb 1st, 2017 to Sep 2nd, 2017, in Baltimore, Maryland, USA.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(a) - Tax imposed on married individuals filing joint returns
+§151(d)(1) - Exemption amount of $2,000
+§151(b) - Taxpayer and spouse exemptions
+§152(c)(2)(A) - Basic standard deduction for joint return (200% of $3,000 = $6,000)
+§63(b) - Taxable income = AGI - standard deduction - personal exemptions
+
+## Reasoning
+Alice files a joint return with her spouse for 2017. Her gross income is $103,272.
+
+Standard deduction: For joint returns, §152(c)(2)(A) provides 200% of the basic amount ($3,000) = $6,000.
+
+Personal exemptions: §151(d)(1) sets exemption amount at $2,000. Under §151(b), Alice gets an exemption for herself ($2,000) and an additional exemption for her spouse ($2,000) since spouse has no gross income and they file jointly. Total exemptions = $4,000.
+
+Taxable income = $103,272 - $6,000 - $4,000 = $93,272.
+
+The payment to Bob is not deductible under this statute (no provisions for business expenses or payments to individuals).
+
+Tax calculation under §1(a)(iii): For taxable income over $89,150 but not over $140,000:
+Tax = $20,165 + 31% of excess over $89,150
+Excess = $93,272 - $89,150 = $4,122
+31% × $4,122 = $1,277.82
+Total tax = $20,165 + $1,277.82 = $21,442.82
+
+Rounded to nearest whole dollar: $21,443
+
+## Answer
+Answer: 21443
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | head -200 /app/statute.txt | output 10069 bytes, truncated (395 bytes omitted)
+step 3 | wc -l /app/statute.txt; tail -300 /app/statute.txt | output 10070 bytes, truncated (5356 bytes omitted)
+step 4 | grep -n 'standard deduction' /app/statute.txt; grep -n '§62\|§63\|adjusted gross\|AGI' /app/statute.txt | head -30 | output 2847 bytes
+step 5 | sed -n '378,410p' /app/statute.txt; sed -n '358,380p' /app/statute.txt | output 2438 bytes
+step 6 | grep -n 'deduction\|wages\|compensation' /app/statute.txt | head -50; sed -n '390,430p' /app/statute.txt | output 8314 bytes
+step 7 | sed -n '384,398p' /app/statute.txt; sed -n '110,140p' /app/statute.txt | output 2224 bytes
+step 8 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 3095 bytes
+step 9 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

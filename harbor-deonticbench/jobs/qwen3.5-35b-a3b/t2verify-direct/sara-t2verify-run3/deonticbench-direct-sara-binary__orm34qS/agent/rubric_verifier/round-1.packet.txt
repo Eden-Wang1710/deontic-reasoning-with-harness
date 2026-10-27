@@ -1,0 +1,45 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has a son, Bob, who satisfies section 152(c)(1) for the year 2015.
+
+
+**Question:**
+Under section 152(a), Bob is a dependent of Alice for the year 2015.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§152(a) - A dependent means a qualifying child or qualifying relative
+§152(c)(1) - Defines qualifying child
+§152(c)(2)(A) - Relationship: child of the taxpayer
+## Reasoning
+The statute at §152(a) defines a dependent as either a qualifying child or a qualifying relative. Section 152(c)(1) defines what a qualifying child is. The case facts state that Bob satisfies section 152(c)(1) for 2015, meaning Bob meets all requirements to be a qualifying child. Under §152(a), a qualifying child is a dependent. Since Bob satisfies the qualifying child requirements, Bob is a dependent of Alice under section 152(a).
+## Answer
+Answer: Entailment
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '§152' /app/statute.txt | output 131 bytes
+step 3 | sed -n '95,180p' /app/statute.txt | output 3705 bytes
+step 4 | (no commands) | output 176 bytes
+step 5 | sed -n '95,180p' /app/statute.txt | output 3705 bytes
+step 6 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 829 bytes
+step 7 | cat /app/output/answer.txt | output 752 bytes
+step 8 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

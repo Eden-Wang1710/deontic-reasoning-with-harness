@@ -1,0 +1,48 @@
+New Terminal Output:
+
+root@18f520fb7874:/app# python3 << 'EOF'
+> # Alice's tax calculation
+>
+> # Facts
+> gross_income = 210204  # Alice's gross income
+>
+> # Filing status: Head of Household (unmarried, has dependent father Charlie)
+> # Standard deduction for head of household: $4,400
+> standard_deduction = 4400
+>
+> # Personal exemptions: Alice + Charlie (qualifying relative)
+> # Bob is NOT a dependent - no qualifying relationship stated
+> exemption_amount = 2000  # per §151(d)(1)
+> total_exemptions = 2 * exemption_amount  # Alice + Charlie
+>
+> # Taxable income = AGI - standard deduction - exemptions
+> taxable_income = gross_income - standard_deduction - total_exemptions
+> print(f"Taxable income: ${taxable_income}")
+>
+> # Head of household tax brackets (§1(b)):
+> # - 15% if not over $29,600
+> # - $4,440 + 28% of excess over $29,600 if over $29,600 but not over $76,400
+> # - $17,544 + 31% of excess over $76,400 if over $76,400 but not over $127,500
+> # - $33,385 + 36% of excess over $127,500 if over $127,500 but not over $250,000
+> # - $77,485 + 39.6% of excess over $250,000 if over $250,000
+>
+> taxable_income = 201804
+>
+> if taxable_income <= 29600:
+>     tax = 0.15 * taxable_income
+> elif taxable_income <= 76400:
+>     tax = 4440 + 0.28 * (taxable_income - 29600)
+> elif taxable_income <= 127500:
+>     tax = 17544 + 0.31 * (taxable_income - 76400)
+> elif taxable_income <= 250000:
+>     tax = 33385 + 0.36 * (taxable_income - 127500)
+> else:
+>     tax = 77485 + 0.396 * (taxable_income - 250000)
+>
+> print(f"Tax: ${tax}")
+> print(f"Rounded: ${round(tax)}")
+> EOF
+Taxable income: $201804
+Tax: $60134.44
+Rounded: $60134
+root@18f520fb7874:/app#

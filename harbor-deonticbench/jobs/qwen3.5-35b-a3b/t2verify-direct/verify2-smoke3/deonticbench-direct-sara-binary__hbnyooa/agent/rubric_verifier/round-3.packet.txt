@@ -1,0 +1,90 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob got married on Feb 3rd, 1992. Alice died on July 9th, 2014.
+
+
+**Question:**
+Section 2(b)(2)(C) applies to Bob in 2014.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+Section 2(b)(2)(C) at line 232:
+
+    (C) a taxpayer shall be considered as married at the close of his taxable year if his spouse (other than a spouse described in subparagraph (B)) died during the taxable year.
+
+Section 2(b)(2)(B) at line 230:
+
+    (B) a taxpayer shall be considered as not married at the close of his taxable year if at any time during the taxable year his spouse is a nonresident alien; and
+
+## Reasoning
+
+The facts state:
+- Alice and Bob got married on Feb 3rd, 1992
+- Alice died on July 9th, 2014
+- We are evaluating whether Section 2(b)(2)(C) applies to Bob in 2014
+
+Section 2(b)(2)(C) provides that a taxpayer shall be considered as married at the close of his taxable year if his spouse died during the taxable year, except for a spouse described in subparagraph (B).
+
+Section 2(b)(2)(B) provides an exception: a taxpayer is considered as not married if at any time during the taxable year his spouse is a nonresident alien.
+
+Checking the exception against the facts:
+- The case facts state only the marriage date (Feb 3rd, 1992) and death date (July 9th, 2014)
+- The facts do NOT state that Alice was a nonresident alien
+- Since there is no evidence that Alice was a nonresident alien, the exception in 2(b)(2)(B) does not apply
+
+Therefore, Section 2(b)(2)(C) applies to Bob in 2014 because:
+1. Alice died during Bob's 2014 taxable year (July 9th, 2014)
+2. The 2(b)(2)(B) exception does not apply (no indication Alice was a nonresident alien)
+
+## Answer
+Answer: Entailment
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '2(b)' /app/statute.txt; grep -n '2(b)(2)' /app/statute.txt | output 989 bytes
+step 3 | grep -n 'section 2' /app/statute.txt | head -30 | output 992 bytes
+step 4 | grep -n '^§2' /app/statute.txt; grep -n '2(a)' /app/statute.txt | head -20 | output 743 bytes
+step 5 | sed -n '182,280p' /app/statute.txt | output 6146 bytes
+step 6 | sed -n '222p' /app/statute.txt; sed -n '210,225p' /app/statute.txt | output 1509 bytes
+step 7 | grep -n 'died during the taxable year' /app/statute.txt | output 314 bytes
+step 8 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1101 bytes
+step 9 | cat /app/output/answer.txt | output 1000 bytes
+step 10 | (no commands) | output 1556 bytes | task_complete claimed
+step 11 | grep -n 'nonresident alien' /app/statute.txt; sed -n '228,235p' /app/statute.txt | output 1414 bytes
+step 12 | (no commands) | output 1523 bytes | task_complete claimed
+step 13 | cat > /app/output/answer.txt <<'EOF' | output 1680 bytes
+step 14 | cat /app/output/answer.txt | output 1611 bytes
+step 15 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 3 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 2 of 3)
+1. Tool-call integrity: YES. All 12 steps completed; step 11 retrieved nonresident alien clauses; answer file unchanged.
+2. Statute coverage: YES. Quote at line 232 verified; §2(b)(2)(B) exception (line 230) retrieved in step 11 but not applied.
+3. Grounded reasoning: YES. Quote is verbatim at line 232; facts (marriage/death dates) from instruction; no external numbers used.
+4. Provision selection and application: NO. §2(b)(2)(B) exception (line 230) not checked against facts; residency status unknown but affects §2(b)(2)(C) applicability.
+5. Tool-assisted computation: NA. Entailment question requires no arithmetic; only logical application of statute.
+Unresolved:
+- Check §2(b)(2)(B) exception (line 230) against facts: spouse's residency status not provided
+Suggested next actions:
+- grep -n 'nonresident alien' /app/statute.txt to review exception conditions
+- Confirm if case facts mention spouse's residency or citizenship status (none found)
+- Determine if statute requires explicit residency info for §2(b)(2)(C) to apply

@@ -1,0 +1,54 @@
+New Terminal Output:
+
+root@165fea09b4de:/app# echo 'Calculating tax for Alice...'
+Calculating tax for Alice...
+root@165fea09b4de:/app# python3 << 'EOF'
+> # Given values
+> gross_income = 684642
+> standard_deduction = 9350  # For joint return in 2017 (§63(c)(2)(A))
+> exemption_amount = 2000  # Per person (§151(d)(1))
+>
+> # Personal exemptions: 2 (taxpayer + spouse)
+> total_exemptions = 2 * exemption_amount  # $4,000
+>
+> # Phaseout calculation (§151(d)(3)(B))
+> # Applicable amount for joint return: $300,000 (§68(b)(1)(A))
+> applicable_amount = 300000
+> ag = gross_income  # Gross income = AGI since no adjustments mentioned
+> excess = ag - applicable_amount  # $384,642
+>
+> # Phaseout percentage: 1% per $2,500 (or fraction thereof)
+> # Ceiling at 100%
+> phaseout_percent = min(100, (excess / 2500) * 100)
+> print(f"AGI: ${ag}")
+> print(f"Excess over threshold: ${excess}")
+> print(f"Phaseout percent: {phaseout_percent}%")
+>
+> # Apply phaseout to exemptions
+> reduced_exemptions = total_exemptions * (1 - phaseout_percent/100)
+> print(f"Reduced exemptions: ${reduced_exemptions}")
+>
+> # Taxable income
+> taxable_income = ag - standard_deduction - reduced_exemptions
+> print(f"Taxable income: ${taxable_income}")
+>
+> # Tax calculation (§1(a)(v))
+> # $75,528.50 + 39.6% of excess over $250,000
+> base_tax = 75528.50
+> excess_over_250k = taxable_income - 250000
+> tax = base_tax + (excess_over_250k * 0.396)
+> print(f"Base tax: ${base_tax}")
+> print(f"Excess over $250k: ${excess_over_250k}")
+> print(f"Tax: ${tax}")
+> print(f"Rounded tax: ${round(tax)}")
+> EOF
+AGI: $684642
+Excess over threshold: $384642
+Phaseout percent: 100%
+Reduced exemptions: $0.0
+Taxable income: $675292.0
+Base tax: $75528.5
+Excess over $250k: $425292.0
+Tax: $243944.132
+Rounded tax: $243944
+root@165fea09b4de:/app#

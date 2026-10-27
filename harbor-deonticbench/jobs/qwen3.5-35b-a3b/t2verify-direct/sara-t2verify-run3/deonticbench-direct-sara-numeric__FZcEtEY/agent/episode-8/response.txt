@@ -1,0 +1,21 @@
+
+
+{
+  "analysis": "I found §2(b) which defines head of household. Alice qualifies because she's not married (divorced 2015), maintains a household for her qualifying child Charlie for more than half the year, and furnishes over half the cost. Charlie is a qualifying child under §152(c) - he's her child, lives with her, is under 25, and can't file a joint return at age 5. The facts don't mention Charlie having any income, so he has none.",
+  "plan": "Verify the computation using python3 and update the answer file with the correct statute references including §2(b) and §152.",
+  "commands": [
+    {
+      "keystrokes": "python3 -c \"gross=9560; std_ded=4400; exemptions=4000; taxable=gross-std_ded-exemptions; tax=taxable*0.15; print(f'Gross: {gross}, Deductions: {std_ded+exemptions}, Taxable: {taxable}, Tax: {tax}')\"\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "cat > /app/output/answer.txt <<'EOF'\n## Statute\n§1(b) - Tax rates for heads of households (15% on income up to $29,600)\n§2(b) - Definition of head of household\n§63(c)(2)(B) - Basic standard deduction for head of household ($4,400)\n§151(b) - Exemption for taxpayer ($2,000)\n§151(c) - Exemption for dependents ($2,000)\n§152(c) - Definition of qualifying child\n§7703(a)(2) - Individual legally separated under decree of divorce not considered married\n\n## Reasoning\nAlice was legally separated under a decree of divorce on March 2, 2015, so under §7703(a)(2) she is not considered married in 2017.\n\nUnder §2(b), Alice qualifies as head of household because:\n- She is not married at the close of 2017 (divorced 2015)\n- She is not a surviving spouse\n- She maintains a household that is Charlie's principal place of abode for more than half the year\n- She furnishes over half the cost of maintaining the household\n\nCharlie qualifies as Alice's dependent under §152(c) as a qualifying child:\n- Relationship: Charlie is Alice's child\n- Same principal place of abode for more than half the year (they live together)\n- Age requirement: Charlie was born Feb 2, 2012, so he was 5 in 2017 (under 25)\n- Not filing a joint return (a 5-year-old cannot file)\n\nCharlie has no gross income (not mentioned in facts), satisfying §152(d)(1)(B) for qualifying relative if needed.\n\nAlice's income calculation:\n- Gross income: $9,560\n- Standard deduction (head of household per §63(c)(2)(B)): $4,400\n- Personal exemptions: $4,000 ($2,000 for Alice under §151(b) + $2,000 for Charlie under §151(c))\n- Taxable income: $9,560 - $4,400 - $4,000 = $1,160\n\nUnder §1(b), head of households with taxable income not over $29,600 pay 15% of taxable income.\n\nTax: $1,160 × 15% = $174\n\n## Answer\nAnswer: 174\nEOF\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "cat /app/output/answer.txt\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

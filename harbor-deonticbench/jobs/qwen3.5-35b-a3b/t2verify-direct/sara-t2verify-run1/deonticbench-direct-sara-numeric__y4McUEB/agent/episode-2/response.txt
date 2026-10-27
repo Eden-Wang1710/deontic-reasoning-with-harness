@@ -1,0 +1,16 @@
+
+
+{
+  "analysis": "I can see the tax brackets and personal exemption rules. Now I need to find section 2 which defines 'head of household' and 'surviving spouse'. Let me search for section 2 in the statute.",
+  "plan": "Search for section 2 definition of head of household to determine Bob's filing status.",
+  "commands": [
+    {
+      "keystrokes": "grep -n \"head of household\" /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '200,350p' /app/statute.txt\n",
+      "duration": 0.5
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+New Terminal Output:
+
+root@81b451293f1b:/app# grep -n 'section 152\|section 68\|section 7703' /app/statute.txt | head -20
+7:    (1) every married individual (as defined in section 7703) who makes a single return jointly with his spouse, and
+31:There is hereby imposed on the taxable income of every individual (other than a surviving spouse as defined in section 2(a) or the head of a household as def
+ined in section 2(b)) who is not a married individual (as defined in section 7703) a tax determined in accordance with the following:
+41:There is hereby imposed on the taxable income of every married individual (as defined in section 7703) who does not make a single return jointly with his spo
+use, a tax determined in accordance with the following:
+64:An exemption of the exemption amount for each individual who is a dependent (as defined in section 152) of the taxpayer for the taxable year.
+82:        In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exempti
+on amount shall be reduced by the applicable percentage.
+86:        For purposes of subparagraph (A), the term "applicable percentage" means 2 percentage points for each $2,500 (or fraction thereof) by which the taxpa
+yer's adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b). In the case of a married individual filing a separ
+ate return, the preceding sentence shall be applied by substituting "$1,250" for "$2,500". In no event shall the applicable percentage exceed 100 percent.
+177:        (H) An individual (other than an individual who at any time during the taxable year was the spouse, determined without regard to section 7703, of th
+e taxpayer) who, for the taxable year of the taxpayer, has the same principal place of abode as the taxpayer and is a member of the taxpayer's household.
+192:        (B) who maintains as his home a household which constitutes for the taxable year the principal place of abode (as a member of such household) of a d
+ependent (i) who (within the meaning of section 152) is a son, stepson, daughter, or stepdaughter of the taxpayer, and (ii) with respect to whom the taxpayer is
+ entitled to a deduction for the taxable year under section 151.
+212:            (i) a qualifying child of the individual (as defined in section 152(c)), but not if such child-
+216:                (II) is not a dependent of such individual by reason of section 152(b)(2) or
+240:        (B) by reason of an individual who would not be a dependent for the taxable year but for subparagraph (H) of section 152(d)(2).
+466:For purposes of this section, marital status shall be determined under section 7703.
+495:    For purposes of this paragraph, marital status shall be determined under section 7703.
+root@81b451293f1b:/app# grep -n 'applicable amount' /app/statute.txt
+82:        In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exempti
+on amount shall be reduced by the applicable percentage.
+86:        For purposes of subparagraph (A), the term "applicable percentage" means 2 percentage points for each $2,500 (or fraction thereof) by which the taxpa
+yer's adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b). In the case of a married individual filing a separ
+ate return, the preceding sentence shall be applied by substituting "$1,250" for "$2,500". In no event shall the applicable percentage exceed 100 percent.
+475:In the case of an individual whose adjusted gross income exceeds the applicable amount, the amount of the itemized deductions otherwise allowable for the ta
+xable year shall be reduced by the lesser of-
+477:    (1) 3 percent of the excess of adjusted gross income over the applicable amount, or
+485:    For purposes of this section, the term "applicable amount" means-
+root@81b451293f1b:/app# sed -n '465,480p' /app/statute.txt
+
+For purposes of this section, marital status shall be determined under section 7703.
+
+
+---
+
+§68. Overall limitation on itemized deductions
+
+(a) General rule
+
+In the case of an individual whose adjusted gross income exceeds the applicable amount, the amount of the itemized deductions otherwise allowable for the taxabl
+e year shall be reduced by the lesser of-
+
+    (1) 3 percent of the excess of adjusted gross income over the applicable amount, or
+
+    (2) 80 percent of the amount of the itemized deductions otherwise allowable for such taxable year.
+
+root@81b451293f1b:/app#

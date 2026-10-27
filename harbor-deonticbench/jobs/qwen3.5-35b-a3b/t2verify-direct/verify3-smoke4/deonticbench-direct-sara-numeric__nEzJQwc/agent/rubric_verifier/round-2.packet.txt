@@ -1,0 +1,99 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Bob is Alice's father. Alice's gross income in 2015 is $311510. Bob has no income in 2015. Alice takes the standard deduction in 2015.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c) - Tax rate for unmarried individuals
+§152(d)(1)(C) - Basic standard deduction ($3,000 for unmarried)
+§152(d)(1)(B) - Qualifying relative no income test
+§152(d)(2)(C) - Qualifying relative relationship test (father/mother)
+§151(c) - Additional exemption for dependents
+§151(d)(1) - Personal exemption amount ($2,000)
+§151(d)(3) - Personal exemption phaseout
+§68(b)(1)(C) - Applicable amount for phaseout ($250,000 for unmarried)
+
+## Reasoning
+Alice is unmarried (Bob is her father, not spouse) and not a head of household (no qualifying child mentioned), so §1(c) applies.
+
+Standard deduction: $3,000 under §152(d)(1)(C) for unmarried individuals.
+
+Personal exemptions:
+- Alice: $2,000 under §151(d)(1)
+- Bob: $2,000 under §151(c) as qualifying dependent
+
+Bob qualifies as a qualifying relative under §152(d):
+- Relationship test: §152(d)(2)(C) - Bob is Alice's father
+- No income test: §152(d)(1)(B) - Bob has no income
+
+Total exemptions before phaseout: $4,000
+
+Phaseout calculation under §151(d)(3):
+- Alice's AGI: $311,510
+- Applicable amount for unmarried: $250,000 under §68(b)(1)(C)
+- Excess: $311,510 - $250,000 = $61,510
+- Number of $2,500 increments: $61,510 / $2,500 = 24.604
+- Rounded up: 25 increments
+- Applicable percentage: 25 × 2% = 50%
+- Reduced exemptions: $4,000 × (1 - 0.50) = $2,000
+
+Taxable income: $311,510 - $3,000 - $2,000 = $306,510
+
+Tax calculation under §1(c)(v):
+- Base tax: $79,772
+- Excess over $250,000: $306,510 - $250,000 = $56,510
+- Tax on excess: $56,510 × 39.6% = $22,377.96
+- Total tax: $79,772 + $22,377.96 = $102,149.96
+
+Rounded to nearest dollar: $102,150
+
+## Answer
+Answer: 102150
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1440 bytes
+step 3 | cat /app/output/answer.txt | output 1317 bytes
+step 4 | (no commands) | output 1304 bytes | task_complete claimed
+step 5 | grep -n '63(c)(2)(A)' /app/statute.txt; sed -n '60,80p' /app/statute.txt; grep -n '151(c)' /app/statute.txt | output 1363 bytes
+step 6 | grep -n '63(c)' /app/statute.txt; grep -n 'standard deduction' /app/statute.txt | output 1510 bytes
+step 7 | sed -n '384,400p' /app/statute.txt | output 775 bytes
+step 8 | grep -n '152(d)' /app/statute.txt; sed -n '200,250p' /app/statute.txt | output 3493 bytes
+step 9 | grep -n '152(' /app/statute.txt | head -30; sed -n '140,200p' /app/statute.txt | output 3441 bytes
+step 10 | cat > /app/output/answer.txt <<'EOF' | output 1856 bytes
+step 11 | cat /app/output/answer.txt | output 1758 bytes
+step 12 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file contains all three sections (§, Reasoning, Answer) and the Answer: line is present per trajectory step 3
+Unresolved:
+- Check §63(c)(2)(A) for correct standard deduction amount ($3,000 vs $6,350 cited)
+- Check §152(d) for Bob's relationship as father and no-income condition for dependent status
+- Check §151(c) for additional exemption if Bob qualifies as Alice's dependent
+Suggested next actions:
+- sed -n '364,366p' /app/statute.txt to verify §63(c)(2)(A) amount
+- sed -n '155,165p' /app/statute.txt to check §152(d)(2) relationship requirements
+- sed -n '60,64p' /app/statute.txt to check §151(c) dependent exemption conditions

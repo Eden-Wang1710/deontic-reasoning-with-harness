@@ -1,0 +1,49 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Charlie is Bob's father since April 15th, 2014. Alice married Charlie on October 12th, 1992.
+
+
+**Question:**
+Alice bears a relationship to Bob under section 152(d)(2)(F).
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§152(d)(2)(F)
+
+## Reasoning
+Section 152(d)(2)(F) states that an individual bears a relationship to a taxpayer if the individual is "A brother or sister of the father or mother of the taxpayer." This defines an uncle or aunt relationship.
+
+Applying this to the facts:
+- Bob's father is Charlie (since April 15th, 2014)
+- Alice married Charlie on October 12th, 1992, making her Charlie's spouse, not his sibling
+
+For Alice to bear a relationship to Bob under section 152(d)(2)(F), Alice would need to be a brother or sister of Bob's father (Charlie) or Bob's mother. However, Alice is Charlie's wife, not his brother or sister. Therefore, Alice does not bear a relationship to Bob under section 152(d)(2)(F).
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '152' /app/statute.txt | head -50 | output 1021 bytes
+step 3 | sed -n '95,180p' /app/statute.txt | output 3705 bytes
+step 4 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 936 bytes
+step 5 | cat /app/output/answer.txt | output 851 bytes
+step 6 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

@@ -1,0 +1,48 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice is a surviving spouse for the year 2017. Alice's taxable income for the year 2017 is $236422.
+
+
+**Question:**
+Alice has to pay $70640 in taxes for the year 2017 under section 1(a)(iv).
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(a)(iv)
+
+## Reasoning
+Alice is a surviving spouse for 2017 with taxable income of $236,422. Under §1(a)(iv), for taxable income over $140,000 but not over $250,000, the tax is $35,928.50 plus 36% of the excess over $140,000.
+
+Calculation:
+- Excess over $140,000: $236,422 - $140,000 = $96,422
+- 36% of excess: 0.36 × $96,422 = $34,711.92
+- Total tax: $35,928.50 + $34,711.92 = $70,640.42
+
+The calculated tax of $70,640.42 rounds to $70,640, matching the claimed amount.
+
+## Answer
+Answer: Entailment
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 701 bytes
+step 3 | cat /app/output/answer.txt | output 614 bytes
+step 4 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

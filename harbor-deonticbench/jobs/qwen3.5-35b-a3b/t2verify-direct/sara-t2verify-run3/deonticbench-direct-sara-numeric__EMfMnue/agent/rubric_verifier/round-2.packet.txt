@@ -1,0 +1,87 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Harold got married on Sep 3rd, 1992. Harold and Alice have a son, born Jan 25th, 2000. Harold died on Feb 28th, 2016. They had been living in the same house since 1993, maintained by Alice. Alice and her son continued doing so after Harold's death. Alice's gross income for the year 2017 was $236422. Alice has employed Bob, Cameron, Dan, Emily, Fred and George for agricultural labor from Sep 9th to Oct 1st 2017, and paid them $5012 each. Alice takes the standard deduction in 2017.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§2(a) - Definition of surviving spouse
+§1(a)(2) - Tax imposed on surviving spouses
+§151(b)(1) - Exemption for taxpayer
+§151(c) - Additional exemption for dependents
+§151(d)(1) - Exemption amount of $2,000
+§63(c)(2)(A) - Standard deduction for surviving spouse
+§152(c) - Qualifying child definition
+§68(b)(1)(A) - Phaseout threshold for surviving spouse
+§68(f) - Phaseout does not apply after 2017
+
+## Reasoning
+Alice's spouse Harold died on Feb 28, 2016, which is within the two years immediately preceding the 2017 taxable year. Alice maintains a household with her son who is a dependent (qualifying child under §152(c)). The son was born Jan 25, 2000, making him 17 years old at the end of 2017 (less than 25), has the same principal place of abode as Alice for more than half the year, and has not filed a joint return. Therefore, Alice qualifies as a surviving spouse under §2(a) and is taxed under §1(a)(2).
+
+The statute does not contain any provision for business expense deductions. Therefore, Alice's AGI equals her gross income of $236,422.
+
+Alice qualifies for the standard deduction of $6,000 (200% of $3,000 for surviving spouse under §63(c)(2)(A)) and personal exemptions of $4,000 ($2,000 for herself + $2,000 for her dependent son under §151(b)(1) and §151(c)). Under §68(b)(1)(A), the phaseout threshold for surviving spouse is $300,000. Since Alice's AGI of $236,422 is below this threshold, no phaseout applies.
+
+Taxable income = $236,422 - $6,000 - $4,000 = $226,422.
+
+Using §1(a)(2) tax brackets for surviving spouses: Taxable income of $226,422 falls in bracket (iv) (over $140,000 but not over $250,000).
+Tax = $35,928.50 + 36% × ($226,422 - $140,000) = $35,928.50 + $31,111.92 = $67,040.42, rounded to $67,040.
+
+## Answer
+Answer: 67040
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat /app/statute.txt | head -200 | output 10069 bytes, truncated (446 bytes omitted)
+step 3 | cat /app/statute.txt | head -400 | tail -200 | output 10070 bytes, truncated (1757 bytes omitted)
+step 4 | cat /app/statute.txt | tail -200 | output 8808 bytes
+step 5 | cat > /app/output/answer.txt <<'EOF' | output 1866 bytes
+step 6 | cat /app/output/answer.txt | output 1804 bytes
+step 7 | (no commands) | output 2476 bytes | task_complete claimed
+step 8 | sed -n '1,50p' /app/statute.txt; grep -n 'deduction' /app/statute.txt | head -30 | output 7307 bytes
+step 9 | sed -n '372,410p' /app/statute.txt; sed -n '95,130p' /app/statute.txt | output 2922 bytes
+step 10 | sed -n '130,160p' /app/statute.txt; grep -n 'expense\|wage\|compensation' /app/statute.txt | head -20 | output 3469 bytes
+step 11 | python3 -c "agi=236422; std=6000; exp=4000; ti=agi-std-exp; print(f'Taxable income: {ti}'); tax=3592 | output 252 bytes
+step 12 | python3 -c "from datetime import date; born=date(2000,1,25); end=date(2017,12,31); age=end.year-born | output 690 bytes
+step 13 | cat > /app/output/answer.txt <<'EOF' | output 1950 bytes
+step 14 | cat /app/output/answer.txt | output 1890 bytes
+step 15 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has all three sections and Answer: line; step 7 shows task_complete claimed after step 6 displayed answer file
+2. Statute coverage: NO. §151(c)(2)(A) and §151(c)(2) do not exist in the file - standard deduction is in §63(c)(2), not §151; §152(c) used in reasoning but not listed in ## Statute
+3. Grounded reasoning: NO. Agricultural labor wages deduction not found in statute (§63(b) only lists standard deduction and exemptions as deductions); tax computation $56,035 does not reproduce from stated inputs (python3 gives $56,214.50)
+4. Provision selection and application: NO. §152(c) dependency conditions not checked against facts; §3306 defines employer but doesn't state wages are deductible; §68(f) says phaseout doesn't apply after 2017, so 2017 phaseout applies but solver didn't verify
+5. Tool-assisted computation: NO. Tax computation done in prose (trajectory shows no python3/bc/awk for calculation); stated computation does not reproduce from inputs (solver says $56,035, actual is $56,214.50)
+Unresolved:
+- Rewrite ## Statute: remove §151(c)(2)(A) and §151(c)(2), add §63(c)(2) for standard deduction
+- Verify §152(c) dependency conditions against son's facts (age < 25, same abode, not filing joint return)
+- Re-run tax computation with python3 using correct formula from §1(a)(2)(iv) and compare with Reasoning
+- Check if agricultural labor wages deduction exists in statute or remove from AGI calculation
+- Confirm §68(f) phaseout does not apply to 2017 (it says taxable year beginning after Dec 31, 2017)
+Suggested next actions:
+- sed -n '358,400p' /app/statute.txt to read §63(c) standard deduction provisions
+- sed -n '95,130p' /app/statute.txt to read §152(c) qualifying child conditions
+- python3 -c "print(35928.50 + 0.36 * (196350 - 140000))" to verify tax calculation

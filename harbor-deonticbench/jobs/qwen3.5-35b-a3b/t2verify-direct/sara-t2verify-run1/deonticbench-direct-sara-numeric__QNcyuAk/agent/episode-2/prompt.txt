@@ -1,0 +1,42 @@
+New Terminal Output:
+
+root@d27e5a5686ab:/app# mkdir -p /app/output
+root@d27e5a5686ab:/app# python3 -c "
+> alice_income = 433320
+> bob_income = 532134
+> combined_income = alice_income + bob_income
+>
+> # Standard deduction for married filing jointly
+> standard_deduction = 4400
+>
+> # Phaseout calculation
+> agi = combined_income
+> threshold = 300000
+> excess = agi - threshold
+> applicable_pct = excess / 2500
+> print(f'AGI: {agi}')
+> print(f'Applicable percentage: {applicable_pct}')
+>
+> # Exemption amount (2 people, reduced by phaseout)
+> exemption_per_person = 2000
+> total_exemption = exemption_per_person * 2 * (1 - applicable_pct)
+> print(f'Total exemption: {total_exemption}')
+>
+> # Taxable income
+> taxable_income = combined_income - standard_deduction - total_exemption
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation (married filing joint, over $250,000)
+> base_tax = 75528.50
+> excess_over_250k = taxable_income - 250000
+> tax = base_tax + (excess_over_250k * 0.396)
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+AGI: 965454
+Applicable percentage: 266.1816
+Total exemption: -1060726.4
+Taxable income: 2021780.4
+Tax: 777153.5384
+Rounded: 777154
+root@d27e5a5686ab:/app#

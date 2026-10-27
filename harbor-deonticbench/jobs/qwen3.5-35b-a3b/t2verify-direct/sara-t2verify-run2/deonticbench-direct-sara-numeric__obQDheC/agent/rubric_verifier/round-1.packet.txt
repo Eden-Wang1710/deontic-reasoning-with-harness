@@ -1,0 +1,145 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has a brother, Bob, who was born January 31st, 2014. Alice's gross income in 2015 was $260932. Bob lived at Alice's house in 2015. For 2015, Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+§1(b) Tax imposed on heads of households (lines 22-34):
+"There is hereby imposed on the taxable income of every head of a household (as defined in section 2(b)) a tax determined in accordance with the following:
+    (v) $77,485, plus 39.6% of the excess over $250,000 if the taxable income is over $250,000."
+
+§151(a) Allowance of deductions (line 54):
+"In the case of an individual, the exemptions provided by this section shall be allowed as deductions in computing taxable income."
+
+§151(b) Taxpayer and spouse (lines 56-59):
+"An exemption of the exemption amount for the taxpayer; and an additional exemption of the exemption amount for the spouse of the taxpayer if a joint return is not made by the taxpayer and his spouse, and if the spouse, for the calendar year in which the taxable year of the taxpayer begins, has no gross income and is not the dependent of another taxpayer."
+
+§151(c) Additional exemption for dependents (lines 61-62):
+"An exemption of the exemption amount for each individual who is a dependent (as defined in section 152) of the taxpayer for the taxable year."
+
+§151(d)(1) Exemption amount (lines 66-68):
+"Except as otherwise provided in this subsection, the term 'exemption amount' means $2,000."
+
+§151(d)(3)(A) Phaseout (lines 72-74):
+"In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exemption amount shall be reduced by the applicable percentage."
+
+§151(d)(3)(B) Applicable percentage (lines 76-80):
+"For purposes of subparagraph (A), the term 'applicable percentage' means 2 percentage points for each $2,500 (or fraction thereof) by which the taxpayer's adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b)."
+
+§152(b) Taxable income for non-itemizers (lines 364-371):
+"In the case of an individual who does not elect to itemize his deductions for the taxable year, for purposes of this subtitle, the term 'taxable income' means adjusted gross income, minus
+    (1) the standard deduction, and
+    (2) the deduction for personal exemptions provided in section 151."
+
+§152(c)(2)(B) Basic standard deduction for head of household (lines 392-393):
+"$4,400 in the case of a head of household (as defined in section 2(b))"
+
+§2(b)(1) Definition of head of household (lines 215-221):
+"An individual shall be considered a head of a household if, and only if, such individual is not married at the close of his taxable year, is not a surviving spouse (as defined in subsection (a)), and either
+    (A) maintains as his home a household which constitutes for more than one-half of such taxable year the principal place of abode, as a member of such household, of
+        (ii) any other person who is a dependent of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such person under section 151"
+
+§152(c)(1) Qualifying child (lines 115-122):
+"The term 'qualifying child' means, with respect to any taxpayer for any taxable year, an individual
+    (A) who bears a relationship to the taxpayer described in paragraph (2),
+    (B) who has the same principal place of abode as the taxpayer for more than one-half of such taxable year,
+    (C) who meets the age requirements of paragraph (3), and
+    (E) who has not filed a joint return (other than only for a claim of refund) with the individual's spouse for the taxable year beginning in the calendar year in which the taxable year of the taxpayer begins."
+
+§152(c)(2)(B) Relationship (lines 131-132):
+"a brother, sister, stepbrother, or stepsister of the taxpayer or a descendant of any such relative."
+
+§152(c)(3) Age requirements (lines 135-137):
+"an individual meets the requirements of this paragraph if such individual is younger than the taxpayer claiming such individual as a qualifying child and is less than 25 years old at the end of the taxable year."
+
+§68(b)(1)(C) Applicable amount for unmarried (lines 488-489):
+"$250,000 in the case of an individual who is not married and who is not a surviving spouse or head of household"
+
+## Reasoning
+
+**Step 1: Determine Alice's filing status**
+- Alice is unmarried (no spouse mentioned in the facts)
+- Bob (her brother) lived at Alice's house in 2015
+- Alice maintains a household that constitutes the principal place of abode for Bob
+
+**Step 2: Determine if Bob is a dependent**
+Bob qualifies as a "qualifying child" under §152(c):
+- Relationship: Bob is Alice's brother (§152(c)(2)(B))
+- Same principal place of abode: Bob lived at Alice's house in 2015 (§152(c)(1)(B))
+- Age: Bob was born January 31st, 2014, making him 1 year old at the end of 2015, which is less than 25 years old (§152(c)(3))
+- Joint return: No indication Bob filed a joint return (§152(c)(1)(E))
+
+Since Bob is Alice's dependent, Alice qualifies as a "head of a household" under §2(b)(1)(A)(ii).
+
+**Step 3: Calculate personal exemptions**
+From §151(a), (b), (c), (d)(1):
+- Exemption amount = $2,000
+- Alice is entitled to: 1 (taxpayer) + 1 (Bob) = 2 exemptions
+- Total exemptions before phaseout = 2 × $2,000 = $4,000
+
+From §151(d)(3)(A), (B) and §68(b)(1)(C):
+- Phaseout threshold for unmarried = $250,000
+- Alice's AGI = $260,932
+- Excess = $260,932 - $250,000 = $10,932
+- Number of $2,500 fractions = ceiling($10,932 / $2,500) = ceiling(4.3728) = 5
+- Applicable percentage = 5 × 2% = 10%
+- Reduced exemptions = $4,000 × (1 - 0.10) = $4,000 × 0.90 = $3,600
+
+**Step 4: Calculate taxable income**
+From §152(b):
+- AGI = $260,932
+- Standard deduction for head of household = $4,400 (§152(c)(2)(B))
+- Personal exemptions = $3,600
+- Taxable income = $260,932 - $4,400 - $3,600 = $252,932
+
+**Step 5: Calculate tax**
+From §1(b)(v):
+- Taxable income ($252,932) exceeds $250,000
+- Base tax = $77,485
+- Excess over $250,000 = $252,932 - $250,000 = $2,932
+- Tax on excess = 39.6% × $2,932 = $1,161.072
+- Total tax = $77,485 + $1,161.072 = $78,646.072
+
+Rounded to nearest whole dollar: $78,646
+
+## Answer
+Answer: 78646
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n "§1" /app/statute.txt | head -30; grep -n "§152" /app/statute.txt | head -20; grep -n "§151" /app/statute.txt | head -20 | output 439 bytes
+step 3 | sed -n '1,51p' /app/statute.txt; sed -n '52,94p' /app/statute.txt; sed -n '95,150p' /app/statute.txt | output 7950 bytes
+step 4 | sed -n '150,220p' /app/statute.txt; wc -l /app/statute.txt | output 4292 bytes
+step 5 | sed -n '220,300p' /app/statute.txt | output 5499 bytes
+step 6 | grep -n "standard deduction" /app/statute.txt | output 1453 bytes
+step 7 | sed -n '378,430p' /app/statute.txt | output 2183 bytes
+step 8 | grep -n "subsection (f)" /app/statute.txt | head -10; sed -n '440,490p' /app/statute.txt | output 2457 bytes
+step 9 | grep -n "§68" /app/statute.txt; sed -n '470,485p' /app/statute.txt; sed -n '362,377p' /app/statute.txt | output 1477 bytes
+step 10 | sed -n '362,440p' /app/statute.txt; sed -n '500,522p' /app/statute.txt | output 4420 bytes
+step 11 | python3 << 'EOF' | output 2712 bytes
+step 12 | mkdir -p /app/output; cat > /app/output/answer.txt << 'EOF' | output 6377 bytes
+step 13 | cat /app/output/answer.txt; tail -5 /app/output/answer.txt | output 6254 bytes
+step 14 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

@@ -1,0 +1,120 @@
+harbor-deonticbench/jobs/qwen3.5-35b-a3b/t2verify-direct/sara-t2verify-run1: 65 finished, 0 running/unfinished
+
+== sara-binary: n=30, correct=24, acc=0.800
+   macro-F1 0.796
+   agent time median 455 s, max 1310 s; >600 s: 6; >=1800 s: 0; acc at 600 s: 0.700
+   verifier rounds per trial: {1: 21, 2: 8, 3: 1}
+   decisions: continue 10, finish 30; finish turns with commands 1, of which the answer changed after the last round 0; extra confidence turn needed 0
+   verifier: rounds without report 0, context exceeded 0, mean steps/round 2.2, mean verifier tokens/trial 39958 prompt + 4002 completion, mean verifier time/trial 254 s
+   first-claim answer acc 0.833 → final acc 0.800; answer changed in 3; wrong→right 1, right→wrong 2
+   rubric statuses on the first round (correct / wrong trials):
+     tool_call_integrity        correct[YES:24]  wrong[YES:6]
+     statute_coverage           correct[YES:24]  wrong[YES:6]
+     grounded_reasoning         correct[NO:2 YES:22]  wrong[NO:1 YES:5]
+     provision_selection        correct[NO:3 YES:21]  wrong[NO:2 YES:4]
+     tool_assisted_computation  correct[NA:17 NO:4 YES:3]  wrong[NA:5 NO:1]
+   rubric statuses on the last round (correct / wrong trials):
+     tool_call_integrity        correct[YES:24]  wrong[YES:6]
+     statute_coverage           correct[YES:24]  wrong[YES:6]
+     grounded_reasoning         correct[NO:1 YES:23]  wrong[YES:6]
+     provision_selection        correct[NO:2 YES:22]  wrong[YES:6]
+     tool_assisted_computation  correct[NA:17 YES:7]  wrong[NA:5 YES:1]
+   stated confidence (n=30): acc 0.800, mean conf 0.988, AUROC 0.51, ECE 0.19, Brier 0.20, Kuiper 0.20; cov/acc @0.9 1.00/0.80
+     distinct confidence values: [0.9, 0.95, 1.0]
+   rubric score (1 - notYES/5, last round, n=30): AUROC 0.46, mean 0.980; distribution of notYES: {0: 28, 1: 1, 2: 1}
+   rubric score on round 1: AUROC 0.61
+   vs baseline (same 30 tasks, timeouts counted wrong): baseline correct 27; agree 27 (both correct 24); gained 0, lost 3 (of which lost by timeout 0)
+
+== sara-numeric: n=35, correct=10, acc=0.286
+   exceptions: Counter({'AgentTimeoutError': 11})
+   agent time median 1127 s, max 1711 s; >600 s: 24; >=1800 s: 0; acc at 600 s: 0.000
+   verifier rounds per trial: {2: 21, 3: 3}
+   decisions: continue 27, finish 24; finish turns with commands 0, of which the answer changed after the last round 0; extra confidence turn needed 2
+   verifier: rounds without report 0, context exceeded 0, mean steps/round 3.3, mean verifier tokens/trial 101251 prompt + 7575 completion, mean verifier time/trial 471 s
+   first-claim answer acc 0.208 → final acc 0.417; answer changed in 16; wrong→right 6, right→wrong 1
+   rubric statuses on the first round (correct / wrong trials):
+     tool_call_integrity        correct[NO:3 YES:6 —:1]  wrong[NO:7 YES:7]
+     statute_coverage           correct[NO:6 YES:3 —:1]  wrong[NO:9 YES:5]
+     grounded_reasoning         correct[NO:8 YES:1 —:1]  wrong[NO:13 YES:1]
+     provision_selection        correct[NO:7 UNKNOWN:1 YES:1 —:1]  wrong[NO:11 YES:3]
+     tool_assisted_computation  correct[NO:7 YES:2 —:1]  wrong[NO:12 YES:2]
+   rubric statuses on the last round (correct / wrong trials):
+     tool_call_integrity        correct[NO:2 YES:8]  wrong[NO:1 YES:13]
+     statute_coverage           correct[NO:1 YES:9]  wrong[YES:14]
+     grounded_reasoning         correct[NO:1 YES:9]  wrong[YES:14]
+     provision_selection        correct[YES:10]  wrong[YES:14]
+     tool_assisted_computation  correct[YES:10]  wrong[YES:14]
+   stated confidence (n=24): acc 0.417, mean conf 1.000, AUROC 0.50, ECE 0.58, Brier 0.58, Kuiper 0.58; cov/acc @0.9 1.00/0.42
+     distinct confidence values: [1.0]
+   rubric score (1 - notYES/5, last round, n=24): AUROC 0.43, mean 0.958; distribution of notYES: {0: 21, 1: 2, 3: 1}
+   rubric score on round 1: AUROC 0.60
+   vs baseline (same 35 tasks, timeouts counted wrong): baseline correct 7; agree 28 (both correct 5); gained 5, lost 2 (of which lost by timeout 2)
+
+Per trial:
+  neg 3od7seo R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=455s unverified_finish=False
+  neg 3ok2rAD R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:1notYES,2:0notYES] agent=401s unverified_finish=False
+  pos 6HwFkEq R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=0.9 rounds=[1:2notYES] agent=595s unverified_finish=False
+  pos 83MnDDp R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=0.9 rounds=[1:0notYES] agent=658s unverified_finish=False
+  neg 8gDexVx R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=360s unverified_finish=False
+  pos BnxeNsx R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=0.9 rounds=[1:1notYES] agent=511s unverified_finish=False
+  pos JBnGGhw R=0   base=1 exp=Entailment first=Entailment got=Contradiction conf=1.0 rounds=[1:1notYES,2:0notYES] agent=830s unverified_finish=False
+  pos KGUDvFy R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=1.0 rounds=[1:1notYES,2:0notYES] agent=716s unverified_finish=False
+  neg LDckXE2 R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=326s unverified_finish=False
+  neg M39WEEF R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=368s unverified_finish=False
+  neg MRRpoxP R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=470s unverified_finish=False
+  neg RHAdLuz R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=375s unverified_finish=False
+  neg RdrAdcA R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=369s unverified_finish=False
+  pos S45ZJjf R=0   base=1 exp=Entailment first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=1029s unverified_finish=False
+  neg SBTPZ9d R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=428s unverified_finish=False
+  pos aW6f8uX R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=1.0 rounds=[1:0notYES] agent=420s unverified_finish=False
+  pos akBtpE8 R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=1.0 rounds=[1:0notYES] agent=474s unverified_finish=False
+  pos akLK29V R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=1.0 rounds=[1:0notYES] agent=302s unverified_finish=False
+  pos akzbtTQ R=0   base=1 exp=Entailment first=Entailment got=Contradiction conf=0.95 rounds=[1:2notYES,2:2notYES,3:0notYES] agent=1310s unverified_finish=False
+  neg f8MyDeH R=0   base=0 exp=Contradiction first=Entailment got=Entailment conf=1.0 rounds=[1:0notYES] agent=425s unverified_finish=False
+  pos gmpjrYj R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=1.0 rounds=[1:0notYES] agent=313s unverified_finish=False
+  neg hGr7PBg R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:1notYES,2:0notYES] agent=492s unverified_finish=False
+  neg jmoqMEN R=0   base=0 exp=Contradiction first=Entailment got=Entailment conf=1.0 rounds=[1:0notYES] agent=429s unverified_finish=False
+  neg jpCCGDT R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=404s unverified_finish=False
+  pos kVLbLzn R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=1.0 rounds=[1:1notYES,2:0notYES] agent=359s unverified_finish=False
+  pos mj6naqs R=1   base=1 exp=Entailment first=Entailment got=Entailment conf=1.0 rounds=[1:0notYES] agent=467s unverified_finish=False
+  neg pd5qVjF R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES] agent=383s unverified_finish=False
+  neg wmW6iqH R=1   base=1 exp=Contradiction first=Contradiction got=Contradiction conf=1.0 rounds=[1:0notYES,2:0notYES] agent=494s unverified_finish=False
+  neg xC7p9y8 R=1   base=1 exp=Contradiction first=Entailment got=Contradiction conf=1.0 rounds=[1:2notYES,2:0notYES] agent=666s unverified_finish=False
+  pos zDW3a4M R=0   base=0 exp=Entailment first=Contradiction got=Contradiction conf=1.0 rounds=[1:1notYES,2:0notYES] agent=549s unverified_finish=False
+   15 2ct4MyV R=1   base=0 exp=5460 first=5236 got=5460 conf=1.0 rounds=[1:4notYES,2:0notYES] agent=1165s unverified_finish=False
+   35 5YZpKoN R=0   base=0 exp=2384 first=1432 got=2174 conf=1.0 rounds=[1:4notYES,2:0notYES] agent=1211s unverified_finish=False
+   69 7vtvjgQ R=1   base=0 exp=264225 first=264225 got=264225 conf=1.0 rounds=[1:0notYES,2:2notYES,3:0notYES] agent=1112s unverified_finish=False
+   85 Bwd2hV2 R=1   base=1 exp=2477 first=2477 got=2477 conf=None rounds=[1:2notYES] agent=1800s unverified_finish=None
+   67 EKaiR2a R=1   base=0 exp=207772 first=207772 got=207772 conf=1.0 rounds=[1:3notYES,2:0notYES] agent=1008s unverified_finish=False
+   60 GYJfJjx R=0   base=0 exp=4331 first=3641 got=4631 conf=1.0 rounds=[1:5notYES,2:1notYES,3:0notYES] agent=1127s unverified_finish=False
+   58 Gps2va7 R=0   base=0 exp=21635 first=21443 got=22063 conf=1.0 rounds=[1:4notYES,2:1notYES] agent=1088s unverified_finish=False
+   70 J8VaHoH R=1   base=0 exp=178147 first=None got=178147 conf=None rounds=[] agent=1800s unverified_finish=None
+   47 Jbfzpmz R=0   base=0 exp=45946 first=43204 got=45616 conf=1.0 rounds=[1:5notYES,2:0notYES] agent=1168s unverified_finish=False
+   51 LpvRwbm R=1   base=1 exp=55528 first=53746 got=55528 conf=1.0 rounds=[1:5notYES,2:0notYES] agent=1653s unverified_finish=False
+   56 PLz6x6r R=0   base=0 exp=130388 first=130388 got=129596 conf=1.0 rounds=[1:2notYES,2:0notYES] agent=1139s unverified_finish=False
+   90 PM484ZS R=0   base=0 exp=96641 first=101393 got=101393 conf=1.0 rounds=[1:4notYES,2:0notYES] agent=876s unverified_finish=False
+   74 Q2gEnwo R=1   base=1 exp=4525 first=4133 got=4525 conf=1.0 rounds=[1:4notYES,2:0notYES] agent=785s unverified_finish=False
+   71 QNcyuAk R=1   base=1 exp=356472 first=357106 got=356472 conf=None rounds=[1:3notYES] agent=1800s unverified_finish=None
+   10 ST8Vpw9 R=0   base=0 exp=68844 first=None got=64628 conf=None rounds=[] agent=1800s unverified_finish=None
+   91 ShPXQV2 R=0   base=0 exp=247432 first=242617 got=245848 conf=1.0 rounds=[1:5notYES,2:0notYES] agent=1580s unverified_finish=False
+   29 TbJovLs R=0   base=0 exp=40741 first=40469 got=40469 conf=1.0 rounds=[1:1notYES,2:0notYES] agent=1446s unverified_finish=False
+   75 TzigcWp R=0   base=0 exp=None first=None got=None conf=None rounds=[] agent=1800s unverified_finish=None
+   94 VLFkLZF R=0   base=0 exp=63345 first=60134 got=60134 conf=None rounds=[1:1notYES] agent=1800s unverified_finish=None
+    2 Vr5JUpW R=0   base=0 exp=None first=None got=None conf=None rounds=[] agent=1800s unverified_finish=None
+   97 Xh63Kdy R=0   base=0 exp=33069 first=33518 got=32798 conf=1.0 rounds=[1:4notYES,2:0notYES] agent=953s unverified_finish=False
+   93 YNsJoaD R=1   base=1 exp=102150 first=100843 got=102150 conf=1.0 rounds=[1:3notYES,2:0notYES] agent=928s unverified_finish=False
+   78 ZCYeHFR R=0   base=0 exp=14470 first=10467 got=10467 conf=1.0 rounds=[1:3notYES,2:0notYES] agent=1029s unverified_finish=False
+   63 bNPUotP R=1   base=0 exp=20298 first=20918 got=20298 conf=1.0 rounds=[1:5notYES,2:4notYES,3:3notYES] agent=1711s unverified_finish=False
+   18 bap5GWo R=0   base=0 exp=19801 first=19398 got=20421 conf=1.0 rounds=[1:3notYES,2:0notYES] agent=1364s unverified_finish=False
+   44 bbsibdQ R=0   base=0 exp=None first=None got=None conf=None rounds=[] agent=1800s unverified_finish=None
+   73 c54bF7y R=1   base=1 exp=15109 first=15081 got=15109 conf=1.0 rounds=[1:3notYES,2:0notYES] agent=1046s unverified_finish=False
+   64 hq8QqoP R=0   base=0 exp=81487 first=76705 got=78488 conf=1.0 rounds=[1:5notYES,2:0notYES] agent=1567s unverified_finish=False
+   84 iSWQGTi R=1   base=0 exp=2574 first=2574 got=2574 conf=1.0 rounds=[1:1notYES,2:0notYES] agent=1372s unverified_finish=False
+   95 mm656gR R=1   base=1 exp=174 first=174 got=174 conf=1.0 rounds=[1:4notYES,2:1notYES] agent=990s unverified_finish=False
+   83 mutqsYs R=0   base=0 exp=206073 first=202093 got=205281 conf=None rounds=[1:4notYES] agent=1800s unverified_finish=None
+    6 q5RNcgp R=0   base=0 exp=180610 first=177436 got=173793 conf=None rounds=[1:5notYES] agent=1800s unverified_finish=None
+   61 rVqkyP7 R=0   base=0 exp=None first=None got=None conf=None rounds=[] agent=1800s unverified_finish=None
+   49 vaeickM R=0   base=0 exp=82819 first=82095 got=83421 conf=1.0 rounds=[1:5notYES,2:0notYES] agent=919s unverified_finish=False
+   39 y4McUEB R=0   base=0 exp=6812 first=6005 got=6005 conf=1.0 rounds=[1:2notYES,2:0notYES] agent=1077s unverified_finish=False
+
+wrote outputs/verifier_run1_trials.json

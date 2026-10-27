@@ -1,0 +1,53 @@
+New Terminal Output:
+
+root@f2b5b1218f98:/app# sed -n '82,95p' /app/statute.txt
+        In the case of any taxpayer whose adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b), the exemption
+amount shall be reduced by the applicable percentage.
+
+        (B) Applicable percentage
+
+        For purposes of subparagraph (A), the term "applicable percentage" means 2 percentage points for each $2,500 (or fraction thereof) by which the taxpayer
+'s adjusted gross income for the taxable year exceeds the applicable amount in effect under section 68(b). In the case of a married individual filing a separate
+ return, the preceding sentence shall be applied by substituting "$1,250" for "$2,500". In no event shall the applicable percentage exceed 100 percent.
+
+    (5) Special rules for taxable years 2018 through 2025
+
+    In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026, the term "exemption amount" means zero.
+
+
+---
+
+§152. Dependent defined
+root@f2b5b1218f98:/app# grep -n 'section 152' /app/statute.txt
+64:An exemption of the exemption amount for each individual who is a dependent (as defined in section 152) of the taxpayer for the taxable year.
+192:        (B) who maintains as his home a household which constitutes for the taxable year the principal place of abode (as a member of such household) of a d
+ependent (i) who (within the meaning of section 152) is a son, stepson, daughter, or stepdaughter of the taxpayer, and (ii) with respect to whom the taxpayer is
+ entitled to a deduction for the taxable year under section 151.
+212:            (i) a qualifying child of the individual (as defined in section 152(c)), but not if such child-
+216:                (II) is not a dependent of such individual by reason of section 152(b)(2) or
+240:        (B) by reason of an individual who would not be a dependent for the taxable year but for subparagraph (H) of section 152(d)(2).
+root@f2b5b1218f98:/app# sed -n '110,130p' /app/statute.txt
+
+    If an individual is a dependent of a taxpayer for any taxable year of such taxpayer beginning in a calendar year, such individual shall be treated as having
+ no dependents for any taxable year of such individual beginning in such calendar year.
+
+    (2) Married dependents
+
+    An individual shall not be treated as a dependent of a taxpayer under subsection (a) if such individual has made a joint return with the individual's spouse
+ for the taxable year beginning in the calendar year in which the taxable year of the taxpayer begins.
+
+(c) Qualifying child
+
+For purposes of this section-
+
+    (1) In general
+
+    The term "qualifying child" means, with respect to any taxpayer for any taxable year, an individual-
+
+        (A) who bears a relationship to the taxpayer described in paragraph (2),
+
+        (B) who has the same principal place of abode as the taxpayer for more than one-half of such taxable year,
+
+        (C) who meets the age requirements of paragraph (3), and
+
+root@f2b5b1218f98:/app#

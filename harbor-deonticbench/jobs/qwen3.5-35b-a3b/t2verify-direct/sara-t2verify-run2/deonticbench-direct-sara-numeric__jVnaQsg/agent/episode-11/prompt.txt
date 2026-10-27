@@ -1,0 +1,28 @@
+New Terminal Output:
+
+root@cc8ac6b30b44:/app# python3 -c "
+> gross_income = 87319
+> exemption_amount = 2000
+> num_exemptions = 3  # Alice, Charlie, Bob
+> taxable_income = gross_income - (exemption_amount * num_exemptions)
+> print(f'Taxable income: {taxable_income}')
+>
+> # Unmarried individual tax brackets from §1(c)
+> # (iii) $12,107, plus 31% of the excess over $53,500 if over $53,500 but not over $115,000
+>
+> if taxable_income <= 22100:
+>     tax = 0.15 * taxable_income
+> elif taxable_income <= 53500:
+>     tax = 3315 + 0.28 * (taxable_income - 22100)
+> elif taxable_income <= 115000:
+>     tax = 12107 + 0.31 * (taxable_income - 53500)
+> else:
+>     tax = 31172 + 0.36 * (taxable_income - 115000)
+>
+> print(f'Tax: {tax}')
+> print(f'Integer tax: {int(tax)}')
+> "
+Taxable income: 81319
+Tax: 20730.89
+Integer tax: 20730
+root@cc8ac6b30b44:/app#

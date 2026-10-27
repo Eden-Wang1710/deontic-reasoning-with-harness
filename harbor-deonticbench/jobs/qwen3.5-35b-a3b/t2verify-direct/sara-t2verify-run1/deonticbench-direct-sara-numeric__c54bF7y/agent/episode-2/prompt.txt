@@ -1,0 +1,45 @@
+New Terminal Output:
+
+root@85a00669dcc2:/app# python3 -c "
+> # Facts
+> alice_income = 71879
+> bob_income = 11213
+> total_gross = alice_income + bob_income
+>
+> # Standard deduction for married filing jointly (2013)
+> # From statute: married filing jointly = $6,100 * 2 = $12,200
+> standard_deduction = 12200
+>
+> # Personal exemptions: $2,000 each for taxpayer, spouse, and dependent child
+> # Charlie is their child, born 2000, so 12 years old in 2013 - qualifies as dependent
+> personal_exemptions = 3 * 2000  # Alice, Bob, Charlie
+>
+> # Taxable income
+> taxable_income = total_gross - standard_deduction - personal_exemptions
+> print(f'Total gross income: {total_gross}')
+> print(f'Standard deduction: {standard_deduction}')
+> print(f'Personal exemptions: {personal_exemptions}')
+> print(f'Taxable income: {taxable_income}')
+>
+> # Tax calculation for married filing jointly
+> # From §1(a)(1)(ii): $5,535 + 28% of excess over $36,900
+> # (for income between $36,900 and $89,150)
+> base_tax = 5535
+> excess = taxable_income - 36900
+> tax = base_tax + 0.28 * excess
+> print(f'Base tax: {base_tax}')
+> print(f'Excess over threshold: {excess}')
+> print(f'Tax on excess: {0.28 * excess}')
+> print(f'Total tax: {tax}')
+> print(f'Rounded tax: {round(tax)}')
+> "
+Total gross income: 83092
+Standard deduction: 12200
+Personal exemptions: 6000
+Taxable income: 64892
+Base tax: 5535
+Excess over threshold: 27992
+Tax on excess: 7837.760000000001
+Total tax: 13372.760000000002
+Rounded tax: 13373
+root@85a00669dcc2:/app#

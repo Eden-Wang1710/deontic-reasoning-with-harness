@@ -1,0 +1,143 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice's gross income for the year 2017 is $22895. In 2017, Alice takes the standard deduction. Alice has a son, Bob, who has the same principal place of abode as her in 2017 and is not married.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+§1. Tax imposed (lines 1-50)
+
+"(b) Heads of households
+
+There is hereby imposed on the taxable income of every head of a household (as defined in section 2(b)) a tax determined in accordance with the following:
+
+    (i) 15% of taxable income if the taxable income is not over $29,600;"
+
+§153. Standard deduction (lines 362-422)
+
+"(2) Basic standard deduction
+
+For purposes of paragraph (1), the basic standard deduction is-
+
+        (B) $4,400 in the case of a head of household (as defined in section 2(b)),"
+
+§151. Allowance of deductions for personal exemptions (lines 54-94)
+
+"(b) Taxpayer and spouse
+
+An exemption of the exemption amount for the taxpayer; and an additional exemption of the exemption amount for the spouse of the taxpayer if a joint return is not made by the taxpayer and his spouse, and if the spouse, for the calendar year in which the taxable year of the taxpayer begins, has no gross income and is not the dependent of another taxpayer.
+
+(c) Additional exemption for dependents
+
+An exemption of the exemption amount for each individual who is a dependent (as defined in section 152) of the taxpayer for the taxable year."
+
+"(d) Exemption amount
+
+For purposes of this section-
+
+    (1) In general
+
+    Except as otherwise provided in this subsection, the term "exemption amount" means $2,000."
+
+§2. Surviving spouse and head of household defined (lines 189-240)
+
+"(b) Definition of head of household
+
+    (1) In general
+
+    An individual shall be considered a head of a household if, and only if, such individual is not married at the close of his taxable year, is not a surviving spouse (as defined in subsection (a)), and either-
+
+        (A) maintains as his home a household which constitutes for more than one-half of such taxable year the principal place of abode, as a member of such household, of-
+
+            (i) a qualifying child of the individual (as defined in section 152(c)), but not if such child-
+
+                (I) is married at the close of the taxpayer's taxable year, and
+
+                (II) is not a dependent of such individual by reason of section 152(b)(2)"
+
+§152. Dependent defined (lines 95-152)
+
+"(c) Qualifying child
+
+For purposes of this section-
+
+    (1) In general
+
+    The term "qualifying child" means, with respect to any taxpayer for any taxable year, an individual-
+
+        (A) who bears a relationship to the taxpayer described in paragraph (2),
+
+        (B) who has the same principal place of abode as the taxpayer for more than one-half of such taxable year,
+
+        (C) who meets the age requirements of paragraph (3), and
+
+        (E) who has not filed a joint return (other than only for a claim of refund) with the individual's spouse for the taxable year beginning in the calendar year in which the taxable year of the taxpayer begins."
+
+"(2) Relationship
+
+For purposes of paragraph (1)(A), an individual bears a relationship to the taxpayer described in this paragraph if such individual is-
+
+        (A) a child of the taxpayer or a descendant of such a child, or"
+
+## Reasoning
+
+1. **Filing Status**: Alice is a head of household under §2(b). She is not married, maintains a household with her son Bob who has the same principal place of abode as her, and Bob is not married. Bob qualifies as a qualifying child under §152(c) because he bears a relationship to Alice as her child (§152(c)(2)(A)), has the same principal place of abode as Alice for more than one-half of the taxable year (§152(c)(1)(B)), and has not filed a joint return.
+
+2. **Gross Income**: $22,895 (given in case facts).
+
+3. **Standard Deduction**: Under §153(b)(2)(B), the basic standard deduction for a head of household is $4,400.
+
+4. **Personal Exemptions**: Under §151(b), Alice is entitled to an exemption of the exemption amount for herself. Under §151(c), Alice is entitled to an exemption for Bob as her dependent. Under §151(d)(1), the exemption amount is $2,000. Thus, total exemptions = $2,000 (Alice) + $2,000 (Bob) = $4,000.
+
+5. **Taxable Income**: Computed as gross income minus standard deduction minus personal exemptions:
+
+   ```
+   Taxable Income = $22,895 - $4,400 - $4,000 = $14,495
+   ```
+
+6. **Tax Calculation**: Under §1(b), the tax for a head of household is 15% of taxable income if the taxable income is not over $29,600. Since $14,495 is not over $29,600:
+
+   ```
+   Tax = $14,495 × 0.15 = $2,174.25
+   ```
+
+   Rounding to the nearest whole dollar gives $2,174.
+
+## Answer
+Answer: 2174
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n 'Head of household' /app/statute.txt; grep -n 'section 2' /app/statute.txt | head -20; grep -n 'standard deduction' /app/statute.txt | head -20 | output 2479 bytes
+step 3 | sed -n '1,50p' /app/statute.txt; grep -n '152' /app/statute.txt | head -20 | output 4349 bytes
+step 4 | sed -n '200,250p' /app/statute.txt; sed -n '95,150p' /app/statute.txt | output 5504 bytes
+step 5 | sed -n '378,400p' /app/statute.txt; sed -n '117,130p' /app/statute.txt | output 1474 bytes
+step 6 | sed -n '117,125p' /app/statute.txt; sed -n '105,120p' /app/statute.txt | output 1098 bytes
+step 7 | sed -n '125,140p' /app/statute.txt | output 936 bytes
+step 8 | grep -n 'exemption amount' /app/statute.txt | output 1397 bytes
+step 9 | python3 -c "print(22895 - 4400 - 4000)"; python3 -c "print(round(14495 * 0.15))" | output 185 bytes
+step 10 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 4812 bytes
+step 11 | cat /app/output/answer.txt; tail -3 /app/output/answer.txt | output 4678 bytes
+step 12 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

@@ -1,0 +1,12 @@
+
+
+{
+  "analysis": "I now have all the key information from the statute:\n- Line 29-37: Tax brackets for unmarried individuals\n- Line 396: Basic standard deduction for unmarried is $3,000\n- Line 72: Exemption amount is $2,000\n- Alice's gross income: $311,510\n- Bob has no income, so Alice can claim him as a dependent\n- Alice is unmarried (taking standard deduction)",
+  "plan": "Now I'll calculate Alice's tax using Python to ensure accuracy. Taxable income = Gross income - Standard deduction - Personal exemptions. Then apply the tax bracket for unmarried individuals over $250,000.",
+  "commands": [
+    {
+      "keystrokes": "python3 << 'EOF'\n# Case facts\nalice_gross_income = 311510\nbob_income = 0\n\n# Statute provisions\nstandard_deduction = 3000  # Line 396: $3,000 for unmarried\nexemption_amount = 2000    # Line 72: $2,000 per exemption\n\n# Alice can claim Bob as dependent (Bob has no income)\n# Section 151(b): exemption for spouse with no gross income\n# Section 151(c): exemption for dependents\nnum_exemptions = 2  # Alice + Bob as dependent\ntotal_exemptions = num_exemptions * exemption_amount\n\n# Taxable income = Gross income - Standard deduction - Personal exemptions\ntaxable_income = alice_gross_income - standard_deduction - total_exemptions\nprint(f\"Gross income: {alice_gross_income}\")\nprint(f\"Standard deduction: {standard_deduction}\")\nprint(f\"Total exemptions: {total_exemptions}\")\nprint(f\"Taxable income: {taxable_income}\")\n\n# Tax calculation for unmarried (line 29-37, section (c))\n# (v) $79,772, plus 39.6% of the excess over $250,000 if over $250,000\ntax = 79772 + 0.396 * (taxable_income - 250000)\nprint(f\"Tax: {tax}\")\nprint(f\"Tax (rounded): {round(tax)}\")\nEOF\n",
+      "duration": 1.0
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Bob is Alice's father. Alice's gross income in 2015 is $311510. Bob has no income in 2015. Alice takes the standard deduction in 2015.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c) - Tax imposed on unmarried individuals
+§151(c)(2)(C) - Basic standard deduction for unmarried individuals ($3,000)
+§151(d)(1) - Personal exemption amount ($2,000)
+§151(d)(3) - Phaseout of personal exemptions
+§68(b)(1)(C) - Applicable amount for single filers ($250,000)
+
+## Reasoning
+Alice is unmarried and files as an unmarried individual under §1(c).
+
+1. Gross income: $311,510
+2. Standard deduction: $3,000 under §151(c)(2)(C) for unmarried individuals
+3. Personal exemptions: Alice gets $2,000 (§151(d)(1)). Bob is her dependent (qualifying relative with no income), so she gets an additional $2,000 (§151(c)), totaling $4,000.
+4. Phaseout calculation (§151(d)(3)(B)): AGI of $311,510 exceeds the $250,000 threshold (§68(b)(1)(C)) by $61,510. Phaseout percentage = 2% × ceil(61,510/2,500) = 2% × 25 = 50%. Remaining exemptions = $4,000 × (1 - 0.50) = $2,000.
+5. Taxable income: $311,510 - $3,000 - $2,000 = $306,510
+6. Tax under §1(c)(v): $79,772 + 39.6% × ($306,510 - $250,000) = $79,772 + 39.6% × $56,510 = $79,772 + $22,377.96 = $102,149.96
+7. Rounded to nearest whole dollar: $102,150
+
+## Answer
+Answer: 102150
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | cat /app/statute.txt > /tmp/statute.txt && wc -l /tmp/statute.txt | output 157 bytes
+step 3 | head -100 /tmp/statute.txt | output 5781 bytes
+step 4 | grep -n 'standard deduction' /tmp/statute.txt | head -20 | output 1464 bytes
+step 5 | sed -n '378,430p' /tmp/statute.txt | output 2183 bytes
+step 6 | mkdir -p /app/output | output 91 bytes
+step 7 | cat > /app/output/answer.txt <<'EOF' | output 1305 bytes
+step 8 | cat /app/output/answer.txt | output 1252 bytes
+step 9 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

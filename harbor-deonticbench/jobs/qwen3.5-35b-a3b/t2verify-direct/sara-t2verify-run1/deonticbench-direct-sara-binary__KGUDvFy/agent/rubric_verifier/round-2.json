@@ -1,0 +1,47 @@
+{
+  "round": 2,
+  "answer": "Answer: Entailment",
+  "answer_changed": false,
+  "report": {
+    "rubrics": [
+      {
+        "name": "tool_call_integrity",
+        "status": "YES",
+        "evidence": "All commands (cat, grep, sed, python3, echo) ran successfully without errors or truncation affecting the final result."
+      },
+      {
+        "name": "statute_coverage",
+        "status": "YES",
+        "evidence": "Section 3306(a)(2)(B) retrieved at lines 251-350 via sed -n '251,350p' showing the 10 days/5 individuals requirement."
+      },
+      {
+        "name": "grounded_reasoning",
+        "status": "YES",
+        "evidence": "All figures (5 individuals, 10 days, agricultural labor) trace to statute text at lines 271-273 of the sed output."
+      },
+      {
+        "name": "provision_selection",
+        "status": "YES",
+        "evidence": "Solver correctly matched \u00a73306(a)(2)(B) to agricultural labor facts and verified all 12 employment dates had 5+ workers."
+      },
+      {
+        "name": "tool_assisted_computation",
+        "status": "YES",
+        "evidence": "Step 6 ran python3 with datetime.isocalendar() to count 11 different calendar weeks, confirming the prose analysis."
+      }
+    ],
+    "unresolved": [],
+    "suggested_actions": []
+  },
+  "report_text": "VERIFICATION REPORT (round 2 of 3)\n1. Tool-call integrity: YES. All commands (cat, grep, sed, python3, echo) ran successfully without errors or truncation affecting the final result.\n2. Statute coverage: YES. Section 3306(a)(2)(B) retrieved at lines 251-350 via sed -n '251,350p' showing the 10 days/5 individuals requirement.\n3. Grounded reasoning: YES. All figures (5 individuals, 10 days, agricultural labor) trace to statute text at lines 271-273 of the sed output.\n4. Provision selection and application: YES. Solver correctly matched \u00a73306(a)(2)(B) to agricultural labor facts and verified all 12 employment dates had 5+ workers.\n5. Tool-assisted computation: YES. Step 6 ran python3 with datetime.isocalendar() to count 11 different calendar weeks, confirming the prose analysis.",
+  "steps_used": 0,
+  "parse_failures": 0,
+  "context_exceeded": false,
+  "commands": [],
+  "packet_chars": 28597,
+  "prompt_tokens": 11012,
+  "completion_tokens": 969,
+  "n_llm_calls": 1,
+  "elapsed_sec": 59.746418476104736,
+  "trajectory_file": "trajectory.verifier-round-2.json"
+}

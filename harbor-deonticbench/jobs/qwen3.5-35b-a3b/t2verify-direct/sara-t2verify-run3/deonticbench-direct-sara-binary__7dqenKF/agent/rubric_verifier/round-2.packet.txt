@@ -1,0 +1,72 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob have been married since 2 Feb 2015. Bob has no income for 2015.
+
+
+**Question:**
+Alice can receive an exemption for Bob under section 151(b) for the year 2015.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§151(b) - Taxpayer and spouse
+§151(d)(1) - Exemption amount
+§7703(a) - Determination of marital status
+
+## Reasoning
+Under §151(b), an additional exemption is allowed for a spouse if:
+1. A joint return is not made by the taxpayer and spouse
+2. The spouse has no gross income for the calendar year in which the taxable year begins
+3. The spouse is not the dependent of another taxpayer
+
+The facts state:
+- Alice and Bob have been married since 2 Feb 2015 (establishes marital status under §7703)
+- Bob has no income for 2015 (satisfies the no gross income requirement)
+
+The question asks whether Alice "can receive" an exemption for Bob. The facts confirm the marriage and the no gross income condition. The facts do not state that they filed jointly or that Bob is claimed as a dependent by another taxpayer, so those conditions do not contradict the claim. Given the facts, Alice can receive the exemption for Bob under §151(b) for 2015 if she files separately and Bob is not claimed as a dependent by another taxpayer.
+
+## Answer
+Answer: Entailment
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 2115 bytes
+step 3 | (no commands) | output 1866 bytes | task_complete claimed
+step 4 | grep -n -A 15 '^§151\(b\)' /app/statute.txt | output 115 bytes
+step 5 | grep -n '151(b)' /app/statute.txt; grep -n 'Taxpayer and spouse' /app/statute.txt | output 618 bytes
+step 6 | sed -n '55,70p' /app/statute.txt | output 876 bytes
+step 7 | cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 2338 bytes
+step 8 | tail -5 /app/output/answer.txt | output 587 bytes
+step 9 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has ## Statute, ## Reasoning, ## Answer sections and Answer: Entailment line; trajectory shows cat commands ran
+2. Statute coverage: YES. §151(b), §151(d)(1), §7703(a) all exist in statute and appeared in trajectory terminal output
+3. Grounded reasoning: NO. Reasoning at lines 38, 297, 322, 343 of trajectory says 'assuming they file separately and Bob is not claimed as a dependent by another taxpayer' - facts do not state these conditions
+4. Provision selection and application: NO. §151(b) at lines 52-60 has three conditions; facts only confirm 'no gross income'; filing status and dependency status not verified against facts
+5. Tool-assisted computation: NA. Task is entailment/contradiction classification, no numerical computation required
+Unresolved:
+- Verify §151(b) condition 'no joint return' - facts do not state filing status
+- Verify §151(b) condition 'spouse not dependent of another taxpayer' - facts do not state this
+Suggested next actions:
+- grep -n -E '^§151\(b\)' /app/statute.txt to confirm conditions
+- Check case facts for any statement about filing jointly or separately
+- Check case facts for any statement about Bob being claimed as dependent by another taxpayer

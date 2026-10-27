@@ -1,0 +1,45 @@
+New Terminal Output:
+
+root@9f3ff4d2d8a2:/app# sed -n '405,425p' /app/statute.txt
+
+        (A) $500, or
+
+        (B) the sum of $250 and such individual's earned income.
+
+    (6) Certain individuals, etc., not eligible for standard deduction
+
+    In the case of-
+
+        (A) a married individual filing a separate return where either spouse itemizes deductions,
+
+        (B) a nonresident alien individual, or
+
+        (D) an estate or trust, common trust fund, or partnership,
+
+    the standard deduction shall be zero.
+
+    (7) Special rules for taxable years 2018 through 2025
+
+    In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026-
+
+root@9f3ff4d2d8a2:/app# python3 -c "
+> gross_income = 554313
+> standard_deduction = 0  # husband itemizes
+> exemption = 0  # fully phased out at this income level
+> taxable_income = gross_income - standard_deduction - exemption
+> print(f'Taxable income: {taxable_income}')
+> # Married filing separately bracket (v): over 125,000
+> base = 37764.25
+> excess = taxable_income - 125000
+> tax = base + 0.396 * excess
+> print(f'Base: {base}')
+> print(f'Excess: {excess}')
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+Taxable income: 554313
+Base: 37764.25
+Excess: 429313
+Tax: 207772.198
+Rounded: 207772
+root@9f3ff4d2d8a2:/app#

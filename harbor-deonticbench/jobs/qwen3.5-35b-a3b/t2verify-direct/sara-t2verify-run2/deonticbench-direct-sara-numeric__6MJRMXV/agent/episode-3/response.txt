@@ -1,0 +1,13 @@
+
+
+{
+  "analysis": "I have the statute text with line numbers. Now I need to:\n1. Calculate Alice's total itemized deductions: $4,571 + $1,973 + $15,271 = $21,815\n2. Determine filing status: Alice is unmarried (not specified as married or head of household), so §1(c) applies\n3. Check if §68 applies: 2015 is before 2017, so §68 DOES apply\n4. Calculate AGI, itemized deduction reduction under §68, exemption phaseout under §151, taxable income, and tax\n\nLet me verify with Python calculations.",
+  "plan": "Run Python to compute the tax step by step:\n1. Calculate total itemized deductions\n2. Calculate §68 reduction (lesser of 3% of AGI excess over $250,000 or 80% of itemized deductions)\n3. Calculate exemption phaseout (capped at 100%)\n4. Calculate taxable income\n5. Calculate tax using §1(c)(v) bracket",
+  "commands": [
+    {
+      "keystrokes": "python3 << 'PYEOF'\n# Alice's case facts\ngross_income = 395276\nitemized_deductions = 4571 + 1973 + 15271  # $21,815\nprint(f\"Total itemized deductions: ${itemized_deductions}\")\n\n# AGI for unmarried individual (before itemized deductions)\nagi = gross_income\nprint(f\"AGI: ${agi}\")\n\n# §68 reduction (unmarried: applicable amount = $250,000)\nexcess_agi = agi - 250000\nreduction_3_percent = excess_agi * 0.03\nreduction_80_percent = itemized_deductions * 0.80\nsection68_reduction = min(reduction_3_percent, reduction_80_percent)\nprint(f\"§68 reduction: lesser of 3% of excess (${reduction_3_percent}) or 80% of deductions (${reduction_80_percent}) = ${section68_reduction}\")\n\n# Exemption phaseout under §151(d)(3)\nexemption_amount = 2000  # §151(d)(1)\nphaseout_fractions = (excess_agi + 2499.99) // 2500  # fraction thereof\napplicable_percentage = min(phaseout_fractions * 2, 100)  # capped at 100%\nexemption_reduction = exemption_amount * (applicable_percentage / 100)\nprint(f\"Exemption phaseout: {phaseout_fractions} fractions, {applicable_percentage}% reduction, exemption reduced by ${exemption_reduction}\")\n\n# Taxable income\ntaxable_income = agi - section68_reduction - exemption_reduction\nprint(f\"Taxable income: ${taxable_income}\")\n\n# Tax calculation under §1(c)(v) for unmarried with taxable income > $250,000\ntax = 79772 + (taxable_income - 250000) * 0.396\nprint(f\"Tax: ${tax}\")\nprint(f\"Rounded tax: ${round(tax)}\")\nPYEOF\n",
+      "duration": 1.0
+    }
+  ],
+  "task_complete": false
+}

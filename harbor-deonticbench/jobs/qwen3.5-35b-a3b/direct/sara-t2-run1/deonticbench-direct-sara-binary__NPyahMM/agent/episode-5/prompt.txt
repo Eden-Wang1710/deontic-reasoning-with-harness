@@ -1,0 +1,33 @@
+New Terminal Output:
+
+root@18547d2651d1:/app# python3 << 'EOF'
+> from datetime import date, timedelta
+>
+> # Verify Dec 1 and Dec 2, 2017 are in same week
+> d1 = date(2017, 12, 1)
+> d2 = date(2017, 12, 2)
+>
+> print(f"Dec 1, 2017 is a {d1.strftime('%A')}")
+> print(f"Dec 2, 2017 is a {d2.strftime('%A')}")
+> print(f"Difference: {(d2-d1).days} days")
+>
+> # Calendar week (Sunday start)
+> def get_week_number(year, month, day):
+>     d = date(year, month, day)
+>     dow = d.weekday()  # 0=Mon, 6=Sun
+>     days_since_sunday = (dow + 1) % 7
+>     sunday_of_week = d - timedelta(days=days_since_sunday)
+>     jan1 = date(year, 1, 1)
+>     jan1_sunday = jan1 - timedelta(days=jan1.weekday())
+>     week_num = (sunday_of_week - jan1_sunday).days // 7 + 1
+>     return week_num
+>
+> print(f"Week for Dec 1: {get_week_number(2017, 12, 1)}")
+> print(f"Week for Dec 2: {get_week_number(2017, 12, 2)}")
+> EOF
+Dec 1, 2017 is a Friday
+Dec 2, 2017 is a Saturday
+Difference: 1 days
+Week for Dec 1: 48
+Week for Dec 2: 48
+root@18547d2651d1:/app#

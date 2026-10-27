@@ -1,0 +1,82 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice married Bob on May 29th, 2008. Their son Charlie was born October 4th, 2004. Bob died October 22nd, 2016. Alice's gross income for the year 2016 was $113580. In 2017, Alice's gross income was $567192. In 2017, Alice and Charlie lived in a house maintained by Alice. That same year, Alice is allowed a deduction of $59850 for donating cash to a charity.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§2(a) - definition of surviving spouse
+§63(d) - itemized deductions
+§68 - overall limitation on itemized deductions
+§151 - personal exemptions
+§1(a) - tax rates for married individuals filing joint returns and surviving spouses
+
+## Reasoning
+1. Filing Status: Alice is a surviving spouse for 2017. Bob died in 2016 (one of the two preceding years), Alice maintained a household for dependent Charlie in 2017, and Charlie is her qualifying child (born 2004, under age 19, lived with her all year).
+
+2. AGI: $567,192 (gross income for 2017; charitable contribution is an itemized deduction, not above-the-line)
+
+3. Itemized Deductions: Alice donated $59,850 to charity. Under §68, itemized deductions are reduced by the lesser of:
+   - 3% of excess AGI over $300,000 (surviving spouse threshold): 0.03 × $267,192 = $8,015.76
+   - 80% of itemized deductions: 0.80 × $59,850 = $47,880
+   Net itemized deductions = $59,850 - $8,015.76 = $51,834.24
+
+4. Personal Exemptions: Alice gets exemption for herself and Charlie (2 exemptions × $2,000 = $4,000). However, under §151(d)(3), exemptions are phased out by 2% per $2,500 (or fraction) that AGI exceeds $300,000. With $267,192 excess, that's 107 increments = 214% phaseout, exceeding 100%, so exemptions = $0.
+
+5. Taxable Income: $567,192 - $51,834.24 - $0 = $515,357.76
+
+6. Tax Calculation (§1(a)): For taxable income over $250,000:
+   Tax = $75,528.50 + 39.6% × ($515,357.76 - $250,000)
+   Tax = $75,528.50 + 0.396 × $265,357.76
+   Tax = $75,528.50 + $105,081.67 = $180,610.17
+   Rounded to whole dollar: $180,610
+
+## Answer
+Answer: 180610
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | python3 -c " | output 1861 bytes
+step 3 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 2522 bytes
+step 4 | cat /app/output/answer.txt | output 1745 bytes
+step 5 | tail -1 /app/output/answer.txt | output 2040 bytes | task_complete claimed
+step 6 | sed -n '358,380p' /app/statute.txt; grep -n -i 'prior\|previous\|2016' /app/statute.txt | output 1002 bytes
+step 7 | cat > /app/output/answer.txt <<'EOF' | output 1776 bytes
+step 8 | cat /app/output/answer.txt | output 1710 bytes
+step 9 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has all three sections and ends with Answer: line; trajectory shows 5 steps with answer file creation and verification
+2. Statute coverage: NO. §63(c)(2)(A) cited but not used - solver applied itemized deductions (§68) not standard deduction under §63(c)(2)(A)
+3. Grounded reasoning: YES. All numbers in Reasoning trace to cited sections: §68 threshold $300,000 (line 487), §151 phaseout 2%/$2,500 (lines 69-71), §1(a) brackets (lines 13-17), facts from instruction
+4. Provision selection and application: NO. §63(c)(2)(A) mismatched to reasoning (itemized vs standard deduction); 2016 income $113,580 is UNUSED with no section engaging prior-year income
+5. Tool-assisted computation: YES. Trajectory step 2 shows python3 -c command executed; §68 reduction and §151 phaseout calculations match tool-assisted approach
+Unresolved:
+- §63(c)(2)(A) cited but not used - verify if standard deduction applies or remove cite
+- 2016 income $113,580 unused - search if any section uses prior-year income
+Suggested next actions:
+- sed -n '358,380p' /app/statute.txt to check §63(c)(2)(A) standard deduction amounts
+- grep -n -i 'prior|2016|previous year' /app/statute.txt to find any prior-year income engagement
+- Remove §63(c)(2)(A) from Statute section if standard deduction was not actually applied

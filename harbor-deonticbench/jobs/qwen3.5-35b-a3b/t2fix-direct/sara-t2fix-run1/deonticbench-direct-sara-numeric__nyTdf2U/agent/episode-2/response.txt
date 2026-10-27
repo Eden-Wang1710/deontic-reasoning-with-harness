@@ -1,0 +1,12 @@
+
+
+{
+  "analysis": "I calculated the tax as $4,858, but I need to reconsider. Looking at the statute again, §63(f) provides additional amounts for the aged ($600). Alice was born March 2, 1950, so she was 67 in 2017 (attained age 65 before close of taxable year). She should get an additional $600 standard deduction for being aged.",
+  "plan": "Recalculate with the additional standard deduction for age ($600). So:\n- Income: $36,266\n- Standard deduction: $6,350 + $600 (aged) = $6,950\n- Exemptions: $4,000 ($2,000 for Alice + $2,000 for Bob)\n- Taxable income: $36,266 - $6,950 - $4,000 = $25,316\n- Tax: $2,767.50 + 28% of ($25,316 - $18,450)",
+  "commands": [
+    {
+      "keystrokes": "python3 -c \"income = 36266; std_ded = 6350 + 600; exemptions = 4000; taxable = income - std_ded - exemptions; print(f'Taxable income: {taxable}')\nbase_tax = 2767.50\nexcess = taxable - 18450\ntax = base_tax + 0.28 * excess\nprint(f'Tax: {tax}')\nprint(f'Rounded: {round(tax)}')\"\n",
+      "duration": 1.0
+    }
+  ]
+}

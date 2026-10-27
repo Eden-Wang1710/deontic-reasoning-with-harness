@@ -1,0 +1,43 @@
+New Terminal Output:
+
+root@6344a1487f15:/app# python3 << 'EOF'
+> # Case facts
+> alice_income = 71879
+> bob_income = 11213
+> gross_income = alice_income + bob_income
+>
+> # Standard deduction for joint return: 200% of $3,000
+> standard_deduction = 2 * 3000
+>
+> # Exemptions: Alice + Bob + Charlie (qualifying child)
+> exemption_amount = 2000
+> total_exemptions = 3 * exemption_amount
+>
+> # Taxable income
+> taxable_income = gross_income - standard_deduction - total_exemptions
+>
+> # Tax calculation for joint filers (§1(a)(ii))
+> # $5,535 plus 28% of excess over $36,900
+> if taxable_income <= 36900:
+>     tax = 0.15 * taxable_income
+> elif taxable_income <= 89150:
+>     tax = 5535 + 0.28 * (taxable_income - 36900)
+> elif taxable_income <= 140000:
+>     tax = 20165 + 0.31 * (taxable_income - 89150)
+> else:
+>     tax = 75528.50 + 0.396 * (taxable_income - 250000)
+>
+> print(f"Gross Income: {gross_income}")
+> print(f"Standard Deduction: {standard_deduction}")
+> print(f"Total Exemptions: {total_exemptions}")
+> print(f"Taxable Income: {taxable_income}")
+> print(f"Tax: {tax}")
+> print(f"Tax (rounded): {round(tax)}")
+> EOF
+Gross Income: 83092
+Standard Deduction: 6000
+Total Exemptions: 6000
+Taxable Income: 71092
+Tax: 15108.76
+Tax (rounded): 15109
+root@6344a1487f15:/app#

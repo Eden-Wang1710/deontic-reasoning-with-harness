@@ -1,0 +1,11 @@
+def compose_prompt_source_binary(statutes: str, case: Dict) -> str:
+    """Create a formatted prompt for binary (entailment/contradiction) direct solving."""
+    return (f"Statutes:\n{statutes}\n\n"
+            f"Case: {case['text']}\n\n"
+            f"Claim: {case['question']}\n\n"
+            "The claim above makes a statement about the case in relation to the statutes. "
+            "Determine whether the claim is correct (Entailment) or incorrect (Contradiction) "
+            "based on the case and statutes above. "
+            "Your answer should be exactly one of: Entailment or Contradiction. "
+            "Indicate your answer using \\boxed{}"
+            " Think step-by-step before answering.")

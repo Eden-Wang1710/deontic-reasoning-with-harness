@@ -1,0 +1,21 @@
+
+
+{
+  "analysis": "I've read the statute which contains tax rates and deduction rules. I need to calculate Alice's 2017 tax. From the facts: Alice was paid $200 for services and $31,220 in remuneration, so her gross income is $31,420. She's unmarried (no spouse mentioned) and takes the standard deduction. I need to determine her filing status, deductions, and apply the correct tax bracket.",
+  "plan": "1. Calculate gross income: $200 + $31,220 = $31,420\n2. Determine filing status: Single (unmarried individual)\n3. From §162(c)(1)(B), standard deduction for unmarried individuals = $3,000\n4. From §151(d)(1), personal exemption = $2,000\n5. Taxable income = $31,420 - $3,000 - $2,000 = $26,420\n6. Apply §1(c) tax brackets for unmarried individuals:\n   - 15% on first $22,100 = $3,315\n   - 28% on excess over $22,100 = 28% × $4,320 = $1,209.60\n7. Total tax = $3,315 + $1,209.60 = $4,524.60, rounded to $4,525\n8. Write answer to /app/output/answer.txt",
+  "commands": [
+    {
+      "keystrokes": "mkdir -p /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat > /app/output/answer.txt << 'EOF'\nAnswer: 4525\nEOF\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/output/answer.txt\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

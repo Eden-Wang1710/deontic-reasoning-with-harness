@@ -1,0 +1,56 @@
+New Terminal Output:
+
+root@81b451293f1b:/app# cat > /tmp/calc.py << 'PYEOF'
+> import math
+>
+> # Alice's data
+> gross_income = 311510
+> standard_deduction = 3000
+> exemption_amount = 2000
+>
+> # Phaseout calculation for unmarried (applicable amount = $250,000)
+> applicable_amount = 250000
+> excess_agi = gross_income - applicable_amount
+> print(f'AGI excess over applicable amount: ${excess_agi}')
+>
+> # 2 percentage points for each $2,500 (or fraction thereof)
+> fractions = math.ceil(excess_agi / 2500)
+> print(f'Number of $2,500 fractions: {fractions}')
+> applicable_percentage = fractions * 2
+> print(f'Applicable percentage: {applicable_percentage}%')
+>
+> # Reduce exemption by applicable percentage
+> reduction = exemption_amount * (applicable_percentage / 100)
+> allowed_exemption = exemption_amount - reduction
+> print(f'Exemption reduction: ${reduction}')
+> print(f'Allowed exemption: ${allowed_exemption}')
+>
+> # Taxable income
+> taxable_income = gross_income - standard_deduction - allowed_exemption
+> print(f'Taxable income: ${taxable_income}')
+>
+> # Tax calculation per §1(c)(v)
+> # $79,772.50, plus 39.6% of the excess over $250,000
+> base_tax = 79772.50
+> excess_over_250k = taxable_income - 250000
+> tax_on_excess = excess_over_250k * 0.396
+> total_tax = base_tax + tax_on_excess
+> print(f'Base tax: ${base_tax}')
+> print(f'Excess over $250,000: ${excess_over_250k}')
+> print(f'Tax on excess: ${tax_on_excess}')
+> print(f'Total tax: ${total_tax}')
+> print(f'Rounded: ${round(total_tax)}')
+> PYEOF
+root@81b451293f1b:/app# python3 /tmp/calc.py
+AGI excess over applicable amount: $61510
+Number of $2,500 fractions: 25
+Applicable percentage: 50%
+Exemption reduction: $1000.0
+Allowed exemption: $1000.0
+Taxable income: $307510.0
+Base tax: $79772.5
+Excess over $250,000: $57510.0
+Tax on excess: $22773.960000000003
+Total tax: $102546.46
+Rounded: $102546
+root@81b451293f1b:/app#

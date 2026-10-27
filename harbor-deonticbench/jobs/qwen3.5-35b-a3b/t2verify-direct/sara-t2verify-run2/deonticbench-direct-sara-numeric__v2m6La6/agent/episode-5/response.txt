@@ -1,0 +1,20 @@
+
+
+{
+  "analysis": "I can see the basic standard deduction is $3,000 for 'any other case'. But I need to understand: (1) Alice's filing status (married filing separately), (2) exemption amounts, (3) whether Bob qualifies as a dependent, and (4) the exemption phaseout rules.",
+  "plan": "Let me search for more specific rules about married filing separately standard deduction, AGI definition, and exemption phaseout applicable amounts.",
+  "commands": [
+    {
+      "keystrokes": "grep -n 'married.*separate' /app/statute.txt | head -20\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "sed -n '405,425p' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "grep -n 'adjusted gross income' /app/statute.txt | head -10\n",
+      "duration": 0.5
+    }
+  ]
+}

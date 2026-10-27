@@ -1,0 +1,15 @@
+New Terminal Output:
+
+root@4fe1dac3e47f:/app# python3 -c "
+> gross_income = 22895
+> standard_deduction = 4400  # Head of Household 2017
+> exemption_amount = 2000  # per person
+> exemptions = 2  # Alice + Bob
+> taxable_income = gross_income - standard_deduction - (exemption_amount * exemptions)
+> print(f'Taxable Income: {taxable_income}')
+> tax = round(taxable_income * 0.15)
+> print(f'Tax: {tax}')
+> "
+Taxable Income: 14495
+Tax: 2174
+root@4fe1dac3e47f:/app#

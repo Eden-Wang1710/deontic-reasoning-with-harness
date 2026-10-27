@@ -1,0 +1,100 @@
+New Terminal Output:
+
+root@20f672ae51f1:/app# python3 << 'EOF'
+s[worker] += 1
+
+# Total wages
+TOTAL_WAGES = sum(count * WAGE_PER_WORKER for count in workers.values())
+print(f"Total wages paid: ${TOTAL_WAGES}")
+
+# Check employer threshold (Section 269)
+print(f"Exceeds $20,000 threshold: {TOTAL_WAGES >= 20000}")
+
+# Taxable income (Section 162(b) - standard deduction and personal exemption)
+STANDARD_DEDUCTION = 3000  # Section 395(C) - unmarried
+PERSONAL_EXEMPTION = 2000  # Section 72
+TAXABLE_INCOME = GROSS_INCOME - STANDARD_DEDUCTION - PERSONAL_EXEMPTION
+print(f"Taxable income: ${TAXABLE_INCOME}")
+
+# Income tax (Section 1(c)(v) - unmarried, over $250,000)
+BASE_TAX = 79772
+EXCESS = TAXABLE_INCOME - 250000
+RATE = 0.396
+INCOME_TAX = BASE_TAX + RATE * EXCESS
+print(f"Income tax: ${INCOME_TAX}")
+
+# Employer excise tax (Section 247)
+EMPLOYER_TAX_RATE = 0.06
+EMPLOYER_TAX = EMPLOYER_TAX_RATE * TOTAL_WAGES
+print(f"Employer excise tax: ${EMPLOYER_TAX}")
+
+# Total tax
+TOTAL_TAX = INCOME_TAX + EMPLOYER_TAX
+print(f"Total tax: ${TOTAL_TAX}")
+print(f"Rounded: ${round(TOTAL_TAX)}")
+EOF
+> # Calculate Alice's tax
+>
+> # Facts
+> GROSS_INCOME = 567192
+> WAGE_PER_WORKER = 550
+>
+> # Count worker occasions
+> workers = {'Bob': 0, 'Cameron': 0, 'Dan': 0, 'Emily': 0, 'Fred': 0, 'George': 0}
+> occasions = [
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred'],      # Jan 24
+>     ['Bob', 'Cameron', 'Fred'],                      # Feb 4
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred'],      # Mar 3
+>     ['Cameron', 'Dan', 'Emily', 'Fred', 'George'],   # Mar 19
+>     ['Bob', 'Cameron', 'Dan', 'Fred', 'George'],     # Apr 2
+>     ['Cameron', 'Dan', 'Emily', 'Fred', 'George'],   # May 9
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'George'],    # Oct 15
+>     ['Bob', 'Emily', 'Fred', 'George'],              # Oct 25
+>     ['Bob', 'Cameron', 'Emily', 'Fred', 'George'],   # Nov 8
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred'],      # Nov 22
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'George'],    # Dec 1
+>     ['Bob', 'Cameron', 'Dan', 'Emily', 'George'],    # Dec 3
+> ]
+>
+> for occasion in occasions:
+>     for worker in occasion:
+>         workers[worker] += 1
+>
+> # Total wages
+> TOTAL_WAGES = sum(count * WAGE_PER_WORKER for count in workers.values())
+> print(f"Total wages paid: ${TOTAL_WAGES}")
+>
+> # Check employer threshold (Section 269)
+> print(f"Exceeds $20,000 threshold: {TOTAL_WAGES >= 20000}")
+>
+> # Taxable income (Section 162(b) - standard deduction and personal exemption)
+> STANDARD_DEDUCTION = 3000  # Section 395(C) - unmarried
+> PERSONAL_EXEMPTION = 2000  # Section 72
+> TAXABLE_INCOME = GROSS_INCOME - STANDARD_DEDUCTION - PERSONAL_EXEMPTION
+> print(f"Taxable income: ${TAXABLE_INCOME}")
+>
+> # Income tax (Section 1(c)(v) - unmarried, over $250,000)
+> BASE_TAX = 79772
+> EXCESS = TAXABLE_INCOME - 250000
+> RATE = 0.396
+> INCOME_TAX = BASE_TAX + RATE * EXCESS
+> print(f"Income tax: ${INCOME_TAX}")
+>
+> # Employer excise tax (Section 247)
+> EMPLOYER_TAX_RATE = 0.06
+> EMPLOYER_TAX = EMPLOYER_TAX_RATE * TOTAL_WAGES
+> print(f"Employer excise tax: ${EMPLOYER_TAX}")
+>
+> # Total tax
+> TOTAL_TAX = INCOME_TAX + EMPLOYER_TAX
+> print(f"Total tax: ${TOTAL_TAX}")
+> print(f"Rounded: ${round(TOTAL_TAX)}")
+> EOF
+Total wages paid: $31350
+Exceeds $20,000 threshold: True
+Taxable income: $562192
+Income tax: $203400.032
+Employer excise tax: $1881.0
+Total tax: $205281.032
+Rounded: $205281
+root@20f672ae51f1:/app#

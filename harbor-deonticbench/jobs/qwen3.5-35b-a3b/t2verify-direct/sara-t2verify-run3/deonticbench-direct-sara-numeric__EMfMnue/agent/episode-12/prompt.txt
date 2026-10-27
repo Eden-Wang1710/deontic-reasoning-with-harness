@@ -1,0 +1,11 @@
+New Terminal Output:
+
+root@741f32070e75:/app# python3 -c "from datetime import date; born=date(2000,1,25); end=date(2017,12,31); age=end.year-born.year-(end.month,end.day)<(born.mont
+h,born.day); print(f'Age at end of 2017: {age}')"
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    from datetime import date; born=date(2000,1,25); end=date(2017,12,31); age=end.year-born.year-(end.month,end.day)<(born.month,born.day); print(f'Age at end
+of 2017: {age}')
+                                                                               ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~
+TypeError: unsupported operand type(s) for -: 'int' and 'tuple'
+root@741f32070e75:/app#

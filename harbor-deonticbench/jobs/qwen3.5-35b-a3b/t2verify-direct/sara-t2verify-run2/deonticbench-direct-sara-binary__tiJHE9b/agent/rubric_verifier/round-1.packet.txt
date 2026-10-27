@@ -1,0 +1,74 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice is married under section 7703 for the year 2017. Alice files a joint return with her spouse for 2017. Alice's and her spouse's taxable income for the year 2017 is $17330.
+
+
+**Question:**
+Alice and her spouse have to pay $2600 in taxes for the year 2017 under section 1(a)(i).
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+§1. Tax imposed
+
+(a) Married individuals filing joint returns and surviving spouses
+
+There is hereby imposed on the taxable income of-
+
+    (1) every married individual (as defined in section 7703) who makes a single return jointly with his spouse, and
+
+    (2) every surviving spouse (as defined in section 2(a)),
+
+a tax determined in accordance with the following:
+
+    (i) 15% of taxable income if the taxable income is not over $36,900; (line 13)
+
+§7703. Determination of marital status
+
+(a) General rule
+
+    (1) the determination of whether an individual is married shall be made as of the close of his taxable year; except that if his spouse dies during his taxable year such determination shall be made as of the time of such death; and (line 508)
+
+## Reasoning
+
+1. Alice is married under section 7703 (given in case facts), as defined by §7703(a)(1) at line 508 which states "the determination of whether an individual is married shall be made as of the close of his taxable year".
+
+2. Alice files a joint return with her spouse (given in case facts), so she falls under §1(a)(1) at line 7: "every married individual (as defined in section 7703) who makes a single return jointly with his spouse".
+
+3. Alice's taxable income is $17,330 (given in case facts).
+
+4. Since $17,330 is not over $36,900, the tax rate from §1(a)(i) at line 13 applies: "15% of taxable income if the taxable income is not over $36,900".
+
+5. Tax calculation: 0.15 × $17,330 = $2,599.50
+
+6. The claim states Alice and her spouse have to pay $2,600 in taxes. However, the statute requires 15% of $17,330 = $2,599.50.
+
+7. Since $2,599.50 ≠ $2,600, the claim is false.
+
+## Answer
+Answer: Contradiction
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '7703' /app/statute.txt; grep -n '15% of taxable income if the taxable income is not over' /app/statute.txt; python3 -c "print(0.15 * 17330)" | output 1751 bytes
+step 3 | sed -n '1,15p' /app/statute.txt; sed -n '504,510p' /app/statute.txt | output 1273 bytes
+step 4 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF'; cat /app/output/answer.txt | output 3677 bytes
+step 5 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

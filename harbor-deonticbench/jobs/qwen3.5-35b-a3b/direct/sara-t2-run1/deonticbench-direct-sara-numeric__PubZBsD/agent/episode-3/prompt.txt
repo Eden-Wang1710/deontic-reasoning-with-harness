@@ -1,0 +1,35 @@
+New Terminal Output:
+
+root@c9d8294a9c4a:/app# python3 -c "
+> # Gross income
+> alice_income = 133200
+> bob_income = 44311
+> gross = alice_income + bob_income
+>
+> # Standard deduction for married filing jointly: 8800
+> # Additional for blind (Alice): 600
+> std_ded = 8800 + 600
+>
+> # Personal exemptions: 2000 each for Alice and Bob
+> exemptions = 2000 + 2000
+>
+> # Taxable income
+> taxable = gross - std_ded - exemptions
+> print(f'Gross income: {gross}')
+> print(f'Standard deduction: {std_ded}')
+> print(f'Exemptions: {exemptions}')
+> print(f'Taxable income: {taxable}')
+>
+> # Tax bracket: over 140000 but not over 250000
+> # 35928.50 + 36% of excess over 140000
+> tax = 35928.50 + 0.36 * (taxable - 140000)
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+Gross income: 177511
+Standard deduction: 9400
+Exemptions: 4000
+Taxable income: 164111
+Tax: 44608.46
+Rounded: 44608
+root@c9d8294a9c4a:/app#

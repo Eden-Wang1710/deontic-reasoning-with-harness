@@ -1,0 +1,17 @@
+
+
+{
+  "analysis": "I found the qualifying relative section at line 151. I need to see the full definition of qualifying relative to determine if Charlie qualifies as a dependent. I also need to find information about adjustments to income for retirement and health insurance.",
+  "plan": "Let me view the qualifying relative section (lines 151-180) and search for adjustments to income.",
+  "commands": [
+    {
+      "keystrokes": "sed -n '151,195p' /app/statute.txt\n",
+      "duration": 0.5
+    },
+    {
+      "keystrokes": "grep -n 'adjusted gross\\|AGI' /app/statute.txt\n",
+      "duration": 0.5
+    }
+  ],
+  "task_complete": false
+}

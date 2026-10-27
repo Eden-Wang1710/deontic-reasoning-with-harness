@@ -1,0 +1,79 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice and Bob got married on Feb 3rd, 1992. Alice died on July 9th, 2014.
+
+
+**Question:**
+Section 2(b)(2)(C) applies to Bob in 2014.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+Section 2(b)(2)(C) at line 232:
+
+    (C) a taxpayer shall be considered as married at the close of his taxable year if his spouse (other than a spouse described in subparagraph (B)) died during the taxable year.
+
+## Reasoning
+
+The facts state:
+- Alice and Bob got married on Feb 3rd, 1992
+- Alice died on July 9th, 2014
+- We are evaluating whether Section 2(b)(2)(C) applies to Bob in 2014
+
+Section 2(b)(2)(C) provides that a taxpayer shall be considered as married at the close of his taxable year if his spouse died during the taxable year.
+
+The computation:
+- Alice's death date: July 9th, 2014 (from case facts)
+- Bob's taxable year in question: 2014
+- Since July 9th, 2014 is within the year 2014, Alice died during Bob's 2014 taxable year.
+
+Therefore, Section 2(b)(2)(C) applies to Bob in 2014 because his spouse Alice died during the taxable year 2014.
+
+## Answer
+Answer: Entailment
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '2(b)' /app/statute.txt; grep -n '2(b)(2)' /app/statute.txt | output 989 bytes
+step 3 | grep -n 'section 2' /app/statute.txt | head -30 | output 992 bytes
+step 4 | grep -n '^§2' /app/statute.txt; grep -n '2(a)' /app/statute.txt | head -20 | output 743 bytes
+step 5 | sed -n '182,280p' /app/statute.txt | output 6146 bytes
+step 6 | sed -n '222p' /app/statute.txt; sed -n '210,225p' /app/statute.txt | output 1509 bytes
+step 7 | grep -n 'died during the taxable year' /app/statute.txt | output 314 bytes
+step 8 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1101 bytes
+step 9 | cat /app/output/answer.txt | output 1000 bytes
+step 10 | (no commands) | output 1556 bytes | task_complete claimed
+step 11 | grep -n 'nonresident alien' /app/statute.txt; sed -n '228,235p' /app/statute.txt | output 1414 bytes
+step 12 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: no
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: YES. Answer file has all three required sections; step 6 displayed section 2(b)(2)(C) at lines 220-235.
+2. Statute coverage: YES. Line 232 quote matches statute text; section 2(b)(2)(B) exception text also displayed in step 6 output.
+3. Grounded reasoning: YES. Quote is verbatim at line 232; all facts (Marriage Feb 3 1992, death July 9 2014) from case instruction; year 2014 from question.
+4. Provision selection and application: UNKNOWN. Section 2(b)(2)(B) exception for nonresident alien spouse was displayed but not checked against facts; facts do not state spouse's residency status.
+5. Tool-assisted computation: NA. Entailment question requires no arithmetic computation.
+Unresolved:
+- Check whether section 2(b)(2)(B) exception applies: verify spouse is not a nonresident alien
+Suggested next actions:
+- grep -n 'nonresident alien' /app/statute.txt to see the (B) exception text
+- Check facts for any mention of spouse's residency or citizenship status
+- Verify whether the statute provides default treatment when exception status is unknown

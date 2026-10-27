@@ -1,0 +1,64 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice was paid $200 in March 2017 for services performed at Johns Hopkins Hospital. Alice was a patient at Johns Hopkins Hospital from March 15th, 2017 to April 2nd, 2017. In 2017, Alice was also paid $31220 in remuneration. Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+§1(c) - Tax rates for unmarried individuals
+§63(c)(2)(C) - Basic standard deduction for unmarried individuals
+§151(d)(1) - Exemption amount
+
+## Reasoning
+Alice's gross income consists of:
+- $200 for services performed at Johns Hopkins Hospital
+- $31,220 in remuneration
+Total gross income = $31,420
+
+Alice is an unmarried individual (not married, not head of household, not surviving spouse).
+
+Standard deduction (§63(c)(2)(C)): $3,000 for unmarried individuals
+Personal exemption (§151(d)(1)): $2,000
+
+Taxable income = Gross income - Standard deduction - Personal exemption
+Taxable income = $31,420 - $3,000 - $2,000 = $26,420
+
+Under §1(c)(ii), for unmarried individuals with taxable income over $22,100 but not over $53,500:
+Tax = $3,315 + 28% of excess over $22,100
+Excess = $26,420 - $22,100 = $4,320
+28% of $4,320 = $1,209.60
+Tax = $3,315 + $1,209.60 = $4,524.60
+
+Rounded to whole dollar: $4,525
+
+## Answer
+Answer: 4525
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '6350\|12700\|9350\|18650\|standard' /app/statute.txt | output 1469 bytes
+step 3 | sed -n '386,397p' /app/statute.txt | output 520 bytes
+step 4 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 1151 bytes
+step 5 | cat /app/output/answer.txt | output 1039 bytes
+step 6 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 1 of 3 ===

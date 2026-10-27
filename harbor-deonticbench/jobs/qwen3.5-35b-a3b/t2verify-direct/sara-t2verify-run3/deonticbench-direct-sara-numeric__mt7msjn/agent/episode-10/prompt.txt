@@ -1,0 +1,29 @@
+New Terminal Output:
+
+root@a2d72f646a63:/app# python3 -c "
+> agi = 554313
+> threshold = 150000
+> excess = agi - threshold
+> units = (excess + 1249) // 1250  # ceiling division for 'fraction thereof'
+> percent = min(100, units * 2)
+> print(f'AGI: {agi}')
+> print(f'Threshold: {threshold}')
+> print(f'Excess: {excess}')
+> print(f'Units of 1250: {units}')
+> print(f'Phaseout percent: {percent}%')
+> print(f'Exemption amount: {2000 * (1 - percent/100)}')
+>
+> # Tax calculation
+> tax = 37764.25 + 0.396 * (554313 - 125000)
+> print(f'Tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+AGI: 554313
+Threshold: 150000
+Excess: 404313
+Units of 1250: 324
+Phaseout percent: 100%
+Exemption amount: 0.0
+Tax: 207772.198
+Rounded: 207772
+root@a2d72f646a63:/app#

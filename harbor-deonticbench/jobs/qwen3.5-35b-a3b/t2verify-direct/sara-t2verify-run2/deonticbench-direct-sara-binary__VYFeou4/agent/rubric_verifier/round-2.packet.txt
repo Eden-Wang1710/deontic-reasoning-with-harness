@@ -1,0 +1,107 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice has paid wages of $3200 to Bob for domestic service done in her home from Feb 1st, 2017 to Sep 2nd, 2017, in Baltimore, Maryland, USA.
+
+
+**Question:**
+Section 3306(c)(2) applies to Alice employing Bob for the year 2017.
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is exactly "Entailment" (the claim is true given the statute and facts) or "Contradiction" (the claim is false). E.g., `Answer: Entailment`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+Section 3306(c)(2) (lines 327-328):
+"(2) domestic service in a private home, local college club, or local chapter of a college fraternity or sorority unless performed for a person who paid cash remuneration of $1,000 or more to individuals employed in such domestic service in the calendar year or the preceding calendar year;"
+
+Section 3306(a)(3) (lines 273-274):
+"(3) Domestic service
+    In the case of domestic service in a private home, local college club, or local chapter of a college fraternity or sorority, the term 'employer' means, with respect to any calendar year, any person who during the calendar year or the preceding calendar year paid wages in cash of $1,000 or more for such service."
+
+## Reasoning
+
+1. From the case facts: Alice paid wages of $3200 to Bob for domestic service done in her home from Feb 1st, 2017 to Sep 2nd, 2017.
+
+2. From Section 3306(c)(2): Domestic service in a private home is NOT considered "employment" UNLESS the person paid cash remuneration of $1,000 or more to individuals employed in such domestic service in the calendar year or preceding calendar year.
+
+3. From Section 3306(a)(3): For domestic service in a private home, the term "employer" means any person who during the calendar year or preceding calendar year paid wages in cash of $1,000 or more for such service.
+
+4. Computation (run with python3): python3 -c 'print(3200 > 1000, 3200 - 1000)'
+   Result: True 2200
+   Since 3200 > 1000 is True, the exception in 3306(c)(2) does not apply, meaning the domestic service IS considered "employment" under the statute.
+
+5. Since Alice paid $3200 (which exceeds the $1000 threshold) for domestic service in her home in 2017, Section 3306(c)(2) applies to determine that this is employment (the exception for domestic service is overridden because the payment threshold was met).
+
+## Answer
+Answer: Entailment
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n '3306' /app/statute.txt | output 471 bytes
+step 3 | sed -n '251,320p' /app/statute.txt | output 4917 bytes
+step 4 | sed -n '320,380p' /app/statute.txt | output 3122 bytes
+step 5 | sed -n '265,275p' /app/statute.txt | output 965 bytes
+step 6 | mkdir -p /app/output; cat > /app/output/answer.txt <<'EOF' | output 2082 bytes
+step 7 | cat /app/output/answer.txt | output 1981 bytes
+step 8 | (no commands) | output 1775 bytes | task_complete claimed
+step 9 | python3 -c 'print(3200 > 1000, 3200 - 1000)' | output 125 bytes
+step 10 | cat > /app/output/answer.txt <<'EOF' | output 2923 bytes
+step 11 | cat /app/output/answer.txt | output 1975 bytes
+step 12 | tail -1 /app/output/answer.txt | output 120 bytes
+step 13 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+{
+  "analysis": "Completed all five rubric checks. Tool-call integrity, statute coverage, grounded reasoning, and provision selection are satisfied. Computation was done in prose without python3/bc/awk.",
+  "commands": [],
+  "report": {
+    "rubrics": [
+      {
+        "name": "tool_call_integrity",
+        "status": "YES",
+        "evidence": "Answer file has all three sections with Answer: line; trajectory shows sed commands ran and displayed content (steps 3-5)"
+      }
+    ],
+    "facts": [
+      {
+        "fact": "Alice paid wages of $3200 to Bob for domestic service done in her home from Feb 1st, 2017 to Sep 2nd, 2017",
+        "used_by": "3306(c)(2) and 3306(a)(3)"
+      },
+      {
+        "fact": "Service location: domestic service in private home",
+        "used_by": "3306(c)(2) and 3306(a)(3)"
+      },
+      {
+        "fact": "Year: 2017",
+        "used_by": "3306(c)(2) and 3306(a)(3)"
+      }
+    ],
+    "quoted_lines": [
+      "275",
+      "325"
+    ],
+    "unresolved": [
+      "Computation was performed in prose; rubric requires numerical steps executed with python3, bc, or awk"
+    ],
+    "suggested_actions": [
+      "Re-run the threshold comparison with python3: python3 -c 'print(3200 > 1000)' and compare with the figure in your Reasoning section"
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+
+
+{
+  "analysis": "I've read the statute which contains tax rates and deduction rules. I need to apply these to the facts: Alice ($71,879) and Bob ($11,213) file jointly in 2013. They have a child Charlie (born 2000, so 13 years old in 2013). I need to calculate their taxable income and tax.",
+  "plan": "1. Calculate gross income: $71,879 + $11,213 = $83,092\n2. Determine standard deduction for married filing jointly (from §162(c)(2)(A), it's 2x unmarried amount of $3,000 = $6,000)\n3. Determine personal exemptions: Alice ($2,000) + Bob ($2,000) + Charlie as dependent ($2,000) = $6,000\n4. Calculate taxable income: $83,092 - $6,000 - $6,000 = $71,092\n5. Apply tax brackets from §1(a): For income over $36,900 but not over $89,150: $5,535 + 28% of excess over $36,900\n6. Write answer to file",
+  "commands": [
+    {
+      "keystrokes": "mkdir -p /app/output\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "echo 'Answer: 15109' > /app/output/answer.txt\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cat /app/output/answer.txt\n",
+      "duration": 0.1
+    }
+  ],
+  "task_complete": false
+}

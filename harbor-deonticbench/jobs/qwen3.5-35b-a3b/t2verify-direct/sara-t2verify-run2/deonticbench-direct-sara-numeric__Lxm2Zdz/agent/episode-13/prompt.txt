@@ -1,0 +1,74 @@
+New Terminal Output:
+
+root@9aaaffa9e76f:/app# python3 -c "
+> # Agricultural labor employment tax calculation
+>
+> # Payment schedule (date: workers)
+> payments = [
+>     ('Jan 24', ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred']),      # 5 workers
+>     ('Feb 4', ['Bob', 'Cameron', 'Fred']),                       # 3 workers
+>     ('Mar 3', ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred']),       # 5 workers
+>     ('Mar 19', ['Cameron', 'Dan', 'Emily', 'Fred', 'George']),   # 5 workers
+>     ('Apr 2', ['Bob', 'Cameron', 'Dan', 'Fred', 'George']),      # 5 workers
+>     ('May 9', ['Cameron', 'Dan', 'Emily', 'Fred', 'George']),    # 5 workers
+>     ('Oct 15', ['Bob', 'Cameron', 'Dan', 'Emily', 'George']),    # 5 workers
+>     ('Oct 25', ['Bob', 'Emily', 'Fred', 'George']),              # 4 workers
+>     ('Nov 8', ['Bob', 'Cameron', 'Emily', 'Fred', 'George']),    # 5 workers
+>     ('Nov 22', ['Bob', 'Cameron', 'Dan', 'Emily', 'Fred']),      # 5 workers
+>     ('Dec 1', ['Bob', 'Cameron', 'Dan', 'Emily', 'George']),     # 5 workers
+>     ('Dec 3', ['Bob', 'Cameron', 'Dan', 'Emily', 'George']),     # 5 workers
+> ]
+>
+> wage_per_occasion = 632
+>
+> # Count days with 5+ workers (for §3306(a)(2)(B) threshold)
+> days_with_5_plus = sum(1 for workers in payments if len(workers) >= 5)
+> print(f'Days with 5+ workers: {days_with_5_plus}')
+>
+> # Check if Alice is an employer under §3306(a)(2)
+> # She employed 5 workers on 10 days - meets threshold!
+> print(f'Is Alice an agricultural labor employer? {days_with_5_plus >= 10}')
+>
+> # Count total worker occurrences and wages per worker
+> from collections import Counter
+> worker_counts = Counter()
+> for workers in payments:
+>     for w in workers:
+>         worker_counts[w] += 1
+>
+> print(f'Worker occurrences: {dict(worker_counts)}')
+>
+> # Calculate total wages and taxable wages
+> # Per §3306(b)(1): wages exclude remuneration after $7000 paid to an individual
+> total_wages = 0
+> taxable_wages = 0
+> for worker, count in worker_counts.items():
+>     worker_total = count * wage_per_occasion
+>     total_wages += worker_total
+>     # Apply $7000 exclusion
+>     taxable = max(0, worker_total - 7000)
+>     taxable_wages += taxable
+>     print(f'{worker}: {count} occasions × \${wage_per_occasion} = \${worker_total}, taxable = \${taxable}')
+>
+> print(f'Total wages: \${total_wages}')
+> print(f'Taxable wages (after \$7000 exclusion): \${taxable_wages}')
+>
+> # 6% employment tax per §3301
+> employment_tax = taxable_wages * 0.06
+> print(f'Employment tax (6%): \${employment_tax}')
+>
+> # Income tax from before
+> income_tax = 245270.73
+> total_tax = income_tax + employment_tax
+> print(f'Income tax: \${income_tax}')
+> print(f'Total tax: \${total_tax}')
+> print(f'Rounded total tax: {round(total_tax)}')
+> "
+Days with 5+ workers: 0
+Is Alice an agricultural labor employer? False
+Traceback (most recent call last):
+  File "<string>", line 35, in <module>
+    worker_counts[w] += 1
+    ~~~~~~~~~~~~~^^^
+TypeError: unhashable type: 'list'
+root@9aaaffa9e76f:/app#

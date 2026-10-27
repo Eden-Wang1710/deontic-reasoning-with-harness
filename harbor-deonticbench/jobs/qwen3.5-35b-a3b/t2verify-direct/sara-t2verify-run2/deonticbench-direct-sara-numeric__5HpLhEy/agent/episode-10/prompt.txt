@@ -1,0 +1,45 @@
+New Terminal Output:
+
+root@8eccb9aae519:/app# python3 -c "
+> # Alice's 2017 tax calculation
+> alice_income = 433320
+> bob_income = 532134
+> agi = alice_income + bob_income
+> std_ded = 6000  # 200% of $3,000 for joint return
+>
+> # §151(b): spouse exemption only if joint return is NOT made
+> # So for joint return, only 1 exemption (taxpayer)
+> num_exemptions = 1
+> exemption_amount = 2000  # §151(d)(1) for 2017
+>
+> # §151(d)(3) phaseout check
+> agi_excess = agi - 300000  # §68(b)(1)(A) for joint return
+> print(f'AGI excess over threshold: {agi_excess}')
+>
+> # Phaseout percentage: 2% per $2,500 (or fraction)
+> import math
+> fractions = math.ceil(agi_excess / 2500)
+> phaseout_pct = min(100, fractions * 2)
+> print(f'Fractions: {fractions}, Phaseout %: {phaseout_pct}')
+>
+> # Effective exemptions after phaseout
+> effective_exemptions = num_exemptions * exemption_amount * (1 - phaseout_pct/100)
+> print(f'Effective exemptions: {effective_exemptions}')
+>
+> taxable = agi - std_ded - effective_exemptions
+> print(f'Taxable income: {taxable}')
+>
+> # Tax: over $250,000 bracket
+> base_tax = 75528.50
+> excess_taxable = taxable - 250000
+> total_tax = base_tax + 0.396 * excess_taxable
+> print(f'Total tax: {total_tax}')
+> print(f'Rounded: {round(total_tax)}')
+> "
+AGI excess over threshold: 665454
+Fractions: 267, Phaseout %: 100
+Effective exemptions: 0.0
+Taxable income: 959454.0
+Total tax: 356472.284
+Rounded: 356472
+root@8eccb9aae519:/app#

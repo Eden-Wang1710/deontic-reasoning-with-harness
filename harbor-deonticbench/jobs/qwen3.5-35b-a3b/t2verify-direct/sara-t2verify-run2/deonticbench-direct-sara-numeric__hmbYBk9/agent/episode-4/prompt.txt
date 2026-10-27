@@ -1,0 +1,123 @@
+New Terminal Output:
+
+root@67734e523ae9:/app# python3 << 'PYEOF'
+> # Alice's case facts
+> alice_gross_income = 554313
+> husband_gross_income = 56298
+> husband_itemized = 4421
+>
+> # Filing status: married filing separately
+> # §1(d) applies
+   excess = agi - applicable_amount
+    # For married filing separately, use $1,250 instead of $2,500
+    num_fractions = (excess + 1249) // 1250  # Ceiling division
+    applicable_percentage = min(100, num_fractions * 2)
+    print(f"AGI excess over applicable amount: ${excess}")
+    print(f"Number of $1,250 fractions: {num_fractions}")
+    print(f"Applicable percentage: {applicable_percentage}%")
+else:
+    applicable_percentage = 0
+
+# Effective exemption amount
+effective_exemption = exemption_amount * (1 - applicable_percentage / 100)
+print(f"Effective exemption per person: ${effective_exemption}")
+
+# Taxable income = AGI - standard deduction - exemptions
+total_exemptions = effective_exemption * num_exemptions
+taxable_income = agi - standard_deduction - total_exemptions
+print(f"\nTaxable income: ${taxable_income}")
+
+# Tax calculation under §1(d) for married filing separately
+# (i) 15% if not over $18,450
+# (ii) $2,767.50 + 28% over $18,450 if over $18,450 but not over $44,575
+# (iii) $10,082.50 + 31% over $44,575 if over $44,575 but not over $70,000
+# (iv) $17,964.25 + 36% over $70,000 if over $70,000 but not over $125,000
+# (v) $37,764.25 + 39.6% over $125,000 if over $125,000
+
+if taxable_income <= 18450:
+    tax = 0.15 * taxable_income
+elif taxable_income <= 44575:
+    tax = 2767.50 + 0.28 * (taxable_income - 18450)
+elif taxable_income <= 70000:
+    tax = 10082.50 + 0.31 * (taxable_income - 44575)
+elif taxable_income <= 125000:
+    tax = 17964.25 + 0.36 * (taxable_income - 70000)
+else:
+    tax = 37764.25 + 0.396 * (taxable_income - 125000)
+
+print(f"\nTax calculated: ${tax}")
+print(f"Tax (rounded): ${round(tax)}")
+PYEOF
+>
+> # Standard deduction (§162):
+> # - Basic standard deduction for 'any other case' = $3,000 (§162(b)(2)(C))
+> # - BUT §162(b)(6)(A): if married filing separately and either spouse itemizes, standard deduction = 0
+> # Husband itemizes, so Alice's standard deduction = 0
+> standard_deduction = 0
+>
+> # Exemptions (§151):
+> # - Exemption amount = $2,000 (§151(d)(1))
+> # - Alice gets her own exemption
+> # - Spouse exemption (§151(b)): requires spouse to have no gross income
+> # - Husband has $56,298 income, so no spouse exemption
+> exemption_amount = 2000
+> num_exemptions = 1  # Only Alice's own exemption
+>
+> # AGI = gross income - above-the-line deductions (none mentioned)
+> agi = alice_gross_income
+>
+> # Phaseout (§151(d)(3)):
+> # Applicable amount for married filing separately = $150,000 (§68(b)(1)(D))
+> applicable_amount = 150000
+>
+> if agi > applicable_amount:
+>     excess = agi - applicable_amount
+>     # For married filing separately, use $1,250 instead of $2,500
+>     num_fractions = (excess + 1249) // 1250  # Ceiling division
+>     applicable_percentage = min(100, num_fractions * 2)
+>     print(f"AGI excess over applicable amount: ${excess}")
+>     print(f"Number of $1,250 fractions: {num_fractions}")
+>     print(f"Applicable percentage: {applicable_percentage}%")
+> else:
+>     applicable_percentage = 0
+>
+> # Effective exemption amount
+> effective_exemption = exemption_amount * (1 - applicable_percentage / 100)
+> print(f"Effective exemption per person: ${effective_exemption}")
+>
+> # Taxable income = AGI - standard deduction - exemptions
+> total_exemptions = effective_exemption * num_exemptions
+> taxable_income = agi - standard_deduction - total_exemptions
+> print(f"\nTaxable income: ${taxable_income}")
+>
+> # Tax calculation under §1(d) for married filing separately
+> # (i) 15% if not over $18,450
+> # (ii) $2,767.50 + 28% over $18,450 if over $18,450 but not over $44,575
+> # (iii) $10,082.50 + 31% over $44,575 if over $44,575 but not over $70,000
+> # (iv) $17,964.25 + 36% over $70,000 if over $70,000 but not over $125,000
+> # (v) $37,764.25 + 39.6% over $125,000 if over $125,000
+>
+> if taxable_income <= 18450:
+>     tax = 0.15 * taxable_income
+> elif taxable_income <= 44575:
+>     tax = 2767.50 + 0.28 * (taxable_income - 18450)
+> elif taxable_income <= 70000:
+>     tax = 10082.50 + 0.31 * (taxable_income - 44575)
+> elif taxable_income <= 125000:
+>     tax = 17964.25 + 0.36 * (taxable_income - 70000)
+> else:
+>     tax = 37764.25 + 0.396 * (taxable_income - 125000)
+>
+> print(f"\nTax calculated: ${tax}")
+> print(f"Tax (rounded): ${round(tax)}")
+> PYEOF
+AGI excess over applicable amount: $404313
+Number of $1,250 fractions: 324
+Applicable percentage: 100%
+Effective exemption per person: $0.0
+
+Taxable income: $554313.0
+
+Tax calculated: $207772.198
+Tax (rounded): $207772
+root@67734e523ae9:/app#

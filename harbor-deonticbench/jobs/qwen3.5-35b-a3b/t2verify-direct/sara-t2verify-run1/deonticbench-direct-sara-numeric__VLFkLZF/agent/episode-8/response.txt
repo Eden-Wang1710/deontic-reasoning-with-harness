@@ -1,0 +1,16 @@
+
+
+Looking at the statute, I need to understand the tax rules and apply them to Alice's case.
+
+Let me search for more specific information about deductions and AGI calculation.
+
+{
+  "analysis": "I've reviewed the statute. Key findings:\n- §1 provides tax brackets for different filing statuses\n- §151 provides personal exemptions of $2,000 each\n- §63 defines taxable income and standard deduction amounts\n- §152 defines qualifying relatives (including father)\n\nFor Alice's case:\n- Gross income: $210,204\n- Bob has no income (could be dependent if qualifying relationship)\n- Charlie is Alice's father who retired in 2009 (no mention of 2010 income, so likely no income)\n\nSince Charlie is Alice's father with no income, he qualifies as a dependent (qualifying relative). Alice can claim head of household status since she maintains Charlie's household (implied by her paying health insurance for him).",
+  "plan": "Calculate Alice's tax:\n1. Filing status: Head of household (maintains household for father Charlie)\n2. Standard deduction: $4,400 (head of household)\n3. Personal exemptions: $4,000 (Alice + Charlie)\n4. Taxable income: $210,204 - $4,400 - $4,000 = $201,804\n5. Apply head of household tax brackets",
+  "commands": [
+    {
+      "keystrokes": "python3 << 'EOF'\n# Alice's tax calculation\n\n# Facts\ngross_income = 210204\n\n# Filing status: Head of household (maintains household for father Charlie)\n# Charlie qualifies as dependent (father, no income since retired in 2009)\n\n# Standard deduction for head of household: $4,400\nstandard_deduction = 4400\n\n# Personal exemptions: Alice ($2,000) + Charlie ($2,000) = $4,000\nexemptions = 2000 + 2000\n\n# Taxable income\ntaxable_income = gross_income - standard_deduction - exemptions\nprint(f\"Taxable income: {taxable_income}\")\n\n# Head of household tax brackets (§1(b)):\n# (i) 15% of taxable income if not over $29,600\n# (ii) $4,440 + 28% of excess over $29,600 if over $29,600 but not over $76,400\n# (iii) $17,544 + 31% of excess over $76,400 if over $76,400 but not over $127,500\n# (iv) $33,385 + 36% of excess over $127,500 if over $127,500 but not over $250,000\n\nif taxable_income <= 29600:\n    tax = taxable_income * 0.15\nelif taxable_income <= 76400:\n    tax = 4440 + (taxable_income - 29600) * 0.28\nelif taxable_income <= 127500:\n    tax = 17544 + (taxable_income - 76400) * 0.31\nelse:\n    tax = 33385 + (taxable_income - 127500) * 0.36\n\nprint(f\"Tax: {tax}\")\nprint(f\"Rounded tax: {round(tax)}\")\nEOF\n",
+      "duration": 1.0
+    }
+  ]
+}

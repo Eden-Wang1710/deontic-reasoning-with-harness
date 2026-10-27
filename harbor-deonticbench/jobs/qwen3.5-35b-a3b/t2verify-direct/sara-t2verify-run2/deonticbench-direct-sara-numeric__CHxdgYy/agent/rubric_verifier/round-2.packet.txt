@@ -1,0 +1,111 @@
+=== TASK INSTRUCTION ===
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Alice was paid $200 in March 2017 for services performed at Johns Hopkins Hospital. Alice was a patient at Johns Hopkins Hospital from March 15th, 2017 to April 2nd, 2017. In 2017, Alice was also paid $31220 in remuneration. Alice takes the standard deduction.
+
+
+**Question:**
+How much tax does Alice have to pay in 2017?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+=== ANSWER FILE (contents of /app/output/answer.txt) ===
+## Statute
+
+§345(10)(B) Exclusion of hospital patient services (lines 343-346):
+"(10)
+    (A) service performed in the employ of a school, college, or university, if such service is performed
+        (i) by a student who is enrolled and is regularly attending classes at such school, college, or university, or
+        (ii) by the spouse of such a student, or
+    (B) service performed in the employ of a hospital, if such service is performed by a patient of such hospital;"
+
+§63(c)(2)(C) Basic standard deduction (line 396):
+"(C) $3,000 in any other case."
+
+§151(d)(1) Exemption amount (line 72):
+"Except as otherwise provided in this subsection, the term 'exemption amount' means $2,000."
+
+§151(d)(5) Special rules for taxable years 2018 through 2025 (lines 88-92):
+"In the case of a taxable year beginning after December 31, 2017, and before January 1, 2026, the term 'exemption amount' means zero."
+
+§1(c) Tax imposed on unmarried individuals (lines 29-37):
+"There is hereby imposed on the taxable income of every individual (other than a surviving spouse as defined in section 2(a) or the head of a household as defined in section 2(b)) who is not a married individual (as defined in section 7703) a tax determined in accordance with the following:
+    (i) 15% of taxable income if the taxable income is not over $22,100;
+    (ii) $3,315, plus 28% of the excess over $22,100 if the taxable income is over $22,100 but not over $53,500;"
+
+## Reasoning
+
+1. Alice's gross income calculation:
+   - Services income ($200): EXCLUDED under §345(10)(B) because Alice was a patient at Johns Hopkins Hospital while performing services there (facts: "Alice was a patient at Johns Hopkins Hospital from March 15th, 2017 to April 2nd, 2017")
+   - Remuneration: $31,220
+   - Gross income = $31,220
+   Computation: python3 -c "print(0 + 31220)"
+
+2. Alice's filing status: Unmarried individual (not head of household under §2(b) as no qualifying child or dependent parent; not married per facts)
+
+3. Alice's standard deduction = $3,000 (basic standard deduction for 'any other case' under §63(c)(2)(C), line 396)
+
+4. Alice's personal exemption = $2,000 (exemption amount under §151(d)(1), line 72)
+   Note: §151(d)(5) makes exemption zero only for years BEGINNING after Dec 31, 2017. Alice's 2017 tax year begins before that date, so $2,000 applies.
+
+5. Alice's taxable income = Gross income - Standard deduction - Personal exemptions
+   Computation: python3 -c "print(31220 - 3000 - 2000)"
+   Taxable income = $26,220
+
+6. Tax calculation under §1(c):
+   Since $26,220 is over $22,100 but not over $53,500:
+   Tax = $3,315 + 28% of ($26,220 - $22,100)
+   Computation: python3 -c "print(3315 + 0.28 * (26220 - 22100))"
+   Tax = $3,315 + $1,153.60 = $4,468.60
+
+7. Rounding to whole number: $4,469
+
+## Answer
+Answer: 4469
+
+=== SOLVER TRAJECTORY INDEX ===
+Full trajectory (every analysis, command and terminal output exactly as the solver saw it) is at /tmp/rubric_verifier/trajectory.txt; steps are headed '--- step N ---'. Read it with grep -n / sed -n as needed.
+step 1 | cat /app/statute.txt | output 10071 bytes, truncated (17347 bytes omitted)
+step 2 | grep -n "standard deduction" /app/statute.txt; grep -n "\$" /app/statute.txt | head -60 | output 5593 bytes
+step 3 | sed -n '380,410p' /app/statute.txt; sed -n '52,90p' /app/statute.txt | output 3815 bytes
+step 4 | grep -n "3,000" /app/statute.txt; grep -n "2,000" /app/statute.txt | output 454 bytes
+step 5 | python3 << 'EOF' | output 1405 bytes
+step 6 | mkdir -p /app/output; cat > /app/output/answer.txt << 'EOF' | output 1915 bytes
+step 7 | cat /app/output/answer.txt | output 1789 bytes
+step 8 | (no commands) | output 2115 bytes | task_complete claimed
+step 9 | sed -n '343,348p' /app/statute.txt; sed -n '88,92p' /app/statute.txt; grep -n 'head of household' /app/statute.txt | output 1122 bytes
+step 10 | sed -n '330,360p' /app/statute.txt; sed -n '204,230p' /app/statute.txt | output 3187 bytes
+step 11 | python3 << 'EOF' | output 1623 bytes
+step 12 | cat > /app/output/answer.txt << 'EOF' | output 3025 bytes
+step 13 | cat /app/output/answer.txt | output 2918 bytes
+step 14 | (no commands) | output 46 bytes | task_complete claimed
+
+=== VERIFICATION ROUND 2 of 3 ===
+Answer file changed since the previous round: yes
+Previous report:
+VERIFICATION REPORT (round 1 of 3)
+1. Tool-call integrity: NO. Step 1 cat output was truncated (17347 bytes omitted). The solver treated the truncated output as complete without acknowledging the truncation.
+2. Statute coverage: NO. Section 345(B) at lines 345-346 about hospital patient services was never displayed in any trajectory step. The case fact about Alice being a patient engaging this section never appeared in solver's output.
+3. Grounded reasoning: NO. The $200 service income fact was not checked against section 345(B) which excludes income for services performed by hospital patients. The solver's reasoning does not trace this fact to any provision.
+4. Provision selection and application: NO. Fact 'Alice was a patient at Johns Hopkins Hospital' engages section 345(B) (lines 345-346) which excludes income for services performed by patients. This fact is UNUSED in the solver's reasoning.
+5. Tool-assisted computation: YES. All three computations were executed via python3 and reproduce from stated inputs: 200+31220=31420, 31420-3000-2000=26420, 3315+0.28*(26420-22100)=4524.6
+Unresolved:
+- Read section 345(B) at lines 345-346 to check if Alice's $200 hospital service income is excluded
+- Check section 151(d)(5) at line 90 - exemption amount is zero for taxable years beginning after December 31, 2017
+- Verify filing status requirements against section 2 definitions before applying §1(c)
+Suggested next actions:
+- sed -n '343,348p' /app/statute.txt - check hospital patient service exclusion
+- sed -n '88,92p' /app/statute.txt - check exemption amount for 2017
+- grep -n 'head of household' /app/statute.txt - verify filing status conditions

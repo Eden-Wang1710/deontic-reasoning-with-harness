@@ -26,8 +26,8 @@ venv/
 #   python DeonticBench/scripts/download_hf_data.py --splits whole
 DeonticBench/data/*/whole.json
 
-# Run artifacts (regenerable)
-outputs/
+# Run artifacts: tracked since 2026-10-27 (machine switch; the repo is the only sync
+# channel). outputs/ and harbor-deonticbench/jobs/ are committed, including job logs.
 bootstrap_results/
 wandb/
 *.log
@@ -37,4 +37,10 @@ wandb/
 *.safetensors
 *.pt
 *.bin
-tools/db_stats.json
+
+# Re-include run artifacts and their logs (overrides *.log and the nested ignores)
+!outputs/
+!harbor-deonticbench/jobs/
+!harbor-deonticbench/jobs/**
+!harbor-deonticbench/jobs/**/*.log
+!DeonticBench/outputs/
