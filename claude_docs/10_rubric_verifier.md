@@ -619,4 +619,31 @@ change before the full run.
   qualifying child of another taxpayer is not in the case facts") is a lead written as a
   violation on a numeric task; v3's "never a `NO`" rule covers entailment tasks only.
 
-Re-smoked after the fix (`verify3-smoke2`, same two tasks, started 00:20 UTC).
+**Smoke test 2** (`verify3-smoke2`, same two tasks, 00:14 – 00:39 UTC) — reports now
+render fully (all five rubrics inside `rubrics`, lists present, closing prompt honoured),
+binary correct in one round (4 steps, 213 s, all YES/NA). The numeric task went 3 rounds and
+ended wrong (99309 vs 102150; round-1 answer 101635 was also wrong) and exposed two defects
+that would have hit every numeric task, so no full run was started:
+
+- **Finding 3 (fixed, `d9a7f7a`, skill only):** the statute file nests subsections as
+  indented `(d)` / `(2)` / `(C)` lines under a `§152.` header; the literal string `§152(d)`
+  occurs nowhere in it. Skill v3's step 1 said "one `grep -E` with the cited section
+  numbers", so `grep '§152(d)'` returned nothing and the verifier reported "§1(b)(v), §152(d)
+  and §151(d)(3) do not exist in statute" (rubrics 2 and 3 `NO` in rounds 2 and 3) although
+  all three exist. The solver reacted by stripping the subsection labels from its record
+  (`§1 §2 §63 §151 §152`), i.e. the false `NO` degraded the record it was meant to check. The
+  skill now explains the numbering, locates a cite by grepping its section header
+  (`'^§(152|63)\.'`) and confirming the nested label while reading the block in step 2,
+  and checks what reached the solver by the ranges the solver displayed.
+- **Finding 4 (fixed, `d9a7f7a`, parser robustness):** in round 3 the verifier wrote
+  `grep 'a\|b'` inside JSON strings; `\|` is not a JSON escape, so all four replies failed
+  to parse, each failure consumed a step, and the round ran 283 s with zero commands before
+  the forced report. `_extract_json_object` now retries after doubling backslashes that are
+  not JSON escapes (tested on the failing reply), the parse-failure message names the cause,
+  and the skill asks for `grep -E 'a|b'`. No checking logic was touched.
+- Also seen: round 2 used four command steps although the skill limits later rounds to one;
+  the verifier's `unresolved` list repeats the same three items across rounds. Not changed.
+- Verifier cost per round: 168 / 168 / 283 s, 5 calls each; solver agent time 1,450 s total
+  (under the 1,800 s wall clock), binary 323 s.
+
+Re-smoked after the fixes (`verify3-smoke3`, same two tasks, started 03:40 UTC).
