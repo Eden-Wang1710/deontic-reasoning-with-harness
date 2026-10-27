@@ -479,16 +479,28 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 'a "rubrics" list with all five rubrics (name, status, evidence), then '
                 '"unused_facts", "quoted_lines", "unresolved" and "suggested_actions".'
             )
-            try:
-                resp = await call(closing)
+            retry = (
+                "Your reply could not be parsed as one JSON object whose \"report\" is an "
+                "object. Check the brackets: every { has one }, every [ has one ], and a "
+                "rubric entry ends with } followed by a comma or the ] that closes "
+                "\"rubrics\". Reply once more with exactly that JSON object and nothing else."
+            )
+            prompt_text: str | None = closing
+            for attempt in range(2):
+                try:
+                    resp = await call(closing if attempt == 0 else retry)
+                except ContextLengthExceededError:
+                    context_exceeded = True
+                    break
                 parsed = _extract_json_object(resp.content)
                 if parsed and isinstance(parsed.get("report"), dict):
                     report = parsed["report"]
-                else:
-                    parse_failures += 1
-                self._append_verifier_step(vsteps, resp, [], None, prompt_text=closing)
-            except ContextLengthExceededError:
-                context_exceeded = True
+                    self._append_verifier_step(vsteps, resp, [], None, prompt_text=prompt_text)
+                    break
+                parse_failures += 1
+                # The retry text is logged once, as this step's observation.
+                self._append_verifier_step(vsteps, resp, [], retry, prompt_text=prompt_text)
+                prompt_text = None
 
         report_text = self._render_report(report, round_no, context_exceeded)
         elapsed = time.time() - started
