@@ -15,8 +15,9 @@ deontic-reasoning-with-harness/
 ├── README.md                     ✅ public landing page: what the thesis is, where things are
 ├── CLAUDE.md                     ✅ auto-loaded context for Claude Code; indexes claude_docs/,
 │                                    repo rules (English files, no artifacts/keys in git)
-├── .gitignore                    ✅ root ignore list: outputs/, bootstrap_results/, *.log,
-│                                    weights, DeonticBench whole splits, tools/db_stats.json
+├── .gitignore                    ✅ root ignore list: bootstrap_results/, wandb/, stray *.log,
+│                                    weights, DeonticBench whole splits; re-includes outputs/,
+│                                    DeonticBench/outputs/ and harbor-deonticbench/jobs/ (since 2026-10-27)
 │
 ├── claude_docs/                  ✅ all project documentation, NN_snake_case.md, English
 │   ├── 01_project_overview.md       thesis in one page, repo layout, references
@@ -65,20 +66,20 @@ deontic-reasoning-with-harness/
 │   │                                grading rules (DAR exact match / DeonticBench ±1, macro-F1),
 │   │                                bootstrap CI; reuses DeonticBench's parser (needs pandas)
 │   ├── deonticbench_stats.py        dataset statistics behind claude_docs/03 Part III
-│   └── db_stats.json             ⬜ output of deonticbench_stats.py (regenerable)
+│   └── db_stats.json             ✅ output of deonticbench_stats.py (regenerable; committed since 2026-10-27)
 │
-├── outputs/                      ⬜ our run artifacts outside the subtrees
+├── outputs/                      ✅ our run artifacts outside the subtrees (committed since 2026-10-27)
 │   └── verbalized_confidence/<run>/ per-trial JSON + summary.json from verbalized_confidence.py
 │
 ├── DeonticBench/                 upstream subtree (prompt-based benchmark)
 │   ├── data/*/whole.json         ⬜ fetched per machine from HuggingFace (too large for GitHub)
-│   └── outputs/                  ⬜ generate_e2e.py outputs (prompt-based direct runs)
+│   └── outputs/                  ✅ generate_e2e.py outputs (committed since 2026-10-27) (prompt-based direct runs)
 │
 └── harbor-deonticbench/          upstream subtree (DAR: Harbor + meta-harness)
     ├── datasets/                 ✏️✅ generated Harbor tasks, tracked here on purpose
     │                                (upstream gitignores them; see claude_docs/02 §5)
     ├── .gitignore                ✏️ the `/datasets/` line commented out, with a note
-    └── jobs/qwen3.5-35b-a3b/     ⬜ Harbor job dirs: <framing>/, t2fix-<framing>/, kira-<framing>/,
+    └── jobs/qwen3.5-35b-a3b/     ✅ Harbor job dirs (committed since 2026-10-27): <framing>/, t2fix-<framing>/, kira-<framing>/,
                                      t2verify-<framing>/
 ```
 
@@ -110,6 +111,7 @@ serve_qwen35_35b.sh ──► vLLM at :9009 ◄── run_dar_qwen35_35b.sh ─�
 - Scripts go in `tools/`; a larger body of thesis code gets its own top-level directory.
 - Never put our files inside `DeonticBench/` or `harbor-deonticbench/`; the only in-subtree edits
   are the two marked ✏️ above.
-- Run artifacts (`outputs/`, `jobs/`, `bootstrap_results/`), logs, weights and `whole` splits are
-  gitignored; the docs in `claude_docs/` carry the numbers.
+- Run artifacts (`outputs/`, `DeonticBench/outputs/`, `harbor-deonticbench/jobs/` with their logs)
+  are committed since 2026-10-27 so every machine has every run; `bootstrap_results/`, `wandb/`,
+  weights and `whole` splits stay gitignored. The docs in `claude_docs/` still carry the numbers.
 - Add a line here, and a row in the `CLAUDE.md` table for docs, in the same commit that adds the file.

@@ -2,18 +2,20 @@
 
 - **Date**: 2026-10-14. Rewritten from scratch; the earlier version (work Mac / personal Mac /
   "JHU cluster" TBD) is obsolete and survives only in git history.
-- **Scope**: all work now happens on **two lab cluster machines**. No laptops are involved.
+- **Scope**: all work now happens on **lab cluster machines**: two DGX Sparks (0238, and 029b since
+  2026-10-28) and the BRTX GPU nodes. No laptops are involved.
 - ✅ = checked on the machine on the date given. 🔶 = not yet checked.
 
 ## 1. Machines
 
 | Name | Hardware | Role | Status |
 |---|---|---|---|
+| **029b** (`spark-029b`) | NVIDIA DGX Spark, same spec as 0238: 1× GB10, 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe (2.7 TB free), aarch64 ✅ 2026-10-28 | Same role as 0238 (DAR harness in Docker, local vLLM serving). Added 2026-10-28 as a second Spark so runs can proceed on two machines | Set up 2026-10-28, see §2b |
 | **0238** (`spark-0238`) | NVIDIA DGX Spark: 1× GB10 (Grace Blackwell), 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe, aarch64 ✅ | Docker available → runs the DAR harness (Harbor tasks in containers); small-model serving; all docs and code | Partially set up, see §2 |
 | **BRTX** (`brtx601`–`brtx606.idies.jhu.edu`) | 6 Slurm nodes, x86_64, RHEL 9.8. **602**: 4× A100 80GB PCIe, 2× Xeon Silver 4214 (24 threads), 754 GB RAM ✅ 2026-10-23. 601: 8× Quadro RTX 6000 24GB; 603–606: 10× RTX 6000 each (48 total) ✅ from `sinfo`. Every node: 2× 3.5 TB NVMe | GPU work on **602** (`ba100` partition): hosting Qwen3.5-35B-A3B with hidden-state access, probe training, distillation (see [04](04_initial_proposal.md) §4.2, §5). RTX 6000 nodes for small jobs. **No Docker for us** → DAR harness runs on 0238 only | Account works, repo cloned; **no Python env yet, local disks full**, see §3 |
 
-Both machines clone the same GitHub repo. **The repo is the only shared state**: commit and push
-on one machine before switching to the other; `git pull` first thing on the other. Nothing else is
+All machines clone the same GitHub repo. **The repo is the only shared state**: commit and push
+on one machine before switching to another; `git pull` first thing on the other. Nothing else is
 synchronised automatically.
 
 ## 2. 0238 (DGX Spark) — current state ✅ 2026-10-14
@@ -52,6 +54,34 @@ Upstream's README differs from this repo in two places (still true ✅):
 - `harbor-deonticbench/datasets/` does not need generating: we track it in git (§5).
 
 Update the table in §2 once each item is done.
+
+## 2b. 029b (DGX Spark) — current state ✅ 2026-10-28
+
+Second DGX Spark, hostname `spark-029b`, user `zixuan`. Hardware and OS are identical to 0238
+(Ubuntu 24.04.3 LTS, aarch64, GB10, 20 cores, 119 GB unified memory, 3.7 TB NVMe), so the 0238
+recipe in §2.1 applies with the deviations noted below. Everything in this table was set up and
+checked on 2026-10-28.
+
+| Item | State | Action needed |
+|---|---|---|
+| OS / GPU | Ubuntu 24.04.3 LTS, aarch64; GB10, driver 580.95.05, CUDA 13.0 toolkit at `/usr/local/cuda` (`nvcc` on PATH) ✅ | — |
+| Docker | 28.3.3, daemon active; `zixuan` added to the `docker` group ✅ 2026-10-28 (`sudo usermod -aG docker zixuan`). In a shell opened before that, use `sg docker -c "<cmd>"`; new logins get it directly. Base image `ghcr.io/laude-institute/t-bench/python-3-13:20250620` has an `arm64` manifest and a DAR task image (`datasets/deonticbench-direct/...airline-cases-100/environment/Dockerfile`) builds and runs here ✅ (swipl 9.0.4, Python 3.13.1, tmux 3.3a inside the container). | — |
+| Python | miniconda3 at `~/miniconda3` (conda 26.9.4, base = 3.14.9). Installed with `-b`, **`conda init bash` not run** → either run it once or call binaries by path (`~/miniconda3/envs/<env>/bin/...`, as `tools/serve_qwen35_35b.sh` does). System `python3` is 3.12.3. | `~/miniconda3/bin/conda init bash` if the interactive `conda activate` is wanted |
+| `myenv` (serving) | Python 3.12; **vllm 0.20.1, torch 2.11.0+cu130, transformers 5.8.0, flashinfer 0.6.8.post1, ninja** — same versions as 0238. `torch.cuda.is_available()` → True on the GB10 ✅. `pip` warns that `xgrammar 0.2.5.post1` wants `transformers<5`; the import works and 0238 runs the same pair, so ignored. | — |
+| `deontic` (DeonticBench) | Python 3.12 with `DeonticBench/requirements.txt` minus `vllm` ✅. **`conda-forge` has no `swi-prolog` package for `linux-aarch64`** (the §2.1 line fails here); use the host's `/usr/bin/swipl` 9.0.4 instead, which is on PATH. | — |
+| `uv` | 0.13.6 at `~/.local/bin/uv` ✅; `harbor-deonticbench` synced (`uv sync --all-extras --dev`), `uv run harbor` works ✅. `hf` CLI installed with `uv tool install huggingface_hub` (`~/.local/bin/hf`). | — |
+| `swipl` / `tmux` | both on the host: `/usr/bin/swipl` 9.0.4, `/usr/bin/tmux` ✅ | — |
+| `gh` | ❌ not installed | Optional |
+| git identity | `user.name "Zixuan Wang"`, `user.email zixuanw712@gmail.com` set globally ✅ (matches the existing commits) | — |
+| git remote | SSH, `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`, with an ed25519 key (`~/.ssh/id_ed25519`) registered on GitHub ✅ 2026-10-28; `ssh -T git@github.com` authenticates and pushes work. | — |
+| Repo path | `/home/zixuan/deontic-reasoning-with-harness` (cloned 2026-10-28 at `a19ac500`) | — |
+| Model weights | `~/models/Qwen3.5-35B-A3B` (bf16, 14 safetensors shards, 67 GiB) ✅ via `hf download Qwen/Qwen3.5-35B-A3B --local-dir ~/models/Qwen3.5-35B-A3B`; vLLM logs in `~/vllm_logs/` | Other models: same `hf download` pattern |
+| vLLM serving | `tools/serve_qwen35_35b.sh` works unchanged (all paths are `$HOME`-relative): smoke-started 2026-10-28, `/v1/models` lists `qwen3.5-35b-a3b` and a chat request returns thinking in `message.reasoning` ✅. First start took ~14 min (00:36 → 00:50: weight load, torch.compile, FlashInfer MoE kernel JIT + autotune; cached under `~/.cache` afterwards). GPU KV cache 1,037,178 tokens at `--gpu-memory-utilization 0.75` (15.8× concurrency at 64k). **Caveat 🔶:** the very first attempt died at 64 % of weight loading with `CUDA error: unspecified launch failure` (`~/vllm_logs/smoke-029b-first-start.log`); the shards verified intact and an immediate retry succeeded, so treated as transient. If it recurs, retry once before debugging. | — |
+| API keys | none in the environment yet | Export `OPENAI_API_KEY` etc. in `~/.bashrc` (§4); not needed for local-vLLM runs |
+| Shell profile | untouched: no conda init, no `~/.local/bin` export needed (already on PATH), no keys | — |
+
+Differences from 0238 worth remembering: the host has `swipl` (0238 does not); `conda init` has not
+been run; pushing goes over SSH (0238 had no push auth configured).
 
 ## 3. BRTX (601–606) — current state ✅ 2026-10-23, written on brtx602
 
@@ -156,10 +186,15 @@ on a second GPU, or a vLLM hook — decide once the env exists.
 4. If both machines diverge, `git pull --rebase` on the later one; the docs are plain markdown and
    conflicts are easy to resolve.
 
-**Not in git**, by design (regenerate or copy out of band with `rsync`/`scp` between the two
-machines when needed):
+**Run artifacts are tracked since 2026-10-27** (commit `51dc548`, made for the machine switch):
+`outputs/`, `DeonticBench/outputs/` and `harbor-deonticbench/jobs/` including their job and trial
+logs are committed, so a fresh clone has every run. Keep committing them with the runs that produce
+them.
 
-- run artifacts: `outputs/`, `bootstrap_results/`, `wandb/`, `*.log`, `harbor-deonticbench/jobs/`
+**Not in git**, by design (regenerate or copy out of band with `rsync`/`scp` between machines when
+needed):
+
+- `bootstrap_results/`, `wandb/`, and `*.log` files outside the paths above
 - model weights: `*.ckpt`, `*.safetensors`, `*.pt`, `*.bin`
 - `DeonticBench/data/*/whole.json` (re-download: `python DeonticBench/scripts/download_hf_data.py --splits whole`)
 

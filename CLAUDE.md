@@ -5,8 +5,8 @@ built on two papers by a senior PhD student in the same group, Guangyao Dou (JHU
 **DeonticBench** (arXiv 2604.04443, vendored at `DeonticBench/`) and **DAR: Deontic Reasoning with
 Agentic Harnesses** (arXiv 2606.05009, vendored at `harbor-deonticbench/`).
 
-The owner works on two lab cluster machines (0238, a DGX Spark with Docker; 601-606, the GPU
-nodes), so **this git repo is the only shared state** — anything worth keeping must be committed
+The owner works on lab cluster machines (0238 and 029b, two DGX Sparks with Docker; 601-606, the
+GPU nodes), so **this git repo is the only shared state** — anything worth keeping must be committed
 and pushed. See `claude_docs/02_setup_and_sync.md` for per-machine status.
 
 ## Docs: `claude_docs/`
@@ -18,7 +18,7 @@ on this summary alone.
 |---|---|---|
 | **Orientation** | | |
 | `claude_docs/01_project_overview.md` | What the thesis is and what it builds on, repo layout, references, repo visibility | Starting a session; unsure what belongs where |
-| `claude_docs/02_setup_and_sync.md` | The two cluster machines (0238 DGX Spark, 601-606 GPU nodes) and their verified state, project env setup, sync workflow between them, regenerating `datasets/`, pulling both subtrees | Setting up or running anything on either machine; syncing; updating either subtree |
+| `claude_docs/02_setup_and_sync.md` | The cluster machines (0238 and 029b DGX Sparks, 601-606 GPU nodes) and their verified state, project env setup, sync workflow between them, regenerating `datasets/`, pulling both subtrees | Setting up or running anything on either machine; syncing; updating either subtree |
 | **Background review** | | |
 | `claude_docs/03_background_review.md` | Background review in three parts. Part I (§1–4): close reading of DeonticBench — task/eval/training summary, headline results, verified problems (✅) vs. hypotheses (🔶), the reference-Prolog scan. Part II (§5–9): close reading of DAR — what the harness actually does, grading differences vs. DeonticBench, gaps in the released code, what DAR leaves open. Part III (§10–17): measured sizes — case counts per domain/split, label balance, statute and prompt token counts, exactly which data DAR uses | Designing experiments; before trusting any number from either paper; working with `harbor-deonticbench/`; sizing any experiment or choosing splits |
 | **Proposal and repo** | | |
@@ -72,7 +72,7 @@ file per paper, named `NN_snake_case.md` with a two-digit reading-order prefix (
 - `harbor-deonticbench/meta-harness/` is documented upstream as a submodule but is committed as
   plain files on `main`; there is no `.gitmodules`, so `--recurse-submodules` is a no-op here.
 - Prolog eval needs `swipl` on PATH; the Harbor side needs Python ≥3.12, `uv` and a Docker daemon
-  the user can reach. Check the per-machine tables in `02` first; 0238 is ARM (aarch64).
+  the user can reach. Check the per-machine tables in `02` first; the Sparks are ARM (aarch64).
 - API keys come from environment variables. Never write keys into files.
 
 ## Easy to get wrong (evidence in `claude_docs/03`)
@@ -99,7 +99,8 @@ file per paper, named `NN_snake_case.md` with a two-digit reading-order prefix (
 
 - The owner writes in Chinese: **respond in Chinese** unless asked otherwise. All files — docs, code,
   comments, commit messages — are in English.
-- Do not commit run artifacts (`outputs/`, `bootstrap_results/`, `jobs/`), model weights, or `whole`
-  splits. `datasets/` is the deliberate exception (see above).
+- Run artifacts (`outputs/`, `DeonticBench/outputs/`, `harbor-deonticbench/jobs/` with their logs)
+  **are committed** since 2026-10-27 so every machine has every run. Do not commit
+  `bootstrap_results/`, `wandb/`, model weights, or `whole` splits. `datasets/` is tracked too (see above).
 - The GitHub repo is **public** (owner's decision, 2026-10-14). Never commit API keys, run
   artifacts or anything the author of the vendored repos has not released.
