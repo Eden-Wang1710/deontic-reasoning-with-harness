@@ -5,7 +5,7 @@ argument of ``execute_commands`` to be a JSON array of ``{"keystrokes", "duratio
 objects. Qwen3.5 served through vLLM's ``qwen3_xml`` tool parser emits a single object
 (or occasionally a list of plain strings) for that parameter, and ``baseline_kira``
 then crashes with ``AttributeError: 'str' object has no attribute 'get'`` before the
-first command runs (observed 2026-10-16, see claude_docs/08 §1).
+first command runs (observed 2026-10-16, see claude_docs/06 §1).
 
 This subclass only reshapes the arguments into the expected form, recovers ``commands``
 when the model wrote JSON inside one XML parameter, and strips stray ``<parameter=...>``

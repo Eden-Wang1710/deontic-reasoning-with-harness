@@ -15,14 +15,12 @@ Built on two papers by Guangyao Dou (JHU, Van Durme group), both vendored here a
 | [`claude_docs/`](claude_docs/) | All project documentation, numbered |
 | ├ [`01_project_overview.md`](claude_docs/01_project_overview.md) | What the thesis is, repo layout, references, visibility |
 | ├ [`02_setup_and_sync.md`](claude_docs/02_setup_and_sync.md) | Per-machine setup, multi-machine sync, regenerating datasets, pulling upstream |
-| ├ [`03_deonticbench_review.md`](claude_docs/03_deonticbench_review.md) | Close reading of the DeonticBench paper, code and data |
-| ├ [`04_dar_review.md`](claude_docs/04_dar_review.md) | Close reading of DAR and the Harbor harness |
-| ├ [`05_data_statistics.md`](claude_docs/05_data_statistics.md) | Measured dataset sizes, prompt lengths, and what DAR uses |
-| ├ [`06_initial_proposal.md`](claude_docs/06_initial_proposal.md) | Initial thesis proposal (self-verification and confidence calibration in the DAR harness) and the decision log |
-| ├ [`07_repo_additions.md`](claude_docs/07_repo_additions.md) | Map of every file we added outside the vendored subtrees |
-| ├ [`08_native_trajectories.md`](claude_docs/08_native_trajectories.md) | Pass-1 DAR trajectories per model: serving, harness config, runs, scores, failure modes |
-| ├ [`09_verbalized_confidence.md`](claude_docs/09_verbalized_confidence.md) | Self-verbalised confidence baseline and calibration metrics on those trajectories |
-| └ [`10_solver_verifier_harness.md`](claude_docs/10_solver_verifier_harness.md) | The solver-verifier harness: rubric verifier sub-agent on terminus-2, protocol, runs 1-3 and results |
+| ├ [`03_background_review.md`](claude_docs/03_background_review.md) | Background review: close readings of DeonticBench (Part I) and DAR / Harbor (Part II), measured data statistics (Part III) |
+| ├ [`04_initial_proposal.md`](claude_docs/04_initial_proposal.md) | Initial thesis proposal (self-verification and confidence calibration in the DAR harness) and the decision log |
+| ├ [`05_repo_additions.md`](claude_docs/05_repo_additions.md) | Map of every file we added outside the vendored subtrees |
+| ├ [`06_native_trajectories.md`](claude_docs/06_native_trajectories.md) | Pass-1 DAR trajectories per model: serving, harness config, runs, scores, failure modes |
+| ├ [`07_verbalized_confidence.md`](claude_docs/07_verbalized_confidence.md) | Self-verbalised confidence baseline and calibration metrics on those trajectories |
+| └ [`08_solver_verifier_harness.md`](claude_docs/08_solver_verifier_harness.md) | The solver-verifier harness: rubric verifier sub-agent on terminus-2, protocol, runs 1-3 and results |
 | [`tools/`](tools/) | Project-owned scripts (outside the subtrees) |
 | [`CLAUDE.md`](CLAUDE.md) | Context auto-loaded by Claude Code; indexes `claude_docs/` |
 | [`DeonticBench/`](DeonticBench/) | Upstream benchmark (prompt-based eval), git subtree |

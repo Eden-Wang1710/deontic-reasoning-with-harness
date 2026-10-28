@@ -3,7 +3,7 @@
 DeonticBench's own `scripts/bootstrap_outputs.py` reports accuracy with a ±$1 tolerance on
 numeric answers and abstentions counted wrong. DAR's `test.sh` grades numeric answers by exact
 integer match, and the DAR paper reports SARA-Binary as macro-F1. To compare a prompt-based run
-with the harness runs in claude_docs/08 the same generations have to be scored both ways; this
+with the harness runs in claude_docs/06 the same generations have to be scored both ways; this
 script reuses DeonticBench's answer parser and label loader and adds the DAR rules.
 
 For every domain it reports, over 1,000 bootstrap replicates that draw one generation per case

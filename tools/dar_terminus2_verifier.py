@@ -1,6 +1,6 @@
 """terminus-2 with a rubric-based verifier sub-agent consulted at task completion.
 
-Design (claude_docs/10_solver_verifier_harness.md). Stock terminus-2 handles ``task_complete`` in two
+Design (claude_docs/08_solver_verifier_harness.md). Stock terminus-2 handles ``task_complete`` in two
 steps: the first claim puts the agent in a *pending* state and sends back the "Are you sure
 you want to mark the task as complete?" confirmation message; a second ``task_complete``
 ends the trial, running any commands in that response first. This subclass keeps that
@@ -33,7 +33,7 @@ Agent kwargs (``--ak key=value``): ``max_verify_rounds`` (3), ``verifier_max_ste
 ``skill_path`` (tools/skills/rubric_verifier/SKILL.md), ``include_reasoning`` (false),
 ``answer_path`` (/app/output/answer.txt, DAR's convention in all four subdomains).
 
-Run-2 options (claude_docs/10 §8), all off by default so that run-1 is reproducible:
+Run-2 options (claude_docs/08 §8), all off by default so that run-1 is reproducible:
 ``derivation_record=true`` swaps the solver's prompt template for
 ``tools/templates/terminus-json-plain-derivation.txt`` (the upstream template plus a
 paragraph asking for a three-section answer file: Statute quotes with line numbers,

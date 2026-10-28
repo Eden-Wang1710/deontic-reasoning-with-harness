@@ -2,7 +2,7 @@
 # Serve Qwen3.5-35B-A3B with vLLM on 0238 (DGX Spark, GB10, 119 GB unified memory).
 # Harbor task containers reach it at http://172.17.0.1:9009/v1 (Docker bridge gateway).
 #
-# Settings (decided 2026-10-15, see claude_docs/06 decision log):
+# Settings (decided 2026-10-15, see claude_docs/04 decision log):
 #   bf16 weights, thinking mode ON, reasoning parser splits <think> into reasoning_content,
 #   64k context, sampling defaults from the model's generation_config.json
 #   (temperature 1.0, top_p 0.95, top_k 20 = Qwen's "thinking mode, general tasks" recommendation).
@@ -12,7 +12,7 @@
 # PREFIX_CACHE=1 (default since 2026-10-26, run-2 of the rubric verifier) adds
 # --enable-prefix-caching. vLLM disables automatic prefix caching by default for this hybrid
 # (Gated DeltaNet + attention) model; the hit rate was 0.0 % in every run before run-2
-# (claude_docs/10 §7.2). Set PREFIX_CACHE=0 to reproduce the earlier server configuration.
+# (claude_docs/08 §7.2). Set PREFIX_CACHE=0 to reproduce the earlier server configuration.
 set -euo pipefail
 PREFIX_CACHE="${PREFIX_CACHE:-1}"
 EXTRA_ARGS=""

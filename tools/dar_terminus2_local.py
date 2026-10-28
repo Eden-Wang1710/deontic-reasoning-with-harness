@@ -8,9 +8,9 @@ interior bytes omitted ...]`` in between. In the agent loop that function is app
 ~10,070 bytes (two halves plus the marker), so the second pass trims 71 more bytes around
 the marker and rewrites it as ``71 interior bytes omitted``. On DAR's SARA tasks the model
 ``cat``s the 27 KB statute, sees "71 bytes omitted", and in 38/65 trials never reads the
-missing 17 KB (claude_docs/08 §1.5, observed 2026-10-16).
+missing 17 KB (claude_docs/06 §1.5, observed 2026-10-16).
 
-Decision 2026-10-16 (claude_docs/06 §8, option "c"): keep the 10,000-byte limit, which is
+Decision 2026-10-16 (claude_docs/04 §8, option "c"): keep the 10,000-byte limit, which is
 part of the DAR task design (the agent is expected to navigate the statute with shell
 tools), but make the marker truthful. This subclass makes ``_limit_output_length``
 idempotent: text that already carries a marker is returned unchanged, so the model sees

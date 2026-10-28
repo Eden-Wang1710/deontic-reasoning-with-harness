@@ -9,7 +9,7 @@
 #   t2   = Harbor's built-in terminus-2 (DAR main line), jobs under jobs/<model>/<framing>/
 #   t2fix = terminus-2 with a truthful output-truncation marker (tools/dar_terminus2_local.py;
 #          same 10,000-byte limit, but the "N interior bytes omitted" count is no longer
-#          overwritten by a second truncation pass; decision 2026-10-16 in claude_docs/06 §8),
+#          overwritten by a second truncation pass; decision 2026-10-16 in claude_docs/04 §8),
 #          jobs under jobs/<model>/t2fix-<framing>/.
 #   kira = meta-harness baseline_kira (terminus-2 subclass with native tool calling, the agent
 #          behind the paper's KIRA numbers) via tools/dar_kira_local.py, which only normalises
@@ -19,14 +19,14 @@
 #          goes through HOSTED_VLLM_API_KEY instead.
 #   t2verify = t2fix plus a rubric-based verifier sub-agent consulted at every completion claim
 #          (tools/dar_terminus2_verifier.py + tools/skills/rubric_verifier/SKILL.md; design in
-#          claude_docs/10_solver_verifier_harness.md), jobs under jobs/<model>/t2verify-<framing>/.
+#          claude_docs/08_solver_verifier_harness.md), jobs under jobs/<model>/t2verify-<framing>/.
 #          Tunables via --ak: max_verify_rounds=3 verifier_max_steps=8 include_reasoning=false.
-#   t2verify2 = run-2 configuration of the same agent (claude_docs/10 §8): solver writes a
+#   t2verify2 = run-2 configuration of the same agent (claude_docs/08 §8): solver writes a
 #          three-section answer file (derivation_record=true, tools/templates/), no confidence
 #          field (report_confidence=false), verifier gets a trajectory index and reads the full
 #          trajectory from a file in the container (packet_mode=index), skill v2
 #          (tools/skills/rubric_verifier_v2/SKILL.md). Jobs under the same t2verify-<framing>/.
-#   t2verify3 = run-3 configuration (claude_docs/10 §9): answer file lists section numbers only
+#   t2verify3 = run-3 configuration (claude_docs/08 §9): answer file lists section numbers only
 #          (tools/templates/terminus-json-plain-derivation-v2.txt), skill v3 with a fixed
 #          four-step plan (verifier_max_steps=4), N_CONCURRENT defaults to 2.
 #
@@ -42,7 +42,7 @@
 #   sara = sara-numeric + sara-binary (decision 2026-10-15: only SARA for now), numeric / binary =
 #   one SARA subdomain (smoke tests), all = no filter
 #
-# Settings (decided 2026-10-15, see claude_docs/06 decision log):
+# Settings (decided 2026-10-15, see claude_docs/04 decision log):
 #   agent terminus-2, 4 concurrent trials, agent timeout 600 s x 3,
 #   64k context split as 49,152 input + 16,384 output tokens per turn.
 set -euo pipefail

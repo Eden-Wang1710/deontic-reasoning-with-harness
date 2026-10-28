@@ -1,11 +1,11 @@
-# 10 · Solver-Verifier Harness (rubric verifier sub-agent on terminus-2)
+# 08 · Solver-Verifier Harness (rubric verifier sub-agent on terminus-2)
 
 - **Name**: the method is called the **solver-verifier harness** (owner, 2026-10-28): a
   terminus-2 solver that must pass a rubric verifier sub-agent before it may finish. Run-3
   (§9) is the current configuration.
 - **Date opened**: 2026-10-26
 - **Purpose**: design and run log of the first self-verification module of the proposal
-  ([06](06_initial_proposal.md) §2.1): a **verifier sub-agent** that the solver must consult
+  ([04](04_initial_proposal.md) §2.1): a **verifier sub-agent** that the solver must consult
   before it may finish, which checks the trajectory against five process rubrics in an
   **independent context**, with shell access to the same container, and reports back in a
   short fixed format. The solver then continues (repairs) or finishes with a confidence.
@@ -21,13 +21,13 @@ Two findings from the native trajectories drive the design:
 
 1. **In-context self-assessment is anchored.** The same model asked for its confidence inside
    its own trajectory reports a near-constant 0.86–0.97 whatever the answer; AUROC is at chance
-   on SARA-Numeric ([09](09_verbalized_confidence.md) §2.1–2.4). The only elicitation with
+   on SARA-Numeric ([07](07_verbalized_confidence.md) §2.1–2.4). The only elicitation with
    signal was the *answer-only* re-solve in a fresh context (AUROC 0.82–0.89, §2.2), i.e. the
    gain comes from **de-anchoring**. The verifier therefore runs in its own `Chat`, seeing the
    trajectory as data rather than as its own reasoning.
 2. **The solver's own "verification" turn is empty.** Every native trajectory ends with a
    "let me verify my reasoning once more" turn that restates the same figures
-   ([08](08_native_trajectories.md) §1.5, §1.6.1: KIRA's completion checklist produced 0
+   ([06](06_native_trajectories.md) §1.5, §1.6.1: KIRA's completion checklist produced 0
    corrections in 24 wrong trials). The dominant numeric errors are process failures that a
    checklist can name: statute text hidden by truncation and never retrieved (27/29 stock
    misses), amounts and section numbers from memory (16/29), an engaged provision dismissed as
@@ -106,7 +106,7 @@ Statuses are `YES / NO / UNKNOWN / NA` (the proposal's satisfied / violated / ca
 assessed, plus not-applicable). Two rules in the skill shape the report: **no alternative
 answer value** (the verifier points at the gap, never at the figure, so the measured effect is
 that of verification, not of a second solve; cf. the answer-only re-solve of
-[09](09_verbalized_confidence.md) §4, which is a different method), and **evidence or no
+[07](07_verbalized_confidence.md) §4, which is a different method), and **evidence or no
 verdict** (`YES` needs a cited place, `NO` a cited violation, otherwise `UNKNOWN`).
 
 ## 4. SKILL.md v1: rubric order and content
@@ -119,9 +119,9 @@ not a conclusion) plus a **condition ledger** (every applied provision → its c
 with the fact that satisfies it; no inference from related facts); the fifth re-runs prose
 arithmetic in python and reports mismatch without the corrected value. Wording is generic to
 rule-grounded tasks (the file named in the instruction, "every tax the file makes X liable
-for"); it was written after the failure analysis of [08](08_native_trajectories.md) §1.5.1 and
+for"); it was written after the failure analysis of [06](06_native_trajectories.md) §1.5.1 and
 §1.6.1 on the 65 SARA `hard` tasks, so those tasks are development data for the skill
-(decision in [06](06_initial_proposal.md) §8).
+(decision in [04](04_initial_proposal.md) §8).
 
 ## 5. Logs per trial
 
@@ -138,12 +138,12 @@ include them.
 
 | Setting | Value | Note |
 |---|---|---|
-| Base agent | t2fix (truthful truncation marker) | baseline `sara-t2fix-run1`, [08](08_native_trajectories.md) §1.4 |
+| Base agent | t2fix (truthful truncation marker) | baseline `sara-t2fix-run1`, [06](06_native_trajectories.md) §1.4 |
 | Model / sampling | Qwen3.5-35B-A3B on 0238, T 0.7, thinking on, 16k output per call | same server and settings as the baseline; the verifier uses the same `Chat` kwargs |
 | `max_verify_rounds` | 3 | then the solver must finish with a confidence |
 | `verifier_max_steps` | 8 | per round |
 | `include_reasoning` | false | |
-| Agent time limit | 600 s × 3 = 1,800 s wall clock, unchanged | verifier time counts against it; trials that exceed it are scored wrong as in [08](08_native_trajectories.md). Token budget remains the long-term definition |
+| Agent time limit | 600 s × 3 = 1,800 s wall clock, unchanged | verifier time counts against it; trials that exceed it are scored wrong as in [06](06_native_trajectories.md). Token budget remains the long-term definition |
 | Controls | none new | compared against the existing `sara-t2fix-run1` baseline only |
 | Skill | hand-written v1, not optimised | optimisation on a dev subset is a later step |
 
@@ -184,7 +184,7 @@ v1 is frozen for `sara-t2verify-run1`):
    earlier step) as unresolved, which drives repair rounds that cannot change the answer.
 2. The fact ledger needs to be forced (one line per fact, every fact), otherwise the verifier
    checks the solver's provisions instead of the case's facts and the FUTA / dependency /
-   filing-status classes of [08](08_native_trajectories.md) §1.5.1 pass unnoticed.
+   filing-status classes of [06](06_native_trajectories.md) §1.5.1 pass unnoticed.
 
 ### 7.2 Full SARA pass (`sara-t2verify-run1`, started 2026-10-26 01:05 UTC)
 
@@ -199,7 +199,7 @@ trials, 11 `AgentTimeoutError` (all numeric). Scored with `tools/verifier_job_su
 
 **Grading convention.** Harbor still runs `test.sh` on a timed-out trial, so a timed-out
 trial has a reward from whatever was in the answer file. The protocol of
-[08](08_native_trajectories.md) counts timed-out trials as wrong; the table gives that
+[06](06_native_trajectories.md) counts timed-out trials as wrong; the table gives that
 number first and the file-graded number in brackets. The baseline's single timeout
 (case 94) was wrong by file as well, so its numbers are the same under both conventions.
 
@@ -228,7 +228,7 @@ failures); mean 3.3 command steps per numeric round, 2.2 per binary round; 0 com
 rounds (round-2 confirmations).
 
 **All six numeric repairs are the standard-deduction class** of
-[08](08_native_trajectories.md) §1.5.1: the solver had used $4,400 / $6,350 / $12,700 with a
+[06](06_native_trajectories.md) §1.5.1: the solver had used $4,400 / $6,350 / $12,700 with a
 fabricated §162 / §163 / §161 citation; the verifier `grep`'d the citation (absent), read
 §63(c), reported "the figure is not in the file" and pointed at the section; the solver re-read
 it and recomputed, mostly with python. The two baseline-wrong cases among them (15, 63) are
@@ -262,11 +262,11 @@ the report contained a replacement figure or conclusion, against the skill's rul
 | sara-binary | 30 | 0.99 / {0.9, 0.95, 1.0} | 0.51 | 0.19 | 0.20 | 0.46 (28 of 30 all-YES) | 0.61 |
 
 The solver's stated confidence after the verifier loop is exactly as constant as in
-[09](09_verbalized_confidence.md): every numeric trial says 100 %. The last-round rubric
+[07](07_verbalized_confidence.md): every numeric trial says 100 %. The last-round rubric
 statuses are almost all YES by construction (the solver repairs until the verifier is
 satisfied), so they carry no signal; the round-1 count of items not YES is weakly ordered
 (AUROC 0.60 / 0.61 with 10 / 6 positives, CIs include 0.5). Neither reaches the working target
-of [06](06_initial_proposal.md) §8 (AUROC ≥ 0.7 and ECE ≤ 0.15).
+of [04](04_initial_proposal.md) §8 (AUROC ≥ 0.7 and ECE ≤ 0.15).
 
 #### Cost
 
@@ -617,7 +617,7 @@ change before the full run.
   LLM calls sum to ≈640 s: the first call after `cat statute.txt` ran into the 16,384-token
   output cap (`job.log`: "hit max_tokens limit"), ≈550 s at 30 tok/s, and Harbor retried.
   Long thinking at T 0.7 is model variance seen in all runs (run-1 case 2: one 1,681 s
-  episode); the cap stays as decided in `06` §8.
+  episode); the cap stays as decided in `04` §8.
 - Noted for later, not changed: rubric 4's `NO` on the numeric task ("Bob not being a
   qualifying child of another taxpayer is not in the case facts") is a lead written as a
   violation on a numeric task; v3's "never a `NO`" rule covers entailment tasks only.

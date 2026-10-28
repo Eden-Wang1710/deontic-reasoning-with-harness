@@ -10,7 +10,7 @@
 | Name | Hardware | Role | Status |
 |---|---|---|---|
 | **0238** (`spark-0238`) | NVIDIA DGX Spark: 1× GB10 (Grace Blackwell), 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe, aarch64 ✅ | Docker available → runs the DAR harness (Harbor tasks in containers); small-model serving; all docs and code | Partially set up, see §2 |
-| **BRTX** (`brtx601`–`brtx606.idies.jhu.edu`) | 6 Slurm nodes, x86_64, RHEL 9.8. **602**: 4× A100 80GB PCIe, 2× Xeon Silver 4214 (24 threads), 754 GB RAM ✅ 2026-10-23. 601: 8× Quadro RTX 6000 24GB; 603–606: 10× RTX 6000 each (48 total) ✅ from `sinfo`. Every node: 2× 3.5 TB NVMe | GPU work on **602** (`ba100` partition): hosting Qwen3.5-35B-A3B with hidden-state access, probe training, distillation (see [06](06_initial_proposal.md) §4.2, §5). RTX 6000 nodes for small jobs. **No Docker for us** → DAR harness runs on 0238 only | Account works, repo cloned; **no Python env yet, local disks full**, see §3 |
+| **BRTX** (`brtx601`–`brtx606.idies.jhu.edu`) | 6 Slurm nodes, x86_64, RHEL 9.8. **602**: 4× A100 80GB PCIe, 2× Xeon Silver 4214 (24 threads), 754 GB RAM ✅ 2026-10-23. 601: 8× Quadro RTX 6000 24GB; 603–606: 10× RTX 6000 each (48 total) ✅ from `sinfo`. Every node: 2× 3.5 TB NVMe | GPU work on **602** (`ba100` partition): hosting Qwen3.5-35B-A3B with hidden-state access, probe training, distillation (see [04](04_initial_proposal.md) §4.2, §5). RTX 6000 nodes for small jobs. **No Docker for us** → DAR harness runs on 0238 only | Account works, repo cloned; **no Python env yet, local disks full**, see §3 |
 
 Both machines clone the same GitHub repo. **The repo is the only shared state**: commit and push
 on one machine before switching to the other; `git pull` first thing on the other. Nothing else is
@@ -144,7 +144,7 @@ Not yet tried. Starting point: one A100 80GB holds the bf16 weights (72 GB) with
 `--gpus=2` and run vLLM with `--tensor-parallel-size 2` under `sbatch -p ba100` (24 h limit → the server
 must be resubmitted daily; write the script so it restarts cleanly). Serve on a port in 50000–51024 so
 jobs on other nodes can reach it. For hidden states, vLLM does not expose them; the plan in
-[06](06_initial_proposal.md) §4.2 needs either a `transformers` forward pass with `output_hidden_states=True`
+[04](04_initial_proposal.md) §4.2 needs either a `transformers` forward pass with `output_hidden_states=True`
 on a second GPU, or a vLLM hook — decide once the env exists.
 
 ## 4. Sync workflow
