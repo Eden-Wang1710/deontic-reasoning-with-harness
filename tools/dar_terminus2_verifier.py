@@ -1,6 +1,6 @@
 """terminus-2 with a rubric-based verifier sub-agent consulted at task completion.
 
-Design (claude_docs/10_rubric_verifier.md). Stock terminus-2 handles ``task_complete`` in two
+Design (claude_docs/10_solver_verifier_harness.md). Stock terminus-2 handles ``task_complete`` in two
 steps: the first claim puts the agent in a *pending* state and sends back the "Are you sure
 you want to mark the task as complete?" confirmation message; a second ``task_complete``
 ends the trial, running any commands in that response first. This subclass keeps that

@@ -1,4 +1,4 @@
-# 06 · Data Statistics: DeonticBench and What DAR Uses
+# 05 · Data Statistics: DeonticBench and What DAR Uses
 
 - **Date**: 2026-10-14, computed on 0238. ✅ everything in this file was measured directly with
   `tools/deonticbench_stats.py` (DeonticBench side) and an ad-hoc pass over
@@ -134,7 +134,7 @@ Differences from DeonticBench's prompts worth remembering ✅:
   `DISCARDED_SARA_EXAMPLE` as well (two exemplars).
 - DAR's grader: exact integer match / case-insensitive string; DeonticBench: ±$1 on numeric.
 
-## 7. Implications for the thesis ([05](05_confidence_proposal.md))
+## 7. Implications for the thesis ([06](06_initial_proposal.md))
 
 - **SARA via DAR is 65 cases** (35 numeric + 30 binary) per framing. Going to `whole` (100 + 276)
   requires generating Harbor tasks for it; the adapter would need a `data_file` switch and the

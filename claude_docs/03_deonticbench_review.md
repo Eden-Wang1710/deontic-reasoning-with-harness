@@ -10,7 +10,7 @@
   🔶 = inference from a small sample; needs verification.
 - **Why this note exists**: this is the foundation the thesis builds on, so the failure modes below
   are entry points, not criticism. Directions derived from them live in
-  [05_confidence_proposal.md](05_confidence_proposal.md); the agentic follow-up is in
+  [06_initial_proposal.md](06_initial_proposal.md); the agentic follow-up is in
   [04_dar_review.md](04_dar_review.md).
 
 ## 1. What the work is
@@ -168,7 +168,7 @@ Table 2 are not significant. USCIS `hard` is also year-skewed: all 11 items from
 
 ## 3. Where this leads
 
-The thesis direction built on the above is in [05_confidence_proposal.md](05_confidence_proposal.md),
+The thesis direction built on the above is in [06_initial_proposal.md](06_initial_proposal.md),
 together with what DAR ([04](04_dar_review.md)) already addresses and what it leaves open.
 
 ## 4. Reproducing the §2.1 scan

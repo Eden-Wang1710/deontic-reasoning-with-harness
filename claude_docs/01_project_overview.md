@@ -25,7 +25,7 @@ feedback drives answer revision, and the rubric assessments are mapped to a cali
 that decides whether to accept the answer or send the case to a human. Evaluated by accuracy before
 vs. after verification, calibration (ECE, Kuiper) and break-even price on SARA-Numeric. Extensions:
 hidden-state probes and harness distillation into Qwen. The proposal, reviewed with the PhD senior
-and the advisor, is restated in [05_confidence_proposal.md](05_confidence_proposal.md), which
+and the advisor, is restated in [06_initial_proposal.md](06_initial_proposal.md), which
 doubles as the decision log.
 
 The direction is grounded in two close-reading notes:
@@ -53,7 +53,7 @@ This is in-group work — the author is reachable, and missing pieces can simply
 Only `README.md` and `CLAUDE.md` live at the repo root (GitHub renders the first on the landing
 page; Claude Code auto-loads the second only from the root). Every other doc goes in `claude_docs/`.
 
-Where my own code will live is decided once the direction is fixed (see `05`). The rule is: keep it
+Where my own code will live is decided once the direction is fixed (see `06`). The rule is: keep it
 **out of the two subtree directories**, or every future `git subtree pull` will conflict.
 
 ## References

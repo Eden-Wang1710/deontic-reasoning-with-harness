@@ -1,4 +1,4 @@
-# 09 · What we added to the repo (file map)
+# 07 · What we added to the repo (file map)
 
 The two vendored subtrees (`DeonticBench/`, `harbor-deonticbench/`) are upstream code. Everything
 else in the repository, plus a few deliberate edits inside the subtrees, is ours. This file is the
@@ -23,13 +23,13 @@ deontic-reasoning-with-harness/
 │   ├── 02_setup_and_sync.md         machines 0238 / 601-606, env setup, sync, subtree pulls
 │   ├── 03_deonticbench_review.md    close reading of DeonticBench (verified problems vs hypotheses)
 │   ├── 04_dar_review.md             close reading of DAR and the Harbor harness
-│   ├── 05_confidence_proposal.md    thesis proposal + §8 decision log (every project decision)
-│   ├── 06_data_statistics.md        measured case counts, label balance, prompt/statute lengths
-│   ├── 07_native_trajectories.md    pass-1 trajectory log per model: serving, harness config,
+│   ├── 05_data_statistics.md        measured case counts, label balance, prompt/statute lengths
+│   ├── 06_initial_proposal.md       initial thesis proposal + §8 decision log (every project decision)
+│   ├── 07_repo_additions.md         this file
+│   ├── 08_native_trajectories.md    pass-1 trajectory log per model: serving, harness config,
 │   │                                runs, scores, failure modes, deviations from the paper
-│   ├── 08_verbalized_confidence.md  self-verbalised confidence baseline on those trajectories
-│   ├── 09_repo_additions.md         this file
-│   └── 10_rubric_verifier.md        rubric-based verifier sub-agent: design, protocol, runs
+│   ├── 09_verbalized_confidence.md  self-verbalised confidence baseline on those trajectories
+│   └── 10_solver_verifier_harness.md  the solver-verifier harness: design, protocol, runs 1-3
 │
 ├── paper_review_gpt/             ✅ GPT-written Chinese summaries of related papers (owner's;
 │   ├── NN_snake_case.md             do not edit; exception to the English-only rule)
@@ -52,7 +52,7 @@ deontic-reasoning-with-harness/
 │   │                                non-conforming execute_commands tool arguments
 │   ├── dar_trajectory_dossiers.py   per-trial dossiers of SARA-numeric trajectories (what
 │   │                                statute lines the model saw, its reads, final reasoning);
-│   │                                source of the error taxonomy in claude_docs/07 §1.5.1
+│   │                                source of the error taxonomy in claude_docs/08 §1.5.1
 │   ├── dar_job_summary.py           score a Harbor job dir: accuracy / macro-F1 per subdomain,
 │   │                                timing, tokens, 600 s re-scoring; --trials for per-trial lines
 │   ├── verbalized_confidence.py     elicit self-verbalised confidence on finished trajectories
@@ -65,7 +65,7 @@ deontic-reasoning-with-harness/
 │   ├── db_direct_score.py           score a DeonticBench prompt-based direct run under both
 │   │                                grading rules (DAR exact match / DeonticBench ±1, macro-F1),
 │   │                                bootstrap CI; reuses DeonticBench's parser (needs pandas)
-│   ├── deonticbench_stats.py        dataset statistics behind claude_docs/06
+│   ├── deonticbench_stats.py        dataset statistics behind claude_docs/05
 │   └── db_stats.json             ⬜ output of deonticbench_stats.py (regenerable)
 │
 ├── outputs/                      ⬜ our run artifacts outside the subtrees
@@ -96,7 +96,7 @@ serve_qwen35_35b.sh ──► vLLM at :9009 ◄── run_dar_qwen35_35b.sh ─�
                                    │            └ AGENT=kira  dar_kira_local.py
                                    │
           verbalized_confidence.py ┘ (reads jobs/<...>/, writes outputs/verbalized_confidence/)
-          dar_job_summary.py         (reads jobs/<...>/, prints the tables in claude_docs/07)
+          dar_job_summary.py         (reads jobs/<...>/, prints the tables in claude_docs/08)
 ```
 
 - Agent subclasses are loaded by Harbor's `--agent-import-path module:Class` with `tools/` on

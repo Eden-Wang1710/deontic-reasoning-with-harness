@@ -5,7 +5,7 @@ For every finished trial of a Harbor job, rebuild the conversation the agent had
 marked the task complete, append one user turn that asks for the probability that the final
 answer is exactly correct, call the same model once, and parse ``Confidence: NN%``.
 Then score the confidences against the verifier's reward (ECE, Kuiper, Brier, AUROC,
-selective accuracy). See claude_docs/08_verbalized_confidence.md.
+selective accuracy). See claude_docs/09_verbalized_confidence.md.
 
 Conditions (``--condition``):
   incontext   the agent's own full conversation (terminus-2: exact messages from the last
@@ -386,7 +386,7 @@ def ece(conf, y, bins=10):
 
 
 def kuiper(conf, y):
-    """Confidence-weighted Kuiper measure as transcribed in claude_docs/05 §3.2."""
+    """Confidence-weighted Kuiper measure as transcribed in claude_docs/06 §3.2."""
     order = sorted(range(len(conf)), key=lambda i: conf[i])
     n = len(conf)
     c, cmax, cmin = 0.0, 0.0, 0.0

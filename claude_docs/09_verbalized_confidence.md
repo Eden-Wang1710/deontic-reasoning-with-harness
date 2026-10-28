@@ -1,12 +1,12 @@
-# 08 · Self-Verbalised Confidence on Native Trajectories
+# 09 · Self-Verbalised Confidence on Native Trajectories
 
 - **Date opened**: 2026-10-16
-- **Purpose**: the first confidence baseline of the proposal ([05](05_confidence_proposal.md)
+- **Purpose**: the first confidence baseline of the proposal ([06](06_initial_proposal.md)
   §4.3): after the agent has marked a task complete, ask the *same* model for the probability
   that its final answer is exactly correct, and score that number with the calibration metrics
-  of [05](05_confidence_proposal.md) §3.2. Everything later (rubric-derived confidence, Prolog
+  of [06](06_initial_proposal.md) §3.2. Everything later (rubric-derived confidence, Prolog
   verification) is compared against this.
-- **Baseline definition** (owner's decision 2026-10-21, logged in [05](05_confidence_proposal.md)
+- **Baseline definition** (owner's decision 2026-10-21, logged in [06](06_initial_proposal.md)
   §8): the **in-context** condition (§2.1) *is* the self-verbalised confidence baseline. The
   **answer-only** condition is not a baseline but a first verification method (an independent
   re-solve, §4); it is kept in §2.2 for reference.
@@ -18,7 +18,7 @@
 
 | Item | Value |
 |---|---|
-| Trajectories | Pass-1 runs from [07](07_native_trajectories.md): terminus-2 × direct (`sara-t2-run1`, 65 trials) and KIRA × direct (`sara-kira-run1`, finished trials). SARA numeric + binary only. |
+| Trajectories | Pass-1 runs from [08](08_native_trajectories.md): terminus-2 × direct (`sara-t2-run1`, 65 trials) and KIRA × direct (`sara-kira-run1`, finished trials). SARA numeric + binary only. |
 | Model | The same served Qwen3.5-35B-A3B (bf16, thinking on, model-default sampling T 1.0 / top-p 0.95 / top-k 20), one extra call per trial, `max_tokens` 8,192. Sampling is stochastic, so a single call is one draw 🔶 (repeat draws are a cheap follow-up). |
 | Condition `incontext` | The agent's own conversation at the moment it confirmed `task_complete`, then one user turn asking for confidence. terminus-2: the exact `messages` of the last LLM call (from `agent/episode-N/debug.json`) plus its final assistant content. KIRA: rebuilt from `agent/trajectory.json` in KIRA's native format (assistant `tool_calls` → `tool: executed` → user terminal output); the elicitation is appended to the last terminal output. Thinking of earlier turns is *not* in the history, as in the real runs. |
 | Condition `answeronly` | A fresh context: the statute, the task instruction and the agent's final answer, no trajectory. A judge-style baseline showing how much the trajectory context changes the estimate. |
@@ -26,7 +26,7 @@
 | Direct analogues (`tools/db_direct_confidence.py`, 2026-10-23) | `joint`: the stored direct prompt of run 3 plus "end with `Confidence: NN%`", one new generation per case, graded with DAR's exact rule (`reward`) and DeonticBench's ±1 (`reward_pm1`). `posthoc` (replaying each stored generation with the in-context elicitation, 258 generations) was implemented but **cancelled by the owner 2026-10-24** before running: it would only repeat the in-context measurement of §2.1 in the direct setting. |
 | Elicitation | "…estimate how likely it is that this answer is exactly correct … The grader uses exact match … Consider whether you may have misread or misapplied a provision, missed a cross-reference or an exception, misjudged filing status or a dependency, or made an arithmetic slip. Reply in plain text, not JSON … first line exactly `Confidence: <0–100>%` followed by at most three sentences naming the main risk." (full text in the script) |
 | Label | DAR's verifier reward (exact match), from `verifier/test-stdout.txt`. |
-| Metrics | ECE (10 equal-width bins), the confidence-weighted Kuiper measure as transcribed in [05](05_confidence_proposal.md) §3.2, Brier, AUROC (correct vs. wrong), and selective accuracy / coverage at confidence ≥ 0.5 / 0.7 / 0.9. Reliability table with 5 bins. |
+| Metrics | ECE (10 equal-width bins), the confidence-weighted Kuiper measure as transcribed in [06](06_initial_proposal.md) §3.2, Brier, AUROC (correct vs. wrong), and selective accuracy / coverage at confidence ≥ 0.5 / 0.7 / 0.9. Reliability table with 5 bins. |
 
 The two elicitations are not word-for-word parallel: the in-context prompt lists four risk
 classes to consider ("misread or misapplied a provision, missed a cross-reference or an
@@ -44,7 +44,7 @@ unparsed answers are reported and excluded from the metrics.
 terminus-2 records are the **stock** run `sara-t2-run1` (65 trials; no confidence pass on
 `t2fix` yet). KIRA records are the **wrapper-repaired** pass: `sara-kira-run1` (56 finished)
 plus `sara-kira-rerun9` (9), i.e. the merged 65-trial run of
-[07](07_native_trajectories.md) §1.6. All 130 records parsed (one terminus-2 trial answered in
+[08](08_native_trajectories.md) §1.6. All 130 records parsed (one terminus-2 trial answered in
 the agent's JSON format without a number on the first draw and was re-asked; a bare "15%" tax
 rate in that reply is why the parser only accepts percentages tied to a confidence word).
 
@@ -93,7 +93,7 @@ tokens (the agent's own conversation, incl. the statute as the agent saw it), ~1
 ### 2.2 All four conditions, for reference ✅ 2026-10-17 (`outputs/verbalized_confidence/{t2,kira}_{incontext,answeronly}`)
 
 KIRA records cover `sara-kira-run1` (56 finished trials) plus `sara-kira-rerun9`, i.e. the
-merged 65-trial KIRA pass of [07](07_native_trajectories.md) §1.6. All 65 × 4 records parsed.
+merged 65-trial KIRA pass of [08](08_native_trajectories.md) §1.6. All 65 × 4 records parsed.
 
 **Budget.** Answer-only elicitation with thinking on re-derives the whole case from the
 statute before stating a number: at the original 8,192-token budget 25/35 terminus-2 and 15/27
@@ -141,7 +141,7 @@ the ones still unparsed after that.
 | terminus-2 fix | binary | 29 | 21/29 (0.72) | 26/29 (0.90) | 24/29 | 0.943 | 0.74 [0.51, 0.94] | 0.22 | 0.20 | 0.23 | 0.90 / 0.77 | 1,454 |
 | KIRA | numeric | 35 | 12/35 (0.34) | 11/35 (0.31) | 23/35 | 0.906 | 0.40 [0.22, 0.59] | 0.59 | 0.53 | 0.56 | 0.77 / 0.37 | 2,737 |
 | KIRA | binary | 28 | 21/28 (0.75) | 24/28 (0.86) | 25/28 | 0.950 | 0.53 [0.25, 0.82] | 0.20 | 0.19 | 0.22 | 0.93 / 0.81 | 975 |
-| direct joint | numeric | 34 | 13/34 (0.38) exact, 18/34 (0.53) ±1 | 0.435 exact / 0.478 ±1 (run 3 mean, [07](07_native_trajectories.md) §4) | — | 0.943 | 0.48 [0.35, 0.61] | 0.56 | 0.53 | 0.55 | 0.97 / 0.39 | 11,989 |
+| direct joint | numeric | 34 | 13/34 (0.38) exact, 18/34 (0.53) ±1 | 0.435 exact / 0.478 ±1 (run 3 mean, [08](08_native_trajectories.md) §4) | — | 0.943 | 0.48 [0.35, 0.61] | 0.56 | 0.53 | 0.55 | 0.97 / 0.39 | 11,989 |
 | direct joint | binary | 30 | 24/30 (0.80) | 0.823 (run 3 mean) | — | 0.973 | 0.61 [0.30, 0.92] | 0.17 | 0.17 | 0.18 | 0.97 / 0.83 | 6,257 |
 
 n is the number of parsed replies (answer and confidence both present); the full-run counts
@@ -188,7 +188,7 @@ replies say exactly 95 %), so ECE and Kuiper are effectively a single-bin gap.
 **Status for the thesis.** `lastturn` is an alternative *elicitation point*, not a different
 confidence signal; it stays in the chapter as a sensitivity check on §2.1 (same overconfidence,
 no consistent AUROC change) and as the source of the answer-stability observation above. The
-in-context baseline of §2.1 remains the reference ([05](05_confidence_proposal.md) §8,
+in-context baseline of §2.1 remains the reference ([06](06_initial_proposal.md) §8,
 2026-10-21).
 
 ### 2.4 Post-hoc vs. answer-step, side by side ✅ 2026-10-25
@@ -248,14 +248,14 @@ correct ranking with inflated values scores a high AUROC with a poor ECE.
   correctly) while 24 wrong answers stated ≥ 0.85 (memorised deduction amounts, stated
   confidently); with n = 6 this is an observation, not a result. As an abstention signal,
   in-context verbalised confidence on SARA-Numeric is useless for this model; the break-even
-  analysis of [05](05_confidence_proposal.md) §3.3 will show it costs more than accepting
+  analysis of [06](06_initial_proposal.md) §3.3 will show it costs more than accepting
   everything 🔶. (Wording corrected 2026-10-21; see §2.1.)
 - **Binary looks calibrated but is equally uninformative.** Mean confidence 0.94 vs. accuracy
   0.87 (ECE 0.085); the small gap is a coincidence between the model's habitual 0.95 and a task
   it gets right 87 % of the time, not self-knowledge: all four misses sit at 0.85–0.95 among 26
   hits at the same values. AUROC 0.69 (terminus-2) and 0.38 (KIRA) are noise over 4 negatives.
 - **The stated risks are the right kind but the wrong instance.** The justification sentences
-  name exactly the error classes seen in [07](07_native_trajectories.md) §1.5 (exemption
+  name exactly the error classes seen in [08](08_native_trajectories.md) §1.5 (exemption
   phase-out, dependency status, standard-deduction amount), and in wrong trials the named risk
   is sometimes the actual error (e.g. `WFrmvX5`, `Sh3HGrS` both flag the exemption phase-out
   at 70 %), yet the number stays ≥ 0.7. The model can *list* its failure modes but does not
@@ -280,7 +280,7 @@ correct ranking with inflated values scores a high AUROC with a poor ECE.
 - **It is expensive, because it is a second solve.** ~8k thinking tokens per trial versus ~1k
   for in-context, and the 8k budget was not enough for 40 of 70 numeric answers. Any
   "answer-only verifier" in the harness has to budget for a full re-derivation; this is the
-  cost side of the break-even analysis in [05](05_confidence_proposal.md) §3.3.
+  cost side of the break-even analysis in [06](06_initial_proposal.md) §3.3.
 - **Binary is saturated either way.** Accuracy 0.87 on both harnesses, 3–4 errors, every
   condition states 0.86–0.95 on nearly everything; AUROCs 0.38–0.69 are noise over ≤ 4
   negatives. Verbalised confidence has nothing to work with on SARA-Binary for this model.
@@ -308,7 +308,7 @@ which a confidence module living inside the harness might not "deserve". Resolut
 - **Consequences for the thesis.** The confidence-calibration baseline is in-context (§2.1).
   Answer-only moves to the verification chapter as the first candidate verifier, scored on
   AUROC / selective accuracy, with its ~8k-token re-derivation charged in the break-even
-  analysis ([05](05_confidence_proposal.md) §3.3).
+  analysis ([06](06_initial_proposal.md) §3.3).
 
 ## 5. Open items
 

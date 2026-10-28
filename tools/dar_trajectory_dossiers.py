@@ -5,7 +5,7 @@ and gold Prolog comments (from DeonticBench/data/sara_numeric/hard.json), which 
 the model actually had in its observations (exact line matching against the task's
 statute.txt, summarised per key provision), the statute-reading commands it issued, whether
 it ran python, and the last analysis messages plus the tail of the thinking that produced the
-answer. The output is what the error classification in claude_docs/07 §1.5.1 was read from.
+answer. The output is what the error classification in claude_docs/08 §1.5.1 was read from.
 
 Usage (from the repo root):
     python tools/dar_trajectory_dossiers.py <job_dir> <tag> <out_dir>

@@ -2,7 +2,7 @@
 # Serve Qwen3.5-35B-A3B with vLLM on 0238 (DGX Spark, GB10, 119 GB unified memory).
 # Harbor task containers reach it at http://172.17.0.1:9009/v1 (Docker bridge gateway).
 #
-# Settings (decided 2026-10-15, see claude_docs/05 decision log):
+# Settings (decided 2026-10-15, see claude_docs/06 decision log):
 #   bf16 weights, thinking mode ON, reasoning parser splits <think> into reasoning_content,
 #   64k context, sampling defaults from the model's generation_config.json
 #   (temperature 1.0, top_p 0.95, top_k 20 = Qwen's "thinking mode, general tasks" recommendation).

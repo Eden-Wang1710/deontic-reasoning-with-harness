@@ -1,10 +1,10 @@
-# 07 · Native Trajectories per Model
+# 08 · Native Trajectories per Model
 
 - **Purpose**: the log of **pass-1 ("native") trajectories** collected by running the unmodified DAR
   harness with each model, before any self-verification or confidence module is added. One section
   per model. Each section records how the model was served, how the harness was configured, what
   was run, the scores, and the failure-mode observations that feed the rubric design in
-  [05](05_confidence_proposal.md) §2.1.
+  [06](06_initial_proposal.md) §2.1.
 - **Date opened**: 2026-10-15
 - **Confidence convention**: ✅ = checked directly on the machine / in the run output on the date
   given. 🔶 = expectation or inference.
@@ -13,7 +13,7 @@
 
 ## 0. Which runs, and why
 
-Per the proposal ([05](05_confidence_proposal.md) §4.2), the open-weight model is
+Per the proposal ([06](06_initial_proposal.md) §4.2), the open-weight model is
 **Qwen3.5-35B-A3B**, chosen because (a) it is the model the proposal names, (b) DAR's paper reports
 it (SARA-Numeric 34.0 % direct → 11.4 % KIRA, Airline 13.7 % → 1.3 %, per the GPT summary of Table 1
 🔶 — re-check against the paper), so a reference number exists to validate our pipeline against, and
@@ -23,7 +23,7 @@ deferred to a later scale comparison.
 
 **Scope decision (2026-10-15)**: for now only the two **SARA** subdomains are run (sara-numeric 35
 + sara-binary 30 = 65 tasks per framing); Airline and USCIS-AAO are deferred. SARA is the
-evaluation benchmark named in the proposal ([05](05_confidence_proposal.md) §4.1), and the
+evaluation benchmark named in the proposal ([06](06_initial_proposal.md) §4.1), and the
 break-even-price analysis needs SARA-Numeric specifically.
 
 Planned run order for each model:
@@ -50,7 +50,7 @@ Planned run order for each model:
 | Precision | **bf16** (paper-comparable; FP8 MoE kernels on GB10 untested 🔶). |
 | Thinking | **On** (model default). `--reasoning-parser qwen3` routes `<think>` into `reasoning_content` so the harness only sees the answer text. |
 | Tool calling | `--enable-auto-tool-choice --tool-call-parser qwen3_xml` (added 2026-10-16 for the KIRA harness; terminus-2 does not send `tools`). `--override-generation-config '{"max_new_tokens": 16384}'` gives requests that omit `max_tokens` (baseline_kira) the same 16k per-turn cap as terminus-2. |
-| Sampling | Server defaults from `generation_config.json`: temperature 1.0, top_p 0.95, top_k 20. **But both harnesses send `temperature: 0.7`** (Terminus2's constructor default, inherited by baseline_kira; confirmed in `episode-N/debug.json`, ✅ 2026-10-16) and no `max_tokens`, so the agent runs used T 0.7 with the server's top-p/top-k. Only the verbalised-confidence calls ([08](08_verbalized_confidence.md)) use T 1.0. Earlier text here claiming T 1.0 for the runs was wrong. |
+| Sampling | Server defaults from `generation_config.json`: temperature 1.0, top_p 0.95, top_k 20. **But both harnesses send `temperature: 0.7`** (Terminus2's constructor default, inherited by baseline_kira; confirmed in `episode-N/debug.json`, ✅ 2026-10-16) and no `max_tokens`, so the agent runs used T 0.7 with the server's top-p/top-k. Only the verbalised-confidence calls ([09](09_verbalized_confidence.md)) use T 1.0. Earlier text here claiming T 1.0 for the runs was wrong. |
 | Context | `--max-model-len 65536`, `--max-num-seqs 8`, `--gpu-memory-utilization 0.75` (unified memory; leaves ~30 GB for OS and task containers). |
 | Endpoint | `http://0.0.0.0:9009/v1`, served model name `qwen3.5-35b-a3b`, api key `token-abc123` (dummy, local only). Containers use `http://172.17.0.1:9009/v1`. |
 | Memory estimate 🔶 | weights 72 GB + runtime ~8 GB + KV cache 20 KB/token for the 10 full-attention layers (1.34 GB per 64k sequence) ≈ 90 GB in use. |
@@ -67,7 +67,7 @@ Launcher: `tools/run_dar_qwen35_35b.sh <framing>`.
 | `--n-concurrent` | 4 | Number of trials (task containers + agent loops) running in parallel; vLLM batches their requests. MoE with 3B active is bandwidth-bound, so 4-way batching is nearly free. |
 | Agent timeout | task default 600 s × `--agent-timeout-multiplier 3` = 1,800 s | Local throughput is far below the cloud APIs the paper used; 600 s would inflate timeouts. The 600 s accuracy can be recomputed post hoc from trajectory timestamps. |
 | Jobs dir | `harbor-deonticbench/jobs/qwen3.5-35b-a3b/<framing>/` (gitignored) | — |
-| `AGENT=t2fix` | `--agent-import-path dar_terminus2_local:Terminus2TruthfulMarker` = `tools/dar_terminus2_local.py`, a Terminus2 subclass whose `_limit_output_length` is idempotent; jobs under `jobs/qwen3.5-35b-a3b/t2fix-<framing>/` | Decision 2026-10-16 (`05` §8): stock terminus-2 truncates each observation twice, so the statute arrives with a "71 interior bytes omitted" marker while 17,205 bytes are missing (§1.5). The subclass keeps the 10,000-byte limit and only makes the count truthful (verified offline on `tax-case-10/statute.txt`: once → 17,205, twice → 71, fixed → 17,205). |
+| `AGENT=t2fix` | `--agent-import-path dar_terminus2_local:Terminus2TruthfulMarker` = `tools/dar_terminus2_local.py`, a Terminus2 subclass whose `_limit_output_length` is idempotent; jobs under `jobs/qwen3.5-35b-a3b/t2fix-<framing>/` | Decision 2026-10-16 (`06` §8): stock terminus-2 truncates each observation twice, so the statute arrives with a "71 interior bytes omitted" marker while 17,205 bytes are missing (§1.5). The subclass keeps the 10,000-byte limit and only makes the count truthful (verified offline on `tax-case-10/statute.txt`: once → 17,205, twice → 71, fixed → 17,205). |
 | `AGENT=kira` | `--agent-import-path dar_kira_local:AgentHarness` = `tools/dar_kira_local.py`, a subclass of meta-harness `agents.baseline_kira:AgentHarness` (the paper's KIRA harness: terminus-2 with native tool calling); jobs under `jobs/qwen3.5-35b-a3b/kira-<framing>/`; api key via `HOSTED_VLLM_API_KEY` because baseline_kira calls litellm directly and ignores `llm_kwargs` | The subclass only fixes the *shape* of the `commands` tool argument (see §1.6); prompt, tools and loop are upstream's. |
 
 ### 1.3 Runs
@@ -165,7 +165,7 @@ Summary against the paper (SARA, Qwen3.5-35B-A3B, terminus-2; our runs at the 1,
 
 
 Same harness, prompt, sampling (T 0.7) and 10,000-byte observation limit as `sara-t2-run1`;
-the only change is `tools/dar_terminus2_local.py` (decision 2026-10-16, `05` §8): the model is
+the only change is `tools/dar_terminus2_local.py` (decision 2026-10-16, `06` §8): the model is
 told the true number of omitted bytes (`17347 interior bytes omitted` in 68/68 statute reads)
 instead of `71`. Server otherwise idle, so the timings are comparable with run 1. 65 trials,
 1 agent timeout (counted wrong), 2 h 39 min wall.
@@ -256,7 +256,7 @@ because the marker polling removes the fixed per-command waits.
   re-statement of the same reasoning ("Let me verify my analysis one more time") that confirms
   the answer; in `tMSxBwb` (smoke) the model did revise once, from a right-looking 102,546 to a
   wrong 102,348. There is no independent check (no re-derivation, no code, no second reading).
-  This is the behaviour the rubric-based verifier in [05](05_confidence_proposal.md) §2.1 has
+  This is the behaviour the rubric-based verifier in [06](06_initial_proposal.md) §2.1 has
   to replace, and the natural place to hook a confidence estimate.
 - **Token usage carries no correctness signal.** Numeric: correct 10,457 vs. wrong 11,394 mean
   completion tokens (thinking 30k vs. 33k chars); binary: 3,624 vs. 3,823. No turn hit the 16k
@@ -265,7 +265,7 @@ because the marker polling removes the fixed per-command waits.
 - **Time is the real cost on local hardware.** Numeric trials average 12.6 min of agent time
   and 20/35 exceed DAR's 600 s limit; under the paper's timeout half of this model's numeric
   runs would be scored as failures regardless of answer quality. Any thesis table must state
-  the timeout used (decision in [05](05_confidence_proposal.md) §8).
+  the timeout used (decision in [06](06_initial_proposal.md) §8).
 - **Harness noise**: 26 trials logged "Parser warnings: Extra text detected before JSON object"
   (the model writes prose before the JSON tool call; terminus-2 still parses it), one "No valid
   JSON object found" (recovered next turn). Six LiteLLM error footers appear in the job log
@@ -373,7 +373,7 @@ Reading:
   way.
 - **Pure computation errors exist but are few** (2 and 3), always in the mental multiplication
   of the top bracket or in rounding; python was used in 5 of the 57 wrong trials.
-- **Implication for the verifier (05 §2.1)**: a provision-coverage check ("did the agent read
+- **Implication for the verifier (06 §2.1)**: a provision-coverage check ("did the agent read
   the section its answer depends on?") would flag 27/29 and 24/28 of these misses before any
   arithmetic check, and a cheap "every dollar amount in the answer must be quoted from the file"
   rule would catch the standard-deduction class outright 🔶.
@@ -597,4 +597,4 @@ KIRA (`sara-kira-run1` + `sara-kira-rerun9`):
 Prompt-based direct (run 3, DeonticBench): statute fully in the prompt; `n = 4` generations at
 T 0.7; DeonticBench's own scorer uses ±$1 on numeric answers, so for the DAR comparison the
 outputs must be re-scored with exact match (decision 2026-10-14 in
-[05](05_confidence_proposal.md) §8).
+[06](06_initial_proposal.md) §8).
