@@ -3,7 +3,7 @@
 - **Date**: 2026-10-14. Rewritten from scratch; the earlier version (work Mac / personal Mac /
   "JHU cluster" TBD) is obsolete and survives only in git history.
 - **Scope**: all work now happens on **lab cluster machines**: two DGX Sparks (0238, and 029b since
-  2026-10-28) and the BRTX GPU nodes. No laptops are involved.
+  2026-10-28; 0238 under the personal account `zixuan0238` since 2026-10-29) and the BRTX GPU nodes. No laptops are involved.
 - ✅ = checked on the machine on the date given. 🔶 = not yet checked.
 
 ## 1. Machines
@@ -11,37 +11,49 @@
 | Name | Hardware | Role | Status |
 |---|---|---|---|
 | **029b** (`spark-029b`) | NVIDIA DGX Spark, same spec as 0238: 1× GB10, 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe (2.7 TB free), aarch64 ✅ 2026-10-28 | Same role as 0238 (DAR harness in Docker, local vLLM serving). Added 2026-10-28 as a second Spark so runs can proceed on two machines | Set up 2026-10-28, see §2b |
-| **0238** (`spark-0238`) | NVIDIA DGX Spark: 1× GB10 (Grace Blackwell), 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe, aarch64 ✅ | Docker available → runs the DAR harness (Harbor tasks in containers); small-model serving; all docs and code | Partially set up, see §2 |
+| **0238** (`spark-0238`) | NVIDIA DGX Spark: 1× GB10 (Grace Blackwell), 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe, aarch64 ✅ | Docker available → runs the DAR harness (Harbor tasks in containers); small-model serving; all docs and code | Set up under `zixuan0238` 2026-10-29, see §2 |
 | **BRTX** (`brtx601`–`brtx606.idies.jhu.edu`) | 6 Slurm nodes, x86_64, RHEL 9.8. **602**: 4× A100 80GB PCIe, 2× Xeon Silver 4214 (24 threads), 754 GB RAM ✅ 2026-10-23. 601: 8× Quadro RTX 6000 24GB; 603–606: 10× RTX 6000 each (48 total) ✅ from `sinfo`. Every node: 2× 3.5 TB NVMe | GPU work on **602** (`ba100` partition): hosting Qwen3.5-35B-A3B with hidden-state access, probe training, distillation (see [04](04_initial_proposal.md) §4.2, §5). RTX 6000 nodes for small jobs. **No Docker for us** → DAR harness runs on 0238 only | Account works, repo cloned; **no Python env yet, local disks full**, see §3 |
 
 All machines clone the same GitHub repo. **The repo is the only shared state**: commit and push
 on one machine before switching to another; `git pull` first thing on the other. Nothing else is
 synchronised automatically.
 
-## 2. 0238 (DGX Spark) — current state ✅ 2026-10-14
+## 2. 0238 (DGX Spark) — current state ✅ 2026-10-29 (account `zixuan0238`)
+
+Since 2026-10-29 work on 0238 happens under the personal account **`zixuan0238`** (previously the
+shared lab account `blab-0238`, whose home is not readable by other users). The old account still
+exists and, as of 2026-10-29, still runs its own vLLM server on port 9009 (see the vLLM row). The
+earlier `blab-0238` table (2026-10-14/15) is in git history; its facts that still apply are kept below.
 
 | Item | State | Action needed |
 |---|---|---|
-| OS | Ubuntu 24.04.3 LTS, aarch64 (ARM) | Note: ARM. Docker images and Python wheels must be `arm64`; check Harbor's task images build/pull on ARM 🔶. |
-| GPU | GB10, driver 580.82.09, CUDA 13.0 toolkit at `/usr/local/cuda` | — |
-| Docker | 28.3.3; user added to `docker` group ✅ 2026-10-15. In a shell opened before that, use `sg docker -c "<cmd>"`; new logins get it directly. Base image `ghcr.io/laude-institute/t-bench/python-3-13:20250620` has an `arm64` manifest and a DAR task image builds and runs here ✅ (swipl 9.0.4, Python 3.13.1, tmux). | — |
-| Python | miniconda3 at `~/miniconda3`, base = 3.13.11; env `myenv` (Python 3.12) has **vllm 0.20.1, torch 2.11.0+cu130, transformers 5.8.0, flashinfer 0.6.8** and CUDA works on the GB10 ✅ 2026-10-15. Used for model serving (`tools/serve_qwen35_35b.sh`). | A separate DeonticBench env is still to do, see §2.1 |
-| `uv` | 0.13.1 at `~/.local/bin/uv` ✅ 2026-10-15; `harbor-deonticbench` synced (`uv sync --all-extras --dev`), `uv run harbor` works | — |
-| `swipl` | ❌ not on the host; **not needed for Harbor runs** (it is inside the task image) | Install into the project env only for DeonticBench's own Prolog eval |
-| `torch` | in `myenv` (see Python row) | — |
+| OS / GPU | Ubuntu 24.04.3 LTS, aarch64 (ARM); GB10, driver 580.82.09, CUDA 13.0 toolkit at `/usr/local/cuda` (`nvcc` on PATH) ✅ | Docker images and Python wheels must be `arm64`. |
+| Docker | 28.3.3, daemon active; `zixuan0238` added to the `docker` group ✅ 2026-10-29 (`sudo usermod -aG docker zixuan0238`). In a shell opened before that, use `sg docker -c "<cmd>"`; new logins get it directly. The DAR task image builds and runs on this host (verified under `blab-0238`, 2026-10-15). | — |
+| Python | miniconda3 at `~/miniconda3` (conda 26.9.4). Installed with `-b`, **`conda init bash` not run** → call binaries by path (`~/miniconda3/envs/<env>/bin/...`, as `tools/serve_qwen35_35b.sh` does). **Anaconda's default channels need a ToS acceptance on this conda version**; both envs were created with `--override-channels -c conda-forge` instead, which needs none. | `~/miniconda3/bin/conda init bash` if the interactive `conda activate` is wanted |
+| `myenv` (serving) | Python 3.12 (conda-forge); **vllm 0.20.1, torch 2.11.0+cu130, transformers 5.8.0, flashinfer 0.6.8.post1, ninja** — same versions as 029b. `pip install vllm==0.20.1` pulled the cu130 torch by itself; transformers was then upgraded to 5.8.0 (vLLM pins 4.57.6; the `xgrammar` warning is the same as on 029b and ignored). `torch.cuda.is_available()` → True on the GB10 ✅. | — |
+| `deontic` (DeonticBench) | Python 3.12 (conda-forge) with `DeonticBench/requirements.txt` minus `vllm` ✅. No `swipl`: conda-forge has no `linux-aarch64` build and, unlike 029b, this host has no `/usr/bin/swipl`. Not needed for Harbor runs (it is inside the task image). | `sudo apt install swi-prolog` only if DeonticBench's own Prolog eval must run here |
+| `uv` | 0.13.6 at `~/.local/bin/uv` ✅; `harbor-deonticbench` synced (`uv sync --all-extras --dev`), `uv run harbor` works ✅. `hf` CLI 2.4.0 via `uv tool install huggingface_hub` (`~/.local/bin/hf`). | — |
+| `swipl` / `tmux` | `swipl` ❌ (see above); `/usr/bin/tmux` ✅ | — |
 | `gh` | ❌ not installed | Optional |
-| git identity | **not set** (`user.name` / `user.email` empty) | `git config --global user.name "Zixuan Wang"` and `git config --global user.email <email>` before the first commit |
-| git remote | `https://github.com/Eden-Wang1710/deontic-reasoning-with-harness`; no credential helper configured | Pushing needs either a PAT with a credential helper, or switch the remote to SSH and add this machine's key to GitHub. **Do this before the first push.** |
-| Repo path | `/home/blab-0238/Desktop/workspace/zwang544/deontic-reasoning-with-harness` | — |
-| Model weights | `~/models/Qwen3.5-35B-A3B` (bf16, 72 GB) ✅ 2026-10-15; vLLM logs in `~/vllm_logs/` | Download others with `hf download <repo> --local-dir ~/models/<name>` (from `myenv`) |
+| git identity | `user.name "Zixuan Wang"`, `user.email zixuanw712@gmail.com` set globally ✅ 2026-10-29 | — |
+| git remote | SSH, `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`, with an ed25519 key (`~/.ssh/id_ed25519`) registered on GitHub ✅ 2026-10-29; `ssh -T git@github.com` authenticates. | — |
+| Repo path | `/home/zixuan0238/deontic-reasoning-with-harness` (cloned 2026-10-29 at `a53d6509`) | — |
+| Model weights | `~/models/Qwen3.5-35B-A3B` is a **symlink to `/home/blab-0238/models/Qwen3.5-35B-A3B`** (bf16, 14 safetensors shards, 67 GiB), shared read-only through a POSIX ACL (`setfacl -m u:zixuan0238:x /home/blab-0238; setfacl -R -m u:zixuan0238:rX /home/blab-0238/models`) set from the `blab-0238` account on 2026-10-29; all shards verified readable ✅. vLLM logs in `~/vllm_logs/`. | New models: `hf download <repo> --local-dir ~/models/<name>`, or ask for them under the shared path |
+| vLLM serving | `tools/serve_qwen35_35b.sh` is unchanged and `$HOME`-relative, so it works from this account 🔶 (not yet started here). **As of 2026-10-29 the `blab-0238` account's server (started 2026-10-26, same model and settings, port 9009, key `token-abc123`) is still up and answers from this account**, holding 89 GB of GPU memory and leaving ~22 GB RAM free. Do not start a second server while it runs: the port is taken and the memory is not there. Reuse it, or have it stopped from the `blab-0238` side first. The same memory-pressure caveat as on 029b applies: launch Harbor runs from a terminal or with `setsid nohup`, not as a Claude Code background task. | — |
+| API keys | none in the environment yet | Export `OPENAI_API_KEY` etc. in `~/.bashrc` (§4); not needed for local-vLLM runs |
 
-### 2.1 Project environment on 0238 (to do)
+### 2.1 Project environment on 0238 ✅ done 2026-10-29
+
+Recipe used (binaries by path; `--override-channels -c conda-forge` avoids the Anaconda channel ToS prompt):
 
 ```bash
 # from the repo root
-conda create -n deontic python=3.12 -y && conda activate deontic     # Harbor needs ≥3.12
-conda install -c conda-forge swi-prolog -y                           # `swipl` for both repos
-grep -v '^vllm' DeonticBench/requirements.txt | pip install -r /dev/stdin   # DeonticBench deps (skip vllm unless serving here)
+C=~/miniconda3/bin/conda
+$C create -n myenv   --override-channels -c conda-forge python=3.12   # serving
+~/miniconda3/envs/myenv/bin/pip install vllm==0.20.1 flashinfer-python==0.6.8.post1 ninja transformers==5.8.0
+$C create -n deontic --override-channels -c conda-forge python=3.12   # DeonticBench (Harbor needs ≥3.12)
+grep -v '^vllm' DeonticBench/requirements.txt | ~/miniconda3/envs/deontic/bin/pip install -r /dev/stdin
+# conda-forge has no swi-prolog for linux-aarch64; install it with apt if needed
 
 # Harbor side
 cd harbor-deonticbench && uv sync --all-extras --dev && cd ..
@@ -52,8 +64,6 @@ Upstream's README differs from this repo in two places (still true ✅):
 - No `git submodule update` is needed: `harbor-deonticbench/meta-harness/` is committed as plain
   files; there is no `.gitmodules`.
 - `harbor-deonticbench/datasets/` does not need generating: we track it in git (§5).
-
-Update the table in §2 once each item is done.
 
 ## 2b. 029b (DGX Spark) — current state ✅ 2026-10-28
 
