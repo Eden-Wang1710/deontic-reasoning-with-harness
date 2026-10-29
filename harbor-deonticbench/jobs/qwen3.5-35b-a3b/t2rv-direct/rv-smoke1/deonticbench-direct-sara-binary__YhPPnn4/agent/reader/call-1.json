@@ -1,0 +1,75 @@
+{
+  "call": 1,
+  "query": "Section 2(b)(2)(C) and the definition of head of household status",
+  "result": {
+    "excerpts": [
+      {
+        "lines": "204-236",
+        "label": "\u00a72(b) Definition of head of household",
+        "why": "the query asks about head of household status and Section 2(b)(2)(C)"
+      },
+      {
+        "lines": "231-234",
+        "label": "\u00a72(b)(2)(C) Spouse death during taxable year",
+        "why": "the taxpayer's spouse died during 2014, triggering this provision"
+      }
+    ],
+    "unresolved": []
+  },
+  "excerpts": [
+    {
+      "index": 1,
+      "file": "/app/statute.txt",
+      "lines": "204-236",
+      "label": "\u00a72(b) Definition of head of household",
+      "why": "the query asks about head of household status and Section 2(b)(2)(C)",
+      "inserted": true,
+      "text": "(b) Definition of head of household\n\n    (1) In general\n\n    An individual shall be considered a head of a household if, and only if, such individual is not married at the close of his taxable year, is not a surviving spouse (as defined in subsection (a)), and either-\n\n        (A) maintains as his home a household which constitutes for more than one-half of such taxable year the principal place of abode, as a member of such household, of-\n\n            (i) a qualifying child of the individual (as defined in section 152(c)), but not if such child-\n\n                (I) is married at the close of the taxpayer's taxable year, and\n\n                (II) is not a dependent of such individual by reason of section 152(b)(2) or\n\n            (ii) any other person who is a dependent of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such person under section 151, or\n\n        (B) maintains a household which constitutes for such taxable year the principal place of abode of the father or mother of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such father or mother under section 151.\n\n    For purposes of this paragraph, an individual shall be considered as maintaining a household only if over half of the cost of maintaining the household during the taxable year is furnished by such individual.\n\n    (2) Determination of status\n\n    Notwithstanding paragraph (1),\n\n        (A) an individual who is legally separated from his spouse under a decree of divorce or of separate maintenance shall not be considered as married;\n\n        (B) a taxpayer shall be considered as not married at the close of his taxable year if at any time during the taxable year his spouse is a nonresident alien; and\n\n        (C) a taxpayer shall be considered as married at the close of his taxable year if his spouse (other than a spouse described in subparagraph (B)) died during the taxable year.\n\n    (3) Limitations\n\n    Notwithstanding paragraph (1), for purposes of this subtitle a taxpayer shall not be considered to be a head of a household-"
+    },
+    {
+      "index": 2,
+      "file": "/app/statute.txt",
+      "lines": "231-234",
+      "label": "\u00a72(b)(2)(C) Spouse death during taxable year",
+      "why": "the taxpayer's spouse died during 2014, triggering this provision",
+      "inserted": true,
+      "text": "\n        (C) a taxpayer shall be considered as married at the close of his taxable year if his spouse (other than a spouse described in subparagraph (B)) died during the taxable year.\n\n    (3) Limitations"
+    }
+  ],
+  "chars_inserted": 2302,
+  "truncated": [],
+  "not_inserted": [],
+  "invalid": [],
+  "result_text": "=== READER RESULT (call 1 of this task) ===\nQuery: Section 2(b)(2)(C) and the definition of head of household status\n\n[1] lines 204-236 of /app/statute.txt \u00b7 \u00a72(b) Definition of head of household\n    why: the query asks about head of household status and Section 2(b)(2)(C)\n(b) Definition of head of household\n\n    (1) In general\n\n    An individual shall be considered a head of a household if, and only if, such individual is not married at the close of his taxable year, is not a surviving spouse (as defined in subsection (a)), and either-\n\n        (A) maintains as his home a household which constitutes for more than one-half of such taxable year the principal place of abode, as a member of such household, of-\n\n            (i) a qualifying child of the individual (as defined in section 152(c)), but not if such child-\n\n                (I) is married at the close of the taxpayer's taxable year, and\n\n                (II) is not a dependent of such individual by reason of section 152(b)(2) or\n\n            (ii) any other person who is a dependent of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such person under section 151, or\n\n        (B) maintains a household which constitutes for such taxable year the principal place of abode of the father or mother of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such father or mother under section 151.\n\n    For purposes of this paragraph, an individual shall be considered as maintaining a household only if over half of the cost of maintaining the household during the taxable year is furnished by such individual.\n\n    (2) Determination of status\n\n    Notwithstanding paragraph (1),\n\n        (A) an individual who is legally separated from his spouse under a decree of divorce or of separate maintenance shall not be considered as married;\n\n        (B) a taxpayer shall be considered as not married at the close of his taxable year if at any time during the taxable year his spouse is a nonresident alien; and\n\n        (C) a taxpayer shall be considered as married at the close of his taxable year if his spouse (other than a spouse described in subparagraph (B)) died during the taxable year.\n\n    (3) Limitations\n\n    Notwithstanding paragraph (1), for purposes of this subtitle a taxpayer shall not be considered to be a head of a household-\n\n[2] lines 231-234 of /app/statute.txt \u00b7 \u00a72(b)(2)(C) Spouse death during taxable year\n    why: the taxpayer's spouse died during 2014, triggering this provision\n\n        (C) a taxpayer shall be considered as married at the close of his taxable year if his spouse (other than a spouse described in subparagraph (B)) died during the taxable year.\n\n    (3) Limitations\n\n(2 excerpt(s) inserted, 2,302 characters, nothing truncated; 2 command steps used)",
+  "steps_used": 2,
+  "parse_failures": 0,
+  "context_exceeded": false,
+  "commands": [
+    {
+      "step": 1,
+      "command": "grep -n '^\u00a7' /app/statute.txt | head -50",
+      "output": "1:\u00a71. Tax imposed\n52:\u00a7151. Allowance of deductions for personal exemptions\n95:\u00a7152. Dependent defined\n182:\u00a72. Definitions and special rules\n245:\u00a73301. Rate of tax\n251:\u00a73306. Definitions\n358:\u00a763. Taxable income defined\n471:\u00a768. Overall limitation on itemized deductions\n504:\u00a77703. Determination of marital status\n"
+    },
+    {
+      "step": 1,
+      "command": "grep -n -i 'head of household' /app/statute.txt",
+      "output": "204:(b) Definition of head of household\n394:        (B) $4,400 in the case of a head of household (as defined in section 2(b)), or\n489:        (B) $275,000 in the case of a head of household (as defined in section 2(b)),\n491:        (C) $250,000 in the case of an individual who is not married and who is not a surviving spouse or head of household, and\n"
+    },
+    {
+      "step": 1,
+      "command": "grep -n -i '2(b)(2)(C)' /app/statute.txt",
+      "output": "\n[exit code 1]"
+    },
+    {
+      "step": 2,
+      "command": "sed -n '182,250p' /app/statute.txt",
+      "output": "\u00a72. Definitions and special rules\n\n(a) Definition of surviving spouse\n\n    (1) In general\n\n    For purposes of section 1, the term \"surviving spouse\" means a taxpayer-\n\n        (A) whose spouse died during either of the two years immediately preceding the taxable year, and\n\n        (B) who maintains as his home a household which constitutes for the taxable year the principal place of abode (as a member of such household) of a dependent (i) who (within the meaning of section 152) is a son, stepson, daughter, or stepdaughter of the taxpayer, and (ii) with respect to whom the taxpayer is entitled to a deduction for the taxable year under section 151.\n\n    For purposes of this paragraph, an individual shall be considered as maintaining a household only if over half of the cost of maintaining the household during the taxable year is furnished by such individual.\n\n    (2) Limitations\n\n    Notwithstanding paragraph (1), for purposes of section 1 a taxpayer shall not be considered to be a surviving spouse-\n\n        (A) if the taxpayer has remarried at any time before the close of the taxable year, or\n\n        (B) unless, for the taxpayer's taxable year during which his spouse died, a joint return could have been made. A husband and wife may make a single return jointly of income taxes, even though one of the spouses has neither gross income nor deductions, except that no joint return shall be made if either the husband or wife at any time during the taxable year is a nonresident alien.\n\n(b) Definition of head of household\n\n    (1) In general\n\n    An individual shall be considered a head of a household if, and only if, such individual is not married at the close of his taxable year, is not a surviving spouse (as defined in subsection (a)), and either-\n\n        (A) maintains as his home a household which constitutes for more than one-half of such taxable year the principal place of abode, as a member of such household, of-\n\n            (i) a qualifying child of the individual (as defined in section 152(c)), but not if such child-\n\n                (I) is married at the close of the taxpayer's taxable year, and\n\n                (II) is not a dependent of such individual by reason of section 152(b)(2) or\n\n            (ii) any other person who is a dependent of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such person under section 151, or\n\n        (B) maintains a household which constitutes for such taxable year the principal place of abode of the father or mother of the taxpayer, if the taxpayer is entitled to a deduction for the taxable year for such father or mother under section 151.\n\n    For purposes of this paragraph, an individual shall be considered as maintaining a household only if over half of the cost of maintaining the household during the taxable year is furnished by such individual.\n\n    (2) Determination of status\n\n    Notwithstanding paragraph (1),\n\n        (A) an individual who is legally separated from his spouse under a decree of divorce or of separate maintenance shall not be considered as married;\n\n        (B) a taxpayer shall be considered as not married at the close of his taxable year if at any time during the taxable year his spouse is a nonresident alien; and\n\n        (C) a taxpayer shall be considered as married at the close of his taxable year if his spouse (other than a spouse described in subparagraph (B)) died during the taxable year.\n\n    (3) Limitations\n\n    Notwithstanding paragraph (1), for purposes of this subtitle a taxpayer shall not be considered to be a head of a household-\n\n        (A) if at any time during the taxable year he is a nonresident alien; or\n\n        (B) by reason of an individual who would not be a dependent for the taxable year but for subparagraph (H) of section 152(d)(2).\n\n\n---\n\n\u00a73301. Rate of tax\n\nThere is hereby imposed on every employer (as defined in section 3306(a)) for each calendar year an excise tax, with respect to having individuals in his employ, equal to 6 percent of the total wages (as defined in section 3306(b)) paid by such employer during the calendar year with respect to employment (as defined in section 3306(c)).\n\n---\n\n"
+    }
+  ],
+  "packet_chars": 987,
+  "prompt_tokens": 7154,
+  "completion_tokens": 1348,
+  "n_llm_calls": 3,
+  "elapsed_sec": 71.91322135925293,
+  "trajectory_file": "trajectory.reader-call-1.json"
+}

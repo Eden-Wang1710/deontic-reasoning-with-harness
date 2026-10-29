@@ -1,0 +1,26 @@
+New Terminal Output:
+
+root@24c7fa31c85d:/app# python3 -c "
+> gross_income = 311510
+> standard_deduction = 3000
+> personal_exemptions = 2000 + 2000  # Alice + Bob
+> taxable_income = gross_income - standard_deduction - personal_exemptions
+> print(f'Taxable income: {taxable_income}')
+>
+> # §1(c)(v): $79,772 + 39.6% of excess over $250,000
+> base_tax = 79772
+> excess = taxable_income - 250000
+> tax = base_tax + excess * 0.396
+> print(f'Base tax: {base_tax}')
+> print(f'Excess over 250k: {excess}')
+> print(f'Additional tax: {excess * 0.396}')
+> print(f'Total tax: {tax}')
+> print(f'Rounded: {round(tax)}')
+> "
+Taxable income: 304510
+Base tax: 79772
+Excess over 250k: 54510
+Additional tax: 21585.960000000003
+Total tax: 101357.96
+Rounded: 101358
+root@24c7fa31c85d:/app#

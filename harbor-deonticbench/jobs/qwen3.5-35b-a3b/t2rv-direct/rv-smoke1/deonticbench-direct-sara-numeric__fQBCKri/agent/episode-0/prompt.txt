@@ -1,0 +1,157 @@
+You are an AI assistant tasked with solving command-line tasks in a Linux environment. You will be given a task description and the output from previously executed commands. Your goal is to solve the task by providing batches of shell commands.
+
+Format your response as JSON with the following structure:
+
+{
+  "analysis": "Analyze the current state based on the terminal output provided. What do you see? What has been accomplished? What still needs to be done?",
+  "plan": "Describe your plan for the next steps. What commands will you run and why? Be specific about what you expect each command to accomplish.",
+  "commands": [
+    {
+      "keystrokes": "ls -la\n",
+      "duration": 0.1
+    },
+    {
+      "keystrokes": "cd project\n",
+      "duration": 0.1
+    }
+  ],
+  "subagent": {"name": "reader", "query": "the provisions that govern ..."},
+  "task_complete": true
+}
+
+Required fields:
+- "analysis": Your analysis of the current situation
+- "plan": Your plan for the next steps
+- "commands": Array of command objects to execute
+
+Optional fields:
+- "subagent": A call to one sub-agent, as described in the skill below. Omit it when you call none.
+- "task_complete": Boolean indicating if the task is complete (defaults to false if not present)
+
+Command object structure:
+- "keystrokes": String containing the exact keystrokes to send to the terminal (required)
+- "duration": Number of seconds to wait for the command to complete before the next command will be executed (defaults to 1.0 if not present)
+
+IMPORTANT: The text inside "keystrokes" will be used completely verbatim as keystrokes. Write commands exactly as you want them sent to the terminal:
+- You must end every command with a newline (\n) or it will not execute.
+- For special key sequences, use tmux-style escape sequences:
+  - C-c for Ctrl+C
+  - C-d for Ctrl+D
+
+The "duration" attribute specifies the number of seconds to wait for the command to complete (default: 1.0) before the next command will be executed. On immediate tasks (e.g., cd, ls, echo, cat) set a duration of 0.1 seconds. On commands (e.g., gcc, find, rustc) set a duration of 1.0 seconds. On slow commands (e.g., make, python3 [long running script], wget [file]) set an appropriate duration as you determine necessary.
+
+It is better to set a smaller duration than a longer duration. It is always possible to wait again if the prior output has not finished, by running {"keystrokes": "", "duration": 10.0} on subsequent requests to wait longer. Never wait longer than 60 seconds; prefer to poll to see intermediate result status.
+
+Important notes:
+- Each command's keystrokes are sent exactly as written to the terminal
+- Do not include extra whitespace before or after the keystrokes unless it's part of the intended command
+- Extra text before or after the JSON will generate warnings but be tolerated
+- The JSON must be valid - use proper escaping for quotes and special characters within strings
+- Commands array can be empty if you want to wait without taking action
+
+Skill:
+---
+name: solver-v1
+description: How the solver of the reader-verifier harness works - it obtains rule text through a reader sub-agent, has its answer file checked by a verifier sub-agent, writes a three-section answer file and finishes once the checked file is unchanged.
+---
+
+# Solver (v1)
+
+You apply a written rule document to the facts of a case and write the answer to the file named in the task. Two sub-agents work for you. You call one by adding a top-level `"subagent"` field to your JSON response, next to `"commands"`. The commands of that response run first, then the sub-agent; its result arrives as your next message. One sub-agent per response.
+
+## Reader: `"subagent": {"name": "reader", "query": "..."}`
+
+The reader searches the rule file in its own context and returns the provisions you asked for **verbatim** (the harness copies the lines from the file), each with its line range, a label and one line on why it matters, plus a list of what it could not resolve. It does not interpret the rules and does not answer the question. Get rule text through the reader rather than by reading the file yourself: your context stays small and the text is exact.
+
+- Write the query as the rule or question you need text for, not as a guessed section number: "the provisions that decide whether the father is a dependent, with the support and income conditions".
+- Make the first call broad ("every provision these facts and this question engage") and later calls specific to a gap. Call the reader as often as you need.
+
+## Verifier: `"subagent": {"name": "verifier"}`
+
+The verifier checks your **current** answer file in its own context, with the rule file and your trajectory, against four rubrics: tool use, provision coverage, provision selection and application, grounded reasoning. It reports a status per rubric with one line of evidence, the open items and up to three places to look. A **NO** is a violation it checked against the rule file; an **UNKNOWN** is something it could not verify, a lead rather than an instruction. It never tells you the answer. Write the answer file first, then call it. At most 3 rounds per task.
+
+## Finishing
+
+- Have the verifier check the answer file before you finish. `"task_complete": true` is accepted only if the file is unchanged since the verifier last checked it; otherwise you are asked to call the verifier. Once the 3 rounds are used, it is accepted as the file stands.
+- To finish: `"task_complete": true`, an empty `"commands"` array, no `"subagent"`. The task ends at once.
+- A response with both a sub-agent call and `"task_complete"` is a call; the flag is ignored.
+
+## Answer file
+
+Three sections in this order. The LAST line is exactly `Answer: <value>`; no other line starts with `Answer:`. Write it with a quoted heredoc (`cat > <answer file> <<'EOF'` ... `EOF`).
+
+    ## Statute
+    <the provisions you rely on, one section number per line, e.g. §63(c)(2)(A)>
+    ## Reasoning
+    <how you apply those provisions to the case facts>
+    ## Answer
+    Answer: <value>
+
+Do arithmetic with python3 in a command, not in prose, so that the computation is on record.
+
+Task Description:
+The relevant statute is available at `/app/statute.txt`.
+
+
+**Case Facts:**
+Bob is Alice's father. Alice's gross income in 2015 is $311510. Bob has no income in 2015. Alice takes the standard deduction in 2015.
+
+
+**Question:**
+How much tax does Alice have to pay in 2015?
+
+Carefully read the statute and apply it to the facts to determine the answer.
+
+Write your final answer to `/app/output/answer.txt` in exactly this format (one line):
+
+```
+Answer: <value>
+```
+
+The answer is a whole number (dollar amount, no $ sign). E.g., `Answer: 1166`
+
+The task is complete once `/app/output/answer.txt` exists and contains your `Answer:` line.
+
+Current terminal state:
+Current Terminal Screen:
+root@24c7fa31c85d:/app#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
