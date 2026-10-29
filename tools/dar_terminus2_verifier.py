@@ -101,11 +101,15 @@ RUBRIC_LABELS = {
 # whole solver trajectory; the skill tells it to read narrow ranges.
 VERIFIER_OUTPUT_LIMIT = 6000
 
-MARKER_BYTES_RE = re.compile(r"output limited to \d+ bytes; (\d+) interior bytes omitted")
+MARKER_BYTES_RE = re.compile(
+    r"output limited to \d+ bytes; (\d+) interior bytes omitted"
+)
 CONFIDENCE_FIELD_RE = re.compile(
     r'"confidence"\s*:\s*"?\s*(\d{1,3}(?:\.\d+)?)\s*%?\s*"?', re.IGNORECASE
 )
-CONFIDENCE_LINE_RE = re.compile(r"confidence\s*[:=]\s*(\d{1,3}(?:\.\d+)?)\s*%?", re.IGNORECASE)
+CONFIDENCE_LINE_RE = re.compile(
+    r"confidence\s*[:=]\s*(\d{1,3}(?:\.\d+)?)\s*%?", re.IGNORECASE
+)
 
 
 def _truthy(value: Any) -> bool:
@@ -187,12 +191,16 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         # Must be set before super().__init__, which reads the prompt template.
         self._derivation_record = _truthy(derivation_record)
         self._derivation_template = (
-            Path(derivation_template) if derivation_template else DERIVATION_TEMPLATE_PATH
+            Path(derivation_template)
+            if derivation_template
+            else DERIVATION_TEMPLATE_PATH
         )
         super().__init__(*args, **kwargs)
         self._report_confidence = _truthy(report_confidence)
         if packet_mode not in ("full", "index"):
-            raise ValueError(f"packet_mode must be 'full' or 'index', got {packet_mode!r}")
+            raise ValueError(
+                f"packet_mode must be 'full' or 'index', got {packet_mode!r}"
+            )
         self._packet_mode = packet_mode
         self._max_verify_rounds = int(max_verify_rounds)
         self._verifier_max_steps = int(verifier_max_steps)
@@ -200,6 +208,8 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         self._answer_path = answer_path
         self._skill_path = Path(skill_path) if skill_path else DEFAULT_SKILL_PATH
         self._skill_text = self._skill_path.read_text()
+        # Rubric names -> labels for rendering; a subclass with another rubric set swaps it.
+        self._rubric_labels: dict[str, str] = dict(RUBRIC_LABELS)
 
         self._verify_round = 0
         self._claimed_complete = False
@@ -223,7 +233,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
     def _get_prompt_template_path(self) -> Path:
         if getattr(self, "_derivation_record", False):
             if self._parser_name != "json":
-                raise ValueError("derivation_record template exists for the json parser only")
+                raise ValueError(
+                    "derivation_record template exists for the json parser only"
+                )
             return self._derivation_template
         return super()._get_prompt_template_path()
 
@@ -245,10 +257,15 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             self._trajectory_steps.append(self._pending_verifier_step)
             self._pending_verifier_step = None
         was_pending = self._pending_completion
-        commands, is_task_complete, feedback, analysis, plan, llm_response = (
-            await super()._handle_llm_interaction(
-                chat, prompt, logging_paths, original_instruction, session
-            )
+        (
+            commands,
+            is_task_complete,
+            feedback,
+            analysis,
+            plan,
+            llm_response,
+        ) = await super()._handle_llm_interaction(
+            chat, prompt, logging_paths, original_instruction, session
         )
         self._current_analysis = analysis or ""
         self._current_plan = plan or ""
@@ -320,7 +337,11 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 + self._finish_clause()
             )
         else:
-            body = self._pending_report_text + "\n\n" + self._decision_instruction(rounds_left)
+            body = (
+                self._pending_report_text
+                + "\n\n"
+                + self._decision_instruction(rounds_left)
+            )
         return f"Current terminal state:\n{terminal_output}\n\n{body}"
 
     def _finish_clause(self) -> str:
@@ -387,7 +408,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         if self._packet_mode == "index":
             full_text = self._build_packet(commands, terminal_output, answer, round_no)
             await self._upload_trajectory(environment, full_text, round_no)
-            packet = self._build_index_packet(commands, terminal_output, answer, round_no)
+            packet = self._build_index_packet(
+                commands, terminal_output, answer, round_no
+            )
         else:
             packet = self._build_packet(commands, terminal_output, answer, round_no)
 
@@ -476,14 +499,14 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 "You have used all command steps. Reply now with exactly one JSON object "
                 'whose "report" field is filled in from the evidence you already have, '
                 'and "commands": []. "report" must follow the schema in your instructions: '
-                'a "rubrics" list with all five rubrics (name, status, evidence), then '
+                f'a "rubrics" list with all {len(self._rubric_labels)} rubrics (name, status, evidence), then '
                 '"unused_facts", "quoted_lines", "unresolved" and "suggested_actions".'
             )
             retry = (
-                "Your reply could not be parsed as one JSON object whose \"report\" is an "
+                'Your reply could not be parsed as one JSON object whose "report" is an '
                 "object. Check the brackets: every { has one }, every [ has one ], and a "
                 "rubric entry ends with } followed by a comma or the ] that closes "
-                "\"rubrics\". Reply once more with exactly that JSON object and nothing else."
+                '"rubrics". Reply once more with exactly that JSON object and nothing else.'
             )
             prompt_text: str | None = closing
             for attempt in range(2):
@@ -495,11 +518,15 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 parsed = _extract_json_object(resp.content)
                 if parsed and isinstance(parsed.get("report"), dict):
                     report = parsed["report"]
-                    self._append_verifier_step(vsteps, resp, [], None, prompt_text=prompt_text)
+                    self._append_verifier_step(
+                        vsteps, resp, [], None, prompt_text=prompt_text
+                    )
                     break
                 parse_failures += 1
                 # The retry text is logged once, as this step's observation.
-                self._append_verifier_step(vsteps, resp, [], retry, prompt_text=prompt_text)
+                self._append_verifier_step(
+                    vsteps, resp, [], retry, prompt_text=prompt_text
+                )
                 prompt_text = None
 
         report_text = self._render_report(report, round_no, context_exceeded)
@@ -513,7 +540,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             "round": round_no,
             "answer": answer,
             "answer_changed": (
-                None if self._previous_answer is None else answer != self._previous_answer
+                None
+                if self._previous_answer is None
+                else answer != self._previous_answer
             ),
             "report": report,
             "report_text": report_text,
@@ -631,7 +660,11 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             out = f"{out}\n{result.stderr}" if out else result.stderr
         if result.return_code not in (0, None):
             out = f"{out}\n[exit code {result.return_code}]"
-        return self._limit_output_length(out, VERIFIER_OUTPUT_LIMIT) if out else "(no output)"
+        return (
+            self._limit_output_length(out, VERIFIER_OUTPUT_LIMIT)
+            if out
+            else "(no output)"
+        )
 
     def _build_packet(
         self, commands: list[Command], terminal_output: str, answer: str, round_no: int
@@ -670,7 +703,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         parts.append(f"=== SOLVER TRAJECTORY ({n} steps) ===")
         parts.extend(steps_text)
         parts.append("")
-        parts.append(f"=== VERIFICATION ROUND {round_no} of {self._max_verify_rounds} ===")
+        parts.append(
+            f"=== VERIFICATION ROUND {round_no} of {self._max_verify_rounds} ==="
+        )
         if round_no > 1 and self._previous_report_text:
             changed = "unknown"
             if self._previous_answer is not None:
@@ -721,17 +756,26 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 if tc.function_name == "bash_command" and isinstance(tc.arguments, dict)
             ]
             claimed = any(
-                tc.function_name == "mark_task_complete" for tc in (step.tool_calls or [])
+                tc.function_name == "mark_task_complete"
+                for tc in (step.tool_calls or [])
             )
             obs = ""
             if step.observation and step.observation.results:
-                obs = "\n".join(r.content for r in step.observation.results if r.content)
+                obs = "\n".join(
+                    r.content for r in step.observation.results if r.content
+                )
             parts.append(self._index_line(n, cmds, obs, claimed))
         n += 1
-        cmds = [c.keystrokes.strip().splitlines()[0][:100] for c in commands if c.keystrokes.strip()]
+        cmds = [
+            c.keystrokes.strip().splitlines()[0][:100]
+            for c in commands
+            if c.keystrokes.strip()
+        ]
         parts.append(self._index_line(n, cmds, terminal_output, True))
         parts.append("")
-        parts.append(f"=== VERIFICATION ROUND {round_no} of {self._max_verify_rounds} ===")
+        parts.append(
+            f"=== VERIFICATION ROUND {round_no} of {self._max_verify_rounds} ==="
+        )
         if round_no > 1 and self._previous_report_text:
             changed = "unknown"
             if self._previous_answer is not None:
@@ -800,7 +844,7 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         # ({"rubrics": [...], "statute_coverage": {"status": ..}, ...}).
         if isinstance(rubrics, list):
             listed = {r.get("name") for r in rubrics if isinstance(r, dict)}
-            for name in RUBRIC_LABELS:
+            for name in self._rubric_labels:
                 entry = report.get(name)
                 if name not in listed and isinstance(entry, dict) and "status" in entry:
                     rubrics = rubrics + [{"name": name, **entry}]
@@ -810,10 +854,14 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                     lines.append(f"{i}. {r}")
                     continue
                 name = str(r.get("name", f"rubric_{i}"))
-                label = RUBRIC_LABELS.get(name, name.replace("_", " ").capitalize())
+                label = self._rubric_labels.get(
+                    name, name.replace("_", " ").capitalize()
+                )
                 status = str(r.get("status", "UNKNOWN")).upper()
                 evidence = str(r.get("evidence", "")).strip()
-                lines.append(f"{i}. {label}: {status}." + (f" {evidence}" if evidence else ""))
+                lines.append(
+                    f"{i}. {label}: {status}." + (f" {evidence}" if evidence else "")
+                )
         else:
             lines.append(json.dumps(report, indent=2))
         unresolved = report.get("unresolved") or []
@@ -874,7 +922,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 metrics=Metrics(
                     prompt_tokens=usage.prompt_tokens if usage else None,
                     completion_tokens=usage.completion_tokens if usage else None,
-                    cached_tokens=usage.cache_tokens if usage and usage.cache_tokens else None,
+                    cached_tokens=usage.cache_tokens
+                    if usage and usage.cache_tokens
+                    else None,
                 ),
             )
         )

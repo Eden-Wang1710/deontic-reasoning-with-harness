@@ -29,7 +29,9 @@ deontic-reasoning-with-harness/
 │   ├── 06_native_trajectories.md    pass-1 trajectory log per model: serving, harness config,
 │   │                                runs, scores, failure modes, deviations from the paper
 │   ├── 07_verbalized_confidence.md  self-verbalised confidence baseline on those trajectories
-│   └── 08_solver_verifier_harness.md  the solver-verifier harness: design, protocol, runs 1-3
+│   ├── 08_solver_verifier_harness.md  the solver-verifier harness: design, protocol, runs 1-3
+│   └── 09_reader_verifier_harness.md  the reader-verifier harness (v1 of reader-verifier-compactor):
+│                                sub-agents as tools, completion gate, reader/verifier skills, runs
 │
 ├── paper_review_gpt/             ✅ GPT-written Chinese summaries of related papers (owner's;
 │   ├── NN_snake_case.md             do not edit; exception to the English-only rule)
@@ -38,7 +40,7 @@ deontic-reasoning-with-harness/
 ├── tools/                        ✅ project-owned scripts; nothing of ours goes in the subtrees
 │   ├── serve_qwen35_35b.sh          start vLLM for Qwen3.5-35B-A3B on 0238 (bf16, thinking
 │   │                                parser, qwen3_xml tool parser, 16k max_new_tokens)
-│   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|kira,
+│   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|t2verify{,2,3}|t2rv|kira,
 │   │                                SUBSET=sara|all; writes harbor-deonticbench/jobs/...
 │   ├── dar_terminus2_local.py       Terminus2 subclass with a truthful truncation marker
 │   │                                (AGENT=t2fix): same 10 KB limit, idempotent limiter
@@ -47,7 +49,23 @@ deontic-reasoning-with-harness/
 │   │                                fresh context with shell access; ≤3 rounds, then finish
 │   │                                with a confidence; logs under <trial>/agent/rubric_verifier/
 │   ├── skills/rubric_verifier/SKILL.md  the verifier's instructions (five rubrics, report
-│   │                                schema); hand-written v1, the object of later optimisation
+│   │                            schema); hand-written v1; v2 and v3 (run-2, run-3) alongside
+│   ├── skills/rubric_verifier_v4/SKILL.md  verifier of the reader-verifier harness: four rubrics
+│   │                            (tool use, provision coverage, provision selection, grounded
+│   │                            reasoning); text that reached the solver through a reader result
+│   │                            counts as coverage
+│   ├── skills/reader_v1/SKILL.md    the reader's instructions: goal = coverage, three-step search,
+│   │                            return line ranges + labels, never an answer; the harness extracts the text
+│   ├── skills/solver_v1/SKILL.md    the solver's instructions for the reader-verifier harness (how to
+│   │                            call the two sub-agents, finishing protocol, answer-file format);
+│   │                            filled into the {skill} slot of the multiagent template
+│   ├── templates/                   solver prompt templates swapped in by derivation_record=true:
+│   │                            terminus-json-plain-derivation{,-v2}.txt (runs 2, 3),
+│   │                            terminus-json-multiagent-v1.txt (reader-verifier harness)
+│   ├── dar_terminus2_multiagent.py  Terminus2ReaderVerifier (AGENT=t2rv): run-3 agent whose solver
+│   │                            calls reader/verifier via a "subagent" JSON field; task_complete
+│   │                            accepted only for an answer-file hash the verifier saw; logs under
+│   │                            <trial>/agent/reader/ and rubric_verifier/
 │   ├── dar_kira_local.py            baseline_kira subclass (AGENT=kira): reshapes Qwen's
 │   │                                non-conforming execute_commands tool arguments
 │   ├── dar_trajectory_dossiers.py   per-trial dossiers of SARA-numeric trajectories (what
@@ -80,7 +98,7 @@ deontic-reasoning-with-harness/
     │                                (upstream gitignores them; see claude_docs/02 §5)
     ├── .gitignore                ✏️ the `/datasets/` line commented out, with a note
     └── jobs/qwen3.5-35b-a3b/     ✅ Harbor job dirs (committed since 2026-10-27): <framing>/, t2fix-<framing>/, kira-<framing>/,
-                                     t2verify-<framing>/
+                                     t2verify-<framing>/, t2rv-<framing>/
 ```
 
 Machine-local files that are not in the repository at all (0238): model weights under
@@ -91,9 +109,11 @@ Machine-local files that are not in the repository at all (0238): model weights 
 
 ```
 serve_qwen35_35b.sh ──► vLLM at :9009 ◄── run_dar_qwen35_35b.sh ──► harbor run ──► jobs/<...>/
-                                   ▲            │ AGENT=t2    stock terminus-2
-                                   │            │ AGENT=t2fix dar_terminus2_local.py
-                                   │            └ AGENT=kira  dar_kira_local.py
+                                   ▲            │ AGENT=t2        stock terminus-2
+                                   │            │ AGENT=t2fix     dar_terminus2_local.py
+                                   │            │ AGENT=t2verify* dar_terminus2_verifier.py (+ skills/rubric_verifier*, templates/)
+                                   │            │ AGENT=t2rv      dar_terminus2_multiagent.py (+ skills/solver_v1, reader_v1, rubric_verifier_v4, templates/)
+                                   │            └ AGENT=kira      dar_kira_local.py
                                    │
           verbalized_confidence.py ┘ (reads jobs/<...>/, writes outputs/verbalized_confidence/)
           dar_job_summary.py         (reads jobs/<...>/, prints the tables in claude_docs/06)

@@ -29,12 +29,19 @@
 #   t2verify3 = run-3 configuration (claude_docs/08 §9): answer file lists section numbers only
 #          (tools/templates/terminus-json-plain-derivation-v2.txt), skill v3 with a fixed
 #          four-step plan (verifier_max_steps=4), N_CONCURRENT defaults to 2.
+#   t2rv = reader-verifier harness (claude_docs/09_reader_verifier_harness.md): the run-3 solver
+#          calls a reader sub-agent (tools/skills/reader_v1/SKILL.md; returns verbatim rule-file
+#          lines chosen by line range) and the verifier (skill v4) through a "subagent" field in
+#          its JSON response; task_complete is accepted only for an answer file the verifier has
+#          seen (tools/dar_terminus2_multiagent.py). Jobs under jobs/<model>/t2rv-<framing>/.
+#          Tunables via --ak: reader_max_steps=3 reader_max_chars=16000 max_unverified_claims=2.
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
 #   AGENT=kira tools/run_dar_qwen35_35b.sh direct                       # baseline_kira harness
 #   AGENT=t2fix tools/run_dar_qwen35_35b.sh direct                      # terminus-2, truthful marker
 #   AGENT=t2verify tools/run_dar_qwen35_35b.sh direct                   # t2fix + rubric verifier
+#   AGENT=t2rv tools/run_dar_qwen35_35b.sh direct                        # reader-verifier harness
 #   tools/run_dar_qwen35_35b.sh direct                                  # SARA numeric + binary (65 tasks)
 #   SUBSET=all tools/run_dar_qwen35_35b.sh direct                       # all 173 tasks
 #
@@ -82,12 +89,17 @@ case "$AGENT" in
         JOBS="jobs/qwen3.5-35b-a3b/t2verify-direct"
         N_CONCURRENT="${N_CONCURRENT:-2}"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
+  t2rv) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        AGENT_ARGS="--agent-import-path dar_terminus2_multiagent:Terminus2ReaderVerifier"
+        JOBS="jobs/qwen3.5-35b-a3b/t2rv-$FRAMING"
+        N_CONCURRENT="${N_CONCURRENT:-2}"
+        export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
         JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
-  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|kira)" >&2; exit 1 ;;
+  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|t2rv|kira)" >&2; exit 1 ;;
 esac
 N_CONCURRENT="${N_CONCURRENT:-4}"
 
