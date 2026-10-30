@@ -2,15 +2,17 @@
 
 - **Date**: 2026-10-14. Rewritten from scratch; the earlier version (work Mac / personal Mac /
   "JHU cluster" TBD) is obsolete and survives only in git history.
-- **Scope**: all work now happens on **lab cluster machines**: two DGX Sparks (0238, and 029b since
-  2026-10-28; 0238 under the personal account `zixuan0238` since 2026-10-29) and the BRTX GPU nodes. No laptops are involved.
+- **Scope**: all work now happens on **lab cluster machines**: the DGX Spark 0238 (under the personal
+  account `zixuan0238` since 2026-10-29) and the BRTX GPU nodes. No laptops are involved.
+- A second DGX Spark (`spark-029b`) was used on 2026-10-28 only and was **returned to the professor on
+  2026-10-30. Do not use it.** Its setup notes were removed from this doc (git history before
+  2026-10-30 has them); a few run artifacts under `harbor-deonticbench/jobs/` still mention it.
 - ✅ = checked on the machine on the date given. 🔶 = not yet checked.
 
 ## 1. Machines
 
 | Name | Hardware | Role | Status |
 |---|---|---|---|
-| **029b** (`spark-029b`) | NVIDIA DGX Spark, same spec as 0238: 1× GB10, 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe (2.7 TB free), aarch64 ✅ 2026-10-28 | Same role as 0238 (DAR harness in Docker, local vLLM serving). Added 2026-10-28 as a second Spark so runs can proceed on two machines | Set up 2026-10-28, see §2b |
 | **0238** (`spark-0238`) | NVIDIA DGX Spark: 1× GB10 (Grace Blackwell), 20 CPU cores, 119 GB unified memory, 3.7 TB NVMe, aarch64 ✅ | Docker available → runs the DAR harness (Harbor tasks in containers); small-model serving; all docs and code | Set up under `zixuan0238` 2026-10-29, see §2 |
 | **BRTX** (`brtx601`–`brtx606.idies.jhu.edu`) | 6 Slurm nodes, x86_64, RHEL 9.8. **602**: 4× A100 80GB PCIe, 2× Xeon Silver 4214 (24 threads), 754 GB RAM ✅ 2026-10-23. 601: 8× Quadro RTX 6000 24GB; 603–606: 10× RTX 6000 each (48 total) ✅ from `sinfo`. Every node: 2× 3.5 TB NVMe | GPU work on **602** (`ba100` partition): hosting Qwen3.5-35B-A3B with hidden-state access, probe training, distillation (see [04](04_initial_proposal.md) §4.2, §5). RTX 6000 nodes for small jobs. **No Docker for us** → DAR harness runs on 0238 only | Account works, repo cloned; **no Python env yet, local disks full**, see §3 |
 
@@ -30,8 +32,8 @@ earlier `blab-0238` table (2026-10-14/15) is in git history; its facts that stil
 | OS / GPU | Ubuntu 24.04.3 LTS, aarch64 (ARM); GB10, driver 580.82.09, CUDA 13.0 toolkit at `/usr/local/cuda` (`nvcc` on PATH) ✅ | Docker images and Python wheels must be `arm64`. |
 | Docker | 28.3.3, daemon active; `zixuan0238` added to the `docker` group ✅ 2026-10-29 (`sudo usermod -aG docker zixuan0238`). In a shell opened before that, use `sg docker -c "<cmd>"`; new logins get it directly. The DAR task image builds and runs on this host (verified under `blab-0238`, 2026-10-15). | — |
 | Python | miniconda3 at `~/miniconda3` (conda 26.9.4). Installed with `-b`, **`conda init bash` not run** → call binaries by path (`~/miniconda3/envs/<env>/bin/...`, as `tools/serve_qwen35_35b.sh` does). **Anaconda's default channels need a ToS acceptance on this conda version**; both envs were created with `--override-channels -c conda-forge` instead, which needs none. | `~/miniconda3/bin/conda init bash` if the interactive `conda activate` is wanted |
-| `myenv` (serving) | Python 3.12 (conda-forge); **vllm 0.20.1, torch 2.11.0+cu130, transformers 5.8.0, flashinfer 0.6.8.post1, ninja** — same versions as 029b. `pip install vllm==0.20.1` pulled the cu130 torch by itself; transformers was then upgraded to 5.8.0 (vLLM pins 4.57.6; the `xgrammar` warning is the same as on 029b and ignored). `torch.cuda.is_available()` → True on the GB10 ✅. | — |
-| `deontic` (DeonticBench) | Python 3.12 (conda-forge) with `DeonticBench/requirements.txt` minus `vllm` ✅. No `swipl`: conda-forge has no `linux-aarch64` build and, unlike 029b, this host has no `/usr/bin/swipl`. Not needed for Harbor runs (it is inside the task image). | `sudo apt install swi-prolog` only if DeonticBench's own Prolog eval must run here |
+| `myenv` (serving) | Python 3.12 (conda-forge); **vllm 0.20.1, torch 2.11.0+cu130, transformers 5.8.0, flashinfer 0.6.8.post1, ninja**. `pip install vllm==0.20.1` pulled the cu130 torch by itself; transformers was then upgraded to 5.8.0 (vLLM pins 4.57.6; the `xgrammar` warning about `transformers<5` is ignored, the import works). `torch.cuda.is_available()` → True on the GB10 ✅. | — |
+| `deontic` (DeonticBench) | Python 3.12 (conda-forge) with `DeonticBench/requirements.txt` minus `vllm` ✅. No `swipl`: conda-forge has no `linux-aarch64` build and this host has no `/usr/bin/swipl`. Not needed for Harbor runs (it is inside the task image). | `sudo apt install swi-prolog` only if DeonticBench's own Prolog eval must run here |
 | `uv` | 0.13.6 at `~/.local/bin/uv` ✅; `harbor-deonticbench` synced (`uv sync --all-extras --dev`), `uv run harbor` works ✅. `hf` CLI 2.4.0 via `uv tool install huggingface_hub` (`~/.local/bin/hf`). | — |
 | `swipl` / `tmux` | `swipl` ❌ (see above); `/usr/bin/tmux` ✅ | — |
 | `gh` | ❌ not installed | Optional |
@@ -39,7 +41,7 @@ earlier `blab-0238` table (2026-10-14/15) is in git history; its facts that stil
 | git remote | SSH, `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`, with an ed25519 key (`~/.ssh/id_ed25519`) registered on GitHub ✅ 2026-10-29; `ssh -T git@github.com` authenticates. | — |
 | Repo path | `/home/zixuan0238/deontic-reasoning-with-harness` (cloned 2026-10-29 at `a53d6509`) | — |
 | Model weights | `~/models/Qwen3.5-35B-A3B` is a **symlink to `/home/blab-0238/models/Qwen3.5-35B-A3B`** (bf16, 14 safetensors shards, 67 GiB), shared read-only through a POSIX ACL (`setfacl -m u:zixuan0238:x /home/blab-0238; setfacl -R -m u:zixuan0238:rX /home/blab-0238/models`) set from the `blab-0238` account on 2026-10-29; all shards verified readable ✅. vLLM logs in `~/vllm_logs/`. | New models: `hf download <repo> --local-dir ~/models/<name>`, or ask for them under the shared path |
-| vLLM serving | `tools/serve_qwen35_35b.sh` works unchanged from this account ✅ 2026-10-29 (started with `setsid nohup`, log `~/vllm_logs/qwen35-35b-a3b.log`): `/v1/models` lists `qwen3.5-35b-a3b`, a chat request returns the answer in `content` and the thinking in `message.reasoning`, and `http://172.17.0.1:9009/v1` (the Docker bridge address the task containers use) answers ✅. Cold start **succeeded on the first attempt** (unlike 2 of 2 on 029b): weights 107 s from the shared NVMe path, torch.compile 25 s, FlashInfer MoE JIT + autotune the rest, ~5 min in total (23:06 → 23:11). GPU KV cache 982,090 tokens at `--gpu-memory-utilization 0.75` (15.0× concurrency at 64k); with the server up `free` shows ~22 GB available. The `blab-0238` account's server that had held port 9009 since 2026-10-26 was stopped on 2026-10-29 before this start. Same memory-pressure caveat as on 029b: launch Harbor runs from a terminal or with `setsid nohup`, not as a Claude Code background task. | — |
+| vLLM serving | `tools/serve_qwen35_35b.sh` works unchanged from this account ✅ 2026-10-29 (started with `setsid nohup`, log `~/vllm_logs/qwen35-35b-a3b.log`): `/v1/models` lists `qwen3.5-35b-a3b`, a chat request returns the answer in `content` and the thinking in `message.reasoning`, and `http://172.17.0.1:9009/v1` (the Docker bridge address the task containers use) answers ✅. Cold start succeeded on the first attempt: weights 107 s from the shared NVMe path, torch.compile 25 s, FlashInfer MoE JIT + autotune the rest, ~5 min in total (23:06 → 23:11). GPU KV cache 982,090 tokens at `--gpu-memory-utilization 0.75` (15.0× concurrency at 64k); with the server up `free` shows ~22 GB available. The `blab-0238` account's server that had held port 9009 since 2026-10-26 was stopped on 2026-10-29 before this start. **Memory-pressure caveat:** a Harbor run with two task containers launched from a Claude Code background shell was once killed by Claude Code's memory-pressure reaper at ~1 GB free; launch Harbor runs from a terminal or with `setsid nohup`, not as a Claude Code background task. | — |
 | API keys | none in the environment yet | Export `OPENAI_API_KEY` etc. in `~/.bashrc` (§4); not needed for local-vLLM runs |
 
 ### 2.1 Project environment on 0238 ✅ done 2026-10-29
@@ -64,34 +66,6 @@ Upstream's README differs from this repo in two places (still true ✅):
 - No `git submodule update` is needed: `harbor-deonticbench/meta-harness/` is committed as plain
   files; there is no `.gitmodules`.
 - `harbor-deonticbench/datasets/` does not need generating: we track it in git (§5).
-
-## 2b. 029b (DGX Spark) — current state ✅ 2026-10-28
-
-Second DGX Spark, hostname `spark-029b`, user `zixuan`. Hardware and OS are identical to 0238
-(Ubuntu 24.04.3 LTS, aarch64, GB10, 20 cores, 119 GB unified memory, 3.7 TB NVMe), so the 0238
-recipe in §2.1 applies with the deviations noted below. Everything in this table was set up and
-checked on 2026-10-28.
-
-| Item | State | Action needed |
-|---|---|---|
-| OS / GPU | Ubuntu 24.04.3 LTS, aarch64; GB10, driver 580.95.05, CUDA 13.0 toolkit at `/usr/local/cuda` (`nvcc` on PATH) ✅ | — |
-| Docker | 28.3.3, daemon active; `zixuan` added to the `docker` group ✅ 2026-10-28 (`sudo usermod -aG docker zixuan`). In a shell opened before that, use `sg docker -c "<cmd>"`; new logins get it directly. Base image `ghcr.io/laude-institute/t-bench/python-3-13:20250620` has an `arm64` manifest and a DAR task image (`datasets/deonticbench-direct/...airline-cases-100/environment/Dockerfile`) builds and runs here ✅ (swipl 9.0.4, Python 3.13.1, tmux 3.3a inside the container). | — |
-| Python | miniconda3 at `~/miniconda3` (conda 26.9.4, base = 3.14.9). Installed with `-b`, **`conda init bash` not run** → either run it once or call binaries by path (`~/miniconda3/envs/<env>/bin/...`, as `tools/serve_qwen35_35b.sh` does). System `python3` is 3.12.3. | `~/miniconda3/bin/conda init bash` if the interactive `conda activate` is wanted |
-| `myenv` (serving) | Python 3.12; **vllm 0.20.1, torch 2.11.0+cu130, transformers 5.8.0, flashinfer 0.6.8.post1, ninja** — same versions as 0238. `torch.cuda.is_available()` → True on the GB10 ✅. `pip` warns that `xgrammar 0.2.5.post1` wants `transformers<5`; the import works and 0238 runs the same pair, so ignored. | — |
-| `deontic` (DeonticBench) | Python 3.12 with `DeonticBench/requirements.txt` minus `vllm` ✅. **`conda-forge` has no `swi-prolog` package for `linux-aarch64`** (the §2.1 line fails here); use the host's `/usr/bin/swipl` 9.0.4 instead, which is on PATH. | — |
-| `uv` | 0.13.6 at `~/.local/bin/uv` ✅; `harbor-deonticbench` synced (`uv sync --all-extras --dev`), `uv run harbor` works ✅. `hf` CLI installed with `uv tool install huggingface_hub` (`~/.local/bin/hf`). | — |
-| `swipl` / `tmux` | both on the host: `/usr/bin/swipl` 9.0.4, `/usr/bin/tmux` ✅ | — |
-| `gh` | ❌ not installed | Optional |
-| git identity | `user.name "Zixuan Wang"`, `user.email zixuanw712@gmail.com` set globally ✅ (matches the existing commits) | — |
-| git remote | SSH, `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`, with an ed25519 key (`~/.ssh/id_ed25519`) registered on GitHub ✅ 2026-10-28; `ssh -T git@github.com` authenticates and pushes work. | — |
-| Repo path | `/home/zixuan/deontic-reasoning-with-harness` (cloned 2026-10-28 at `a19ac500`) | — |
-| Model weights | `~/models/Qwen3.5-35B-A3B` (bf16, 14 safetensors shards, 67 GiB) ✅ via `hf download Qwen/Qwen3.5-35B-A3B --local-dir ~/models/Qwen3.5-35B-A3B`; vLLM logs in `~/vllm_logs/` | Other models: same `hf download` pattern |
-| vLLM serving | `tools/serve_qwen35_35b.sh` works unchanged (all paths are `$HOME`-relative): smoke-started 2026-10-28, `/v1/models` lists `qwen3.5-35b-a3b` and a chat request returns thinking in `message.reasoning` ✅. First start took ~14 min (00:36 → 00:50: weight load, torch.compile, FlashInfer MoE kernel JIT + autotune; cached under `~/.cache` afterwards). GPU KV cache 1,037,178 tokens at `--gpu-memory-utilization 0.75` (15.8× concurrency at 64k). **Caveat 🔶:** the very first attempt died at 64 % of weight loading with `CUDA error: unspecified launch failure` (`~/vllm_logs/smoke-029b-first-start.log`); the shards verified intact and an immediate retry succeeded, so treated as transient. **Recurred on the next cold start (2026-10-28 evening, `~/vllm_logs/qwen35-35b-a3b.log`): same error at the fused-MoE expert weight copy; the immediate retry succeeded again (up in ~6 min).** Pattern so far: 2 of 2 cold starts fail once; always retry once before debugging. **Memory headroom ✅ 2026-10-28:** with vLLM up (`--gpu-memory-utilization 0.75` of 119 GB unified memory) `free` shows ~22 GB available for everything else; a Harbor run with two task containers launched from a Claude Code background shell was killed by Claude Code's memory-pressure reaper at ~1 GB free. Launch Harbor runs from the user's own terminal (or detached with `setsid nohup`), not as a Claude Code background task. | — |
-| API keys | none in the environment yet | Export `OPENAI_API_KEY` etc. in `~/.bashrc` (§4); not needed for local-vLLM runs |
-| Shell profile | untouched: no conda init, no `~/.local/bin` export needed (already on PATH), no keys | — |
-
-Differences from 0238 worth remembering: the host has `swipl` (0238 does not); `conda init` has not
-been run; pushing goes over SSH (0238 had no push auth configured).
 
 ## 3. BRTX (601–606) — current state ✅ 2026-10-23, written on brtx602
 
