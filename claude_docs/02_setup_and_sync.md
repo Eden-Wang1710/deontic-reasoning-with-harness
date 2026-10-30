@@ -82,7 +82,7 @@ a Teams export; the wiki itself is from 2023, so prefer the live checks where th
 | Scheduler | **Slurm, mandatory for all GPU use** (wiki rule). `srun`/`sbatch`/`sinfo`/`squeue` in `/usr/bin`. Slurm sets `CUDA_VISIBLE_DEVICES`. |
 | Partitions (`sinfo` ✅) | `ba100` → brtx602, 4× A100, **24 h limit**, LLM jobs. `brtx6-dev` → brtx601, 8× RTX 6000, 12 h, interactive only (≤1 GPU, ≤1 session, and `srun` for it must be launched **from brtx601**). `brtx6` → brtx604-605, 10× RTX 6000 each, 24 h batch. `brtx6-ir` → brtx603 (IR group). `brtx-pod` → brtx606. |
 | Typical commands | Interactive (from 601): `srun --pty --gpus=1 -p brtx6-dev bash`. Batch on the A100s: `sbatch --gpus=N -p ba100 script.sh` (`--nodelist=brtx602` is implied by the partition). Defaults via `export SLURM_PARTITION=brtx6-dev` / `export SBATCH_PARTITION=ba100`. Status: `squeue -O 'JobID,Name,UserName,tres-per-job,TimeUsed,ReasonList'`. |
-| Contention | On 2026-10-23 three of the four A100s were in use by another user's `ba100` jobs; plan for queueing. Node-wide `gpustat`/`nvidia-smi -l 5`; cross-node dashboard: `gpustat-web` (wiki §GPUs). Helper scripts: <https://github.com/JHU-CLSP/brtx-utils>. |
+| Contention | On 2026-10-23 three of the four A100s were in use by another user's `ba100` jobs; plan for queueing. **2026-10-30 ✅:** `sinfo` showed all six nodes `idle` and `squeue` empty, yet `nvidia-smi` on 602 showed two vLLM servers of another user on GPU 0 (74 GB, up 32 days, 0 % util) and GPU 1 (56 GB, up 11 days), i.e. **started outside Slurm**. GPUs 2 and 3 were free. Consequence: Slurm does not know those two GPUs are taken, so a `--gpus=2` job may be handed GPU 0/1 and collide; check `CUDA_VISIBLE_DEVICES` at job start, or follow the apparent lab practice and start the server directly with `CUDA_VISIBLE_DEVICES=2,3` after coordinating on Teams. 604/605/606 had all 10 RTX 6000 each free. Node-wide `gpustat`/`nvidia-smi -l 5`; cross-node dashboard: `gpustat-web` (wiki §GPUs). Helper scripts: <https://github.com/JHU-CLSP/brtx-utils>. |
 | Networking | Most ports between nodes are blocked; **TCP 50000–51024 are open between all six nodes** (use these for a vLLM server that other nodes/jobs talk to). Inside a node, use `127.0.0.1` not `localhost` (IPv6 hang with Docker-published ports). |
 
 ### 3.2 Hardware and drivers on brtx602 ✅
@@ -113,8 +113,8 @@ a Teams export; the wiki itself is from 2023, so prefer the live checks where th
 | Location | Size / free on 2026-10-23 | Notes |
 |---|---|---|
 | `/home/zwang544` | **25 GB** NFS quota, 3.7 GB used, 22 GB free | Shared across all six nodes. Slow. Fine for configs, `uv`, maybe a small conda; **not** for weights or run outputs. |
-| `/srv/local1` on 602 | 3.5 TB NVMe, **100% full, 249 MB free** | Our repo lives here (`/srv/local1/zwang544/deontic-reasoning-with-harness`, 82 MB). Nothing more fits until other users free space. |
-| `/srv/local2` on 602 | 3.5 TB NVMe, **100% full, 1.5 GB free** | Holds `/srv/local2/docker`; wiki says prefer `local1` anyway. |
+| `/srv/local1` on 602 | 3.5 TB NVMe, **100% full, 249 MB free** (unchanged 2026-10-30) | Our repo lives here (`/srv/local1/zwang544/deontic-reasoning-with-harness`, 82 MB). Nothing more fits until other users free space. |
+| `/srv/local2` on 602 | 3.5 TB NVMe, **100% full, 1.4 GB free** (2026-10-30) | Holds `/srv/local2/docker`; wiki says prefer `local1` anyway. |
 | Other nodes' NVMe, cross-mounted at `/brtx/60{1..6}-nvme{1,2}` (NFS) | 605-nvme1 **639 GB** free, 605-nvme2 327 GB, 601-nvme2 277 GB, 601-nvme1 252 GB, 606-nvme2 235 GB; everything else ≤100 GB | Readable/writable from 602 but over NFS, so slower than local NVMe. A 72 GB bf16 checkpoint read once at vLLM start-up is acceptable from here. |
 
 Plan: ask on Teams whether 602's `/srv/local1` can be cleaned up (we need ~150 GB: weights + env + outputs). Until then,
