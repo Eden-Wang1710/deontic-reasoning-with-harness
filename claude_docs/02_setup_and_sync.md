@@ -72,6 +72,56 @@ Upstream's README differs from this repo in two places (still true ✅):
 Sources: checked on `brtx602` on 2026-10-23, plus the lab's BRTX wiki (`/srv/local1/zwang544/BRTX.pdf`,
 a Teams export; the wiki itself is from 2023, so prefer the live checks where they differ).
 
+### 3.0 Binding rule: operate BRTX strictly by the lab wiki
+
+**Owner's rule, 2026-10-31.** On brtx601–606 we follow the BRTX wiki to the letter, for storage and
+for GPU scheduling alike, even when other users visibly do not. The wiki is a Teams export saved at
+`/srv/local1/zwang544/BRTX.pdf` on 602 (not in git; copy it out of band to any machine that needs
+it). Everything below is a restatement of the wiki; the wiki wins if they ever differ.
+
+**Connecting**
+
+- Never SSH to a node directly; go through `dslogin01.pha.jhu.edu` (or a CLSP login node) with
+  `ProxyJump`. Do not open ports to the outside; between nodes only TCP 50000–51024 are open, so a
+  model server listens on one of those.
+
+**GPU jobs — Slurm, always, no exceptions**
+
+- Every GPU process is started by Slurm (`srun`/`sbatch`) and uses only the GPUs Slurm assigns via
+  `CUDA_VISIBLE_DEVICES`. Nothing GPU-related is ever launched from a login shell, in `nohup`, in
+  `tmux`, or by a Claude Code session on its own initiative.
+- Interactive GPU work: partition `brtx6-dev` (brtx601 only), at most 1 GPU, at most 1 session at
+  a time, 12 h limit; `srun --pty --gpus=1 -p brtx6-dev bash`, launched from brtx601.
+- Batch / servers: `sbatch --gpus=N -p <partition> script.sh`. A100 work goes to `ba100` (brtx602,
+  24 h limit); RTX 6000 batch to `brtx6` (604–605, 24 h). Always pass an explicit `--time` ≤ the
+  partition limit. A vLLM server is a batch job like any other: it ends with the job, is never
+  left running "just in case", and is resubmitted when the next run needs it.
+- Because some users start processes outside Slurm, a job must check at start that the GPUs it was
+  given are really free (`nvidia-smi --query-gpu=memory.used --format=csv`) and exit cleanly if not,
+  instead of squeezing in beside someone else's process.
+- Check the queue with `squeue` (with `-O 'JobID,Name,UserName,tres-per-job,TimeUsed,ReasonList'`
+  for GPU counts) and node health with `nvidia-smi` / `gpustat` before submitting.
+
+**Storage**
+
+- `/home/<user>` is a 25 GB NFS quota shared by all nodes: configs, keys, small tools (`uv`) only.
+  No weights, caches, run outputs or Python environments there; point `HF_HOME`, `UV_CACHE_DIR` and
+  similar at NVMe.
+- Each node has two 3.5 TB NVMe partitions, `/srv/local1` and `/srv/local2` locally, the same disks
+  visible cluster-wide as `/brtx/60X-nvme1` and `/brtx/60X-nvme2`. **Use `local1`/`nvme1`;** avoid
+  `local2`/`nvme2`, which holds Docker's data and breaks Docker on that node if it fills.
+- Own files live under a directory named after the user (`/srv/local1/zwang544/`,
+  `/brtx/601-nvme1/zwang544/`). Check `df -h` before any large write; never fill a partition to 0.
+- Clean up after yourself: delete stale checkpoints and outputs; if a Docker container ever leaves
+  root-owned files, remove them with the wiki's bind-mount recipe rather than leaving them.
+
+**Node hygiene**
+
+- Set `RAYON_RS_NUM_CPUS=1` (and `MKL_NUM_THREADS=1` when relevant) in the shell profile so
+  tokenizers and MKL do not take every core of a shared node.
+- Do not run `docker system prune` or similar cluster-wide cleanups; the admin's weekly cron does it.
+- Anything the wiki does not cover is asked on the lab's Teams channel first, not improvised.
+
 ### 3.1 Access and scheduling
 
 | Item | State |

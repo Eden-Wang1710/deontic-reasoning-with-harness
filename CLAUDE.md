@@ -7,7 +7,10 @@ Agentic Harnesses** (arXiv 2606.05009, vendored at `harbor-deonticbench/`).
 
 The owner works on lab cluster machines (0238, a DGX Spark with Docker; 601-606, the
 GPU nodes), so **this git repo is the only shared state** — anything worth keeping must be committed
-and pushed. See `claude_docs/02_setup_and_sync.md` for per-machine status.
+and pushed. See `claude_docs/02_setup_and_sync.md` for per-machine status. **On BRTX (601–606) the
+lab wiki is binding** (`02` §3.0): GPU work only through Slurm with a time limit, storage only on
+`local1`/`nvme1` under the user's directory, nothing large in `$HOME`. Never start a GPU job or a
+model server there unless the owner asks for it in that conversation.
 
 ## Docs: `claude_docs/`
 
