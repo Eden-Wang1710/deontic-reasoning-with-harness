@@ -113,7 +113,7 @@ a Teams export; the wiki itself is from 2023, so prefer the live checks where th
 | Location | Size / free on 2026-10-23 | Notes |
 |---|---|---|
 | `/home/zwang544` | **25 GB** NFS quota, 3.7 GB used, 22 GB free | Shared across all six nodes. Slow. Fine for configs, `uv`, maybe a small conda; **not** for weights or run outputs. |
-| `/srv/local1` on 602 | 3.5 TB NVMe, **100% full, 100 KB free** (2026-10-31) | The repo was here until 2026-10-31; a `git pull` of the tracked run artifacts (~450 MB of `harbor-deonticbench/jobs/`) could not be written, so **the clone moved to `~/deontic-reasoning-with-harness`** (home, shared by all six nodes). The old copy at `/srv/local1/zwang544/` is deleted. |
+| `/srv/local1` on 602 | 3.5 TB NVMe, **100% full, ~200 MB free** (2026-10-31) | Our repo lives here (`/srv/local1/zwang544/deontic-reasoning-with-harness`, 117 MB after `jobs/` was un-tracked). On 2026-10-31 a `git pull` that still carried ~450 MB of `harbor-deonticbench/jobs/` failed with `No space left on device` and left the clone in a broken rebase; it had to be moved to home to recover, then moved back. **Keep run artifacts out of git** (they are gitignored again) and never let this disk hit 0, or git itself stops working. |
 | `/srv/local2` on 602 | 3.5 TB NVMe, **100% full, 1.5 GB free** | Holds `/srv/local2/docker`; wiki says prefer `local1` anyway. |
 | Other nodes' NVMe, cross-mounted at `/brtx/60{1..6}-nvme{1,2}` (NFS v4.2, rw, dirs are `root:vandurme` setgid so the group can create subdirs; many lab members keep dirs on several nodes) | **Re-checked 2026-10-30, it moves fast**: 605-nvme1 went from 639 GB free to **100% full (inodes too)** in a week. Now: 606-nvme2 235 GB, 605-nvme2 224 GB, 601-nvme2 201 GB, 601-nvme1 115 GB; every other partition ≤55 GB. | Writable from 602 but over NFS. Nothing in the wiki forbids using another node's partition, but the wiki asks to prefer `local1` over `local2` (Docker data lives on `local2`; a full `local2` breaks Docker on that node). The only `local1` with room is **601-nvme1, 115 GB**, enough for one 72 GB checkpoint and little else. Re-run `df -h /brtx/*` right before downloading. |
 
@@ -126,7 +126,7 @@ lands in the 25 GB home. Weekly cron on each node runs `docker system prune -f` 
 
 | Item | State | Action needed |
 |---|---|---|
-| Repo | `~/deontic-reasoning-with-harness` (moved from 602's full `/srv/local1` on 2026-10-31), `main` tracking `origin/main` | Home is 25 GB NFS; the tracked `jobs/` and `outputs/` grow with every run, so watch `du -sh ~/deontic-reasoning-with-harness` and move back to a local NVMe once 602 has space. |
+| Repo | `/srv/local1/zwang544/deontic-reasoning-with-harness`, `main` tracking `origin/main` | Home (25 GB NFS) is not an option for the repo; if local1 fills up again, 601-nvme1 is the fallback. |
 | Identity | set ✅ 2026-10-23 (`user.name` / `user.email` in `~/.gitconfig`, shared by all six nodes) | — |
 | Push auth | HTTPS remote, no credential helper, no `~/.ssh`. **Pushing works from VS Code Remote sessions** ✅ 2026-10-23 because VS Code injects `GIT_ASKPASS` and answers with the GitHub login on the client machine. From a plain SSH shell or a Slurm job it will fail. | If pushes are needed outside VS Code: `git config --global credential.helper store` + PAT, or `ssh-keygen` and switch the remote to `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`. Home is shared, so once for all nodes. |
 
