@@ -128,7 +128,7 @@ lands in the 25 GB home. Weekly cron on each node runs `docker system prune -f` 
 |---|---|---|
 | Repo | `/srv/local1/zwang544/deontic-reasoning-with-harness`, `main` tracking `origin/main` | Home (25 GB NFS) is not an option for the repo; if local1 fills up again, 601-nvme1 is the fallback. |
 | Identity | set ✅ 2026-10-23 (`user.name` / `user.email` in `~/.gitconfig`, shared by all six nodes) | — |
-| Push auth | HTTPS remote, no credential helper, no `~/.ssh`. **Pushing works from VS Code Remote sessions** ✅ 2026-10-23 because VS Code injects `GIT_ASKPASS` and answers with the GitHub login on the client machine. From a plain SSH shell or a Slurm job it will fail. | If pushes are needed outside VS Code: `git config --global credential.helper store` + PAT, or `ssh-keygen` and switch the remote to `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`. Home is shared, so once for all nodes. |
+| Push auth | **SSH, works from any shell on any BRTX node** ✅ 2026-10-31. Key `~/.ssh/id_ed25519` (no passphrase, home is shared by all six nodes) is registered on the GitHub account; remote is `git@github.com:Eden-Wang1710/deontic-reasoning-with-harness.git`. Before this, HTTPS pushes only worked inside VS Code Remote (it injects `GIT_ASKPASS`) and failed from plain SSH or Claude Code remote-control sessions. | — |
 
 ### 3.6 Project environment on BRTX (to do)
 
