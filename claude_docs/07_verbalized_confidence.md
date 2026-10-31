@@ -11,7 +11,7 @@
   **answer-only** condition is not a baseline but a first verification method (an independent
   re-solve, §4); it is kept in §2.2 for reference.
 - **Code**: `tools/verbalized_confidence.py`. Raw per-trial outputs under
-  `outputs/verbalized_confidence/<run>/` on 0238 (gitignored); only the numbers here are shared.
+  `outputs/verbalized_confidence/<run>/` (tracked since 2026-10-27); the numbers here are the summary.
 - **Confidence convention**: ✅ checked in the run output on the date given, 🔶 inference.
 
 ## 1. Method ✅ 2026-10-16

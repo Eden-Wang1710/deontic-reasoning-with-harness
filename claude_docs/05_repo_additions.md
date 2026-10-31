@@ -16,8 +16,8 @@ deontic-reasoning-with-harness/
 ├── CLAUDE.md                     ✅ auto-loaded context for Claude Code; indexes claude_docs/,
 │                                    repo rules (English files, no artifacts/keys in git)
 ├── .gitignore                    ✅ root ignore list: bootstrap_results/, wandb/, stray *.log,
-│                                    weights, DeonticBench whole splits; re-includes outputs/,
-│                                    DeonticBench/outputs/ and harbor-deonticbench/jobs/ (since 2026-10-27)
+│                                    weights, DeonticBench whole splits, harbor-deonticbench/jobs/
+│                                    (ignored again since 2026-10-31); re-includes outputs/ and DeonticBench/outputs/
 │
 ├── claude_docs/                  ✅ all project documentation, NN_snake_case.md, English
 │   ├── 01_project_overview.md       thesis in one page, repo layout, references
@@ -97,8 +97,9 @@ deontic-reasoning-with-harness/
     ├── datasets/                 ✏️✅ generated Harbor tasks, tracked here on purpose
     │                                (upstream gitignores them; see claude_docs/02 §5)
     ├── .gitignore                ✏️ the `/datasets/` line commented out, with a note
-    └── jobs/qwen3.5-35b-a3b/     ✅ Harbor job dirs (committed since 2026-10-27): <framing>/, t2fix-<framing>/, kira-<framing>/,
-                                     t2verify-<framing>/, t2rv-<framing>/
+    └── jobs/qwen3.5-35b-a3b/     ⬜ Harbor job dirs: <framing>/, t2fix-<framing>/, kira-<framing>/, t2verify-<framing>/,
+                                     t2rv-<framing>/ (tracked 2026-10-27..31 for the machine switch, ignored again since;
+                                     the jobs up to rv-smoke1 are in history at commit 0dc69015)
 ```
 
 Machine-local files that are not in the repository at all (0238): model weights under
@@ -131,7 +132,7 @@ serve_qwen35_35b.sh ──► vLLM at :9009 ◄── run_dar_qwen35_35b.sh ─�
 - Scripts go in `tools/`; a larger body of thesis code gets its own top-level directory.
 - Never put our files inside `DeonticBench/` or `harbor-deonticbench/`; the only in-subtree edits
   are the two marked ✏️ above.
-- Run artifacts (`outputs/`, `DeonticBench/outputs/`, `harbor-deonticbench/jobs/` with their logs)
-  are committed since 2026-10-27 so every machine has every run; `bootstrap_results/`, `wandb/`,
-  weights and `whole` splits stay gitignored. The docs in `claude_docs/` still carry the numbers.
+- Small run summaries (`outputs/`, `DeonticBench/outputs/`) are committed since 2026-10-27. Full
+  Harbor job dirs (`harbor-deonticbench/jobs/`), `bootstrap_results/`, `wandb/`, weights and `whole`
+  splits are gitignored (jobs again since 2026-10-31, see `02` §4). The docs in `claude_docs/` carry the numbers.
 - Add a line here, and a row in the `CLAUDE.md` table for docs, in the same commit that adds the file.

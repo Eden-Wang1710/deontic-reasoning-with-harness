@@ -1,9 +1,0 @@
-New Terminal Output:
-
-root@bcd64b18e0ab:/app# grep -n '20,165' /app/statute.txt
-15:    (iii) $20,165, plus 31% of the excess over $89,150 if the taxable income is over $89,150 but not over $140,000;
-root@bcd64b18e0ab:/app# python3 -c "income = 95129; base = 20165; bracket_threshold = 89150; rate = 0.31; excess = income - bracket_threshold; tax = base + rate
- * excess; print(f'Tax: {tax}'); print(f'Rounded: {round(tax)}')"
-Tax: 22018.49
-Rounded: 22018
-root@bcd64b18e0ab:/app#

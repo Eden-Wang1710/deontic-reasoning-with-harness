@@ -170,15 +170,20 @@ on a second GPU, or a vLLM hook — decide once the env exists.
 4. If both machines diverge, `git pull --rebase` on the later one; the docs are plain markdown and
    conflicts are easy to resolve.
 
-**Run artifacts are tracked since 2026-10-27** (commit `51dc548`, made for the machine switch):
-`outputs/`, `DeonticBench/outputs/` and `harbor-deonticbench/jobs/` including their job and trial
-logs are committed, so a fresh clone has every run. Keep committing them with the runs that produce
-them.
+**Run artifacts.** The small per-trial summaries in `outputs/` and `DeonticBench/outputs/` (about
+10 MB together) are tracked since 2026-10-27. The full Harbor job directories under
+`harbor-deonticbench/jobs/` (about 470 MB, 16k files) were tracked from 2026-10-27 (commit `51dc548`)
+to 2026-10-31 so the machine switch could go through git alone; since 2026-10-31 they are
+**gitignored again** and stay on the machine that produced them. Every job up to `rv-smoke1` is
+still in history: `git restore -s 0dc69015 -W -- harbor-deonticbench/jobs` puts them back on disk
+without staging them. **On a clone that still has the tracked copy**, the first `git pull` after
+2026-10-31 deletes those files from the working tree; run that restore command afterwards (or copy
+`jobs/` aside before pulling). The numbers from every run are in `claude_docs/`.
 
 **Not in git**, by design (regenerate or copy out of band with `rsync`/`scp` between machines when
 needed):
 
-- `bootstrap_results/`, `wandb/`, and `*.log` files outside the paths above
+- `harbor-deonticbench/jobs/` (see above), `bootstrap_results/`, `wandb/`, and `*.log` files
 - model weights: `*.ckpt`, `*.safetensors`, `*.pt`, `*.bin`
 - `DeonticBench/data/*/whole.json` (re-download: `python DeonticBench/scripts/download_hf_data.py --splits whole`)
 

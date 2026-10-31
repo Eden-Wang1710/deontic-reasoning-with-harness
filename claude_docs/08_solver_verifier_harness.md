@@ -307,7 +307,7 @@ solver's own generation stalled), 6 during repair after one round.
    the final statuses.
 
 Raw per-trial records: `outputs/verifier_run1_trials.json` and
-`outputs/verifier_run1_summary.txt` on 0238 (gitignored); the numbers above are the shared
+`outputs/verifier_run1_summary.txt` (tracked since 2026-10-27); the numbers above are the shared
 copy.
 
 ## 8. Run-2: derivation record, index packet, skill v2 (owner's decisions 2026-10-26)
@@ -571,7 +571,7 @@ maximises throughput at the cost of per-trial latency; the 1,800 s wall clock is
 per trial.
 
 Raw per-trial records: `outputs/verifier_run2_trials.json` and
-`outputs/verifier_run2_summary.txt` on 0238 (gitignored); the numbers above are the shared
+`outputs/verifier_run2_summary.txt` (tracked since 2026-10-27); the numbers above are the shared
 copy. No run-3 parameters are decided; the owner reviews this section first.
 
 ## 9. Run-3: section-number record, four-step verifier, 2 concurrent (owner's decisions 2026-10-26)
@@ -684,7 +684,7 @@ smoke of v3 where the verifier turned a wrong first answer into a right one. Age
 **Full run** `sara-t2verify-run3` started 2026-10-27 04:08 UTC (65 SARA tasks, 2 concurrent,
 3 rounds, 4 verifier steps, 1,800 s wall clock, skill v3 at `d9a7f7a`, harness at
 `96dc4ec`). Finished 12:48 UTC (8 h 40 min; 5 `AgentTimeoutError`, no other exception).
-Per-trial records: `outputs/verifier_run3_trials.json` (gitignored). Summary command:
+Per-trial records: `outputs/verifier_run3_trials.json` (tracked since 2026-10-27). Summary command:
 `python3 tools/verifier_job_summary.py <run3> --baseline <t2fix-run1> --trials`.
 
 ### 9.2 Run-3 results

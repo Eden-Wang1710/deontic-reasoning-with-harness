@@ -100,8 +100,9 @@ file per paper, named `NN_snake_case.md` with a two-digit reading-order prefix (
 
 - The owner writes in Chinese: **respond in Chinese** unless asked otherwise. All files — docs, code,
   comments, commit messages — are in English.
-- Run artifacts (`outputs/`, `DeonticBench/outputs/`, `harbor-deonticbench/jobs/` with their logs)
-  **are committed** since 2026-10-27 so every machine has every run. Do not commit
-  `bootstrap_results/`, `wandb/`, model weights, or `whole` splits. `datasets/` is tracked too (see above).
+- Small run summaries (`outputs/`, `DeonticBench/outputs/`) **are committed**. Full Harbor job
+  dirs (`harbor-deonticbench/jobs/`, hundreds of MB) are **gitignored again since 2026-10-31**; they
+  were tracked only for the 2026-10-27 machine switch and the old ones remain in git history. Do not
+  commit `bootstrap_results/`, `wandb/`, model weights, or `whole` splits. `datasets/` is tracked (see above).
 - The GitHub repo is **public** (owner's decision, 2026-10-14). Never commit API keys, run
   artifacts or anything the author of the vendored repos has not released.

@@ -26,11 +26,14 @@ venv/
 #   python DeonticBench/scripts/download_hf_data.py --splits whole
 DeonticBench/data/*/whole.json
 
-# Run artifacts: tracked since 2026-10-27 (machine switch; the repo is the only sync
-# channel). outputs/ and harbor-deonticbench/jobs/ are committed, including job logs.
+# Run artifacts. outputs/ and DeonticBench/outputs/ (small per-trial summaries, ~10 MB) are
+# tracked since 2026-10-27. harbor-deonticbench/jobs/ (full Harbor job dirs, ~470 MB and
+# ~16k files) was tracked 2026-10-27..2026-10-31 for a machine switch and is ignored again
+# since 2026-10-31; every job up to rv-smoke1 is still in git history (commit 0dc69015).
 bootstrap_results/
 wandb/
 *.log
+harbor-deonticbench/jobs/
 
 # Model weights / checkpoints
 *.ckpt
@@ -38,9 +41,6 @@ wandb/
 *.pt
 *.bin
 
-# Re-include run artifacts and their logs (overrides *.log and the nested ignores)
+# Re-include the small run summaries (overrides the nested DeonticBench ignore)
 !outputs/
-!harbor-deonticbench/jobs/
-!harbor-deonticbench/jobs/**
-!harbor-deonticbench/jobs/**/*.log
 !DeonticBench/outputs/
