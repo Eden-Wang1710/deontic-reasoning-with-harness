@@ -148,8 +148,8 @@ it). Everything below is a restatement of the wiki; the wiki wins if they ever d
 
 | Item | State | Action needed |
 |---|---|---|
-| Python | system `/usr/bin/python3` = **3.9.25**, no `pip`, `venv` works. Too old for Harbor (≥3.12) and the vLLM stack. | Install **miniconda** (or `uv`) under our own directory, see §3.5. |
-| conda / `uv` | ❌ neither | `uv`: `curl -LsSf https://astral.sh/uv/install.sh \| sh` (→ `~/.local/bin/uv`, already on PATH). conda: Miniconda x86_64 installer. |
+| Python | system `/usr/bin/python3` = **3.9.25**, no `pip`, `venv` works. Too old for Harbor (≥3.12) and the vLLM stack. | Install **miniconda** on NVMe, never in `$HOME` (§3.0): `/brtx/601-nvme1/zwang544/miniconda3` until 602's `local1` has room. See §3.6. |
+| conda / `uv` | `uv` 0.13.6 at `~/.local/bin/uv` ✅ 2026-10-31 (a 40 MB binary; its cache goes to `UV_CACHE_DIR` on NVMe). conda ❌ | conda: Miniconda x86_64 installer with `-p /brtx/601-nvme1/zwang544/miniconda3`. |
 | `swipl` | ❌ | `conda install -c conda-forge swi-prolog` in the project env (needed only for DeonticBench's own Prolog eval). |
 | `torch` / `vllm` | ❌ | Into the project env, CUDA 12.x/13.x wheels (x86_64; driver 595 supports both). |
 | `gh` | ❌ | Optional. |
@@ -162,7 +162,7 @@ it). Everything below is a restatement of the wiki; the wiki wins if they ever d
 
 | Location | Size / free on 2026-10-23 | Notes |
 |---|---|---|
-| `/home/zwang544` | **25 GB** NFS quota, 3.7 GB used, 22 GB free | Shared across all six nodes. Slow. Fine for configs, `uv`, maybe a small conda; **not** for weights or run outputs. |
+| `/home/zwang544` | **25 GB** NFS quota, 3.7 GB used, 22 GB free | Shared across all six nodes. Slow. Configs, SSH keys and the `uv` binary only; **no conda, no Python envs, no caches, no weights, no run outputs** (§3.0). |
 | `/srv/local1` on 602 | 3.5 TB NVMe, **100% full, ~200 MB free** (2026-10-31) | Our repo lives here (`/srv/local1/zwang544/deontic-reasoning-with-harness`, 117 MB after `jobs/` was un-tracked). On 2026-10-31 a `git pull` that still carried ~450 MB of `harbor-deonticbench/jobs/` failed with `No space left on device` and left the clone in a broken rebase; it had to be moved to home to recover, then moved back. **Keep run artifacts out of git** (they are gitignored again) and never let this disk hit 0, or git itself stops working. |
 | `/srv/local2` on 602 | 3.5 TB NVMe, **100% full, 1.5 GB free** | Holds `/srv/local2/docker`; wiki says prefer `local1` anyway. |
 | Other nodes' NVMe, cross-mounted at `/brtx/60{1..6}-nvme{1,2}` (NFS v4.2, rw, dirs are `root:vandurme` setgid so the group can create subdirs; many lab members keep dirs on several nodes) | **Re-checked 2026-10-30, it moves fast**: 605-nvme1 went from 639 GB free to **100% full (inodes too)** in a week. Now: 606-nvme2 235 GB, 605-nvme2 224 GB, 601-nvme2 201 GB, 601-nvme1 115 GB; every other partition ≤55 GB. | Writable from 602 but over NFS. Nothing in the wiki forbids using another node's partition, but the wiki asks to prefer `local1` over `local2` (Docker data lives on `local2`; a full `local2` breaks Docker on that node). The only `local1` with room is **601-nvme1, 115 GB**, enough for one 72 GB checkpoint and little else. Re-run `df -h /brtx/*` right before downloading. |
@@ -185,22 +185,29 @@ lands in the 25 GB home. Weekly cron on each node runs `docker system prune -f` 
 Mirrors §2.1 but x86_64 and disk-aware. Run on 602 (CPU-only steps don't need Slurm):
 
 ```bash
-# one-off: scratch dir on a node with free space, and tools in $HOME (25 GB quota)
-mkdir -p /brtx/601-nvme1/zwang544/{models,hf_cache,outputs}   # 605-nvme1 filled up on 2026-10-30; check df first
-echo 'export HF_HOME=/brtx/601-nvme1/zwang544/hf_cache' >> ~/.bashrc
-echo 'export SBATCH_PARTITION=ba100 RAYON_RS_NUM_CPUS=1' >> ~/.bashrc
-curl -LsSf https://astral.sh/uv/install.sh | sh              # uv → ~/.local/bin
-# miniconda: install to /srv/local1/zwang544/miniconda3 once space exists, else ~/miniconda3 (watch the 25 GB quota)
+# one-off. Everything big lives on NVMe (§3.0); $HOME gets only the uv binary and shell exports.
+# 602's own /srv/local1 is full (2026-10-31), so the NVMe in use is 601's, cross-mounted. Move back when 602 has room.
+S=/brtx/601-nvme1/zwang544
+mkdir -p $S/{models,hf_cache,uv_cache,outputs,logs}            # check `df -h $S` first; 48 GB free on 2026-10-31
+cat >> ~/.bashrc <<'EOF'
+export HF_HOME=/brtx/601-nvme1/zwang544/hf_cache
+export UV_CACHE_DIR=/brtx/601-nvme1/zwang544/uv_cache
+export SBATCH_PARTITION=ba100 RAYON_RS_NUM_CPUS=1
+EOF
+curl -LsSf https://astral.sh/uv/install.sh | sh                 # ✅ done 2026-10-31 → ~/.local/bin/uv
+curl -fsSLo $S/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash $S/miniconda.sh -b -p $S/miniconda3 && rm $S/miniconda.sh   # on NVMe, not in $HOME; do not run `conda init`
+C=$S/miniconda3/bin/conda
 
-# project env (same recipe as 0238)
-conda create -n deontic python=3.12 -y && conda activate deontic
-conda install -c conda-forge swi-prolog -y
-grep -v '^vllm' DeonticBench/requirements.txt | pip install -r /dev/stdin
-pip install vllm torch                                        # serving env; or a separate `myenv` as on 0238
+# project envs (same recipe as 0238 §2.1, binaries by path)
+$C create -n myenv   --override-channels -c conda-forge python=3.12 -y   # serving
+$S/miniconda3/envs/myenv/bin/pip install vllm torch                       # x86_64 wheels; pin to 0238's versions when they work
+$C create -n deontic --override-channels -c conda-forge python=3.12 swi-prolog -y   # DeonticBench; x86_64 has swi-prolog
+grep -v '^vllm' DeonticBench/requirements.txt | $S/miniconda3/envs/deontic/bin/pip install -r /dev/stdin
 cd harbor-deonticbench && uv sync --all-extras --dev && cd ..  # Harbor CLI only; tasks can't run here (no Docker)
 
-# weights
-hf download Qwen/Qwen3.5-35B-A3B --local-dir /brtx/601-nvme1/zwang544/models/Qwen3.5-35B-A3B
+# weights ✅ done 2026-10-31 (71.9 GB, 14 shards verified against the index)
+hf download Qwen/Qwen3.5-35B-A3B --local-dir $S/models/Qwen3.5-35B-A3B
 ```
 
 ### 3.7 Serving Qwen3.5-35B-A3B with hidden-state access 🔶
