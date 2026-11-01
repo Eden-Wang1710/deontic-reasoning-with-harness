@@ -12,10 +12,11 @@
   configuration. Its verifier (skill v3, four-step plan, index packet) is reused with a skill
   v4 (four rubrics, §5); its completion protocol is replaced (§3).
 - **Code**: `tools/dar_terminus2_multiagent.py` (`Terminus2ReaderVerifier`, a subclass of the
-  run-3 verifier agent); one skill per role, `tools/skills/solver_v1/SKILL.md`,
-  `tools/skills/reader_v1/SKILL.md`, `tools/skills/rubric_verifier_v4/SKILL.md`;
-  `tools/templates/terminus-json-multiagent-v1.txt` (the stock terminus-2 template plus the
-  `subagent` field and a `{skill}` slot); `tools/run_dar_qwen35_35b.sh` with `AGENT=t2rv`.
+  run-3 verifier agent); one skill per role, `tools/skills/solver_v2/SKILL.md` (v1 was used
+  only by `rv-smoke1`), `tools/skills/reader_v1/SKILL.md`, `tools/skills/rubric_verifier_v4/SKILL.md`;
+  `tools/templates/terminus-json-multiagent-v2.txt` (the stock terminus-2 template plus a second
+  example response that is a sub-agent call and a `{skill}` slot; v1 had the field only as a line
+  in the example); `tools/run_dar_qwen35_35b.sh` with `AGENT=t2rv`.
 - **Confidence convention**: ✅ checked on the machine / in run output on the date given,
   🔶 expectation or inference.
 
@@ -81,6 +82,19 @@ this open; decided for the JSON field).
 Nothing is intercepted at the shell level. The solver may still read the rule file itself; the
 prompt tells it to use the reader, and the harness counts the solver's own reads of the rule file
 in `summary.json` (owner's decision: no hard-coded interception).
+
+**Protocol correction (added 2026-11-01 after `rv-smoke1`, §9.1).** The one thing the harness
+does correct is a sub-agent call placed where the harness does not read it. A keystroke that is
+the call itself (`subagent={...}`, `"subagent": {...}`, `{"name": "reader", ...}`) or a command
+object carrying a `subagent` key is **not sent to the shell**; the remaining commands run and a
+`=== SUB-AGENT CALL MISPLACED ===` block tells the solver where the field goes and shows the
+correct form. If the response does not parse at all and mentions `subagent`, the same form is
+appended as a `HINT:` to the stock parse-error feedback. The harness never interprets the
+misplaced text as a call (that would be an auto-fix of the protocol; the solver resends it).
+These corrections are counted in `summary.json` (`n_protocol_corrections`,
+`subagent_call_errors[].kind`) and flagged in the verifier's trajectory index. Unlike a
+rule-file read, this is an error in the harness's own protocol and benchmark-independent, which
+is why it is handled mechanically while reads are only counted.
 
 ## 3. Completion protocol
 
@@ -230,19 +244,41 @@ agent renders the four names.
 Owner's decision 2026-10-28: the solver's prompt stays as close to stock terminus-2 as possible
 and everything specific to this harness goes into a skill, so that all three roles have one.
 
-- `tools/templates/terminus-json-multiagent-v1.txt` is the stock `terminus-json-plain.txt` with
-  three additions: the `subagent` field in the JSON example, one line under "Optional fields"
-  pointing at the skill, and a `Skill:\n{skill}` slot before `Task Description:`. The agent
-  fills the slot from the skill file at start-up (braces doubled, since the template is
-  `str.format`-ed with the instruction and terminal state later).
-- `tools/skills/solver_v1/SKILL.md` (38 lines): how to call a sub-agent (one per response,
-  commands first); the reader (verbatim text; query as the rule or question, not a guessed
-  section number; first call broad, later calls specific; unlimited calls); the verifier (four
-  rubrics, `NO` is a checked violation and `UNKNOWN` a lead, never gives the answer, write the
-  file first, ≤ 3 rounds); finishing (verifier before finishing, accepted only for the checked
+- `tools/templates/terminus-json-multiagent-v1.txt` (used by `rv-smoke1` only) is the stock
+  `terminus-json-plain.txt` with three additions: the `subagent` field in the JSON example, one
+  line under "Optional fields" pointing at the skill, and a `Skill:\n{skill}` slot before
+  `Task Description:`. The agent fills the slot from the skill file at start-up (braces doubled,
+  since the template is `str.format`-ed with the instruction and terminal state later).
+- `tools/skills/solver_v1/SKILL.md` (38 lines, `rv-smoke1` only): how to call a sub-agent (one
+  per response, commands first); the reader (verbatim text; query as the rule or question, not a
+  guessed section number; first call broad, later calls specific; unlimited calls); the verifier
+  (four rubrics, `NO` is a checked violation and `UNKNOWN` a lead, never gives the answer, write
+  the file first, ≤ 3 rounds); finishing (verifier before finishing, accepted only for the checked
   file, `task_complete` + empty commands ends at once, call + flag = call); the three-section
   answer file (`## Statute` section numbers, `## Reasoning`, `Answer:` last; quoted heredoc)
   and arithmetic in `python3`. The grader is unchanged.
+- **v2 of both (2026-11-01, the defaults since then; owner's decision after §9.1).** Diagnosis
+  of `rv-smoke1`: both solvers *knew* the reader existed (their first `plan` said "read the
+  statute, then use the reader") and both tried to call it at their first opportunity, but put
+  the call in the wrong place; the stock preamble ("solve the task by providing batches of shell
+  commands") and the task text ("Carefully read the statute at `/app/statute.txt`") outweighed a
+  skill sentence in the middle of a 6.9k-character prompt. Changes, prompt-only:
+  - `terminus-json-multiagent-v2.txt` shows **two complete example responses**, one with
+    commands and one that is a reader call with `"commands": []`; the preamble says the task is
+    solved by commands "and, where the skill below says so, by calling a sub-agent"; the
+    "Optional fields" line says the field is top-level, never a keystroke, never inside a command
+    object. Still the stock template plus one example block and the slot.
+  - `solver_v2/SKILL.md` (45 lines) opens with **Rule 1: read the rule document through the
+    reader, never yourself**, which addresses the task text head-on ("the task description tells
+    you to read the rule document; do that by calling the reader"), names the commands not to use
+    (`cat`, `grep`, `sed`, `head`, `less`, `python3` on the file), and prescribes that **the first
+    response is a broad reader call** with a given example query. The call mechanics ("top-level
+    field next to `commands`") come second; the verifier, finishing and answer-file sections are
+    v1's unchanged.
+  - Rejected for now: intercepting reads of the rule file (owner, 2026-10-28, stands), and a
+    harness-forced first reader call before the solver's first step (two-stage; kept as the
+    fallback if v2 does not stop the solver from reading the file itself, because it would make
+    the sub-agents something other than tools the solver calls).
 
 ## 7. Logs per trial
 
@@ -274,7 +310,7 @@ Under `<trial>/agent/`:
 | Solver reads of the rule file | allowed, counted | no interception |
 | Wall clock | 600 s × 3 = 1,800 s, sub-agent time included | as before; 600 s re-scoring reported alongside |
 | Controls | none; one draw on the 65 SARA tasks | owner: no ablations, no second draw |
-| Skills | solver v1, reader v1, verifier v4 (four rubrics), all hand-written | one skill per role |
+| Skills | solver v1, reader v1, verifier v4 (four rubrics), all hand-written | one skill per role; **solver v2 and template v2 from `rv-smoke2` on** (§6) |
 
 Job: `jobs/qwen3.5-35b-a3b/t2rv-direct/`. Smoke test first on tax-case-93 and s2-b-2-c-pos
 (the two tasks of the run-2/3 smoke tests), then the 65-task run with no code or skill change in
@@ -318,3 +354,15 @@ Partial trajectories are kept. What the 7 minutes showed (✅ from the trajector
 🔶 The two misuses (reader call as a keystroke; a self-made Python "reader") suggest the solver
 does not register the `subagent` field from the skill alone; whether to make the field more
 prominent in the prompt is the owner's call before the next smoke.
+
+### 9.2 `rv-smoke2` (2026-11-01)
+
+Same two tasks, same model and serving, the §6 v2 template and solver skill, the §2 protocol
+correction, reader v1 and verifier v4 unchanged. Launched with `setsid nohup` from a shell (not as
+a Claude Code background task; see [02](02_setup_and_sync.md) §2 memory-pressure caveat). Job
+`jobs/qwen3.5-35b-a3b/t2rv-direct/rv-smoke2/`.
+
+Acceptance, the §8 list plus three items from §9.1: (a) the first response of both trials is a
+reader call; (b) `solver_rule_file_reads` is 0 in both `summary.json`; (c) no protocol
+correction fires, or the solver resends the call correctly in the step after one. Results are
+recorded below when the run ends.

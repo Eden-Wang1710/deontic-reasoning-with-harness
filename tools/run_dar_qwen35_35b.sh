@@ -34,6 +34,8 @@
 #          lines chosen by line range) and the verifier (skill v4) through a "subagent" field in
 #          its JSON response; task_complete is accepted only for an answer file the verifier has
 #          seen (tools/dar_terminus2_multiagent.py). Jobs under jobs/<model>/t2rv-<framing>/.
+#          Solver prompt = templates/terminus-json-multiagent-v2.txt + skills/solver_v2/SKILL.md
+#          (v1 of both = rv-smoke1 only; --ak solver_skill_path=... derivation_template=... to swap).
 #          Tunables via --ak: reader_max_steps=3 reader_max_chars=16000 max_unverified_claims=2.
 #
 # Examples:

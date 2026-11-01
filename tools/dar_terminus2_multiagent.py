@@ -90,10 +90,10 @@ from dar_terminus2_verifier import (
 )
 
 TOOLS_DIR = Path(__file__).resolve().parent
-SOLVER_SKILL_PATH = TOOLS_DIR / "skills" / "solver_v1" / "SKILL.md"
+SOLVER_SKILL_PATH = TOOLS_DIR / "skills" / "solver_v2" / "SKILL.md"  # v1 kept for rv-smoke1
 READER_SKILL_PATH = TOOLS_DIR / "skills" / "reader_v1" / "SKILL.md"
 VERIFIER_V4_SKILL_PATH = TOOLS_DIR / "skills" / "rubric_verifier_v4" / "SKILL.md"
-MULTIAGENT_TEMPLATE_PATH = TOOLS_DIR / "templates" / "terminus-json-multiagent-v1.txt"
+MULTIAGENT_TEMPLATE_PATH = TOOLS_DIR / "templates" / "terminus-json-multiagent-v2.txt"
 
 # Rubric set of skill v4 (four rubrics; run-3's five are in dar_terminus2_verifier.RUBRIC_LABELS).
 RUBRIC_LABELS_V4 = {
@@ -115,7 +115,30 @@ READER_HEADER = "=== READER RESULT"
 VERIFIER_HEADER = "=== VERIFIER RESULT"
 GATE_HEADER = "=== COMPLETION NOT ACCEPTED ==="
 REJECTED_HEADER = "=== SUB-AGENT CALL REJECTED ==="
-SUBAGENT_MARKS = (READER_HEADER, VERIFIER_HEADER, GATE_HEADER, REJECTED_HEADER)
+MISPLACED_HEADER = "=== SUB-AGENT CALL MISPLACED ==="
+SUBAGENT_MARKS = (
+    READER_HEADER,
+    VERIFIER_HEADER,
+    GATE_HEADER,
+    REJECTED_HEADER,
+    MISPLACED_HEADER,
+)
+
+# Protocol correction (smoke1, 2026-10-28: one solver sent `subagent={...}` as a keystroke, the
+# other put "subagent" inside a command object and produced invalid JSON, then gave the reader
+# up). A keystroke that matches one of these is a misplaced sub-agent call: it is not sent to
+# the shell and the solver is told where the field goes. The harness does not interpret it.
+MISPLACED_KEYSTROKE_RES = (
+    re.compile(r'^\s*"?subagent"?\s*[=:]', re.IGNORECASE),
+    re.compile(r'"subagent"\s*:'),
+    re.compile(r'\{\s*"name"\s*:\s*"(?:reader|verifier)"'),
+)
+SUBAGENT_FORM = (
+    '"subagent" is a top-level field of the JSON response, next to "commands"; it is never a '
+    'keystroke and never a field inside a command object. Correct form: {"analysis": "...", '
+    '"plan": "...", "commands": [], "subagent": {"name": "reader", "query": "..."}} or '
+    '{"analysis": "...", "plan": "...", "commands": [], "subagent": {"name": "verifier"}}.'
+)
 
 READER_CALL_RE = re.compile(r"=== READER RESULT \(call (\d+) of this task\) ===")
 VERIFIER_CALL_RE = re.compile(r"=== VERIFIER RESULT \(round (\d+) of (\d+)\) ===")
@@ -182,6 +205,8 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         self._pending_subagent: dict[str, Any] | None = None
         self._episode_claim = False
         self._gate_message: str | None = None
+        self._protocol_note: str | None = None
+        self._protocol_corrections = 0
         # Trajectory steps (system, with sub-agent refs) to insert before the next agent step.
         self._pending_subagent_steps: list[Step] = []
         # Completion gate.
@@ -242,12 +267,26 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         self._episode_claim = False
         self._pending_subagent = None
         self._gate_message = None
+        self._protocol_note = None
 
         parse_error = bool(feedback and "ERROR:" in feedback)
         if parse_error:
+            # The loop sends the feedback back verbatim. If the unparsable response mentions
+            # the field, say where it goes, so the solver does not abandon the sub-agent.
+            if "subagent" in (llm_response.content or "").lower():
+                feedback += "\nHINT: " + SUBAGENT_FORM
+                self._protocol_corrections += 1
+                self._subagent_call_errors.append(
+                    {
+                        "episode_step_id": len(self._trajectory_steps) + 1,
+                        "kind": "misplaced_in_invalid_json",
+                        "error": "response did not parse and mentions subagent",
+                    }
+                )
             return commands, is_task_complete, feedback, analysis, plan, llm_response
 
         obj = _extract_json_object(llm_response.content) or {}
+        commands = self._drop_misplaced_calls(obj, commands)
         sub = self._normalise_subagent(obj.get("subagent"))
         self._pending_subagent = sub
         self._episode_claim = bool(is_task_complete)
@@ -319,6 +358,12 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
 
         if self._episode_claim and sub is None:
             await self._gate_claim(environment)
+
+        if self._protocol_note:
+            block = (
+                f"{block}\n\n{self._protocol_note}" if block else self._protocol_note
+            )
+            self._protocol_note = None
 
         if block is not None:
             terminal_output = (
@@ -455,6 +500,46 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         )
 
     # ---------------------------------------------------------------- reader
+
+    def _drop_misplaced_calls(
+        self, obj: dict[str, Any], commands: list[Command]
+    ) -> list[Command]:
+        """Remove commands that carry a sub-agent call and prepare the correction note.
+
+        Two forms: a keystroke that is the call itself (``subagent={...}``), and a command
+        object with a ``subagent`` key (the stock parser keeps the command and only warns
+        about the unknown field). Neither reaches the shell; the solver gets the correct form.
+        """
+        raw_cmds = obj.get("commands")
+        raw_cmds = raw_cmds if isinstance(raw_cmds, list) else []
+        where: list[str] = []
+        kept: list[Command] = []
+        for i, cmd in enumerate(commands):
+            ks = cmd.keystrokes or ""
+            raw = raw_cmds[i] if i < len(raw_cmds) and isinstance(raw_cmds[i], dict) else {}
+            if any(r.search(ks) for r in MISPLACED_KEYSTROKE_RES):
+                where.append(f'the "keystrokes" of command {i + 1}')
+            elif "subagent" in raw:
+                where.append(f"a field of command object {i + 1}")
+            else:
+                kept.append(cmd)
+        if not where:
+            return commands
+        self._protocol_corrections += 1
+        self._subagent_call_errors.append(
+            {
+                "episode_step_id": len(self._trajectory_steps) + 1,
+                "kind": "misplaced_call",
+                "error": "sub-agent call in " + "; ".join(where),
+            }
+        )
+        self._protocol_note = (
+            f"{MISPLACED_HEADER}\n"
+            f"Your response put a sub-agent call in {'; '.join(where)}, where the harness "
+            "does not read it. That text was NOT sent to the terminal and no sub-agent was "
+            f"called. {SUBAGENT_FORM} Resend the call in that form."
+        )
+        return kept
 
     def _normalise_subagent(self, sub: Any) -> dict[str, Any] | None:
         if sub is None or sub is False or sub == "" or sub == {}:
@@ -968,6 +1053,8 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             flags.append("task_complete claimed, not accepted (unverified)")
         if REJECTED_HEADER in obs:
             flags.append("sub-agent call rejected")
+        if MISPLACED_HEADER in obs:
+            flags.append("sub-agent call misplaced, not run")
         return (" | " + "; ".join(flags)) if flags else ""
 
     @staticmethod
@@ -1194,6 +1281,10 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                     ),
                     "solver_rule_file_reads": self._solver_rule_file_reads,
                     "subagent_call_errors": self._subagent_call_errors,
+                    "n_protocol_corrections": self._protocol_corrections,
+                    "prompt_template_path": str(
+                        getattr(self, "_derivation_template", MULTIAGENT_TEMPLATE_PATH)
+                    ),
                     "completed_via_confirmation": self._finish_reason != "not_finished",
                     "subagent_prompt_tokens": self._subagent_metrics.total_prompt_tokens,
                     "subagent_completion_tokens": self._subagent_metrics.total_completion_tokens,

@@ -58,10 +58,14 @@ deontic-reasoning-with-harness/
 │   │                            return line ranges + labels, never an answer; the harness extracts the text
 │   ├── skills/solver_v1/SKILL.md    the solver's instructions for the reader-verifier harness (how to
 │   │                            call the two sub-agents, finishing protocol, answer-file format);
-│   │                            filled into the {skill} slot of the multiagent template
+│   │                            filled into the {skill} slot of the multiagent template; rv-smoke1 only
+│   ├── skills/solver_v2/SKILL.md    default since 2026-11-01: opens with "read the rule document through
+│   │                            the reader, never yourself", first response = broad reader call,
+│   │                            field position stated before anything else
 │   ├── templates/                   solver prompt templates swapped in by derivation_record=true:
 │   │                            terminus-json-plain-derivation{,-v2}.txt (runs 2, 3),
-│   │                            terminus-json-multiagent-v1.txt (reader-verifier harness)
+│   │                            terminus-json-multiagent-v1.txt (rv-smoke1), -v2.txt (default: a
+│   │                            second example response that is a sub-agent call)
 │   ├── dar_terminus2_multiagent.py  Terminus2ReaderVerifier (AGENT=t2rv): run-3 agent whose solver
 │   │                            calls reader/verifier via a "subagent" JSON field; task_complete
 │   │                            accepted only for an answer-file hash the verifier saw; logs under
