@@ -1,6 +1,6 @@
 ---
 name: rubric-verifier-v4
-description: Check a rule-grounded agent's answer file and trajectory against four rubrics (tool use, provision coverage, provision selection and application, grounded reasoning) in four fixed command steps, and return a short structured report that points at gaps without supplying answers. v4 is for the reader-verifier harness, where rule text reaches the solver through a reader sub-agent.
+description: Check a rule-grounded agent's answer file and trajectory against four rubrics (tool use, provision coverage, provision selection and application, grounded reasoning) in four fixed command steps, and return a short structured report that points at gaps without supplying answers. v4 is for the reader-verifier harness, where rule text reaches the solver through a reader sub-agent. Revised 2026-11-01 after rv-smoke2: suggested actions name the provision to ask the reader for, never a shell command on the rule file.
 ---
 
 # Rubric verifier (v4)
@@ -95,7 +95,7 @@ Use **at most one command step**, then report. Check only the items `unresolved`
    "unused_facts": [{"fact": "one UNUSED fact, in the task's words", "searched": "keywords or sections", "section": "section engaged, or 'none found'"}],
    "quoted_lines": ["line numbers of the rule file you quoted, e.g. 386-392"],
    "unresolved": ["one actionable item per line, naming the fact, section or step"],
-   "suggested_actions": ["where to look: a command or a condition to check, at most 3; never a result"]}}
+   "suggested_actions": ["where to look: a provision to ask the reader for, or a condition to check; at most 3; never a result, never a shell command on the rule file"]}}
 ```
 
-When all four statuses are `YES` or `NA`, `unresolved` and `suggested_actions` **must be empty**: the solver reads a non-empty list as work to do. Every suggested action corresponds to an unresolved item and tells the solver *where to look* (`sed -n '380,420p' /app/statute.txt`, "check the conditions of §2(b) against who maintains the household"), never what it will find.
+When all four statuses are `YES` or `NA`, `unresolved` and `suggested_actions` **must be empty**: the solver reads a non-empty list as work to do. Every suggested action corresponds to an unresolved item and tells the solver *where to look* ("ask the reader for §68(b), the applicable amount", "check the conditions of §2(b) against who maintains the household"), never what it will find. **Never suggest a shell command on the rule file** (`sed`, `grep`, `cat` of the statute): the solver obtains rule text through the reader, and in rv-smoke2 it copied a suggested `sed -n` verbatim, which is the self-read the harness is designed to avoid. Name the provision; the solver turns it into a reader query.

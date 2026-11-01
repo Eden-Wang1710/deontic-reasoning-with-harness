@@ -209,6 +209,10 @@ verifier's (owner, 2026-10-28).
 
 ## 5. The verifier (skill v4, `tools/skills/rubric_verifier_v4/SKILL.md`, 101 lines)
 
+(Revised in place 2026-11-01 after `rv-smoke2`, §9.2 finding 1: suggested actions name a
+provision for a reader query, never a shell command on the rule file. The smoke1/smoke2 packets
+record the text that was in force.)
+
 Mechanics are run-3's: index packet, full trajectory uploaded to the container and read by the
 verifier with `grep`/`sed` (owner, 2026-10-28: the trajectory stays available), four-step plan
 (locate, read, check, report), `verifier_max_steps=4`, one command step on later rounds, same
@@ -364,5 +368,67 @@ a Claude Code background task; see [02](02_setup_and_sync.md) §2 memory-pressur
 
 Acceptance, the §8 list plus three items from §9.1: (a) the first response of both trials is a
 reader call; (b) `solver_rule_file_reads` is 0 in both `summary.json`; (c) no protocol
-correction fires, or the solver resends the call correctly in the step after one. Results are
-recorded below when the run ends.
+correction fires, or the solver resends the call correctly in the step after one.
+
+**Outcome (✅ from `summary.json`, `trajectory.json`, `result.json`, 2026-11-01 18:29–18:59 UTC;
+vLLM stopped at 19:00).** Both answer files correct; the binary trial finished through the
+protocol, the numeric trial ran out of wall clock with the correct file unconfirmed.
+
+| | sara-binary s2-b-2-c-pos | sara-numeric tax-case-93 |
+|---|---|---|
+| Solver steps | 3 | 14 |
+| First response | reader call (broad query) ✅ | reader call (the skill's example query verbatim) ✅ |
+| Reader calls | 1: 73 s, §2(a) 182–207 + §2(b)(2) 226–233 | 2: 93 s, **6 excerpts, 16,075 chars**, §63 cut at 358–437 (33 lines omitted, marker shown), §7703 504–520 listed as not inserted; 36 s, §68 471–498 |
+| Verifier rounds | 1: 325 s, 4 × YES | 3: 279 s / 414 s / 442 s (8.2k / 12.4k / 13.2k completion tokens) |
+| Answer per round | Entailment | 101,358 → **102,150** → 102,150 (gold 102,150) |
+| Finish | `task_complete` at step 3, hash verified, **accepted at once, no "Are you sure?"** ✅; `finish_reason=verified` | round-3 report arrived at +1,798 s; `AgentTimeoutError` at 1,800 s; `finish_reason=not_finished` |
+| Reward | 1.0 | 1.0 file-graded; 0 under the protocol score (timeout) |
+| `solver_rule_file_reads` | 0 ✅ | **1** (see below) |
+| `n_protocol_corrections` | 0 ✅ | 0 ✅ |
+| Wall clock | 7.7 min | 30 min (cap) |
+
+Acceptance: (a) ✅, (c) ✅, (b) ✅ binary, ❌ numeric by one read that the **verifier** caused.
+Of the §8 list, everything is now exercised: reader text verbatim and the reader's commands
+absent from the solver's context ✅; truncation and "not inserted" marked ✅; three-section file
+and verifier call ✅; the verifier read the actual file (the `rounds[].answer` it saw changes
+with the file) ✅; verified `task_complete` ends the trial without a second confirmation ✅; the
+verifier counted reader-delivered text as coverage and found an omitted provision ✅ (numeric
+round 1: `NO` on rubrics 3 and 4 for the §151(d)(3) exemption phase-out; the repair produced the
+gold answer). An unverified `task_complete` did not occur in smoke2 (both solvers called the
+verifier before claiming); the bounce path was exercised in smoke1.
+
+Findings:
+
+1. **The verifier's suggested actions were shell commands on the rule file**, and the solver
+   copied them: round 1 suggested `sed -n '471,503p' /app/statute.txt`, the solver ran exactly
+   that at step 11 (the one counted read); round 2 suggested `grep`/`sed` again; round 3
+   `grep -n -i 'support' /app/statute.txt`. The skill's own example (`sed -n '380,420p'`) was a v3
+   leftover. **Fixed 2026-11-01 in `rubric_verifier_v4/SKILL.md` in place** (description dated):
+   a suggested action names the provision to ask the reader for, never a shell command on the
+   rule file. After round 2 the solver used the reader for §68 by itself.
+2. **Verifier time dominates**: 1,135 of the numeric trial's 1,800 s (63%) were verifier rounds,
+   129 s (7%) reader calls, ~540 s the solver. Each round generates 8–13k completion tokens
+   (thinking on, 16k cap), i.e. 5–7 min at this model's speed. Run-3's 600 s × 3 budget does not
+   hold three rounds plus two reader calls plus the solver's repairs. 🔶 Options for the owner:
+   a lower output cap for the verifier's calls (e.g. 6k), `verifier_max_steps` 4 → 3, or a longer
+   wall clock for this harness with the 1,800 s re-scoring reported alongside as before.
+3. **The broad first reader call returns most of the statute.** With the skill's example query the
+   reader selected §1, §151, §152, §2, §63 and §7703 (lines 1–244 and 358–520), hit the 16,000-
+   character cap and lost the end of §63 and all of §7703. The solver's next generation (step 4)
+   took 6,089 completion tokens, ≈ 4 min. The context is still smaller and cleaner than smoke1's
+   `cat` (10,000 bytes truncated mid-file, then self-made searches), but "broad" plus a 16k cap
+   means the first message is ~4–5k tokens of statute. 🔶 Owner's call: keep (coverage first) or
+   lower `reader_max_chars` / sharpen the skill's example query to "the provisions that decide
+   the question, with the definitions and exceptions they depend on".
+4. **One wrong `NO`**: round 2 rated coverage `NO` for §68(b)(1)(C) "not in reader output",
+   although the solver had the lines in its own terminal output from the step-11 `sed`, which the
+   skill counts as having reached the solver. Harmless here (the solver fetched §68 through the
+   reader and round 3 passed), and finding 1 removes the cause.
+5. Reader internals: call 1 used all 3 steps and 4 LLM calls (one closing prompt), 92.9 s,
+   20.7k prompt / 2.2k completion tokens; call 2 used 2 steps, 36 s. The reader also returned
+   §2(a) (surviving spouse) for the binary task, i.e. it does pick provisions the facts engage
+   beyond the query's section.
+
+Next: decide findings 2 and 3, then either smoke3 on the same two tasks or straight to the
+65-task run (owner's rule in §8: no code or skill change between the accepted smoke and the run;
+the v4 wording fix of finding 1 has not been smoke-tested).
