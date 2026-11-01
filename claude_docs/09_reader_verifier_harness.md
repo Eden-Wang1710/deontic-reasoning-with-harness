@@ -432,3 +432,21 @@ Findings:
 Next: decide findings 2 and 3, then either smoke3 on the same two tasks or straight to the
 65-task run (owner's rule in §8: no code or skill change between the accepted smoke and the run;
 the v4 wording fix of finding 1 has not been smoke-tested).
+
+### 9.3 `rv-run1-numeric` (2026-11-01, all 35 SARA numeric tasks)
+
+Owner's decisions 2026-11-01 on §9.2's findings: finding 2 → **`verifier_max_tokens=6000`**
+(new setting in `dar_terminus2_verifier.py`, an output cap per verifier LLM call, thinking
+included; the model's default is 16k) and **`verifier_max_steps=3`** (was 4); finding 3 (size
+of the broad first reader call) → unchanged for this run. Everything else as §9.2: template v2,
+solver v2, reader v1 (3 steps, 16,000 chars), verifier v4 as revised after smoke2 (the wording
+fix has not been smoke-tested separately; this run is its first use), 3 verifier rounds,
+`max_unverified_claims=2`, 600 s × 3 wall clock, `--n-concurrent 2`, one draw. Binary not run.
+Job `jobs/qwen3.5-35b-a3b/t2rv-direct/rv-run1-numeric/`, launched detached with `setsid nohup`.
+
+🔶 Risk accepted with the 6k cap: a verifier call whose thinking alone exceeds the cap returns
+no content, which the round loop counts as a parse failure and one of the three steps; a round
+can therefore end with no report ("no report" rendering, as in run-3). `round-N.json` records
+`parse_failures` and `completion_tokens`, so the rate is measurable afterwards.
+
+Results are recorded here when the run ends; the vLLM server is stopped at once afterwards.

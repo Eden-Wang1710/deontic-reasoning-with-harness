@@ -36,7 +36,8 @@
 #          seen (tools/dar_terminus2_multiagent.py). Jobs under jobs/<model>/t2rv-<framing>/.
 #          Solver prompt = templates/terminus-json-multiagent-v2.txt + skills/solver_v2/SKILL.md
 #          (v1 of both = rv-smoke1 only; --ak solver_skill_path=... derivation_template=... to swap).
-#          Tunables via --ak: reader_max_steps=3 reader_max_chars=16000 max_unverified_claims=2.
+#          Tunables via --ak: reader_max_steps=3 reader_max_chars=16000 max_unverified_claims=2
+#          verifier_max_steps=4 verifier_max_tokens=<none> (rv-run1-numeric: 3 and 6000).
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test

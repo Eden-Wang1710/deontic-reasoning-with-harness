@@ -179,6 +179,7 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         *args,
         max_verify_rounds: int | str = 3,
         verifier_max_steps: int | str = 8,
+        verifier_max_tokens: int | str | None = None,
         skill_path: str | None = None,
         include_reasoning: bool | str = False,
         answer_path: str = "/app/output/answer.txt",
@@ -204,6 +205,14 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         self._packet_mode = packet_mode
         self._max_verify_rounds = int(max_verify_rounds)
         self._verifier_max_steps = int(verifier_max_steps)
+        # Output cap per verifier LLM call (thinking included); None = the model's default
+        # (16k here). Added 2026-11-01 (owner's decision after rv-smoke2: 8-13k completion
+        # tokens per round made the verifier 63% of the wall clock).
+        self._verifier_max_tokens = (
+            int(verifier_max_tokens)
+            if verifier_max_tokens not in (None, "", "none", "None")
+            else None
+        )
         self._include_reasoning = _truthy(include_reasoning)
         self._answer_path = answer_path
         self._skill_path = Path(skill_path) if skill_path else DEFAULT_SKILL_PATH
@@ -397,6 +406,12 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
 
     # --------------------------------------------------------------- verifier
 
+    def _verifier_llm_kwargs(self) -> dict:
+        kw = dict(self._llm_call_kwargs)
+        if self._verifier_max_tokens is not None:
+            kw["max_tokens"] = self._verifier_max_tokens
+        return kw
+
     async def _run_verifier_round(
         self, session: TmuxSession, commands: list[Command], terminal_output: str
     ) -> str:
@@ -436,7 +451,7 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         async def call(p: str) -> LLMResponse:
             nonlocal last_usage
             t0 = time.time()
-            resp = await vchat.chat(p, **self._llm_call_kwargs)
+            resp = await vchat.chat(p, **self._verifier_llm_kwargs())
             self._track_api_request_time(t0)
             self._update_subagent_metrics(resp.usage)
             self._collect_subagent_rollout_detail(resp)
@@ -966,6 +981,7 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             summary = {
                 "max_verify_rounds": self._max_verify_rounds,
                 "verifier_max_steps": self._verifier_max_steps,
+                "verifier_max_tokens": self._verifier_max_tokens,
                 "include_reasoning": self._include_reasoning,
                 "skill_path": str(self._skill_path),
                 "derivation_record": self._derivation_record,
