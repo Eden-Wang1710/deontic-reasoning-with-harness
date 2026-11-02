@@ -449,4 +449,75 @@ no content, which the round loop counts as a parse failure and one of the three 
 can therefore end with no report ("no report" rendering, as in run-3). `round-N.json` records
 `parse_failures` and `completion_tokens`, so the rate is measurable afterwards.
 
-Results are recorded here when the run ends; the vLLM server is stopped at once afterwards.
+**Outcome (✅ from `result.json`, `summary.json`, `round-N.json`, `trial.log`; run 2026-11-01
+19:29 → 2026-11-02 01:56 UTC, 6 h 26 min; vLLM stopped 01:58).**
+
+| | rv-run1-numeric | run-3 (08 §9) | t2fix baseline |
+|---|---|---|---|
+| File-graded correct / 35 | **13 (0.371)** | 16 (0.457) | 7 (0.200) |
+| Protocol score (timeouts count wrong) | **12 (0.343)** | 14 (0.400) | 7 (0.200) |
+| Timeouts at 1,800 s | 6 (29, 47, 51, 64, 83, 94); 51 had the gold answer in the file | 5 | — |
+| Trials over 600 s | 35 of 35 (median 1,294 s) | all | — |
+| vs run-3 per task | gained 2, 51, 70; lost 49, 63, 75, 91, 93, 97; both 10 | | |
+| vs t2fix per task | gained 2, 6, 44, 56, 67, 69, 70, 84; lost 74, 93; both 5 | | |
+
+Harness mechanics over the 35 trials: first response a reader call in every trial; solver reads
+of the rule file **1** (tax-case-29); reader calls median 2 per trial (range 1–8); verifier rounds
+run 64 (per trial 0: 4, 1: 21, 2: 8, 3: 2); `finish_reason` verified 29, not_finished 6;
+protocol corrections 23 in 12 trials (12 `misplaced_call`, 11 `misplaced_in_invalid_json`, 10 of
+the latter in one trial); answer changed between rounds in 4 trials: 56 and 69 wrong → right, 75
+**right → wrong** (8,883 → 10,418; gold 8,883), 78 wrong → wrong. Time share over all trials:
+solver generation 42%, **reader 31%**, verifier 27%. Solver median 9 steps and 8.3k completion
+tokens per trial; reader median 18.6k characters inserted per trial (the broad first call hits the
+16k cap in nearly every trial).
+
+Findings (the first two are bugs found by this run and fixed on 2026-11-02, see below; the
+comparison with run-3 is therefore not clean):
+
+1. **The 6k cap broke one verifier round in three.** Harbor's LiteLLM wrapper raises
+   `OutputLengthExceededError` when a call hits `max_tokens`; with thinking on, the verifier's
+   first call often needs more than 6k tokens, so the round died with no report. 21 of 64 rounds
+   failed this way (15 trials; both rounds of tax-case-93 and all three of tax-case-10); each
+   failed round still cost 249 s on average (5,238 s in total), so the cap saved nothing on them.
+   Successful rounds took a median of 282 s, about the same as in smoke2 (279–442 s); 4 of them
+   contained a parse-failure step. Rounds per trial fell (21 trials needed only one), which is
+   where the time went down.
+2. **A failed round counted as a verification (bug, fixed 2026-11-02).** `_verifier_call` recorded
+   the answer hash as verified even when the round raised, with the comment "the budget was
+   spent". Consequence: **10 trials finished `verified` on a round that delivered no report**
+   (71, 15, 73, 44, 91, 49, 10, 70, 93, 18; 4 of them correct), and the decision instruction told
+   the solver "the answer file as it stands has been verified". Fix: a failed round is spent but
+   sets no verified hash; the instruction says so and asks for another call; after the rounds are
+   used up `task_complete` is accepted as `budget_exhausted`, which is the honest label. New
+   summary field `verifier_failed_rounds`.
+3. **The parse-error HINT misled a solver for eight steps (fixed 2026-11-02).** tax-case-51's
+   responses had a bracket error (`]` closing a command object) plus a harmless top-level
+   `"subagent": {}`; because the text mentioned `subagent`, the §2 HINT was appended to the
+   stock "No valid JSON found" feedback and the solver kept fixing the field's position instead
+   of the brackets, eight responses in a row, then timed out with the gold answer in the file.
+   The HINT now fires only when the call sits inside a command object or in a keystroke
+   (`MISPLACED_IN_TEXT_RE`); a top-level key, well-formed or not, gets the stock feedback alone.
+   The 12 `misplaced_call` corrections worked as intended: no misplaced text reached the shell,
+   5 were resent as a proper call in the very next response, the others continued with commands
+   and called a sub-agent later; all 12 trials but tax-case-64 (timeout) reached a verifier round.
+4. **The reader is now the largest sub-agent cost** (31% of wall clock vs 27% verifier). Three
+   patterns: the broad first call returns ~16k characters in nearly every trial (14.6k–24.9k
+   characters per trial even with one or two calls); reader loops in the timeouts (tax-case-94:
+   7 calls, 40k characters, no verifier round; 29: 8 calls; 64: 5 calls, no round; 47: 4 calls);
+   and ~90–200 s per call. Finding 3 of §9.2 (query and `reader_max_chars`) is still open.
+5. **Verifier-induced damage exists**: tax-case-75 had the gold answer after round 1 and changed
+   it to a wrong one after the report (as in run-3's binary damages). Not analysed further here.
+6. The §9.2 fix to the verifier skill held: one self-read in 35 trials (tax-case-29, during a
+   reader loop), none copied from a suggested action.
+
+🔶 Reading of the score: 13/35 is between run-3 (16) and the baseline (7), but with a verifier
+that was absent in a third of its rounds and vacuously accepted ten finishes, this run does not
+measure the harness as designed. The decision the owner has to take is how to bound verifier time
+without truncating it: (a) no cap, 3 steps (the per-round time then returns to 280–440 s);
+(b) a cap of 10–12k; (c) a verifier **without thinking** (`chat_template_kwargs:
+{"enable_thinking": false}` for the verifier's calls only), which would make rounds ~1 min but
+changes what the verifier is; smoke-test before choosing. The reader question (finding 4) should
+be settled in the same smoke: a sharper default query and a lower `reader_max_chars` (8–10k).
+
+Code state after this run (commit of 2026-11-02): finding 2 and finding 3 fixed in
+`dar_terminus2_multiagent.py`; nothing else changed; no run has used the fixed code yet.

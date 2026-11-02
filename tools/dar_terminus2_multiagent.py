@@ -133,6 +133,16 @@ MISPLACED_KEYSTROKE_RES = (
     re.compile(r'"subagent"\s*:'),
     re.compile(r'\{\s*"name"\s*:\s*"(?:reader|verifier)"'),
 )
+# For responses that did not parse: a keystroke string that carries a call, or a "subagent" key
+# directly before or after a "keystrokes" key (i.e. inside the same command object).
+_JSTR = r'"(?:[^"\\]|\\.)*"'
+MISPLACED_IN_TEXT_RE = re.compile(
+    r'"keystrokes"\s*:\s*"(?:[^"\\]|\\.)*(?:subagent\s*[=:]|\\"name\\"\s*:\s*\\"(?:reader|verifier))'
+    r"|"
+    r'"keystrokes"\s*:\s*' + _JSTR + r'\s*,\s*(?:"duration"\s*:\s*[\d.]+\s*,\s*)?"subagent"\s*:'
+    r"|"
+    r'"subagent"\s*:\s*\{[^{}]*\}\s*,\s*(?:"duration"\s*:\s*[\d.]+\s*,\s*)?"keystrokes"\s*:'
+)
 SUBAGENT_FORM = (
     '"subagent" is a top-level field of the JSON response, next to "commands"; it is never a '
     'keystroke and never a field inside a command object. Correct form: {"analysis": "...", '
@@ -143,6 +153,12 @@ SUBAGENT_FORM = (
 READER_CALL_RE = re.compile(r"=== READER RESULT \(call (\d+) of this task\) ===")
 VERIFIER_CALL_RE = re.compile(r"=== VERIFIER RESULT \(round (\d+) of (\d+)\) ===")
 LINES_RE = re.compile(r"^\s*L?(\d+)\s*(?:-|–|—|:|,|to)\s*L?(\d+)\s*$")
+
+
+def _subagent_misplaced_in_text(text: str) -> bool:
+    """True if ``text`` (an unparsable response) has a sub-agent call inside a command object or
+    as a keystroke; a top-level ``"subagent"`` key, well-formed or not, is not a misplacement."""
+    return bool(MISPLACED_IN_TEXT_RE.search(text))
 
 
 def _sha(text: str) -> str:
@@ -207,6 +223,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         self._gate_message: str | None = None
         self._protocol_note: str | None = None
         self._protocol_corrections = 0
+        self._failed_rounds = 0  # verifier rounds that ended in an exception (no report)
         # Trajectory steps (system, with sub-agent refs) to insert before the next agent step.
         self._pending_subagent_steps: list[Step] = []
         # Completion gate.
@@ -271,9 +288,12 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
 
         parse_error = bool(feedback and "ERROR:" in feedback)
         if parse_error:
-            # The loop sends the feedback back verbatim. If the unparsable response mentions
-            # the field, say where it goes, so the solver does not abandon the sub-agent.
-            if "subagent" in (llm_response.content or "").lower():
+            # The loop sends the feedback back verbatim. If the unparsable response put the
+            # field inside the commands array or in a keystroke, say where it goes, so the
+            # solver does not abandon the sub-agent. Only then: in rv-run1-numeric (tax-case-51)
+            # a response with a harmless top-level "subagent": {} and a bracket error got this
+            # hint eight times in a row and the solver kept fixing the wrong thing.
+            if _subagent_misplaced_in_text(llm_response.content or ""):
                 feedback += "\nHINT: " + SUBAGENT_FORM
                 self._protocol_corrections += 1
                 self._subagent_call_errors.append(
@@ -463,12 +483,21 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                     "elapsed_sec": time.time() - started,
                 }
             )
-            # The answer the verifier would have seen counts as verified: the budget was spent.
+            # The round is spent but nothing was checked: the hash is NOT recorded as verified.
+            # (Until 2026-11-02 it was, so a trial whose rounds all failed finished as
+            # "verified" with no report ever delivered; rv-run1-numeric, 09 §9.3.) With no
+            # verified hash the gate bounces task_complete while rounds remain and accepts it
+            # as budget_exhausted / unverified_accepted afterwards, which is what happened.
+            self._failed_rounds += 1
+            report_text += (
+                "\nThis round is used up; the answer file does not count as verified by it."
+            )
             self._previous_answer = await self._read_answer(session.environment)
-        # _run_verifier_round read the answer file and stored it in _previous_answer.
-        self._verified_hash = _sha(self._previous_answer or "")
-        if self._rounds_log and self._rounds_log[-1].get("round") == round_no:
-            self._rounds_log[-1]["answer_hash"] = self._verified_hash[:16]
+        else:
+            # _run_verifier_round read the answer file and stored it in _previous_answer.
+            self._verified_hash = _sha(self._previous_answer or "")
+            if self._rounds_log and self._rounds_log[-1].get("round") == round_no:
+                self._rounds_log[-1]["answer_hash"] = self._verified_hash[:16]
         if self._pending_verifier_step is not None:
             self._pending_subagent_steps.append(self._pending_verifier_step)
             self._pending_verifier_step = None
@@ -476,10 +505,18 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         rounds_left = self._max_verify_rounds - round_no
         return (
             f"{VERIFIER_HEADER} (round {round_no} of {self._max_verify_rounds}) ===\n"
-            f"{report_text}\n\n{self._decision_instruction(rounds_left)}"
+            f"{report_text}\n\n"
+            f"{self._decision_instruction(rounds_left, verified=self._verified_hash == _sha(self._previous_answer or ''))}"
         )
 
-    def _decision_instruction(self, rounds_left: int) -> str:
+    def _decision_instruction(self, rounds_left: int, verified: bool = True) -> str:
+        if rounds_left > 0 and not verified:
+            return (
+                f"Decide how to proceed. {rounds_left} verification round(s) remain. This round "
+                "delivered no report, so the answer file has NOT been verified: a "
+                '"task_complete" now would be bounced. Call the verifier again (with the file '
+                "as it stands, or after changes you can support with rule text or a computation)."
+            )
         if rounds_left > 0:
             return (
                 f"Decide how to proceed. {rounds_left} verification round(s) remain.\n"
@@ -1282,6 +1319,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                     "solver_rule_file_reads": self._solver_rule_file_reads,
                     "subagent_call_errors": self._subagent_call_errors,
                     "n_protocol_corrections": self._protocol_corrections,
+                    "verifier_failed_rounds": self._failed_rounds,
                     "prompt_template_path": str(
                         getattr(self, "_derivation_template", MULTIAGENT_TEMPLATE_PATH)
                     ),
