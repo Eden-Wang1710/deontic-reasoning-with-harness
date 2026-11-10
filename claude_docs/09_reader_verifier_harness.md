@@ -6,7 +6,7 @@
   before `task_complete` is accepted. Both sub-agents are called by the solver through a field
   in its JSON response, run in their own `Chat`, and return a text result into the solver's
   conversation. Version 2 adds a **compactor** sub-agent that rebuilds the solver's context;
-  it is implemented and under debugging since 2026-11-10 (§10; no full run yet).
+  it is implemented and under debugging since 2026-11-10 (§10; two smokes, no full run yet).
 - **Date opened**: 2026-10-28
 - **Predecessor**: the solver-verifier harness ([08](08_solver_verifier_harness.md)), run-3
   configuration. Its verifier (skill v3, four-step plan, index packet) is reused with a skill
@@ -682,19 +682,60 @@ history.
    without the cap on fixed code. A clean statement about the compactor needs a `t2rv` rerun
    with the same verifier settings on the same tasks.
 
-### 10.7 Status and next steps (2026-11-10)
+### 10.7 Second smoke: `rvc-smoke2-auto` (2026-11-10, automatic compaction)
 
-- **Status**: the compactor is implemented and its selection quality was debugged offline
-  (§10.5). It has **not yet run inside a real trial**; there is no end-to-end evidence for or
-  against it.
-- **Running at the time of this commit**: `rvc-smoke2-auto`, the same harness with
-  `compact_after_report=auto` (the harness compacts at once after a report with a NO) on
-  tax-case 47, 49, 60, 61, 78, 94. Results will be added here.
-- **Open decisions** (owner): (a) make `auto` the default if the hint stays unused; (b) a
-  wall-clock limit with a no-thinking retry for the reader and the verifier, as the compactor
-  already has; (c) whether to trigger on UNKNOWN items as well as NO; (d) the clean `t2rv`
-  rerun for the comparison in item 4 above.
+Same harness with `--ak compact_after_report=auto` (the harness compacts at once after a report
+with a NO), tax-case 47, 49, 60, 61, 78, 94 (all wrong in `rv-run1-numeric`), two concurrent.
+✅ from `jobs/qwen3.5-35b-a3b/t2rvc-direct/rvc-smoke2-auto/`.
+
+| Case | Reward | Seconds | Verifier rounds (rubrics; seconds) | Reader calls (s) | Compaction: solver prompt tokens, messages, seconds |
+|---|---|---|---|---|---|
+| 47 | 0 | 1,800 timeout | YNNN (836) | 1 (93) | 12.5k → 6.5k, 20 → 2, 152 |
+| 49 | 0 | 1,249 | YYUN (219), YYUY (219) | 3 (316) | 11.8k → 6.7k, 14 → 2, 74 |
+| 60 | 0 | 1,800 timeout | YYNY (532), YYNY (333) | 4 (451) | 12.6k → 5.5k, 16 → 2, 62 |
+| 61 | 0 | 1,800 timeout | YYNN (438) | 4 (724) | 17.1k → 6.6k, 18 → 2, 126 |
+| 78 | 0 | 1,800 timeout | NNNN (480), NYNN (535) | 3 (258) | skipped twice: context below 8,000 tokens |
+| 94 | 0 | 1,800 timeout | NUUU (294), no answer file yet | 4 (613) | 11.8k → 7.1k, 8 → 2, 175 |
+
+**0 of 6 correct, 5 timeouts.** What the trials show:
+
+1. **The mechanics work in a real trial.** Five of five triggered compactions rebuilt the
+   context, in one attempt each with thinking on (62–175 s), roughly halving the solver's
+   prompt (11.8k–17.1k → 5.5k–7.1k tokens). The harness widened three ranges to subsection
+   boundaries; the coverage guard had nothing to restore. In the two trials that went on
+   (49, 60) the solver worked from the page and called the verifier again without a parse
+   error or a protocol violation.
+2. **No trial was repaired, and in most there was no time to try.** A verifier round without
+   the output cap took 219–836 s (5.5k–21k completion tokens), and the compaction another
+   1–3 minutes, so the page arrived at 932–1,511 s of the 1,800 s limit. In 47 and 61 the
+   solver's first response after the page was still being generated when the trial timed out.
+   In 49 the solver changed its answer by one unit and the verifier let it through; in 60
+   the second round repeated the same NO and the trial timed out.
+3. **One trigger bug, fixed**: in tax-case-94 the solver called the verifier before an answer
+   file existed and `auto` compacted on that report. `auto` now requires a non-empty answer
+   file, matching the solver skill's rule.
+4. tax-case-78 shows the lower threshold doing its job: the context was 7.8k tokens at the
+   first report and nothing was rebuilt.
+
+**Reading** (🔶, ten trials over both smokes, all on tasks the baseline failed): the
+compactor does what it was designed to do, and what it does is not what these trials lack.
+With the verifier's thinking uncapped, one verification round costs a quarter to a half of
+the whole time budget, and the reader adds 1.5–12 minutes; a repair after the first report
+has a few minutes at most. The time budget, not the context size, decides these trials.
+
+### 10.8 Status and next steps (2026-11-10)
+
+- **Status**: implemented; selection quality debugged offline (§10.5); runs inside real
+  trials (§10.7). **No evidence of an accuracy gain**: 0 of 10 smoke trials correct, on tasks
+  chosen because the baseline failed them, 7 of 10 timed out.
+- **Open decisions** (owner): (a) bound the time of the reader and the verifier (a wall-clock
+  limit with a no-thinking retry as the compactor has, or the output cap of `rv-run1-numeric`),
+  since without it the compactor cannot be evaluated inside 1,800 s; (b) or raise the agent
+  time limit for this harness and report time as a cost; (c) `auto` as the default, because
+  the hint was ignored in the one trial that showed it (§10.6); (d) whether to trigger on
+  UNKNOWN items as well as NO; (e) a clean `t2rv` rerun with the same verifier settings for the
+  comparison in §10.6 item 4.
 - **Contamination note**: the tasks used for debugging (the 23 failed `rv-run1-numeric`
   tasks) are no longer a clean test set for this harness. Every change made on them is generic
-  and listed in §10.5; a final number should be reported on all 35 tasks with this caveat, or
-  on a split that was not used for debugging.
+  and listed in §10.5–10.7; a final number should be reported on all 35 tasks with this
+  caveat, or on a split that was not used for debugging.

@@ -633,6 +633,7 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
             if (
                 self._compact_after_report == "auto"
                 and rounds_left > 0
+                and (self._previous_answer or "").strip()
                 and self._verified_hash == _sha(self._previous_answer or "")
                 and report_has_no(self._previous_report_text)
             ):
