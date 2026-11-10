@@ -6,7 +6,9 @@
   before `task_complete` is accepted. Both sub-agents are called by the solver through a field
   in its JSON response, run in their own `Chat`, and return a text result into the solver's
   conversation. Version 2 adds a **compactor** sub-agent that rebuilds the solver's context;
-  it is implemented and under debugging since 2026-11-10 (§10; two smokes, no full run yet).
+  it is implemented since 2026-11-10 (§10). Both sub-agents have a wall-clock limit with one
+  fallback to no thinking (§10.9). First full run `rvc-run1-numeric` (§10.10): 13 of 35
+  file-graded, the same as `rv-run1-numeric`, with 14 timeouts instead of 6.
 - **Date opened**: 2026-10-28
 - **Predecessor**: the solver-verifier harness ([08](08_solver_verifier_harness.md)), run-3
   configuration. Its verifier (skill v3, four-step plan, index packet) is reused with a skill
@@ -730,6 +732,9 @@ has a few minutes at most. The time budget, not the context size, decides these 
 - **Status**: implemented; selection quality debugged offline (§10.5); runs inside real
   trials (§10.7). **No evidence of an accuracy gain**: 0 of 10 smoke trials correct, on tasks
   chosen because the baseline failed them, 7 of 10 timed out.
+  **Update 2026-11-10**: with the time limits of §10.9 the first full run is in §10.10
+  (13 of 35 file-graded, equal to the baseline; 14 timeouts); its open decisions replace the
+  list below where they overlap.
 - **Open decisions** (owner): (a) bound the time of the reader and the verifier (a wall-clock
   limit with a no-thinking retry as the compactor has, or the output cap of `rv-run1-numeric`),
   since without it the compactor cannot be evaluated inside 1,800 s (**decided 2026-11-10:
@@ -808,3 +813,103 @@ therefore a lower bound.
 second phase without thinking cut at the limit again (a run without thinking needs more than
 20 s for three steps, as intended for this test); the solver received the two messages above,
 neither round recorded a verified hash, and the trials went on.
+
+### 10.10 First full run: `rvc-run1-numeric` (2026-11-10, all 35 SARA numeric tasks)
+
+**Settings**: `AGENT=t2rvc SUBSET=numeric`, code at commit `a67be467`, template v3, solver v3,
+reader v1, verifier v4 with thinking, no output cap, 3 steps and 3 rounds, compactor v1, the
+time limits of §10.9 at their defaults (reader 180 s, verifier 300 s, compactor 180 s),
+600 s × 3 wall clock, `--n-concurrent 2`, one draw. **`compact_after_report=auto` for this
+run only** (`--ak`), because the hint was ignored in the one trial that showed it (§10.6);
+the default stays `hint` until the owner decides item (c) of §10.8. Job
+`jobs/qwen3.5-35b-a3b/t2rvc-direct/rvc-run1-numeric/`, 07:34 → 14:31 UTC (6 h 57 min); a
+detached watchdog stopped vLLM within a minute of the end. Baseline for the comparison:
+`rv-run1-numeric` (§9.3, `t2rv`, verifier capped at 6,000 tokens, no compactor, no time limits).
+All numbers below are ✅ from `tools/rv_run_report.py <job> <baseline job>`; per-trial rows in
+`outputs/rvc_run1_numeric_trials.json`.
+
+**Outcome: no accuracy gain, and more timeouts.**
+
+| | rvc-run1-numeric | rv-run1-numeric (§9.3) |
+|---|---|---|
+| File-graded correct / 35 | **13 (0.371)**, Wilson 95% [0.232, 0.537] | 13 (0.371) |
+| Protocol score (timeouts count wrong) | **10 (0.286)**, [0.163, 0.451] | 12 (0.343), [0.208, 0.508] |
+| Timeouts at 1,800 s | **14** (6, 15, 18, 35, 39, 44, 47, 49, 51, 56, 61, 64, 91, 94); 15, 44, 56 had the gold answer in the file | 6 |
+| Trial seconds, median (mean) | 1,683 (1,410) | 1,294 (1,290) |
+| Per task | gained 15, 63, 75, 93; lost 2, 6, 51, 85; both correct 9; both wrong 18 | |
+| Paired difference (file-graded) | 0.000, bootstrap 95% [−0.143, +0.171]; exact McNemar p = 1.0 | |
+
+Where the 1,800 s went (mean seconds per trial):
+
+| | verifier | reader | compactor | solver and commands |
+|---|---|---|---|---|
+| rvc-run1-numeric | 444 | 347 | 68 | 552 |
+| rv-run1-numeric | 349 | 404 | 0 | 537 |
+
+**Findings.**
+
+1. **The time limits bound the sub-agents as designed.** No reader call ended without a
+   result and one verifier round of 50 ended without a report (tax-case-56 round 1, both
+   phases cut, 600 s). The longest reader call fell from 750 s to 339 s and the reader's mean
+   from 157 s to 132 s; 23 of 92 reader calls fell back to no thinking, and the phase without
+   thinking took a median of 41 s.
+2. **300 s is below what a thinking verifier round needs: 34 of 50 rounds (68%) fell back.**
+   The 16 rounds that finished with thinking took 95–291 s (median 215 s). In the 34 fallback
+   rounds the thinking phase had completed 0, 1, 2, 3, 4 model calls in 5, 11, 3, 14, 1 rounds
+   (a round is three command steps and the report): in 15 rounds only the report was written
+   without thinking, in 16 rounds everything or everything but the first step was, 3 lie in
+   between. The phase without thinking took a
+   median of 46 s. A round costs 329 s at the median (95–600 s), more than the capped rounds of
+   the baseline (282 s), so the verifier's share of a trial rose from 349 s to 444 s.
+3. **The compactor works mechanically and its cost is small.** 24 calls, all triggered by a
+   report with a NO item (32 of the 50 reports had one); 21 rebuilds in 19 trials; of the 3
+   calls without a rebuild one passed its time limit twice and two were cut by the end of the
+   trial; 4 more triggers were skipped below 8,000 tokens. The solver's prompt went from a median of 10,737 tokens (8,320–18,865)
+   to 6,926 (5,636–9,926). A call took 78 s at the median (44–361 s; 5 calls had a timed-out
+   attempt). Contexts are small at the first report in this harness because the reader already
+   keeps the rule file out of the solver's context, so the rebuild removes about a third of
+   an already modest prompt.
+4. **No repair gain is visible.** Of the 23 trials whose first report was not all YES, 6
+   already had the gold answer and 8 ended correct; the two gained are tax-case-15 (no answer
+   file at round 1) and tax-case-56 (off by one dollar at rounds 1 and 2). 14 reached a second
+   round, the answer value changed in 5, and **11 timed out**. No trial went from a right first
+   answer to a wrong final one (the baseline had one, tax-case-75, which this run kept right
+   through three rounds). The baseline's flagged trials: 20, of which 8 ended correct, 4 gained,
+   1 lost, 4 timed out.
+5. **The first report as an error detector** (first answer right or wrong against gold, a
+   missing answer file counted as wrong): this run flagged 17 of 21 wrong first answers and 6 of
+   11 right ones; the baseline flagged 15 of 21 and 5 of 10. The uncapped, time-limited verifier misses fewer wrong answers (4 vs 6), on small
+   counts.
+6. **The four lost tasks failed before any compaction could matter**: 2 and 6 had a wrong first
+   answer and kept it, 85 had a wrong first answer that the verifier passed, 51 never reached a
+   verifier round (five reader calls, 1,039 s). Two of them miss the gold value by one dollar
+   (2: 26,566 for 26,567; 85: "$2,476.50, rounded to $2,476" for 2,477), which DAR's exact
+   match counts wrong and DeonticBench's ±$1 would count right; under ±$1 this run has 15 and
+   the baseline 13, still inside each other's interval. The four gained ones were right at the first answer (63,
+   75, 93) or had none at round 1 (15). The per-task difference between the two runs is
+   therefore mostly the draw of the solver's first answer, not the harness change.
+
+🔶 **Reading.** The run does not show that the compactor helps or hurts accuracy. What it shows
+is that the binding constraint is time after the first report: a flagged trial has about 950 s
+left at the median (first report at second 848), and one more verifier round plus a rebuild
+costs 400 s of it before the solver has done any repair work. Half of the flagged trials ran
+out. The comparison also confounds four changes (compactor, solver prompt v3, verifier without
+a cap, time limits), the baseline's verifier was itself degraded by its cap (§9.3 finding 1),
+both runs are one draw on 35 tasks, and the 23 tasks the baseline failed were used for
+debugging (§10.8), so 13 against 13 should be read as "no difference detectable", not as two
+equal harnesses.
+
+**Open decisions after this run** (owner):
+
+- (a) Verifier time. Options: keep 300 s; raise it towards the 440 s a thinking round took
+  without a limit (fewer fallbacks, fewer rounds per trial); or run the verifier without
+  thinking from the start (rounds of about one minute, a different verifier). The run gives no
+  evidence that the reports written after a fallback are worse: 26 of 34 fallback rounds and
+  10 of 16 thinking rounds flagged something, which is not a quality measure.
+- (b) Trial time. With three sub-agents, 1,800 s holds about one repair cycle. Either accept
+  that and set `max_verify_rounds=2`, or raise the agent time limit for this harness and
+  report time as a cost (item (b) of §10.8).
+- (c) `auto` as the default: it ran after every report with a NO item (above 8,000 tokens)
+  and no right answer was lost after a rebuild; the hint was not tested in this run.
+- (d) A clean comparison needs a `t2rv` run with the same verifier settings and time limits,
+  so that the compactor is the only difference (item (e) of §10.8), and more than one draw.

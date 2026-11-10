@@ -81,6 +81,10 @@ deontic-reasoning-with-harness/
 │   │                            sub-agent; the harness snaps ranges to outline boundaries, restores
 │   │                            cited sections, rebuilds the solver context as task + one state page;
 │   │                            logs under <trial>/agent/compactor/ (claude_docs/09 §10)
+│   ├── rv_run_report.py             aggregate numbers of a t2rv/t2rvc numeric run vs a baseline run:
+│   │                            accuracy with intervals, paired comparison, time per role, time-limit
+│   │                            fallbacks, compactions, what follows the first verifier report;
+│   │                            --trials-json writes outputs/rvc_run1_numeric_trials.json (09 §10.10)
 │   ├── replay_compactor.py          debugging aid: replays one compactor call on a finished t2rv trial
 │   │                            (state right after verifier round R), live or with a canned result
 │   ├── make_harness_figures.py      writes claude_docs/figures/{reader,compactor}.svg
