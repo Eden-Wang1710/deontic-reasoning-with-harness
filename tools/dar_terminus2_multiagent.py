@@ -1,7 +1,8 @@
 """terminus-2 solver that calls a reader and a verifier sub-agent as tools (reader-verifier harness).
 
 Design: claude_docs/09_reader_verifier_harness.md. This is version 1 of the reader-verifier-
-compactor harness; there is no compactor here.
+compactor harness; the compactor is added by the subclass in tools/dar_terminus2_compactor.py,
+through the hooks marked as such below (no behaviour of this class depends on them).
 
 The solver is the run-3 solver-verifier agent (``Terminus2RubricVerifier``: t2fix base, index
 packet, section-number answer record, no confidence field). Two things change:
@@ -116,12 +117,18 @@ VERIFIER_HEADER = "=== VERIFIER RESULT"
 GATE_HEADER = "=== COMPLETION NOT ACCEPTED ==="
 REJECTED_HEADER = "=== SUB-AGENT CALL REJECTED ==="
 MISPLACED_HEADER = "=== SUB-AGENT CALL MISPLACED ==="
+# Used only by the compactor subclass (dar_terminus2_compactor.py); listed here because the
+# marks below are module-level.
+COMPACTOR_HEADER = "=== COMPACTOR RESULT"
+CONTEXT_NOTE_HEADER = "=== CONTEXT NOTE ==="
 SUBAGENT_MARKS = (
     READER_HEADER,
     VERIFIER_HEADER,
     GATE_HEADER,
     REJECTED_HEADER,
     MISPLACED_HEADER,
+    COMPACTOR_HEADER,
+    CONTEXT_NOTE_HEADER,
 )
 
 # Protocol correction (smoke1, 2026-10-28: one solver sent `subagent={...}` as a keystroke, the
@@ -131,13 +138,13 @@ SUBAGENT_MARKS = (
 MISPLACED_KEYSTROKE_RES = (
     re.compile(r'^\s*"?subagent"?\s*[=:]', re.IGNORECASE),
     re.compile(r'"subagent"\s*:'),
-    re.compile(r'\{\s*"name"\s*:\s*"(?:reader|verifier)"'),
+    re.compile(r'\{\s*"name"\s*:\s*"(?:reader|verifier|compactor)"'),
 )
 # For responses that did not parse: a keystroke string that carries a call, or a "subagent" key
 # directly before or after a "keystrokes" key (i.e. inside the same command object).
 _JSTR = r'"(?:[^"\\]|\\.)*"'
 MISPLACED_IN_TEXT_RE = re.compile(
-    r'"keystrokes"\s*:\s*"(?:[^"\\]|\\.)*(?:subagent\s*[=:]|\\"name\\"\s*:\s*\\"(?:reader|verifier))'
+    r'"keystrokes"\s*:\s*"(?:[^"\\]|\\.)*(?:subagent\s*[=:]|\\"name\\"\s*:\s*\\"(?:reader|verifier|compactor))'
     r"|"
     r'"keystrokes"\s*:\s*' + _JSTR + r'\s*,\s*(?:"duration"\s*:\s*[\d.]+\s*,\s*)?"subagent"\s*:'
     r"|"
@@ -167,6 +174,11 @@ def _sha(text: str) -> str:
 
 class Terminus2ReaderVerifier(Terminus2RubricVerifier):
     """Run-3 solver-verifier agent whose solver calls the reader and the verifier as tools."""
+
+    # Sub-agents the solver may call; a subclass adds to this (and to _dispatch_subagent).
+    SUBAGENT_NAMES: tuple[str, ...] = ("reader", "verifier")
+    SUBAGENT_HELP = '"reader" (with a "query") and "verifier" (no arguments)'
+    SUBAGENT_FORM = SUBAGENT_FORM
 
     def __init__(
         self,
@@ -294,7 +306,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             # a response with a harmless top-level "subagent": {} and a bracket error got this
             # hint eight times in a row and the solver kept fixing the wrong thing.
             if _subagent_misplaced_in_text(llm_response.content or ""):
-                feedback += "\nHINT: " + SUBAGENT_FORM
+                feedback += "\nHINT: " + self.SUBAGENT_FORM
                 self._protocol_corrections += 1
                 self._subagent_call_errors.append(
                     {
@@ -355,10 +367,10 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         if sub is not None:
             if sub.get("error"):
                 block = f"{REJECTED_HEADER}\n{sub['error']}"
-            elif sub["name"] == "reader":
-                block = await self._reader_call(session, sub["query"])
             else:
-                block = await self._verifier_call(session, commands, terminal_output)
+                block = await self._dispatch_subagent(
+                    session, sub, commands, terminal_output
+                )
             if self._episode_claim:
                 block += (
                     '\n\nNote: "task_complete" in this response was ignored because the '
@@ -378,6 +390,8 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
 
         if self._episode_claim and sub is None:
             await self._gate_claim(environment)
+        elif sub is None:
+            block = await self._after_commands(session, commands, terminal_output)
 
         if self._protocol_note:
             block = (
@@ -392,6 +406,24 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                 else block
             )
         return timeout_occurred, terminal_output
+
+    async def _dispatch_subagent(
+        self,
+        session: TmuxSession,
+        sub: dict[str, Any],
+        commands: list[Command],
+        terminal_output: str,
+    ) -> str:
+        if sub["name"] == "reader":
+            return await self._reader_call(session, sub["query"])
+        return await self._verifier_call(session, commands, terminal_output)
+
+    async def _after_commands(
+        self, session: TmuxSession, commands: list[Command], terminal_output: str
+    ) -> str | None:
+        """Hook for a step without sub-agent call and without completion claim; a returned
+        text is appended to the terminal output. Nothing here."""
+        return None
 
     def _get_completion_confirmation_message(self, terminal_output: str) -> str:
         # Called by the loop on a task_complete that this class did not accept: either a
@@ -574,7 +606,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             f"{MISPLACED_HEADER}\n"
             f"Your response put a sub-agent call in {'; '.join(where)}, where the harness "
             "does not read it. That text was NOT sent to the terminal and no sub-agent was "
-            f"called. {SUBAGENT_FORM} Resend the call in that form."
+            f"called. {self.SUBAGENT_FORM} Resend the call in that form."
         )
         return kept
 
@@ -594,10 +626,10 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             .strip()
             .lower()
         )
-        if name not in ("reader", "verifier"):
+        if name not in self.SUBAGENT_NAMES:
             return {
-                "error": f'Unknown sub-agent {name!r}. Available: "reader" (with a '
-                '"query") and "verifier" (no arguments). No sub-agent was called.'
+                "error": f"Unknown sub-agent {name!r}. Available: {self.SUBAGENT_HELP}. "
+                "No sub-agent was called."
             }
         if name == "reader":
             query = sub.get("query") or sub.get("question") or sub.get("request") or ""
@@ -607,17 +639,23 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                     "question or the facts you need rule text for. No sub-agent was called."
                 }
             return {"name": "reader", "query": str(query).strip()}
-        return {"name": "verifier"}
+        return {"name": name}
 
-    def _build_reader_packet(self, query: str, call_no: int) -> str:
+    def _reader_earlier_lines(self, since: int = 0) -> list[str]:
+        """One line per earlier reader call with the ranges it delivered (entries of
+        ``_reader_returned`` from index ``since`` on)."""
         earlier: list[str] = []
         by_call: dict[int, list[str]] = {}
-        for r in self._reader_returned:
+        for r in self._reader_returned[since:]:
             by_call.setdefault(r["call"], []).append(
                 f"lines {r['lines']}" + (f" ({r['label']})" if r.get("label") else "")
             )
         for c in sorted(by_call):
             earlier.append(f"call {c}: " + "; ".join(by_call[c]))
+        return earlier
+
+    def _build_reader_packet(self, query: str, call_no: int) -> str:
+        earlier = self._reader_earlier_lines()
         return "\n".join(
             [
                 "=== TASK ===",
@@ -642,114 +680,24 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         started = time.time()
         packet = self._build_reader_packet(query, call_no)
 
-        rchat = Chat(self._llm, interleaved_thinking=self._interleaved_thinking)
-        rsteps: list[Step] = []
-        session_id = str(uuid.uuid4())
-        prompt = (
-            self._reader_skill_text
-            + "\n\n"
-            + packet
-            + "\n\nBegin. Respond with exactly one JSON object as described in the skill."
-        )
-        rsteps.append(self._user_step(rsteps, prompt))
-
-        result: dict | None = None
-        commands_run: list[dict[str, str]] = []
-        parse_failures = 0
-        steps_used = 0
-        context_exceeded = False
-        n_calls = 0
-
-        async def call(p: str) -> LLMResponse:
-            nonlocal n_calls
-            t0 = time.time()
-            resp = await rchat.chat(p, **self._llm_call_kwargs)
-            self._track_api_request_time(t0)
-            self._update_subagent_metrics(resp.usage)
-            self._collect_subagent_rollout_detail(resp)
-            n_calls += 1
-            return resp
-
-        while steps_used < self._reader_max_steps:
-            try:
-                resp = await call(prompt)
-            except ContextLengthExceededError:
-                context_exceeded = True
-                break
-            parsed = _extract_json_object(resp.content)
-            if parsed is None:
-                parse_failures += 1
-                steps_used += 1
-                observation = (
-                    "Your response could not be parsed as a single JSON object. Reply with "
-                    'exactly one JSON object with the fields "analysis", "commands" and '
-                    '"result". A common cause is a backslash that JSON does not allow, such '
-                    "as grep 'a\\|b': use grep -E 'a|b'."
-                )
-                self._append_verifier_step(rsteps, resp, [], observation)
-                prompt = observation
-                continue
-            if isinstance(parsed.get("result"), dict):
-                result = parsed["result"]
-                self._append_verifier_step(rsteps, resp, [], None)
-                break
-            cmds = parsed.get("commands") or []
-            if not isinstance(cmds, list):
-                cmds = [str(cmds)]
-            cmds = [str(c) for c in cmds if str(c).strip()]
-            if not cmds:
-                steps_used += 1
-                observation = (
-                    'No commands and no result. Either run commands or fill in the "result" '
-                    "field."
-                )
-                self._append_verifier_step(rsteps, resp, [], observation)
-                prompt = observation
-                continue
-            steps_used += 1
-            outputs = []
-            for c in cmds:
-                out = await self._exec_capped(environment, c, READER_OUTPUT_LIMIT)
-                commands_run.append({"step": steps_used, "command": c, "output": out})
-                outputs.append(f"$ {c}\n{out}")
-            observation = (
-                "\n\n".join(outputs)
-                + f"\n\n[reader: {steps_used} of {self._reader_max_steps} command steps used]"
-            )
-            self._append_verifier_step(rsteps, resp, cmds, observation)
-            prompt = observation
-
-        if result is None and not context_exceeded:
-            closing = (
+        run = await self._run_tool_subagent(
+            environment,
+            role="reader",
+            skill_text=self._reader_skill_text,
+            packet=packet,
+            max_steps=self._reader_max_steps,
+            closing=(
                 "You have used all command steps. Reply now with exactly one JSON object "
                 'whose "result" field is filled in from the lines you have already displayed: '
                 '"excerpts" (each with "lines", "label", "why") and "unresolved"; '
                 '"commands": [].'
-            )
-            retry = (
-                'Your reply could not be parsed as one JSON object whose "result" is an '
-                "object. Check the brackets and reply once more with exactly that JSON object "
-                "and nothing else."
-            )
-            prompt_text: str | None = closing
-            for attempt in range(2):
-                try:
-                    resp = await call(closing if attempt == 0 else retry)
-                except ContextLengthExceededError:
-                    context_exceeded = True
-                    break
-                parsed = _extract_json_object(resp.content)
-                if parsed and isinstance(parsed.get("result"), dict):
-                    result = parsed["result"]
-                    self._append_verifier_step(
-                        rsteps, resp, [], None, prompt_text=prompt_text
-                    )
-                    break
-                parse_failures += 1
-                self._append_verifier_step(
-                    rsteps, resp, [], retry, prompt_text=prompt_text
-                )
-                prompt_text = None
+            ),
+        )
+        result = run["result"]
+        rchat, rsteps, session_id = run["chat"], run["steps"], run["session_id"]
+        commands_run, parse_failures = run["commands"], run["parse_failures"]
+        steps_used, context_exceeded = run["steps_used"], run["context_exceeded"]
+        n_calls = run["n_calls"]
 
         excerpts, extraction = await self._extract_excerpts(
             environment, result, call_no
@@ -830,6 +778,140 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         )
         return block
 
+    async def _run_tool_subagent(
+        self,
+        environment,
+        *,
+        role: str,
+        skill_text: str,
+        packet: str,
+        max_steps: int,
+        closing: str,
+        output_limit: int = READER_OUTPUT_LIMIT,
+        llm_kwargs: dict | None = None,
+    ) -> dict[str, Any]:
+        """Command-step loop of a sub-agent that answers with a JSON ``result`` object.
+
+        Shared by the reader and the compactor: a fresh context (skill + packet), up to
+        ``max_steps`` command steps executed in the container, then ``result``; if the steps
+        run out, ``closing`` asks for the result (one retry on a parse failure)."""
+        rchat = Chat(self._llm, interleaved_thinking=self._interleaved_thinking)
+        rsteps: list[Step] = []
+        session_id = str(uuid.uuid4())
+        prompt = (
+            skill_text
+            + "\n\n"
+            + packet
+            + "\n\nBegin. Respond with exactly one JSON object as described in the skill."
+        )
+        rsteps.append(self._user_step(rsteps, prompt))
+
+        result: dict | None = None
+        commands_run: list[dict[str, str]] = []
+        parse_failures = 0
+        steps_used = 0
+        context_exceeded = False
+        n_calls = 0
+
+        async def call(p: str) -> LLMResponse:
+            nonlocal n_calls
+            t0 = time.time()
+            resp = await rchat.chat(
+                p, **(self._llm_call_kwargs if llm_kwargs is None else llm_kwargs)
+            )
+            self._track_api_request_time(t0)
+            self._update_subagent_metrics(resp.usage)
+            self._collect_subagent_rollout_detail(resp)
+            n_calls += 1
+            return resp
+
+        while steps_used < max_steps:
+            try:
+                resp = await call(prompt)
+            except ContextLengthExceededError:
+                context_exceeded = True
+                break
+            parsed = _extract_json_object(resp.content)
+            if parsed is None:
+                parse_failures += 1
+                steps_used += 1
+                observation = (
+                    "Your response could not be parsed as a single JSON object. Reply with "
+                    'exactly one JSON object with the fields "analysis", "commands" and '
+                    '"result". A common cause is a backslash that JSON does not allow, such '
+                    "as grep 'a\\|b': use grep -E 'a|b'."
+                )
+                self._append_verifier_step(rsteps, resp, [], observation)
+                prompt = observation
+                continue
+            if isinstance(parsed.get("result"), dict):
+                result = parsed["result"]
+                self._append_verifier_step(rsteps, resp, [], None)
+                break
+            cmds = parsed.get("commands") or []
+            if not isinstance(cmds, list):
+                cmds = [str(cmds)]
+            cmds = [str(c) for c in cmds if str(c).strip()]
+            if not cmds:
+                steps_used += 1
+                observation = (
+                    'No commands and no result. Either run commands or fill in the "result" '
+                    "field."
+                )
+                self._append_verifier_step(rsteps, resp, [], observation)
+                prompt = observation
+                continue
+            steps_used += 1
+            outputs = []
+            for c in cmds:
+                out = await self._exec_capped(environment, c, output_limit)
+                commands_run.append({"step": steps_used, "command": c, "output": out})
+                outputs.append(f"$ {c}\n{out}")
+            observation = (
+                "\n\n".join(outputs)
+                + f"\n\n[{role}: {steps_used} of {max_steps} command steps used]"
+            )
+            self._append_verifier_step(rsteps, resp, cmds, observation)
+            prompt = observation
+
+        if result is None and not context_exceeded:
+            retry = (
+                'Your reply could not be parsed as one JSON object whose "result" is an '
+                "object. Check the brackets and reply once more with exactly that JSON object "
+                "and nothing else."
+            )
+            prompt_text: str | None = closing
+            for attempt in range(2):
+                try:
+                    resp = await call(closing if attempt == 0 else retry)
+                except ContextLengthExceededError:
+                    context_exceeded = True
+                    break
+                parsed = _extract_json_object(resp.content)
+                if parsed and isinstance(parsed.get("result"), dict):
+                    result = parsed["result"]
+                    self._append_verifier_step(
+                        rsteps, resp, [], None, prompt_text=prompt_text
+                    )
+                    break
+                parse_failures += 1
+                self._append_verifier_step(
+                    rsteps, resp, [], retry, prompt_text=prompt_text
+                )
+                prompt_text = None
+
+        return {
+            "result": result,
+            "chat": rchat,
+            "steps": rsteps,
+            "session_id": session_id,
+            "commands": commands_run,
+            "parse_failures": parse_failures,
+            "steps_used": steps_used,
+            "context_exceeded": context_exceeded,
+            "n_calls": n_calls,
+        }
+
     async def _exec_capped(self, environment, command: str, limit: int) -> str:
         try:
             result = await environment.exec(command, timeout_sec=60)
@@ -868,9 +950,20 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         return count
 
     async def _extract_excerpts(
-        self, environment, result: dict | None, call_no: int
+        self,
+        environment,
+        result: dict | None,
+        call_no: int,
+        max_chars: int | None = None,
+        record: list[dict[str, Any]] | None = None,
+        budget_owner: str = "reader's",
     ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-        """Validate the reader's ranges mechanically and extract the lines verbatim."""
+        """Validate the reader's ranges mechanically and extract the lines verbatim.
+
+        ``max_chars`` (default: the reader's budget) and ``record`` (default:
+        ``_reader_returned``) let the compactor reuse this with its own budget and list."""
+        if record is None:
+            record = self._reader_returned
         extraction: dict[str, Any] = {
             "chars": 0,
             "truncated": [],
@@ -890,7 +983,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                 )
             return excerpts, extraction
 
-        remaining = self._reader_max_chars
+        remaining = self._reader_max_chars if max_chars is None else max_chars
         for i, ex in enumerate(raw, 1):
             if not isinstance(ex, dict):
                 extraction["invalid"].append(
@@ -962,7 +1055,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                 text = (
                     shown
                     + f"\n[excerpt truncated by the harness: lines {a}-{a + shown_lines - 1} "
-                    f"shown, {omitted} line(s) omitted; the reader's character budget is spent]"
+                    f"shown, {omitted} line(s) omitted; the {budget_owner} character budget is spent]"
                 )
                 entry["truncated"] = True
                 entry["lines_shown"] = f"{a}-{a + shown_lines - 1}"
@@ -976,7 +1069,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             entry["inserted"] = True
             extraction["chars"] += len(text)
             excerpts.append(entry)
-            self._reader_returned.append(
+            record.append(
                 {
                     "call": call_no,
                     "file": file,
@@ -1092,7 +1185,14 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             flags.append("sub-agent call rejected")
         if MISPLACED_HEADER in obs:
             flags.append("sub-agent call misplaced, not run")
+        flags.extend(self._extra_flags(obs))
         return (" | " + "; ".join(flags)) if flags else ""
+
+    def _extra_flags(self, obs: str) -> list[str]:
+        return []
+
+    def _index_intro_extra(self) -> str:
+        return ""
 
     @staticmethod
     def _index_line_text(n: int, cmds: list[str], obs: str, flag: str) -> str:
@@ -1127,7 +1227,8 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             "'reader call N' contains, after its terminal output, a block headed "
             f"'{READER_HEADER} (call N of this task) ===' with the verbatim rule-file lines the "
             "solver received (each excerpt headed '[k] lines a-b of <file>'). A step marked "
-            "'verifier round N' contains your previous report.",
+            "'verifier round N' contains your previous report."
+            + self._index_intro_extra(),
         ]
         n = 0
         for step in self._trajectory_steps:

@@ -38,6 +38,16 @@
 #          (v1 of both = rv-smoke1 only; --ak solver_skill_path=... derivation_template=... to swap).
 #          Tunables via --ak: reader_max_steps=3 reader_max_chars=16000 max_unverified_claims=2
 #          verifier_max_steps=4 verifier_max_tokens=<none> (rv-run1-numeric: 3 and 6000).
+#   t2rvc = reader-verifier-compactor harness (claude_docs/09 §10): t2rv plus a compactor
+#          sub-agent ("subagent": {"name": "compactor"}, tools/skills/compactor_v1/SKILL.md) that
+#          selects rule-file line ranges and solver steps; the harness then rebuilds the solver's
+#          context as task + one state page (tools/dar_terminus2_compactor.py). Solver prompt =
+#          templates/terminus-json-multiagent-v3.txt + skills/solver_v3/SKILL.md. Verifier: no
+#          output cap, verifier_max_steps=3. Jobs under jobs/<model>/t2rvc-<framing>/.
+#          Tunables via --ak: compact_after_report=hint|auto|off compactor_max_chars=14000
+#          compactor_min_tokens=8000 compactor_hint_tokens=16000 compactor_force_tokens=30000
+#          max_compactions=3 compactor_max_steps=1 compactor_keep_steps=4
+#          compactor_timeout_sec=180 compactor_thinking=true compactor_fallback=true.
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
@@ -45,6 +55,7 @@
 #   AGENT=t2fix tools/run_dar_qwen35_35b.sh direct                      # terminus-2, truthful marker
 #   AGENT=t2verify tools/run_dar_qwen35_35b.sh direct                   # t2fix + rubric verifier
 #   AGENT=t2rv tools/run_dar_qwen35_35b.sh direct                        # reader-verifier harness
+#   AGENT=t2rvc SUBSET=numeric tools/run_dar_qwen35_35b.sh direct        # + compactor
 #   tools/run_dar_qwen35_35b.sh direct                                  # SARA numeric + binary (65 tasks)
 #   SUBSET=all tools/run_dar_qwen35_35b.sh direct                       # all 173 tasks
 #
@@ -97,12 +108,18 @@ case "$AGENT" in
         JOBS="jobs/qwen3.5-35b-a3b/t2rv-$FRAMING"
         N_CONCURRENT="${N_CONCURRENT:-2}"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
+  t2rvc) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        AGENT_ARGS="--agent-import-path dar_terminus2_compactor:Terminus2ReaderVerifierCompactor \
+          --ak verifier_max_steps=3"
+        JOBS="jobs/qwen3.5-35b-a3b/t2rvc-$FRAMING"
+        N_CONCURRENT="${N_CONCURRENT:-2}"
+        export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
         JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
-  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|t2rv|kira)" >&2; exit 1 ;;
+  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|t2rv|t2rvc|kira)" >&2; exit 1 ;;
 esac
 N_CONCURRENT="${N_CONCURRENT:-4}"
 

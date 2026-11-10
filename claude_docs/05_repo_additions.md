@@ -30,8 +30,11 @@ deontic-reasoning-with-harness/
 │   │                                runs, scores, failure modes, deviations from the paper
 │   ├── 07_verbalized_confidence.md  self-verbalised confidence baseline on those trajectories
 │   ├── 08_solver_verifier_harness.md  the solver-verifier harness: design, protocol, runs 1-3
-│   └── 09_reader_verifier_harness.md  the reader-verifier harness (v1 of reader-verifier-compactor):
-│                                sub-agents as tools, completion gate, reader/verifier skills, runs
+│   ├── 09_reader_verifier_harness.md  the reader-verifier harness (v1 of reader-verifier-compactor):
+│   │                            sub-agents as tools, completion gate, reader/verifier skills, runs;
+│   │                            §10 = version 2, the compactor (design, replay debugging, smokes)
+│   └── figures/                     reader.{svg,png}, compactor.{svg,png}: overview figures of the two
+│                                sub-agents (from tools/make_harness_figures.py)
 │
 ├── paper_review_gpt/             ✅ GPT-written Chinese summaries of related papers (owner's;
 │   ├── NN_snake_case.md             do not edit; exception to the English-only rule)
@@ -64,8 +67,20 @@ deontic-reasoning-with-harness/
 │   │                            field position stated before anything else
 │   ├── templates/                   solver prompt templates swapped in by derivation_record=true:
 │   │                            terminus-json-plain-derivation{,-v2}.txt (runs 2, 3),
-│   │                            terminus-json-multiagent-v1.txt (rv-smoke1), -v2.txt (default: a
-│   │                            second example response that is a sub-agent call)
+│   │                            terminus-json-multiagent-v1.txt (rv-smoke1), -v2.txt (t2rv default: a
+│   │                            second example response that is a sub-agent call), -v3.txt (t2rvc:
+│   │                            v2 plus the compactor call)
+│   ├── skills/solver_v3/SKILL.md    solver skill of AGENT=t2rvc: v2 plus the compactor, when to call it,
+│   │                            and "a report item is a claim to check against rule text"
+│   ├── skills/compactor_v1/SKILL.md the compactor's instructions: select rule line ranges (by the
+│   │                            outline in its packet) and solver steps, never write or judge
+│   ├── dar_terminus2_compactor.py   Terminus2ReaderVerifierCompactor (AGENT=t2rvc): t2rv plus a compactor
+│   │                            sub-agent; the harness snaps ranges to outline boundaries, restores
+│   │                            cited sections, rebuilds the solver context as task + one state page;
+│   │                            logs under <trial>/agent/compactor/ (claude_docs/09 §10)
+│   ├── replay_compactor.py          debugging aid: replays one compactor call on a finished t2rv trial
+│   │                            (state right after verifier round R), live or with a canned result
+│   ├── make_harness_figures.py      writes claude_docs/figures/{reader,compactor}.svg
 │   ├── dar_terminus2_multiagent.py  Terminus2ReaderVerifier (AGENT=t2rv): run-3 agent whose solver
 │   │                            calls reader/verifier via a "subagent" JSON field; task_complete
 │   │                            accepted only for an answer-file hash the verifier saw; logs under
@@ -102,7 +117,7 @@ deontic-reasoning-with-harness/
     │                                (upstream gitignores them; see claude_docs/02 §5)
     ├── .gitignore                ✏️ the `/datasets/` line commented out, with a note
     └── jobs/qwen3.5-35b-a3b/     ⬜ Harbor job dirs: <framing>/, t2fix-<framing>/, kira-<framing>/, t2verify-<framing>/,
-                                     t2rv-<framing>/ (tracked 2026-10-27..31 for the machine switch, ignored again since;
+                                     t2rv-<framing>/, t2rvc-<framing>/ (tracked 2026-10-27..31 for the machine switch, ignored again since;
                                      the jobs up to rv-smoke1 are in history at commit 0dc69015)
 ```
 
@@ -118,6 +133,7 @@ serve_qwen35_35b.sh ──► vLLM at :9009 ◄── run_dar_qwen35_35b.sh ─�
                                    │            │ AGENT=t2fix     dar_terminus2_local.py
                                    │            │ AGENT=t2verify* dar_terminus2_verifier.py (+ skills/rubric_verifier*, templates/)
                                    │            │ AGENT=t2rv      dar_terminus2_multiagent.py (+ skills/solver_v1, reader_v1, rubric_verifier_v4, templates/)
+                                   │            │ AGENT=t2rvc     dar_terminus2_compactor.py (+ skills/solver_v3, compactor_v1, reader_v1, rubric_verifier_v4)
                                    │            └ AGENT=kira      dar_kira_local.py
                                    │
           verbalized_confidence.py ┘ (reads jobs/<...>/, writes outputs/verbalized_confidence/)
