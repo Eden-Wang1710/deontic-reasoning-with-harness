@@ -66,6 +66,7 @@ from dar_terminus2_multiagent import (
     Terminus2ReaderVerifier,
     _sha,
 )
+from dar_terminus2_verifier import no_thinking_kwargs
 
 COMPACTOR_SKILL_PATH = TOOLS_DIR / "skills" / "compactor_v1" / "SKILL.md"
 SOLVER_V3_SKILL_PATH = TOOLS_DIR / "skills" / "solver_v3" / "SKILL.md"
@@ -965,16 +966,7 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
         return f"{decision}\n{where}"
 
     def _compactor_llm_kwargs(self, thinking: bool) -> dict | None:
-        if thinking:
-            return None
-        kw = dict(self._llm_call_kwargs)
-        body = dict(kw.get("extra_body") or {})
-        body["chat_template_kwargs"] = {
-            **(body.get("chat_template_kwargs") or {}),
-            "enable_thinking": False,
-        }
-        kw["extra_body"] = body
-        return kw
+        return None if thinking else no_thinking_kwargs(self._llm_call_kwargs)
 
     async def _rule_outline(self, environment) -> list[tuple[int, str]]:
         """Section and top-level subsection headings of the rule file with line numbers

@@ -38,12 +38,19 @@
 #          (v1 of both = rv-smoke1 only; --ak solver_skill_path=... derivation_template=... to swap).
 #          Tunables via --ak: reader_max_steps=3 reader_max_chars=16000 max_unverified_claims=2
 #          verifier_max_steps=4 verifier_max_tokens=<none> (rv-run1-numeric: 3 and 6000).
+#          Wall-clock limits per sub-agent run (since 2026-11-10, claude_docs/09 §10.9; at the
+#          limit the model call in flight is sent again without thinking, once):
+#          reader_timeout_sec=180 reader_thinking=true reader_fallback=true
+#          verifier_timeout_sec=300 verifier_thinking=true verifier_fallback=true
+#          (rv-run1-numeric and the rvc-smoke runs had none: --ak reader_timeout_sec=none
+#          --ak verifier_timeout_sec=none).
 #   t2rvc = reader-verifier-compactor harness (claude_docs/09 §10): t2rv plus a compactor
 #          sub-agent ("subagent": {"name": "compactor"}, tools/skills/compactor_v1/SKILL.md) that
 #          selects rule-file line ranges and solver steps; the harness then rebuilds the solver's
 #          context as task + one state page (tools/dar_terminus2_compactor.py). Solver prompt =
 #          templates/terminus-json-multiagent-v3.txt + skills/solver_v3/SKILL.md. Verifier: no
-#          output cap, verifier_max_steps=3. Jobs under jobs/<model>/t2rvc-<framing>/.
+#          output cap, verifier_max_steps=3, the t2rv time limits. Jobs under
+#          jobs/<model>/t2rvc-<framing>/.
 #          Tunables via --ak: compact_after_report=hint|auto|off compactor_max_chars=14000
 #          compactor_min_tokens=8000 compactor_hint_tokens=16000 compactor_force_tokens=30000
 #          max_compactions=3 compactor_max_steps=1 compactor_keep_steps=4

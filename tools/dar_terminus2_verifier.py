@@ -33,6 +33,11 @@ Agent kwargs (``--ak key=value``): ``max_verify_rounds`` (3), ``verifier_max_ste
 ``skill_path`` (tools/skills/rubric_verifier/SKILL.md), ``include_reasoning`` (false),
 ``answer_path`` (/app/output/answer.txt, DAR's convention in all four subdomains).
 
+Time limit (2026-11-10, off by default here; the reader-verifier harness turns it on):
+``verifier_timeout_sec`` bounds one verifier round by wall clock, ``verifier_thinking``
+(true) and ``verifier_fallback`` (true) say how the round runs and what happens at the
+limit; see ``SubagentClock``.
+
 Run-2 options (claude_docs/08 §8), all off by default so that run-1 is reproducible:
 ``derivation_record=true`` swaps the solver's prompt template for
 ``tools/templates/terminus-json-plain-derivation.txt`` (the upstream template plus a
@@ -52,6 +57,7 @@ Usage (from ``harbor-deonticbench/``, with ``tools/`` on PYTHONPATH):
 
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 import shlex
@@ -59,7 +65,7 @@ import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Awaitable, Callable
 
 from harbor.agents.terminus_2.terminus_2 import Command
 from harbor.agents.terminus_2.tmux_session import TmuxSession
@@ -114,6 +120,102 @@ CONFIDENCE_LINE_RE = re.compile(
 
 def _truthy(value: Any) -> bool:
     return str(value).strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _falsy(value: Any) -> bool:
+    return str(value).strip().lower() in {"0", "false", "no", "off"}
+
+
+def _opt_seconds(value: Any) -> float | None:
+    """A time limit in seconds; None, "", "none", "off" or a value <= 0 mean no limit."""
+    if value is None or str(value).strip().lower() in {"", "none", "off"}:
+        return None
+    seconds = float(value)
+    return seconds if seconds > 0 else None
+
+
+def no_thinking_kwargs(kwargs: dict) -> dict:
+    """A copy of LLM call kwargs with the chat template's thinking switched off
+    (vLLM: ``extra_body.chat_template_kwargs.enable_thinking = false``)."""
+    kw = dict(kwargs)
+    body = dict(kw.get("extra_body") or {})
+    body["chat_template_kwargs"] = {
+        **(body.get("chat_template_kwargs") or {}),
+        "enable_thinking": False,
+    }
+    kw["extra_body"] = body
+    return kw
+
+
+class SubagentTimeout(Exception):
+    """A sub-agent run passed its wall-clock limit and has no fallback left."""
+
+
+class SubagentClock:
+    """Wall-clock limit for one sub-agent run, with one fallback to no thinking.
+
+    The run (all its LLM calls and command steps) gets ``timeout_sec`` seconds. An LLM call
+    still in flight at the deadline is cancelled. If the run was thinking and ``fallback``
+    is on, that call is sent once more with thinking disabled and the rest of the run
+    continues without thinking under a fresh ``timeout_sec``; the command steps already
+    completed stay in the sub-agent's context. A second expiry (or the first one, without
+    a fallback) raises ``SubagentTimeout``. ``timeout_sec=None`` means no limit.
+
+    ``attempts`` logs each phase: thinking, outcome (finished | timeout), seconds and the
+    number of LLM calls completed in it. Tokens of a cancelled call are not counted
+    anywhere: the request is aborted before the server reports usage.
+    """
+
+    def __init__(self, timeout_sec: float | None, thinking: bool, fallback: bool):
+        self.timeout_sec = timeout_sec
+        self.thinking = thinking
+        self.fallback = fallback
+        self.attempts: list[dict[str, Any]] = []
+        self.fell_back = False
+        self.timed_out = False
+        self._started = time.time()
+        self._calls = 0
+
+    def _close(self, outcome: str) -> None:
+        self.attempts.append(
+            {
+                "thinking": self.thinking,
+                "outcome": outcome,
+                "elapsed_sec": time.time() - self._started,
+                "llm_calls": self._calls,
+            }
+        )
+        self._started = time.time()
+        self._calls = 0
+
+    def finish(self) -> None:
+        """Close the phase that is still open (call once, when the run has ended)."""
+        if not self.timed_out:
+            self._close("finished")
+
+    async def run(self, send: Callable[[bool], Awaitable[LLMResponse]]) -> LLMResponse:
+        """Await ``send(thinking)`` (one LLM call) under the run's deadline."""
+        while True:
+            if self.timeout_sec is None:
+                resp = await send(self.thinking)
+                self._calls += 1
+                return resp
+            remaining = self._started + self.timeout_sec - time.time()
+            try:
+                if remaining <= 0:
+                    raise asyncio.TimeoutError
+                resp = await asyncio.wait_for(send(self.thinking), timeout=remaining)
+                self._calls += 1
+                return resp
+            except (asyncio.TimeoutError, TimeoutError):
+                self._close("timeout")
+                if not (self.thinking and self.fallback):
+                    self.timed_out = True
+                    raise SubagentTimeout(
+                        f"no reply within {self.timeout_sec:g} s"
+                    ) from None
+                self.thinking = False
+                self.fell_back = True
 
 
 def _parse_confidence(text: str) -> float | None:
@@ -180,6 +282,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         max_verify_rounds: int | str = 3,
         verifier_max_steps: int | str = 8,
         verifier_max_tokens: int | str | None = None,
+        verifier_timeout_sec: float | str | None = None,
+        verifier_thinking: bool | str = True,
+        verifier_fallback: bool | str = True,
         skill_path: str | None = None,
         include_reasoning: bool | str = False,
         answer_path: str = "/app/output/answer.txt",
@@ -213,6 +318,10 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             if verifier_max_tokens not in (None, "", "none", "None")
             else None
         )
+        # Wall-clock limit of one verifier round and what happens at the limit (SubagentClock).
+        self._verifier_timeout_sec = _opt_seconds(verifier_timeout_sec)
+        self._verifier_thinking = not _falsy(verifier_thinking)
+        self._verifier_fallback = not _falsy(verifier_fallback)
         self._include_reasoning = _truthy(include_reasoning)
         self._answer_path = answer_path
         self._skill_path = Path(skill_path) if skill_path else DEFAULT_SKILL_PATH
@@ -406,11 +515,11 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
 
     # --------------------------------------------------------------- verifier
 
-    def _verifier_llm_kwargs(self) -> dict:
+    def _verifier_llm_kwargs(self, thinking: bool = True) -> dict:
         kw = dict(self._llm_call_kwargs)
         if self._verifier_max_tokens is not None:
             kw["max_tokens"] = self._verifier_max_tokens
-        return kw
+        return kw if thinking else no_thinking_kwargs(kw)
 
     async def _run_verifier_round(
         self, session: TmuxSession, commands: list[Command], terminal_output: str
@@ -445,13 +554,19 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         parse_failures = 0
         steps_used = 0
         context_exceeded = False
+        timed_out = False
         last_usage = None
         responses: list[LLMResponse] = []
+        clock = SubagentClock(
+            self._verifier_timeout_sec, self._verifier_thinking, self._verifier_fallback
+        )
 
         async def call(p: str) -> LLMResponse:
             nonlocal last_usage
             t0 = time.time()
-            resp = await vchat.chat(p, **self._verifier_llm_kwargs())
+            resp = await clock.run(
+                lambda thinking: vchat.chat(p, **self._verifier_llm_kwargs(thinking))
+            )
             self._track_api_request_time(t0)
             self._update_subagent_metrics(resp.usage)
             self._collect_subagent_rollout_detail(resp)
@@ -464,6 +579,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 resp = await call(prompt)
             except ContextLengthExceededError:
                 context_exceeded = True
+                break
+            except SubagentTimeout:
+                timed_out = True
                 break
             parsed = _extract_json_object(resp.content)
             if parsed is None:
@@ -509,7 +627,7 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             self._append_verifier_step(vsteps, resp, cmds, observation)
             prompt = observation
 
-        if report is None and not context_exceeded:
+        if report is None and not context_exceeded and not timed_out:
             closing = (
                 "You have used all command steps. Reply now with exactly one JSON object "
                 'whose "report" field is filled in from the evidence you already have, '
@@ -530,6 +648,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 except ContextLengthExceededError:
                     context_exceeded = True
                     break
+                except SubagentTimeout:
+                    timed_out = True
+                    break
                 parsed = _extract_json_object(resp.content)
                 if parsed and isinstance(parsed.get("report"), dict):
                     report = parsed["report"]
@@ -544,7 +665,10 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 )
                 prompt_text = None
 
-        report_text = self._render_report(report, round_no, context_exceeded)
+        clock.finish()
+        report_text = self._render_report(
+            report, round_no, context_exceeded, timed_out=timed_out
+        )
         elapsed = time.time() - started
 
         # Logs: ATIF trajectory for the verifier, a compact per-round record, and a
@@ -564,6 +688,9 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             "steps_used": steps_used,
             "parse_failures": parse_failures,
             "context_exceeded": context_exceeded,
+            "timed_out": timed_out,
+            "thinking_fallback": clock.fell_back,
+            "attempts": clock.attempts,
             "commands": commands_run,
             "packet_chars": len(packet),
             "prompt_tokens": vchat.total_input_tokens,
@@ -589,8 +716,14 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
             source="system",
             message=(
                 f"Rubric verifier round {round_no} of {self._max_verify_rounds} consulted "
-                f"({steps_used} command steps, {elapsed:.0f} s); its report is the next "
-                "message to the solver."
+                f"({steps_used} command steps, {elapsed:.0f} s"
+                + (
+                    f"; time limit of {self._verifier_timeout_sec:.0f} s reached, "
+                    + ("no report" if timed_out else "finished without thinking")
+                    if clock.fell_back or timed_out
+                    else ""
+                )
+                + "); its report is the next message to the solver."
             ),
             observation=Observation(
                 results=[
@@ -836,13 +969,19 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
         return "\n".join(lines)
 
     def _render_report(
-        self, report: dict | None, round_no: int, context_exceeded: bool
+        self,
+        report: dict | None,
+        round_no: int,
+        context_exceeded: bool,
+        timed_out: bool = False,
     ) -> str:
         header = f"VERIFICATION REPORT (round {round_no} of {self._max_verify_rounds})"
         if report is None:
             reason = (
                 "the verifier's context limit was exceeded"
                 if context_exceeded
+                else "the verifier did not finish within its time limit"
+                if timed_out
                 else "the verifier did not return a report within its step budget"
             )
             return f"{header}\nNo report: {reason}."
@@ -982,6 +1121,15 @@ class Terminus2RubricVerifier(Terminus2TruthfulMarker):
                 "max_verify_rounds": self._max_verify_rounds,
                 "verifier_max_steps": self._verifier_max_steps,
                 "verifier_max_tokens": self._verifier_max_tokens,
+                "verifier_timeout_sec": self._verifier_timeout_sec,
+                "verifier_thinking": self._verifier_thinking,
+                "verifier_fallback": self._verifier_fallback,
+                "verifier_thinking_fallbacks": sum(
+                    1 for r in self._rounds_log if r.get("thinking_fallback")
+                ),
+                "verifier_timeouts": sum(
+                    1 for r in self._rounds_log if r.get("timed_out")
+                ),
                 "include_reasoning": self._include_reasoning,
                 "skill_path": str(self._skill_path),
                 "derivation_record": self._derivation_record,
