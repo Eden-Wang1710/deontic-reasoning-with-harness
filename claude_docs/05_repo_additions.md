@@ -43,7 +43,7 @@ deontic-reasoning-with-harness/
 ├── tools/                        ✅ project-owned scripts; nothing of ours goes in the subtrees
 │   ├── serve_qwen35_35b.sh          start vLLM for Qwen3.5-35B-A3B on 0238 (bf16, thinking
 │   │                                parser, qwen3_xml tool parser, 16k max_new_tokens)
-│   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|t2verify{,2,3}|t2rv|kira,
+│   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|t2verify{,2,3}|t2rv|t2rvc|kira,
 │   │                                SUBSET=sara|all; writes harbor-deonticbench/jobs/...
 │   ├── dar_terminus2_local.py       Terminus2 subclass with a truthful truncation marker
 │   │                                (AGENT=t2fix): same 10 KB limit, idempotent limiter
@@ -51,6 +51,9 @@ deontic-reasoning-with-harness/
 │   │                                completion confirmation runs a verifier sub-agent in a
 │   │                                fresh context with shell access; ≤3 rounds, then finish
 │   │                                with a confidence; logs under <trial>/agent/rubric_verifier/
+│   │                                also holds SubagentClock, the wall-clock limit with one
+│   │                                no-thinking fallback used by the reader and the verifier
+│   │                                (claude_docs/09 §10.9)
 │   ├── skills/rubric_verifier/SKILL.md  the verifier's instructions (five rubrics, report
 │   │                            schema); hand-written v1; v2 and v3 (run-2, run-3) alongside
 │   ├── skills/rubric_verifier_v4/SKILL.md  verifier of the reader-verifier harness: four rubrics

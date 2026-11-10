@@ -300,6 +300,8 @@ Under `<trial>/agent/`:
   trajectory as a subagent reference).
 - `rubric_verifier/round-N.json`, `round-N.packet.txt`, `trajectory.verifier-round-N.json` as
   in run-3; each round also records the answer hash it verified.
+- Since 2026-11-10 both sub-agents' records carry `attempts`, `thinking_fallback` and
+  `timed_out` (time limits, §10.9).
 - `rubric_verifier/summary.json`: all run-3 fields plus `reader_calls` (count, steps, chars,
   tokens, seconds per call), `claims` (every `task_complete`: hash verified or not, outcome),
   `finish_reason` (`verified` / `budget_exhausted` / `unverified_accepted` / `not_finished`),
@@ -730,7 +732,8 @@ has a few minutes at most. The time budget, not the context size, decides these 
   chosen because the baseline failed them, 7 of 10 timed out.
 - **Open decisions** (owner): (a) bound the time of the reader and the verifier (a wall-clock
   limit with a no-thinking retry as the compactor has, or the output cap of `rv-run1-numeric`),
-  since without it the compactor cannot be evaluated inside 1,800 s; (b) or raise the agent
+  since without it the compactor cannot be evaluated inside 1,800 s (**decided 2026-11-10:
+  the wall-clock limit, §10.9**); (b) or raise the agent
   time limit for this harness and report time as a cost; (c) `auto` as the default, because
   the hint was ignored in the one trial that showed it (§10.6); (d) whether to trigger on
   UNKNOWN items as well as NO; (e) a clean `t2rv` rerun with the same verifier settings for the
@@ -739,3 +742,69 @@ has a few minutes at most. The time budget, not the context size, decides these 
   tasks) are no longer a clean test set for this harness. Every change made on them is generic
   and listed in §10.5–10.7; a final number should be reported on all 35 tasks with this
   caveat, or on a split that was not used for debugging.
+
+### 10.9 Time limits for the reader and the verifier (2026-11-10)
+
+Owner's decision on open item (a) of §10.8: the reader and the verifier get the compactor's
+time control, a wall-clock limit and one retry without thinking. Thinking stays on by
+default; the limit only bounds what one sub-agent run can take from the trial's 1,800 s.
+
+**Mechanism** (`SubagentClock` in `tools/dar_terminus2_verifier.py`, used by the verifier
+round and, through `_run_tool_subagent`, by the reader):
+
+1. One sub-agent run (all its model calls and command steps) gets `*_timeout_sec` seconds.
+2. A model call still in flight at the limit is cancelled. vLLM aborts the request when the
+   client disconnects (✅ `rvc-timeout-forced`: never more than two running requests with
+   two concurrent trials).
+3. That call is sent again with `chat_template_kwargs.enable_thinking=false`, and the rest of
+   the run continues without thinking under a fresh limit of the same length.
+4. If the second limit passes too, the run ends without a result.
+
+One difference from the compactor: the compactor restarts its run from an empty context
+(it has one command step, so little is lost); the reader and the verifier have up to three
+command steps, so the fallback **continues in the same context** and keeps the steps already
+completed. Only the cancelled call is repeated.
+
+| Setting (`--ak`) | Default in `t2rv` / `t2rvc` | Meaning |
+|---|---|---|
+| `reader_timeout_sec` | 180 | limit of one reader call; `none` = no limit |
+| `reader_thinking` | true | false = the reader never thinks |
+| `reader_fallback` | true | false = no second phase, the run ends at the limit |
+| `verifier_timeout_sec` | 300 | limit of one verifier round (`t2verify`: none) |
+| `verifier_thinking` | true | |
+| `verifier_fallback` | true | |
+
+**Why 180 s and 300 s** (✅ durations from `rvc-smoke1` and `rvc-smoke2-auto`, no limit):
+32 of 36 reader calls took 38–147 s and four took 290–698 s, so 180 s, the compactor's
+value, cuts only the outliers. The 13 verifier rounds took 140–836 s (median 438 s), and the
+first model call of a round alone took 146–269 s in 11 of 13 rounds. A limit of 180 s on the
+round would end the thinking phase inside the first call nearly every time, which amounts
+to a verifier without thinking and contradicts the decision to keep it on. With 300 s a
+round thinks for up to five minutes and then finishes without thinking; the worst case is
+600 s on paper and about 400 s in practice (a round without thinking needs four short
+calls). 🔶 The value is a first setting, not tuned.
+
+**When a run ends without a result**:
+
+- Reader: the solver gets `No result: the reader did not finish within its time limit.
+  Nothing was inserted. You may call the reader again, with a narrower query.`
+- Verifier: the report reads `No report: the verifier did not finish within its time limit.`
+  The round is used up and the answer file does **not** count as verified. The same now holds
+  for a round that ends without a report for any other reason (step budget, context limit);
+  until 2026-11-10 such a round marked the answer file as verified although nothing had been
+  checked, the same gap as the one closed for failed rounds on 2026-11-02 (§9.3).
+
+**Logs**: `reader/call-N.json` and `rubric_verifier/round-N.json` gain `attempts` (one entry
+per phase: thinking, outcome `finished` or `timeout`, seconds, model calls completed),
+`thinking_fallback` and `timed_out`; `summary.json` gains the six settings and
+`reader_thinking_fallbacks`, `reader_timeouts`, `verifier_thinking_fallbacks`,
+`verifier_timeouts`. The tokens of a cancelled call are not counted anywhere, because the
+request is aborted before the server reports usage; token totals of a run with fallbacks are
+therefore a lower bound.
+
+**Check with forced limits** (✅ 2026-11-10, `rvc-timeout-forced`, tax-case 78 and 97 with
+`reader_timeout_sec=20 verifier_timeout_sec=45`, stopped by hand once both paths had run):
+15 reader calls and 2 verifier rounds each logged a thinking phase cut at the limit and a
+second phase without thinking cut at the limit again (a run without thinking needs more than
+20 s for three steps, as intended for this test); the solver received the two messages above,
+neither round recorded a verified hash, and the trials went on.
