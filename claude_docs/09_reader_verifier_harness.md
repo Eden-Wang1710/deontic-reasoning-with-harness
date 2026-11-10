@@ -9,6 +9,9 @@
   it is implemented since 2026-11-10 (§10). Both sub-agents have a wall-clock limit with one
   fallback to no thinking (§10.9). First full run `rvc-run1-numeric` (§10.10): 13 of 35
   file-graded, the same as `rv-run1-numeric`, with 14 timeouts instead of 6.
+  Error attribution of that run in §10.11: 12 of its 22 failures are tasks the model solves in
+  another configuration, 10 are not; the solver omits provisions it never asked the reader
+  for, and the verifier named the decisive error in 2 of 18 wrong answers.
 - **Date opened**: 2026-10-28
 - **Predecessor**: the solver-verifier harness ([08](08_solver_verifier_harness.md)), run-3
   configuration. Its verifier (skill v3, four-step plan, index packet) is reused with a skill
@@ -913,3 +916,178 @@ equal harnesses.
   and no right answer was lost after a rebuild; the hint was not tested in this run.
 - (d) A clean comparison needs a `t2rv` run with the same verifier settings and time limits,
   so that the compactor is the only difference (item (e) of §10.8), and more than one draw.
+
+### 10.11 Error attribution for `rvc-run1-numeric`: harness or model? (2026-11-10)
+
+Question from the owner: is the bottleneck the harness design or the model itself? This section
+classifies the 22 trials the run got wrong (file-graded, exact match). Sources: the answer
+files and verifier reports of the run, the gold labels (offline analysis only, never in a
+prompt), and `tools/rv_case_matrix.py`, which puts the run next to the three other harness runs
+(`sara-t2fix-run1`, `sara-t2verify-run3`, `rv-run1-numeric`) and the four direct-prompt
+generations per task (DeonticBench, whole statute in the prompt, no harness). The decisive error
+of each answer was found by reading it against a derivation that reproduces the gold value.
+
+**1. What the model can reach** ✅
+
+| | Tasks of 35 |
+|---|---|
+| Direct prompt, mean accuracy over 4 generations | 0.436 (15.3) |
+| Direct prompt, at least 3 of 4 generations right | 12 |
+| Direct prompt, at least 1 of 4 right | 23 |
+| Right in at least one of the four harness runs | 21 |
+| Right in at least one harness run or direct generation | 25 |
+| Solver's first answer right in this run | 11 |
+| This run, final answer file | 13 |
+
+Of the 22 wrong trials, **10 are solved by no configuration** (10, 29, 35, 39, 47, 58, 60, 61,
+78, 94: all four direct generations and all four harness runs wrong) and **12 are solved by the
+same model somewhere else** (2, 6, 18, 49, 51, 64, 74, 83, 85, 90, 91, 97).
+
+**2. What the solver got wrong** ✅ (per task below; 18 trials had an answer)
+
+| Decisive error in the final answer | n | Tasks |
+|---|---|---|
+| A provision that applies was never considered: the §3301 tax on wages the taxpayer paid | 5 | 10, 29, 47, 58, 97 |
+| A provision that applies was never considered: the phaseout of exemptions (§151(d)(3)) or the limitation of itemized deductions (§68) | 4 | 6, 49, 83, 91 |
+| Filing status or number of dependents | 6 | 18, 60, 61, 64, 78, 90 |
+| Scope of gross income | 1 | 74 |
+| One dollar from gold (rounding) | 2 | 2, 85 |
+| No answer file when the time ran out | 4 | 35, 39, 51, 94 |
+
+Half of the wrong answers are **omissions**: the answer is internally consistent and every step
+it contains is right, but one applicable provision is absent. In 29, 58 and 97 the gap to gold
+is exactly 6% of the wages paid; in 83 it is 39.6% of the $2,000 exemption that should have
+been phased out. 49, 64 and 91 carry a second error (wrong bracket, filing status, wage count).
+
+Whether the omitted text ever reached the solver (line ranges of the rule file delivered by the
+reader or kept by the compactor, whole trial) ✅:
+
+- **§3301 (line 245) was never delivered in any of the five trials that omit its tax** (10, 29,
+  47, 58, 97). The solver asked the reader for §1, §63, §151, §152 and sometimes §2, §68 and
+  §7703; in 10 it received part of §3306 and still not §3301. In 83 and 91 the section arrived
+  only after the verifier's first report asked for it. Under the direct prompt, where the whole
+  file is in the context, the final part of the answer mentions §3301 in 14 of the 20
+  generations on the same five tasks (4, 2, 2, 3, 3 of 4), and 97 is solved twice. The solver
+  reads what it thinks of; a provision it does not think of is never in front of it.
+- **The phaseout clause §151(d)(3) (line 78) was delivered in all five trials that miss it**
+  (6, 49, 64, 83, 91), inside the §151 block the solver had asked for. The threshold it refers
+  to, §68(b), was never delivered in three of them (49, 83, 91). Here the text was present and
+  not applied, or its cross-reference not followed.
+
+**3. What the verifier did with those 18 wrong answers** ✅
+
+| Verifier's handling of the decisive error | n | Tasks |
+|---|---|---|
+| Passed the answer, all YES in the first report | 4 | 10, 85, 90, 97 |
+| The first report led to a change, the new answer passed with the decisive error in it | 2 | 83 (a real first error fixed), 60 (moved further from gold) |
+| Flagged the answer, the objections did not name the decisive error | 10 | 2, 6, 18, 29, 47, 49, 58, 74, 78, 91 |
+| Named the decisive error, no repair followed | 2 | 61, 64 |
+
+49 is counted in the third row although its report named one of its two errors (the wrong
+bracket, not the missing phaseout). In 91 the first report named the missing §3301 tax, the
+solver added it, and the second report did not name what remained.
+
+So the verifier named the error that decided the grade in **2 of 18** wrong answers. What the
+objections were about instead:
+
+- **Provenance and process.** "§151 was not returned in any reader call" (74), "§1 and §151 were
+  not in the compactor's kept ranges" (91 round 2), "§68(b)(1)(A) never appeared in a reader
+  block" (6), "arithmetic done in prose instead of python3" (58, 78: the only NO left at the
+  end). Two of the four rubrics (tool use, provision coverage) ask this kind of question.
+- **Things that are not in the file or the facts.** "§151(d)(1) and §63(c)(2)(C) do not exist"
+  (18, both do), "§152(d)(1)(B) does not exist; the actual provision is §152(d)(1)(B)" (47),
+  "the solver's age claim contradicts the facts" (6, it does not), an arithmetic slip that is
+  not there (64).
+- **Real omissions, when a stated fact was left unused.** The first reports of 83 and 91 said
+  that the facts about agricultural labour engage §3301 and that the answer omits it; the
+  solver added the tax in the next round. This is the one mechanism that caught an omission.
+  It did not fire in 10, 29, 47, 58 and 97, where the unused fact is a single payment for work:
+  in 97 the report lists the payment as an unused fact, searched the file for "payment|paid|Bob"
+  and concluded that it "does not affect taxable income". The phaseout omissions have no unused
+  fact to point at and were named once in five (64).
+
+On the 11 right first answers the verifier flagged 6. All YES therefore came with 5 right and 4
+wrong answers, and a flag with 6 right and 16 wrong: the verdict separates right from wrong
+weakly, and the text of the objections rarely says what is wrong.
+
+**4. Where each wrong trial was lost**
+
+| Task | Gold | Final answer | Decisive error | Verifier | End | Right elsewhere |
+|---|---|---|---|---|---|---|
+| 2 | 26,567 | 26,566 | one dollar | flagged an unused fact, three rounds | rounds used up | `rv` run |
+| 6 | 180,610 | 177,436 | §68 limitation of the itemized deduction missing | provenance of §68(b), a false contradiction | timeout | direct 4/4, run-3, `rv` |
+| 10 | 68,844 | 67,040 | §3301 tax missing ($1,804) | all YES | finished | none (direct twice at 68,845) |
+| 18 | 19,801 | 20,421 | second dependent (the uncle) not counted | "sections do not exist" | timeout | direct 4/4 |
+| 29 | 40,741 | 40,469 | §3301 tax missing | asked for the support test | finished after one flagged round | none |
+| 35 | 2,384 | none | no answer | one round on an empty file at second 1,542 | timeout | none |
+| 39 | 6,812 | none | no answer | no round | timeout, 4 reader calls | none |
+| 47 | 45,946 | 45,616 | §3301 tax missing | self-contradicting objection | timeout | none |
+| 49 | 82,819 | 82,369 | phaseout missing, wrong bracket | named the bracket only | timeout | direct 2/4, run-3 |
+| 51 | 55,528 | none | no answer | no round | timeout, 5 reader calls (1,039 s) | direct 1/4, t2fix, `rv` |
+| 58 | 21,635 | 21,443 | §3301 tax missing ($192) | tool use only | finished | none |
+| 60 | 4,331 | 5,231 | two dependents not counted | UNKNOWN on the spouse exemption; solver dropped it; all YES | finished | none |
+| 61 | 25,055 | 22,959 | head of household instead of single | **named it** (cost of the household is not a stated fact) | solver kept its answer, timeout | none |
+| 64 | 81,487 | 78,488 | head of household, phaseout missing | **named both**, plus two false items | timeout | direct 1/4 |
+| 74 | 4,525 | 4,469 | $200 excluded from income by a §3306 definition | provenance of §151 | finished after one flagged round | direct 2/4, t2fix |
+| 78 | 14,470 | 15,213 | filing status | tool use, bracket numbers | rounds used up | none |
+| 83 | 206,073 | 205,281 | phaseout missing | round 1 named the missing §3301 tax (fixed); round 2 all YES | finished | direct 2/4 |
+| 85 | 2,477 | 2,476 | one dollar ("$2,476.50, rounded to $2,476") | all YES | finished | t2fix, run-3, `rv` |
+| 90 | 96,641 | 99,106 | head of household, no standard deduction | all YES | finished | direct 1/4 |
+| 91 | 247,432 | 245,962 | phaseout missing, wage count | round 1 named the missing §3301 tax (fixed); round 2 provenance | timeout | direct 1/4, run-3 |
+| 94 | 63,345 | none | no answer | no round | timeout, 11 reader calls | none |
+| 97 | 33,069 | 32,798 | §3301 tax missing | report with one rubric of four, YES | finished | direct 2/4, run-3 |
+
+Two defects of the harness itself show up in this table ✅:
+
+- **"Verified" means "seen", not "passed".** The completion gate accepts `task_complete` for any
+  answer file the verifier has reported on. 29 and 74 finished right after a report with NO
+  items, without a change to the file.
+- **An incomplete report counts as a report.** In 97 the verifier returned one rubric of four
+  (tool use: YES); the harness rendered it, recorded the file as verified, and the trial ended.
+  The same happened once in `rv-run1-numeric` (51, round 2).
+
+**5. Answer to the question** 🔶
+
+Both, at different levels, and the part that can be changed is the harness.
+
+- **The ceiling is the model.** With the whole statute in its prompt and no harness the model
+  averages 0.436, and 10 of the 22 failures here are tasks it has never solved in 8 attempts
+  (four direct generations, four harness runs). Where it has the text and still errs, the
+  errors are of one kind: a clause in a section it read is not applied (the phaseout), or a
+  status question is decided without the condition the rule states (61: 22,959 in this run and
+  in all four direct generations). The verifier is the same model and reads no better: 4 wrong
+  answers passed, and 3 reports assert things about the file that are false.
+- **The harness does not reach that ceiling, and that part is design.** 12 of the 22 failures
+  are within the model's demonstrated reach. The solver's first answer is right in 11 of 35
+  tasks, below the direct prompt's 15.3: the reader-mediated solver starts lower than the bare
+  model. The verifier loop then adds 2, and the time limit takes 3 off the protocol score.
+  Four design causes:
+  1. *The solver only sees what it asks for.* Five failures omit a tax whose section never
+     entered the solver's context (item 2). The reader was introduced to keep the context
+     small; on a 522-line rule file it also removes the one property the direct prompt has,
+     that every provision is in view.
+  2. *The verifier audits the record, and the errors are outside the record.* It checks whether
+     what the answer cites was read, computed with a tool and grounded. 9 of 18 wrong answers
+     are wrong by something they do not contain. The one check that looks outside the answer,
+     the unused-fact list, produced both real catches of the run (83, 91).
+  3. *Time.* The first report arrives at second 848 at the median. 8 trials with a flagged
+     first report ran out afterwards, among them the two where the verifier was right (61,
+     64), and 3 more never reached a report.
+  4. *Repair rounds spent on objections that are false or about process*, and a gate that lets
+     a flagged answer through (item 4).
+- Limits of this split: "at least 1 of 4" and "right in some run" need an oracle to pick the
+  right attempt, so they bound what a harness could reach and are not accuracies it is owed.
+  One draw per configuration. 2 and 85 would be right under DeonticBench's ±$1.
+
+**Directions this points to** (owner to decide; all are harness-level and name no task or
+provision):
+
+- (e) Put the whole rule file, or at least its outline with one line per section, in front of
+  the solver before it plans, when the file is small (SARA's is 522 lines, about 6,000 tokens);
+  keep the reader for long files. This addresses cause 1 and, by saving reader calls, cause 3.
+- (f) Make completeness the verifier's main question: for every stated fact, name the provision
+  that uses it or the one that rules it out; for every section the answer applies, read the
+  whole section and list the clauses whose conditions the facts meet and the answer does not
+  mention. Move the two process rubrics out of the model: the harness can check tool use and
+  delivered line ranges from the trajectory itself.
+- (g) Gate on the verdict, not on the hash alone, and reject a report with missing rubrics.

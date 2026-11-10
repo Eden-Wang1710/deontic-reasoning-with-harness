@@ -85,6 +85,9 @@ deontic-reasoning-with-harness/
 │   │                            accuracy with intervals, paired comparison, time per role, time-limit
 │   │                            fallbacks, compactions, what follows the first verifier report;
 │   │                            --trials-json writes outputs/rvc_run1_numeric_trials.json (09 §10.10)
+│   ├── rv_case_matrix.py            per-task matrix for error attribution: the four direct-prompt generations,
+│   │                            the t2fix / run-3 / t2rv / t2rvc rewards and the t2rvc verifier rounds;
+│   │                            needs harbor-deonticbench/.venv/bin/python (09 §10.11)
 │   ├── replay_compactor.py          debugging aid: replays one compactor call on a finished t2rv trial
 │   │                            (state right after verifier round R), live or with a canned result
 │   ├── make_harness_figures.py      writes claude_docs/figures/{reader,compactor}.svg
