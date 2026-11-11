@@ -6,8 +6,9 @@
   before `task_complete` is accepted. Both sub-agents are called by the solver through a field
   in its JSON response, run in their own `Chat`, and return a text result into the solver's
   conversation. Version 2 adds a **compactor** sub-agent that rebuilds the solver's context;
-  it is implemented since 2026-11-10 (§10). Both sub-agents have a wall-clock limit with one
-  fallback to no thinking (§10.9). First full run `rvc-run1-numeric` (§10.10): 13 of 35
+  it is implemented since 2026-11-10 (§10). Each sub-agent run has a limit with one fallback
+  to no thinking: seconds until 2026-11-10 (§10.9), output tokens since 2026-11-11, when
+  time-outs were dropped and inference cost became the second metric (§10.12). First full run `rvc-run1-numeric` (§10.10): 13 of 35
   file-graded, the same as `rv-run1-numeric`, with 14 timeouts instead of 6.
   Error attribution of that run in §10.11: 12 of its 22 failures are tasks the model solves in
   another configuration, 10 are not; the solver omits provisions it never asked the reader
@@ -753,6 +754,9 @@ has a few minutes at most. The time budget, not the context size, decides these 
 
 ### 10.9 Time limits for the reader and the verifier (2026-11-10)
 
+> Superseded on 2026-11-11 (§10.12): the limits now count output tokens, not seconds. The
+> mechanism below is unchanged; the wall-clock settings still exist and default to none.
+
 Owner's decision on open item (a) of §10.8: the reader and the verifier get the compactor's
 time control, a wall-clock limit and one retry without thinking. Thinking stays on by
 default; the limit only bounds what one sub-agent run can take from the trial's 1,800 s.
@@ -1091,3 +1095,156 @@ provision):
   mention. Move the two process rubrics out of the model: the harness can check tool use and
   delivered line ranges from the trajectory itself.
 - (g) Gate on the verdict, not on the hash alone, and reject a report with missing rubrics.
+
+### 10.12 No time-outs: inference cost as the second metric, token limits (2026-11-11)
+
+Owner's decision (`04` §8): wall-clock time is no longer a limit and not a metric. It
+depends on the machine, the vLLM settings and the number of concurrent trials; in
+`rvc-run1-numeric` the 1,800 s limit ended 14 of 35 trials at two concurrent trials (§10.10).
+The second metric next to accuracy is **inference cost**: the tokens a trial consumed, priced
+with a fixed card. It is not the break-even price of `04` §3.3, which prices wrong answers
+and human review; inference cost prices the model calls only.
+
+**Price card** (`tools/pricing/price_card.json`, ✅ fetched 2026-11-11 from OpenRouter, model
+`qwen/qwen3.5-35b-a3b`; the two API responses are stored next to it):
+
+| Token kind | USD per million |
+|---|---|
+| input | 0.14 |
+| output (thinking included) | 1.00 |
+| cache read | 0.05 |
+
+The card has no cache-write fee. It is fixed: later price changes on OpenRouter do not
+change our numbers. One output token costs as much as seven input tokens.
+
+**Two costs per trial**, both from `tools/inference_cost.py`:
+
+- *No cache*: input tokens x 0.14 + output tokens x 1.00. An upper bound. The cost budget
+  below is counted at this price.
+- *With cache*: a prompt cache simulated offline inside the trial. The part of a prompt that
+  is a prefix of an earlier prompt of the same trial is billed at the cache-read price, the
+  rest at the input price. The earlier prompt can belong to another role: the second reader
+  call shares the skill text with the first. Generated tokens are not counted as cached:
+  thinking is on and the reasoning is not sent back, so the next prompt leaves the server's
+  token sequence where the previous prompt ended. No minimum prefix length and no expiry are
+  modelled, so this is a lower bound for a provider with prefix caching.
+- Nothing is cached across tasks. Every task is priced as if it ran alone, so the result
+  does not depend on the order or the number of concurrent trials.
+- 🔶 Approximation: prefixes are measured in characters. When the shared prefix is a whole
+  earlier prompt its token count is used (exact up to the few tokens of the chat template's
+  generation prompt); otherwise tokens are taken in proportion to characters.
+
+**Call ledger** (`tools/dar_cost_ledger.py`, `CostLedgerMixin`, a base class of `t2fix`,
+`t2verify*`, `t2rv` and `t2rvc`): every model call of a trial is appended to
+`agent/llm_calls.jsonl` when it returns or fails.
+
+| Field | Meaning |
+|---|---|
+| `n`, `role`, `started`, `seconds` | call number in the trial; `solver`, `reader`, `verifier`, `compactor` or `summarizer` |
+| `thinking`, `max_tokens` | as sent |
+| `prompt_tokens`, `completion_tokens` | usage as the server reported it (`n_replies` > 1: the LLM layer retried, sums) |
+| `finish` | `stop`, `length` (cut off by `max_tokens`), `context`, `cancelled`, `error` |
+| `prompt_chars`, `lcp_chars`, `lcp_call` | length of the prompt and the longest prefix it shares with an earlier prompt, with that call's number |
+| `spent_usd` | running no-cache cost of the trial |
+
+A reply cut off by an output limit is in the ledger with its tokens. Harbor's own counters
+drop such a reply, so at the end of the trial `n_input_tokens`, `n_output_tokens` and
+`cost_usd` of `result.json` are overwritten from the ledger (`cost_usd` = no-cache cost).
+Runs made before the ledger are priced from the solver's `episode-N/debug.json` (exact
+prompts and usage) and the sub-agent trajectories; requests that failed or were cancelled
+left no usage there and are missing from their cost.
+
+**What stops a run now**
+
+| Limit | Value | At the limit |
+|---|---|---|
+| Cost budget per task, `cost_budget_usd` (`COST_BUDGET_USD`) | 0.15 USD, no-cache price | checked before each solver step; the step in progress (with its sub-agent runs) is finished, then the trial ends and the answer file is graded as it is. `agent/cost_budget.json` records budget, amount spent and `budget_exhausted` |
+| Output tokens of one model call, `max_tokens` (`MAX_TOKENS`) | 16,384 | the reply is cut; terminus-2 handles it as before |
+| Output tokens of one reader call, `reader_max_output_tokens` | 8,000 | the model call that reached the limit is sent again without thinking and the run continues without thinking under a fresh limit; reached again: no result |
+| Output tokens of one verifier round, `verifier_max_output_tokens` | 12,000 | same; reached again: no report, the round is used up |
+| Output tokens of one compactor call, `compactor_max_output_tokens` | 4,000 | the call is repeated from an empty context without thinking; reached again: the context stays as it is |
+| Request timeout (`REQUEST_TIMEOUT`), agent timeout (`AGENT_TIMEOUT_MULT`) | 7,200 s; 600 s x 24 | safety nets against a hung server. A trial that reaches one is an infrastructure failure and is run again, not scored |
+
+- The token limits count completion tokens, thinking included, summed over the model calls
+  of one sub-agent run. Each call is sent with `max_tokens` = what is left of the limit, so
+  the limit cannot be passed. The mechanism is the `SubagentClock` of §10.9 with tokens in
+  place of seconds; `attempts` entries now carry `completion_tokens` and the outcome
+  `output_limit`, and the call records gain `limit_reached`.
+- The wall-clock settings of §10.9 (`reader_timeout_sec`, `verifier_timeout_sec`,
+  `compactor_timeout_sec`) still exist and default to none. `rvc-run1-numeric` is reproduced
+  with 180 / 300 / 180, `--ak reader_max_output_tokens=none --ak
+  verifier_max_output_tokens=none --ak compactor_max_output_tokens=none`,
+  `COST_BUDGET_USD=none AGENT_TIMEOUT_MULT=3 REQUEST_TIMEOUT=600`.
+- Waits inside the container (command durations, `exec` time-outs) are unchanged. They
+  bound shell commands, not the model, and do not depend on the server's speed.
+- With time out of the picture, `N_CONCURRENT` only changes how long a job takes.
+
+**Why these values** (✅ measured on the existing runs; chosen by Claude under the owner's
+delegation, 🔶 first settings, not tuned):
+
+- *0.15 USD.* No-cache cost per trial on SARA numeric: baseline mean 1.6 cents (max 3.7),
+  solver-verifier mean 6.5 (95th percentile 11.2, max 11.7), reader-verifier-compactor mean
+  5.0 (max 8.4, cut short by time-outs). 15 cents is above every trial on record and about
+  three times the mean of our harnesses: it ends runaway trials and leaves normal ones alone.
+- *Reader 8,000, verifier 12,000.* Output tokens per run in `rv-run1-numeric`, which had no
+  limits: reader median 2.6k, 90th percentile 7.0k, 95th 9.7k, max 13.8k; verifier median
+  7.3k, 90th 11.2k, 95th 12.0k, max 13.4k. The limits sit near the 95th percentile, so about
+  one run in twenty falls back to no thinking.
+- *Compactor 4,000.* 95th percentile 2.7k, max 3.2k in `rvc-run1-numeric`.
+- For comparison, the time limits of §10.9 fired far more often in `rvc-run1-numeric`: the
+  reader fell back in 23 of 92 calls, the verifier in 34 of 50 rounds, the compactor in 4 of
+  22 calls. At about 25 output tokens per second, 300 s is 7,500 tokens, the verifier's
+  median need.
+
+**Finding: there was a hidden time limit per model call** (✅ 2026-11-11). litellm's default
+request timeout is 600 s and Harbor does not change it. The longest solver replies on record
+end just below it (573 to 596 s, the largest 15,262 tokens in 595.7 s), and 8 solver requests
+of the four numeric runs have no reply in their `debug.json`. A request that timed out was
+retried up to three times by the LLM layer and its tokens were never counted. The 16,384-token
+limit per turn (decision of 2026-10-15) was applied only as the server's default; at 17 to 25
+tokens per second the 600 s bound came first, at 10k to 15k tokens. Both are now explicit:
+`max_tokens=16384` is sent with every request and the request timeout is 7,200 s.
+
+**Existing runs, priced** (✅ `tools/inference_cost.py --match sara-numeric`, 35 SARA numeric
+tasks, means per task, cost in US cents):
+
+| Run | Correct | Model calls | Input tokens | of which cached | Output tokens | No cache | x baseline | With cache | x baseline |
+|---|---|---|---|---|---|---|---|---|---|
+| `sara-t2fix-run1` (baseline) | 7/35 | 5.6 | 30,105 | 23,229 | 11,695 | 1.59 | 1.00 | 1.38 | 1.00 |
+| `sara-t2verify-run3` (solver-verifier) | 16/35 | 24.2 | 243,046 | 207,939 | 31,099 | 6.51 | 4.09 | 4.64 | 3.36 |
+| `rv-run1-numeric` | 13/35 | 23.5 | 162,256 | 127,708 | 27,052 | 4.98 | 3.13 | 3.83 | 2.77 |
+| `rvc-run1-numeric` | 13/35 | 25.1 | 168,131 | 123,292 | 26,502 | 5.00 | 3.15 | 3.89 | 2.82 |
+
+- These runs were made under the old protocol and are **not** a formal comparison: a trial
+  that ended with an exception, nearly always the 1,800 s limit, stopped spending (1, 5, 6
+  and 14 trials of the four runs), so their cost is truncated, and cancelled or timed-out
+  requests are missing.
+- Output tokens are about half of the no-cache cost of the three harness runs (48 to 54 %)
+  and three quarters of the baseline's. The solver-verifier run sends 1.5 times the input of
+  the reader-verifier runs (its solver keeps the whole trajectory); that is 1.1 cents of the
+  difference without a cache and 0.4 with one.
+- By role in `rvc-run1-numeric` (no cache): solver 2.23 cents (45 %), verifier 1.43 (29 %),
+  reader 1.17 (23 %), compactor 0.18 (4 %).
+
+**Check on the server** (✅ 2026-11-11, three `t2rvc` jobs in parallel, tax-case 78 and 97):
+
+| Job | Setting | Result |
+|---|---|---|
+| `cost-smoke-a` | defaults, cases 78 and 97 | both trials end on their own after 17 and 51 model calls, 4.1 and 11.2 cents, no exception. Requests carry `max_tokens=16384` and a 7,200 s timeout. One reader call thought until its 8,000 tokens were used (the cut reply, 7,563 tokens in 439 s, is in the ledger), was sent again without thinking and finished |
+| `cost-smoke-b` | `COST_BUDGET_USD=0.02`, case 78 | the trial stops before its sixth solver step with 2.9 cents spent (the step that crossed the budget included a verifier round and was finished), `budget_exhausted` true, the answer file is graded, no exception |
+| `cost-smoke-c` | reader 500, verifier 1,500, compactor 300 tokens, case 97 | the reader call and two verifier rounds end without a result after both phases reach the limit; the third round finishes without thinking; the solver gets the "did not finish within its limit" messages and the trial ends normally |
+
+- In all four trials the token totals of `result.json` equal the ledger's, cut replies
+  included (8 in total).
+- The four answers are wrong, as in earlier runs of these two cases; the check is about the
+  mechanism, not accuracy.
+- The trial with 51 calls took 45 minutes at four concurrent requests. Under the old protocol
+  it would have been cut at 30 minutes and counted as a time-out.
+- 🔶 The server does not report cached prompt tokens (`prompt_tokens_details` is empty), so
+  the simulated cache cannot be checked against vLLM's own prefix cache from these logs.
+
+**Reruns under this protocol** (started 2026-11-11 23:27 UTC, 35 SARA numeric tasks each, in
+parallel on one server): `t2fix-direct/t2fix-cost1-numeric` (baseline),
+`t2verify-direct/sv-cost1-numeric` (solver-verifier, the run-3 configuration of `08`; its
+verifier has no token limit, as in run-3) and `t2rvc-direct/rvc-cost1-numeric`. Results
+are added here when they are in.

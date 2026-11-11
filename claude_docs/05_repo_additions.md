@@ -81,6 +81,18 @@ deontic-reasoning-with-harness/
 │   │                            sub-agent; the harness snaps ranges to outline boundaries, restores
 │   │                            cited sections, rebuilds the solver context as task + one state page;
 │   │                            logs under <trial>/agent/compactor/ (claude_docs/09 §10)
+│   ├── dar_cost_ledger.py           CostLedgerMixin, a base of every harness above (since 2026-11-11): logs
+│   │                            every model call of a trial to <trial>/agent/llm_calls.jsonl (role,
+│   │                            tokens, how the reply ended, prefix shared with earlier prompts) and
+│   │                            stops the trial at cost_budget_usd; writes agent/cost_budget.json
+│   │                            (claude_docs/09 §10.12)
+│   ├── pricing/price_card.json      the fixed price card of the inference-cost metric: USD per million
+│   │                            input / output / cache-read tokens (0.14 / 1.00 / 0.05); next to it the
+│   │                            OpenRouter responses it was read from, fetched 2026-11-11
+│   ├── inference_cost.py            inference cost of job dirs: tokens and cents per task and per role,
+│   │                            without a cache and with a simulated prompt cache inside each trial,
+│   │                            as a multiple of a baseline job; reads the ledger, or the debug logs
+│   │                            and sub-agent trajectories of runs made before it (09 §10.12)
 │   ├── rv_run_report.py             aggregate numbers of a t2rv/t2rvc numeric run vs a baseline run:
 │   │                            accuracy with intervals, paired comparison, time per role, time-limit
 │   │                            fallbacks, compactions, what follows the first verifier report;
