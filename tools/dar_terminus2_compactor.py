@@ -66,7 +66,12 @@ from dar_terminus2_multiagent import (
     Terminus2ReaderVerifier,
     _sha,
 )
-from dar_terminus2_verifier import no_thinking_kwargs
+from dar_terminus2_verifier import (
+    SubagentClock,
+    SubagentTimeout,
+    _opt_seconds,
+    _opt_tokens,
+)
 
 COMPACTOR_SKILL_PATH = TOOLS_DIR / "skills" / "compactor_v1" / "SKILL.md"
 SOLVER_V3_SKILL_PATH = TOOLS_DIR / "skills" / "solver_v3" / "SKILL.md"
@@ -481,7 +486,8 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
         compactor_keep_steps: int | str = 4,
         compactor_step_chars: int | str = 2500,
         compactor_notes_chars: int | str = 0,
-        compactor_timeout_sec: int | str = 180,
+        compactor_timeout_sec: float | str | None = None,
+        compactor_max_output_tokens: int | str | None = 4000,
         compactor_thinking: bool | str = True,
         outline_pattern: str = OUTLINE_PATTERN,
         section_pattern: str = SECTION_PATTERN,
@@ -517,15 +523,18 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
         self._compactor_notes_chars = int(compactor_notes_chars)
         self._outline_pattern = outline_pattern
         self._section_pattern = section_pattern
-        # After a timed-out call with thinking, try once more without it (a short reply).
+        # After a call with thinking that reached a limit, try once more without it (a
+        # short reply).
         self._compactor_fallback = str(compactor_fallback).lower() not in (
             "false",
             "0",
             "no",
             "off",
         )
-        # Wall-clock limit of one compactor call; when it is hit the context is left as it is.
-        self._compactor_timeout_sec = float(compactor_timeout_sec)
+        # Limits of one compactor call: completion tokens, and wall clock (off since
+        # 2026-11-11). When one is reached twice the context is left as it is.
+        self._compactor_timeout_sec = _opt_seconds(compactor_timeout_sec)
+        self._compactor_max_output_tokens = _opt_tokens(compactor_max_output_tokens)
         # False asks the server's chat template for a reply without a thinking block
         # (vLLM: chat_template_kwargs.enable_thinking); the solver, the reader and the
         # verifier are not affected.
@@ -965,9 +974,6 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
             )
         return f"{decision}\n{where}"
 
-    def _compactor_llm_kwargs(self, thinking: bool) -> dict | None:
-        return None if thinking else no_thinking_kwargs(self._llm_call_kwargs)
-
     async def _rule_outline(self, environment) -> list[tuple[int, str]]:
         """Section and top-level subsection headings of the rule file with line numbers
         (empty if the file has no line matching the outline pattern)."""
@@ -1081,6 +1087,13 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
         try:
             for i, thinking in enumerate(modes):
                 t_attempt = time.time()
+                clock = SubagentClock(
+                    None,
+                    thinking,
+                    False,
+                    max_output_tokens=self._compactor_max_output_tokens,
+                )
+                outcome = "replied"
                 try:
                     run = await asyncio.wait_for(
                         self._run_tool_subagent(
@@ -1090,31 +1103,27 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
                             packet=packet,
                             max_steps=self._compactor_max_steps,
                             closing=COMPACTOR_CLOSING,
-                            llm_kwargs=self._compactor_llm_kwargs(thinking),
+                            clock=clock,
                         ),
                         timeout=self._compactor_timeout_sec,
                     )
+                    if run["timed_out"]:
+                        outcome = "output_limit"
                 except (asyncio.TimeoutError, TimeoutError):
-                    record["attempts"].append(
-                        {
-                            "thinking": thinking,
-                            "outcome": "timeout",
-                            "elapsed_sec": time.time() - t_attempt,
-                        }
-                    )
-                    if i + 1 == len(modes):
-                        raise
-                    continue
+                    outcome = "timeout"
                 record["attempts"].append(
                     {
                         "thinking": thinking,
-                        "outcome": "replied",
+                        "outcome": outcome,
                         "elapsed_sec": time.time() - t_attempt,
                     }
                 )
-                break
+                if outcome == "replied":
+                    break
+                if i + 1 == len(modes):
+                    raise SubagentTimeout(outcome)
         except Exception as exc:  # keep the trial alive; CancelledError passes
-            timed_out = isinstance(exc, (asyncio.TimeoutError, TimeoutError))
+            timed_out = isinstance(exc, SubagentTimeout)
             self.logger.error(f"compactor call {call_no} failed: {exc!r}")
             record.update(
                 {
@@ -1125,7 +1134,7 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
             )
             self._write_compactor_record(record)
             return refused(
-                "the compactor did not finish within its time limit."
+                "the compactor did not finish within its limit."
                 if timed_out
                 else f"the compactor could not complete ({type(exc).__name__}).",
                 call=call_no,
@@ -1380,6 +1389,7 @@ class Terminus2ReaderVerifierCompactor(Terminus2ReaderVerifier):
                     "compactor_max_chars": self._compactor_max_chars,
                     "compactor_keep_steps": self._compactor_keep_steps,
                     "compactor_timeout_sec": self._compactor_timeout_sec,
+                    "compactor_max_output_tokens": self._compactor_max_output_tokens,
                     "compactor_thinking": self._compactor_thinking,
                     "compactor_fallback": self._compactor_fallback,
                     "compactor_min_tokens": self._compactor_min_tokens,

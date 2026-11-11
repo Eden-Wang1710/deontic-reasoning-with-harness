@@ -137,7 +137,7 @@ def describe(name, d):
         comp = {t for t, x in d.items() if any(c.get("rebuilt") for c in x["compactions"])}
         print(f"compactor: calls {len(cc)} {trig}, rebuilds {len(rb)} in {len(comp)} trials, skips {sum(len(x['skips']) for x in d.values())}")
         print("   seconds", q([c.get("elapsed_sec") for c in cc]), "; calls with a timed-out attempt",
-              sum(1 for c in cc if any(a["outcome"] == "timeout" for a in c.get("attempts") or [])))
+              sum(1 for c in cc if any(a["outcome"] in ("timeout", "output_limit") for a in c.get("attempts") or [])))
         print("   solver prompt tokens before", q([c["solver_prompt_tokens_before"] for c in rb]),
               "; after", q([c.get("solver_prompt_tokens_after") for c in rb]))
         print(f"   correct with a rebuild {sum(d[t]['reward'] == 1.0 for t in comp)}/{len(comp)}, "

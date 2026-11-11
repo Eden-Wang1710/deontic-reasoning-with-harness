@@ -92,6 +92,8 @@ from dar_terminus2_verifier import (
     _extract_json_object,
     _falsy,
     _opt_seconds,
+    _opt_tokens,
+    capped_kwargs,
     no_thinking_kwargs,
 )
 
@@ -192,10 +194,12 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         reader_skill_path: str | None = None,
         reader_max_steps: int | str = 3,
         reader_max_chars: int | str = 16000,
-        reader_timeout_sec: float | str | None = 180,
+        reader_timeout_sec: float | str | None = None,
+        reader_max_output_tokens: int | str | None = 8000,
         reader_thinking: bool | str = True,
         reader_fallback: bool | str = True,
-        verifier_timeout_sec: float | str | None = 300,
+        verifier_timeout_sec: float | str | None = None,
+        verifier_max_output_tokens: int | str | None = 12000,
         rule_path: str = "/app/statute.txt",
         max_unverified_claims: int | str = 2,
         skill_path: str | None = None,
@@ -213,6 +217,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             derivation_template=derivation_template or str(MULTIAGENT_TEMPLATE_PATH),
             verifier_max_steps=verifier_max_steps,
             verifier_timeout_sec=verifier_timeout_sec,
+            verifier_max_output_tokens=verifier_max_output_tokens,
             packet_mode=packet_mode,
             report_confidence=report_confidence,
             **kwargs,
@@ -236,10 +241,12 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         self._reader_skill_text = self._reader_skill_path.read_text()
         self._reader_max_steps = int(reader_max_steps)
         self._reader_max_chars = int(reader_max_chars)
-        # Wall-clock limit of one reader call (SubagentClock): at the limit the call in
-        # flight is sent again without thinking, once. The verifier has the same mechanism
-        # (verifier_timeout_sec / verifier_thinking / verifier_fallback in the base class).
+        # Limits of one reader call (SubagentClock): completion tokens, and wall clock (off
+        # since 2026-11-11). At a limit the model call is sent again without thinking,
+        # once. The verifier has the same mechanism (verifier_max_output_tokens /
+        # verifier_timeout_sec / verifier_thinking / verifier_fallback in the base class).
         self._reader_timeout_sec = _opt_seconds(reader_timeout_sec)
+        self._reader_max_output_tokens = _opt_tokens(reader_max_output_tokens)
         self._reader_thinking = not _falsy(reader_thinking)
         self._reader_fallback = not _falsy(reader_fallback)
         self._rule_path = rule_path
@@ -706,7 +713,10 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         started = time.time()
         packet = self._build_reader_packet(query, call_no)
         clock = SubagentClock(
-            self._reader_timeout_sec, self._reader_thinking, self._reader_fallback
+            self._reader_timeout_sec,
+            self._reader_thinking,
+            self._reader_fallback,
+            max_output_tokens=self._reader_max_output_tokens,
         )
 
         run = await self._run_tool_subagent(
@@ -771,6 +781,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             "parse_failures": parse_failures,
             "context_exceeded": context_exceeded,
             "timed_out": timed_out,
+            "limit_reached": clock.limit_reached,
             "thinking_fallback": clock.fell_back,
             "attempts": clock.attempts,
             "commands": commands_run,
@@ -797,7 +808,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                 message=(
                     f"Reader call {call_no} ({steps_used} command steps, {elapsed:.0f} s"
                     + (
-                        f"; time limit of {self._reader_timeout_sec:.0f} s reached, "
+                        f"; {clock.describe_limit()}, "
                         + ("no result" if timed_out else "finished without thinking")
                         if clock.fell_back or timed_out
                         else ""
@@ -842,8 +853,8 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         Shared by the reader and the compactor: a fresh context (skill + packet), up to
         ``max_steps`` command steps executed in the container, then ``result``; if the steps
         run out, ``closing`` asks for the result (one retry on a parse failure). With a
-        ``clock`` the run is bounded by wall clock; when the clock gives up, the run ends
-        with ``result`` None and ``timed_out`` true."""
+        ``clock`` the run is bounded by its limits (completion tokens, wall clock); when the
+        clock gives up, the run ends with ``result`` None and ``timed_out`` true."""
         rchat = Chat(self._llm, interleaved_thinking=self._interleaved_thinking)
         rsteps: list[Step] = []
         session_id = str(uuid.uuid4())
@@ -864,17 +875,20 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         n_calls = 0
         base_kwargs = self._llm_call_kwargs if llm_kwargs is None else llm_kwargs
 
-        async def send(p: str, thinking: bool) -> LLMResponse:
-            kw = base_kwargs if thinking else no_thinking_kwargs(base_kwargs)
-            return await rchat.chat(p, **kw)
+        async def send(p: str, thinking: bool, cap: int | None) -> LLMResponse:
+            kw = capped_kwargs(base_kwargs, cap)
+            return await rchat.chat(p, **(kw if thinking else no_thinking_kwargs(kw)))
 
         async def call(p: str) -> LLMResponse:
             nonlocal n_calls
             t0 = time.time()
-            if clock is None:
-                resp = await rchat.chat(p, **base_kwargs)
-            else:
-                resp = await clock.run(lambda thinking: send(p, thinking))
+            with self._llm_role_as(role):
+                if clock is None:
+                    resp = await rchat.chat(p, **base_kwargs)
+                else:
+                    resp = await clock.run(
+                        lambda thinking, cap: send(p, thinking, cap)
+                    )
             self._track_api_request_time(t0)
             self._update_subagent_metrics(resp.usage)
             self._collect_subagent_rollout_detail(resp)
@@ -1161,7 +1175,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             reason = (
                 "the reader's context limit was exceeded"
                 if context_exceeded
-                else "the reader did not finish within its time limit"
+                else "the reader did not finish within its limit"
                 if timed_out
                 else "the reader did not return a result within its step budget"
             )
@@ -1449,6 +1463,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                     "reader_max_steps": self._reader_max_steps,
                     "reader_max_chars": self._reader_max_chars,
                     "reader_timeout_sec": self._reader_timeout_sec,
+                    "reader_max_output_tokens": self._reader_max_output_tokens,
                     "reader_thinking": self._reader_thinking,
                     "reader_fallback": self._reader_fallback,
                     "reader_thinking_fallbacks": sum(

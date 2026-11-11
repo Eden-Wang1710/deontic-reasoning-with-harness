@@ -38,23 +38,24 @@
 #          (v1 of both = rv-smoke1 only; --ak solver_skill_path=... derivation_template=... to swap).
 #          Tunables via --ak: reader_max_steps=3 reader_max_chars=16000 max_unverified_claims=2
 #          verifier_max_steps=4 verifier_max_tokens=<none> (rv-run1-numeric: 3 and 6000).
-#          Wall-clock limits per sub-agent run (since 2026-11-10, claude_docs/09 §10.9; at the
-#          limit the model call in flight is sent again without thinking, once):
-#          reader_timeout_sec=180 reader_thinking=true reader_fallback=true
-#          verifier_timeout_sec=300 verifier_thinking=true verifier_fallback=true
-#          (rv-run1-numeric and the rvc-smoke runs had none: --ak reader_timeout_sec=none
-#          --ak verifier_timeout_sec=none).
+#          Output-token limits per sub-agent run (since 2026-11-11, claude_docs/09 §10.12; at
+#          the limit the model call is sent again without thinking, once):
+#          reader_max_output_tokens=8000 reader_thinking=true reader_fallback=true
+#          verifier_max_output_tokens=12000 verifier_thinking=true verifier_fallback=true
+#          (none = no limit). The wall-clock limits of 2026-11-10 (§10.9) are off; they were
+#          --ak reader_timeout_sec=180 --ak verifier_timeout_sec=300, used by rvc-run1-numeric.
 #   t2rvc = reader-verifier-compactor harness (claude_docs/09 §10): t2rv plus a compactor
 #          sub-agent ("subagent": {"name": "compactor"}, tools/skills/compactor_v1/SKILL.md) that
 #          selects rule-file line ranges and solver steps; the harness then rebuilds the solver's
 #          context as task + one state page (tools/dar_terminus2_compactor.py). Solver prompt =
-#          templates/terminus-json-multiagent-v3.txt + skills/solver_v3/SKILL.md. Verifier: no
-#          output cap, verifier_max_steps=3, the t2rv time limits. Jobs under
+#          templates/terminus-json-multiagent-v3.txt + skills/solver_v3/SKILL.md. Verifier:
+#          verifier_max_steps=3, the t2rv limits. Jobs under
 #          jobs/<model>/t2rvc-<framing>/.
 #          Tunables via --ak: compact_after_report=hint|auto|off compactor_max_chars=14000
 #          compactor_min_tokens=8000 compactor_hint_tokens=16000 compactor_force_tokens=30000
 #          max_compactions=3 compactor_max_steps=1 compactor_keep_steps=4
-#          compactor_timeout_sec=180 compactor_thinking=true compactor_fallback=true.
+#          compactor_max_output_tokens=4000 compactor_thinking=true compactor_fallback=true
+#          (compactor_timeout_sec=180 until 2026-11-10, now off).
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
@@ -71,8 +72,24 @@
 #   one SARA subdomain (smoke tests), all = no filter
 #
 # Settings (decided 2026-10-15, see claude_docs/04 decision log):
-#   agent terminus-2, 4 concurrent trials, agent timeout 600 s x 3,
+#   agent terminus-2, 4 concurrent trials,
 #   64k context split as 49,152 input + 16,384 output tokens per turn.
+#
+# Stopping (decided 2026-11-11, claude_docs/04 decision log and claude_docs/09 §10.12): no
+# wall-clock limit decides a result; the second metric is inference cost
+# (tools/inference_cost.py, price card in tools/pricing/).
+#   COST_BUDGET_USD (default 0.15): a trial stops before its next solver step once its model
+#       calls cost this much at the no-cache price; the answer file is graded as it is.
+#       Applies to t2fix, t2verify*, t2rv, t2rvc (tools/dar_cost_ledger.py); "none" = no budget.
+#   MAX_TOKENS (default 16384): output-token cap of every model call, the per-turn limit above,
+#       now sent with each request. Until 2026-11-11 it was only the server's default
+#       (serve_qwen35_35b.sh, max_new_tokens), and the bound that fired first was the 600 s
+#       request timeout of litellm: at 17-25 output tokens/s that is 10k-15k tokens.
+#   REQUEST_TIMEOUT (default 7200 s) and AGENT_TIMEOUT_MULT (default 24, i.e. 600 s x 24 = 4 h
+#       per trial) are safety nets against a hung server. A trial that reaches one is an
+#       infrastructure failure and is run again, not scored.
+#   Runs before 2026-11-11 used agent timeout 600 s x 3, litellm's 600 s request timeout,
+#   no output cap and no budget.
 set -euo pipefail
 
 FRAMING="${1:?framing: direct | zeroshot | fewshot}"; shift || true
@@ -85,9 +102,14 @@ case "$SUBSET" in
   *) echo "unknown SUBSET=$SUBSET (sara|numeric|binary|all)" >&2; exit 1 ;;
 esac
 MODEL_INFO='{"max_input_tokens": 49152, "max_output_tokens": 16384, "max_tokens": 65536, "input_cost_per_token": 0.0, "output_cost_per_token": 0.0}'
+COST_BUDGET_USD="${COST_BUDGET_USD:-0.15}"
+MAX_TOKENS="${MAX_TOKENS:-16384}"
+REQUEST_TIMEOUT="${REQUEST_TIMEOUT:-7200}"
+AGENT_TIMEOUT_MULT="${AGENT_TIMEOUT_MULT:-24}"
+BUDGET_ARGS="--ak cost_budget_usd=$COST_BUDGET_USD"   # agents built on tools/dar_cost_ledger.py
 AGENT="${AGENT:-t2}"
 case "$AGENT" in
-  t2)   AGENT_ARGS="--agent terminus-2"; JOBS="jobs/qwen3.5-35b-a3b/$FRAMING" ;;
+  t2)   AGENT_ARGS="--agent terminus-2"; JOBS="jobs/qwen3.5-35b-a3b/$FRAMING"; BUDGET_ARGS="" ;;
   t2fix) AGENT_ARGS="--agent-import-path dar_terminus2_local:Terminus2TruthfulMarker"
         JOBS="jobs/qwen3.5-35b-a3b/t2fix-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -125,6 +147,7 @@ case "$AGENT" in
         JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
+        BUDGET_ARGS=""
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
   *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|t2rv|t2rvc|kira)" >&2; exit 1 ;;
 esac
@@ -133,13 +156,14 @@ N_CONCURRENT="${N_CONCURRENT:-4}"
 cd "$(dirname "$0")/../harbor-deonticbench"
 exec sg docker -c "$HOME/.local/bin/uv run harbor run \
   --path datasets/deonticbench-$FRAMING \
-  $AGENT_ARGS \
+  $AGENT_ARGS $BUDGET_ARGS \
   --model hosted_vllm/qwen3.5-35b-a3b \
   --ak api_base=http://172.17.0.1:9009/v1 \
-  --ak llm_kwargs='{\"api_key\": \"token-abc123\"}' \
+  --ak llm_kwargs='{\"api_key\": \"token-abc123\", \"timeout\": $REQUEST_TIMEOUT}' \
+  --ak llm_call_kwargs='{\"max_tokens\": $MAX_TOKENS}' \
   --ak model_info='$MODEL_INFO' \
   --n-concurrent $N_CONCURRENT \
-  --agent-timeout-multiplier 3 \
+  --agent-timeout-multiplier $AGENT_TIMEOUT_MULT \
   --jobs-dir $JOBS \
   $INCLUDE \
   $*"

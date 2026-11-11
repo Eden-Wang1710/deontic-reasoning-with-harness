@@ -14,8 +14,12 @@ Decision 2026-10-16 (claude_docs/04 §8, option "c"): keep the 10,000-byte limit
 part of the DAR task design (the agent is expected to navigate the statute with shell
 tools), but make the marker truthful. This subclass makes ``_limit_output_length``
 idempotent: text that already carries a marker is returned unchanged, so the model sees
-the true number of omitted bytes from the first pass. Nothing else is changed; prompts,
-parsing, sampling and the loop are inherited.
+the true number of omitted bytes from the first pass. Prompts, parsing and sampling are
+inherited.
+
+Since 2026-11-11 the class also keeps a ledger of its model calls and accepts a cost budget
+(``--ak cost_budget_usd=0.15``) that ends the trial; both come from ``CostLedgerMixin`` in
+``tools/dar_cost_ledger.py`` and are shared by every harness derived from this class.
 
 Usage (from ``harbor-deonticbench/``, with ``tools/`` on PYTHONPATH):
 
@@ -28,13 +32,16 @@ import re
 
 from harbor.agents.terminus_2.terminus_2 import Terminus2
 
+from dar_cost_ledger import CostLedgerMixin
+
 MARKER_RE = re.compile(
     r"\[\.\.\. output limited to \d+ bytes; \d+ interior bytes omitted \.\.\.\]"
 )
 
 
-class Terminus2TruthfulMarker(Terminus2):
-    """Terminus2 whose output limiter is idempotent (see module docstring)."""
+class Terminus2TruthfulMarker(CostLedgerMixin, Terminus2):
+    """Terminus2 whose output limiter is idempotent, with a call ledger and a cost budget
+    (see module docstring)."""
 
     @staticmethod
     def name() -> str:
