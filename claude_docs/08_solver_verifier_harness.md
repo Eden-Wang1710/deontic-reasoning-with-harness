@@ -777,3 +777,12 @@ run-2's first-claim benefit, while the time it saved is what turned timeouts int
    of clock with 2 right answers in the file; the 1,800 s clock, not the verifier, now sets
    the numeric ceiling.
 
+## 10. Rerun without time-outs: `sv-cost1-numeric` (2026-11-12)
+
+The run-3 configuration (`AGENT=t2verify3`) was run again on the 35 SARA numeric tasks under
+the protocol of [09](09_reader_verifier_harness.md) §10.12: no time limits, a cost budget of
+0.15 USD per task, `max_tokens=16384` per call, inference cost as the second metric. ✅ 15/35
+correct (run-3: 16/35 on the same tasks, 7 lost and 6 gained), no exception, no budget stop,
+7.07 cents per task without a cache and 4.99 with the simulated cache, 4.04 and 3.25 times the
+baseline `t2fix-cost1-numeric` (2/35, 1.75 cents). The verifier takes 40 % of the cost. The
+comparison with the reader-verifier-compactor run and the caveats are in `09` §10.12.

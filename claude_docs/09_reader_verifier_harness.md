@@ -8,7 +8,10 @@
   conversation. Version 2 adds a **compactor** sub-agent that rebuilds the solver's context;
   it is implemented since 2026-11-10 (§10). Each sub-agent run has a limit with one fallback
   to no thinking: seconds until 2026-11-10 (§10.9), output tokens since 2026-11-11, when
-  time-outs were dropped and inference cost became the second metric (§10.12). First full run `rvc-run1-numeric` (§10.10): 13 of 35
+  time-outs were dropped and inference cost became the second metric (§10.12). Reruns under
+  that protocol (§10.12, 2026-11-12): baseline 2/35 at 1.75 cents per task, solver-verifier
+  15/35 at 7.07, reader-verifier-compactor 17/35 at 6.51 (the compactor was called once, so
+  that run does not test it). First full run `rvc-run1-numeric` (§10.10): 13 of 35
   file-graded, the same as `rv-run1-numeric`, with 14 timeouts instead of 6.
   Error attribution of that run in §10.11: 12 of its 22 failures are tasks the model solves in
   another configuration, 10 are not; the solver omits provisions it never asked the reader
@@ -1243,8 +1246,62 @@ tasks, means per task, cost in US cents):
 - 🔶 The server does not report cached prompt tokens (`prompt_tokens_details` is empty), so
   the simulated cache cannot be checked against vLLM's own prefix cache from these logs.
 
-**Reruns under this protocol** (started 2026-11-11 23:27 UTC, 35 SARA numeric tasks each, in
-parallel on one server): `t2fix-direct/t2fix-cost1-numeric` (baseline),
-`t2verify-direct/sv-cost1-numeric` (solver-verifier, the run-3 configuration of `08`; its
-verifier has no token limit, as in run-3) and `t2rvc-direct/rvc-cost1-numeric`. Results
-are added here when they are in.
+**Reruns under this protocol** (✅ 2026-11-12; started 2026-11-11 23:27 UTC, finished 09:28
+UTC, 35 SARA numeric tasks each, one draw, code at commit `14d746a9`, the three jobs in parallel
+on one server with 2 + 3 + 3 concurrent trials; the watchdog stopped vLLM at the end):
+`t2fix-direct/t2fix-cost1-numeric` (baseline), `t2verify-direct/sv-cost1-numeric`
+(solver-verifier, the run-3 configuration of `08`; its verifier has no token limit, as in
+run-3) and `t2rvc-direct/rvc-cost1-numeric` (all defaults, so `compact_after_report=hint`).
+Numbers from `tools/inference_cost.py` (per-trial rows in
+`outputs/cost1_numeric_inference_cost.json`) and `tools/rv_run_report.py`.
+
+| Run | Correct | Wilson 95 % | Calls | Input | Output | No cache (¢) | × base | Cache (¢) | × base | p95 (¢) | Max (¢) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| baseline `t2fix-cost1-numeric` | 2/35 | 1.6–18.6 % | 5.8 | 30,216 | 13,261 | 1.75 | 1.00 | 1.54 | 1.00 | 3.75 | 4.54 |
+| solver-verifier `sv-cost1-numeric` | 15/35 | 28.0–59.1 % | 26.2 | 267,736 | 33,236 | 7.07 | 4.04 | 4.99 | 3.25 | 12.20 | 12.82 |
+| reader-verifier-compactor `rvc-cost1-numeric` | 17/35 | 33.0–64.4 % | 30.5 | 218,520 | 34,486 | 6.51 | 3.72 | 4.92 | 3.20 | 10.51 | 11.59 |
+
+Means per task; p95 and max are of the no-cache cost per trial.
+
+- **The protocol held.** No trial of the 105 ended with an exception, none hit a safety net,
+  and the ledger totals equal `result.json` in all of them. No trial reached the cost budget:
+  the most expensive one spent 12.8 cents, and three trials of each harness spent more than 10.
+- **Both harnesses cost 3.7 to 4.0 times the baseline without a cache and 3.2 to 3.3 times with
+  one.** The two harnesses are 0.6 cents apart without a cache and equal with one.
+- **Accuracy: the two harnesses are not distinguishable** (17 against 15; 5 tasks only the
+  reader-verifier-compactor run solves, 3 only the solver-verifier run). Both are far above
+  the baseline (15 and 14 tasks gained, 0 and 1 lost).
+- **Against the runs with time-outs**: solver-verifier 16/35 before, 15/35 now (7 tasks lost,
+  6 gained); reader-verifier-compactor 13/35 before, 17/35 now (2 lost, 6 gained; exact
+  McNemar p = 0.29). Of the 14 tasks that timed out in `rvc-run1-numeric`, all now end with a
+  graded answer.
+- 🔶 **The compactor was not exercised in this run.** With `compact_after_report=hint` the
+  solver called it once in 35 trials (one rebuild, 16,030 to 5,778 prompt tokens);
+  `rvc-run1-numeric` ran with `auto` and had 24 calls. So the gain of four tasks over
+  `rvc-run1-numeric` comes with two changes at once (no time-outs, and almost no
+  compaction), and this run is in effect a reader-verifier run. A run with `auto` under this
+  protocol is needed before anything is said about the compactor.
+- 🔶 **The baseline moved from 7/35 (`sara-t2fix-run1`) to 2/35** with a configuration that
+  differs only in the three new settings (budget, explicit `max_tokens`, request timeout).
+  Every trial of both runs wrote a number; the two runs give the same number on 10 of 35
+  tasks; 5 tasks were lost and none gained (exact McNemar p = 0.06). No mechanical difference
+  was found, so this reads as the spread of a single draw at temperature 0.7, and the two
+  draws together give 9/70 (12.9 %, Wilson 6.9–22.7 %). The cost of the baseline is stable
+  (1.59 and 1.75 cents). One draw per configuration is not enough to state the accuracy gain
+  as one number.
+- **Token limits**: in the reader-verifier-compactor run 10 of 115 reader calls and 8 of 67
+  verifier rounds reached their limit while thinking; all 18 finished after the fallback, none
+  ended without a result. In `rvc-run1-numeric`, under the limits in seconds, 23 of 92 reader
+  calls and 34 of 50 verifier rounds fell back. In the solver-verifier run 4 verifier replies
+  and 2 solver replies were cut at the 16,384-token call cap.
+- **Cost by role**, reader-verifier-compactor: solver 2.50 cents (38 %), verifier 2.24 (34 %),
+  reader 1.75 (27 %), compactor 0.02. Solver-verifier: solver 4.27 (60 %), verifier 2.80 (40 %).
+  The reader takes rule text out of the solver's context: the solver's input falls from 178,603
+  to 116,841 tokens per task and its output from 17,724 to 8,690.
+- **Cost per correct answer** (derived: total no-cache cost divided by correct answers): 30.6
+  cents for the baseline of this draw (13.0 with the two baseline draws pooled), 16.5 for
+  solver-verifier, 13.4 for reader-verifier-compactor.
+- **Time, for the record only**: median trial 16, 47 and 50 minutes; 5, 33 and 29 trials ran
+  longer than the 30 minutes of the old protocol. The three jobs shared the server (eight
+  concurrent requests), so these durations say nothing about the harnesses. This is the reason
+  time is no longer a limit or a metric.

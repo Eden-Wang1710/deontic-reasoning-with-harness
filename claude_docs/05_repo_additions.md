@@ -92,7 +92,9 @@ deontic-reasoning-with-harness/
 │   ├── inference_cost.py            inference cost of job dirs: tokens and cents per task and per role,
 │   │                            without a cache and with a simulated prompt cache inside each trial,
 │   │                            as a multiple of a baseline job; reads the ledger, or the debug logs
-│   │                            and sub-agent trajectories of runs made before it (09 §10.12)
+│   │                            and sub-agent trajectories of runs made before it (09 §10.12);
+│   │                            --json wrote outputs/cost1_numeric_inference_cost.json (the three
+│   │                            reruns of 2026-11-12, per trial and per role)
 │   ├── rv_run_report.py             aggregate numbers of a t2rv/t2rvc numeric run vs a baseline run:
 │   │                            accuracy with intervals, paired comparison, time per role, time-limit
 │   │                            fallbacks, compactions, what follows the first verifier report;
