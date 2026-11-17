@@ -1,0 +1,16 @@
+{
+  "model": "qwen/qwen3.8-27b",
+  "source": "OpenRouter listing price on 2026-11-17; raw responses in openrouter_qwen3.8-27b_2026-11-17.json",
+  "fetched": "2026-11-17",
+  "usd_per_million_tokens": {
+    "input": 0.15,
+    "output": 1.875,
+    "cache_read": 0.0375
+  },
+  "notes": [
+    "Used only to report the cost of Qwen3.8-27B runs at the model's own price (pass with --price-card).",
+    "During a run the per-task cost budget is still computed with price_card.json (the Qwen3.5-35B-A3B card), so that every model gets the same token allowance.",
+    "Reasoning tokens are billed as output tokens.",
+    "Implicit prompt caching: a cached prompt prefix is billed at cache_read, there is no cache-write fee."
+  ]
+}

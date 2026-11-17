@@ -40,7 +40,7 @@ exec "$PY/vllm" serve "$MODEL_DIR" \
   --api-key token-abc123 \
   --dtype bfloat16 \
   --max-model-len 65536 \
-  --max-num-seqs 8 \
+  --max-num-seqs "${MAX_NUM_SEQS:-8}" \
   --gpu-memory-utilization 0.75 \
   --reasoning-parser qwen3 \
   --enable-auto-tool-choice --tool-call-parser qwen3_xml \
