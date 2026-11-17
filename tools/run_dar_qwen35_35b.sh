@@ -56,6 +56,19 @@
 #          max_compactions=3 compactor_max_steps=1 compactor_keep_steps=4
 #          compactor_max_output_tokens=4000 compactor_thinking=true compactor_fallback=true
 #          (compactor_timeout_sec=180 until 2026-11-10, now off).
+#   t2sc = solver-checks harness (claude_docs/10_solver_checks_harness.md): no compactor; the
+#          rule document is in the solver's first message when it has at most
+#          rule_inline_max_chars characters (otherwise the reader is used), and the verifier is
+#          a list of skill-defined checks, each an independent sub-agent call with the task and
+#          the rule document first in its prompt (tools/dar_terminus2_checks.py). Solver prompt
+#          = templates/terminus-json-multiagent-v4.txt + skills/solver_v4/SKILL.md; checks =
+#          skills/check_<name>_v1/SKILL.md with the shared skills/check_report_v1/FORMAT.md.
+#          Jobs under jobs/<model>/t2sc-<framing>/.
+#          Tunables via --ak: checks=section_table,fact_table,grounded_reasoning (add "process"
+#          for the optional process check) rule_inline_max_chars=60000 check_max_steps=1
+#          check_max_steps_file=6 check_max_output_tokens=8000 check_thinking=true
+#          check_fallback=true max_verify_rounds=3 max_unverified_claims=2
+#          answer_headings="## Sections,## Facts,## Reasoning,## Answer" max_format_rejections=2.
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
@@ -64,12 +77,17 @@
 #   AGENT=t2verify tools/run_dar_qwen35_35b.sh direct                   # t2fix + rubric verifier
 #   AGENT=t2rv tools/run_dar_qwen35_35b.sh direct                        # reader-verifier harness
 #   AGENT=t2rvc SUBSET=numeric tools/run_dar_qwen35_35b.sh direct        # + compactor
+#   AGENT=t2sc SUBSET=binary tools/run_dar_qwen35_35b.sh direct          # solver-checks harness
 #   tools/run_dar_qwen35_35b.sh direct                                  # SARA numeric + binary (65 tasks)
 #   SUBSET=all tools/run_dar_qwen35_35b.sh direct                       # all 173 tasks
 #
 # SUBSET (default "sara") selects subdomains by task-name glob:
 #   sara = sara-numeric + sara-binary (decision 2026-10-15: only SARA for now), numeric / binary =
 #   one SARA subdomain (smoke tests), all = no filter
+#
+# MODEL (default qwen3.5-35b-a3b) is the served model name (SERVED_NAME of
+#   serve_qwen35_35b.sh); jobs go under jobs/$MODEL/. Example for another local model:
+#   MODEL=qwen3.8-27b AGENT=t2sc SUBSET=numeric tools/run_dar_qwen35_35b.sh direct
 #
 # Settings (decided 2026-10-15, see claude_docs/04 decision log):
 #   agent terminus-2, 4 concurrent trials,
@@ -107,49 +125,55 @@ MAX_TOKENS="${MAX_TOKENS:-16384}"
 REQUEST_TIMEOUT="${REQUEST_TIMEOUT:-7200}"
 AGENT_TIMEOUT_MULT="${AGENT_TIMEOUT_MULT:-24}"
 BUDGET_ARGS="--ak cost_budget_usd=$COST_BUDGET_USD"   # agents built on tools/dar_cost_ledger.py
+MODEL="${MODEL:-qwen3.5-35b-a3b}"   # served model name; also the directory under jobs/
 AGENT="${AGENT:-t2}"
 case "$AGENT" in
-  t2)   AGENT_ARGS="--agent terminus-2"; JOBS="jobs/qwen3.5-35b-a3b/$FRAMING"; BUDGET_ARGS="" ;;
+  t2)   AGENT_ARGS="--agent terminus-2"; JOBS="jobs/$MODEL/$FRAMING"; BUDGET_ARGS="" ;;
   t2fix) AGENT_ARGS="--agent-import-path dar_terminus2_local:Terminus2TruthfulMarker"
-        JOBS="jobs/qwen3.5-35b-a3b/t2fix-$FRAMING"
+        JOBS="jobs/$MODEL/t2fix-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   t2verify) AGENT_ARGS="--agent-import-path dar_terminus2_verifier:Terminus2RubricVerifier"
-        JOBS="jobs/qwen3.5-35b-a3b/t2verify-$FRAMING"
+        JOBS="jobs/$MODEL/t2verify-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   t2verify2) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         AGENT_ARGS="--agent-import-path dar_terminus2_verifier:Terminus2RubricVerifier \
           --ak derivation_record=true --ak report_confidence=false --ak packet_mode=index \
           --ak skill_path=$TOOLS_DIR/skills/rubric_verifier_v2/SKILL.md"
-        JOBS="jobs/qwen3.5-35b-a3b/t2verify-direct"
+        JOBS="jobs/$MODEL/t2verify-direct"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   t2verify3) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         AGENT_ARGS="--agent-import-path dar_terminus2_verifier:Terminus2RubricVerifier \
           --ak derivation_record=true --ak report_confidence=false --ak packet_mode=index \
           --ak derivation_template=$TOOLS_DIR/templates/terminus-json-plain-derivation-v2.txt \
           --ak skill_path=$TOOLS_DIR/skills/rubric_verifier_v3/SKILL.md --ak verifier_max_steps=4"
-        JOBS="jobs/qwen3.5-35b-a3b/t2verify-direct"
+        JOBS="jobs/$MODEL/t2verify-direct"
         N_CONCURRENT="${N_CONCURRENT:-2}"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   t2rv) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         AGENT_ARGS="--agent-import-path dar_terminus2_multiagent:Terminus2ReaderVerifier"
-        JOBS="jobs/qwen3.5-35b-a3b/t2rv-$FRAMING"
+        JOBS="jobs/$MODEL/t2rv-$FRAMING"
         N_CONCURRENT="${N_CONCURRENT:-2}"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   t2rvc) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         AGENT_ARGS="--agent-import-path dar_terminus2_compactor:Terminus2ReaderVerifierCompactor \
           --ak verifier_max_steps=3"
-        JOBS="jobs/qwen3.5-35b-a3b/t2rvc-$FRAMING"
+        JOBS="jobs/$MODEL/t2rvc-$FRAMING"
+        N_CONCURRENT="${N_CONCURRENT:-2}"
+        export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
+  t2sc) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        AGENT_ARGS="--agent-import-path dar_terminus2_checks:Terminus2SolverChecks"
+        JOBS="jobs/$MODEL/t2sc-$FRAMING"
         N_CONCURRENT="${N_CONCURRENT:-2}"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
   kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
-        JOBS="jobs/qwen3.5-35b-a3b/kira-$FRAMING"
+        JOBS="jobs/$MODEL/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         BUDGET_ARGS=""
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
-  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|t2rv|t2rvc|kira)" >&2; exit 1 ;;
+  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|t2rv|t2rvc|t2sc|kira)" >&2; exit 1 ;;
 esac
 N_CONCURRENT="${N_CONCURRENT:-4}"
 
@@ -157,7 +181,7 @@ cd "$(dirname "$0")/../harbor-deonticbench"
 exec sg docker -c "$HOME/.local/bin/uv run harbor run \
   --path datasets/deonticbench-$FRAMING \
   $AGENT_ARGS $BUDGET_ARGS \
-  --model hosted_vllm/qwen3.5-35b-a3b \
+  --model hosted_vllm/$MODEL \
   --ak api_base=http://172.17.0.1:9009/v1 \
   --ak llm_kwargs='{\"api_key\": \"token-abc123\", \"timeout\": $REQUEST_TIMEOUT}' \
   --ak llm_call_kwargs='{\"max_tokens\": $MAX_TOKENS}' \

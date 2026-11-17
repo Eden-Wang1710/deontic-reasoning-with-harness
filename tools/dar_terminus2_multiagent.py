@@ -67,7 +67,7 @@ import time
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 from harbor.agents.terminus_2.terminus_2 import Command
 from harbor.agents.terminus_2.tmux_session import TmuxSession
@@ -847,19 +847,32 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         output_limit: int = READER_OUTPUT_LIMIT,
         llm_kwargs: dict | None = None,
         clock: SubagentClock | None = None,
+        prefix: str = "",
+        validate: Callable[[dict], str | None] | None = None,
+        lift: Callable[[dict], dict | None] | None = None,
     ) -> dict[str, Any]:
         """Command-step loop of a sub-agent that answers with a JSON ``result`` object.
 
-        Shared by the reader and the compactor: a fresh context (skill + packet), up to
-        ``max_steps`` command steps executed in the container, then ``result``; if the steps
-        run out, ``closing`` asks for the result (one retry on a parse failure). With a
-        ``clock`` the run is bounded by its limits (completion tokens, wall clock); when the
-        clock gives up, the run ends with ``result`` None and ``timed_out`` true."""
+        Shared by the reader, the compactor and the checks of dar_terminus2_checks.py: a
+        fresh context (skill + packet), up to ``max_steps`` command steps executed in the
+        container, then ``result``; if the steps run out, ``closing`` asks for the result
+        (one retry on a parse failure). With a ``clock`` the run is bounded by its limits
+        (completion tokens, wall clock); when the clock gives up, the run ends with
+        ``result`` None and ``timed_out`` true.
+
+        ``prefix`` is put before the skill: text that several sub-agent runs share (the
+        task, the rule document), so that their prompts have a common prefix for the prompt
+        cache. ``validate`` returns a problem description for a ``result`` it does not
+        accept; the sub-agent is told once and may send a corrected result (the second
+        result is returned as it is, the caller decides what an invalid one means). ``lift``
+        is asked for the result when a reply has no ``result`` object, for a sub-agent that
+        writes the fields of its result at the top level of the reply."""
         rchat = Chat(self._llm, interleaved_thinking=self._interleaved_thinking)
         rsteps: list[Step] = []
         session_id = str(uuid.uuid4())
         prompt = (
-            skill_text
+            prefix
+            + skill_text
             + "\n\n"
             + packet
             + "\n\nBegin. Respond with exactly one JSON object as described in the skill."
@@ -873,7 +886,17 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         context_exceeded = False
         timed_out = False
         n_calls = 0
+        repairs: list[str] = []
         base_kwargs = self._llm_call_kwargs if llm_kwargs is None else llm_kwargs
+        repair_request = (
+            "Your result was not accepted: {problem} Reply once more with exactly one JSON "
+            'object whose "result" is corrected and complete.'
+        )
+
+        def pick(parsed: dict) -> dict | None:
+            if isinstance(parsed.get("result"), dict):
+                return parsed["result"]
+            return lift(parsed) if lift else None
 
         async def send(p: str, thinking: bool, cap: int | None) -> LLMResponse:
             kw = capped_kwargs(base_kwargs, cap)
@@ -917,8 +940,16 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                 self._append_verifier_step(rsteps, resp, [], observation)
                 prompt = observation
                 continue
-            if isinstance(parsed.get("result"), dict):
-                result = parsed["result"]
+            picked = pick(parsed)
+            if picked is not None:
+                problem = validate(picked) if validate else None
+                if problem and not repairs:
+                    repairs.append(problem)
+                    observation = repair_request.format(problem=problem)
+                    self._append_verifier_step(rsteps, resp, [], observation)
+                    prompt = observation
+                    continue
+                result = picked
                 self._append_verifier_step(rsteps, resp, [], None)
                 break
             cmds = parsed.get("commands") or []
@@ -954,9 +985,10 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                 "and nothing else."
             )
             prompt_text: str | None = closing
+            message = closing
             for attempt in range(2):
                 try:
-                    resp = await call(closing if attempt == 0 else retry)
+                    resp = await call(message)
                 except ContextLengthExceededError:
                     context_exceeded = True
                     break
@@ -964,13 +996,24 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                     timed_out = True
                     break
                 parsed = _extract_json_object(resp.content)
-                if parsed and isinstance(parsed.get("result"), dict):
-                    result = parsed["result"]
+                picked = pick(parsed) if parsed else None
+                if picked is not None:
+                    problem = validate(picked) if validate else None
+                    if problem and not repairs and attempt == 0:
+                        repairs.append(problem)
+                        message = repair_request.format(problem=problem)
+                        self._append_verifier_step(
+                            rsteps, resp, [], message, prompt_text=prompt_text
+                        )
+                        prompt_text = None
+                        continue
+                    result = picked
                     self._append_verifier_step(
                         rsteps, resp, [], None, prompt_text=prompt_text
                     )
                     break
                 parse_failures += 1
+                message = retry
                 self._append_verifier_step(
                     rsteps, resp, [], retry, prompt_text=prompt_text
                 )
@@ -989,6 +1032,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             "context_exceeded": context_exceeded,
             "timed_out": timed_out,
             "n_calls": n_calls,
+            "repairs": repairs,
         }
 
     async def _exec_capped(self, environment, command: str, limit: int) -> str:

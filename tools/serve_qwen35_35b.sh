@@ -13,6 +13,9 @@
 # --enable-prefix-caching. vLLM disables automatic prefix caching by default for this hybrid
 # (Gated DeltaNet + attention) model; the hit rate was 0.0 % in every run before run-2
 # (claude_docs/08 §7.2). Set PREFIX_CACHE=0 to reproduce the earlier server configuration.
+# Another local model of the same family (2026-11-17, Qwen3.8-27B):
+#   MODEL_DIR=$HOME/models/Qwen3.8-27B SERVED_NAME=qwen3.8-27b LOG=$HOME/vllm_logs/qwen38-27b.log \
+#     tools/serve_qwen35_35b.sh
 set -euo pipefail
 PREFIX_CACHE="${PREFIX_CACHE:-1}"
 EXTRA_ARGS=""
@@ -20,6 +23,7 @@ if [ "$PREFIX_CACHE" = "1" ]; then EXTRA_ARGS="--enable-prefix-caching"; fi
 
 MODEL_DIR="${MODEL_DIR:-$HOME/models/Qwen3.5-35B-A3B}"
 PORT="${PORT:-9009}"
+SERVED_NAME="${SERVED_NAME:-qwen3.5-35b-a3b}"
 LOG="${LOG:-$HOME/vllm_logs/qwen35-35b-a3b.log}"
 PY="$HOME/miniconda3/envs/myenv/bin"
 
@@ -31,7 +35,7 @@ export PATH="$PY:$CUDA_HOME/bin:$PATH"   # ninja lives in the conda env
 export XDG_CACHE_HOME="$HOME/.cache"
 export MAX_JOBS=4   # cap ninja parallelism: each nvcc/cicc takes ~8 GB RAM next to the loaded model
 exec "$PY/vllm" serve "$MODEL_DIR" \
-  --served-model-name qwen3.5-35b-a3b \
+  --served-model-name "$SERVED_NAME" \
   --host 0.0.0.0 --port "$PORT" \
   --api-key token-abc123 \
   --dtype bfloat16 \
