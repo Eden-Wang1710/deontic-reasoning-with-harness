@@ -598,3 +598,22 @@ Prompt-based direct (run 3, DeonticBench): statute fully in the prompt; `n = 4` 
 T 0.7; DeonticBench's own scorer uses ±$1 on numeric answers, so for the DAR comparison the
 outputs must be re-scored with exact match (decision 2026-10-14 in
 [04](04_initial_proposal.md) §8).
+
+## 2. Qwen3.8-27B (self-hosted on 0238)
+
+### 2.1 Model and serving ✅ 2026-11-17
+
+Served for one run of the solver-checks harness ([10](10_solver_checks_harness.md) §7.3). No
+baseline trajectory of this model exists yet.
+
+| Item | Value |
+|---|---|
+| Weights | `Qwen/Qwen3.8-27B` from HF, bf16 safetensors, 52 GB (18 shards), at `~/models/Qwen3.8-27B` on 0238. |
+| Architecture | `Qwen3_5ForConditionalGeneration` (`model_type: qwen3_5`, the same family code as Qwen3.5), **dense**: 64 layers, 16 full-attention + 48 linear-attention, hidden size 5120, 4 KV heads × 256 head-dim, native context 262,144. Has a vision tower (unused). |
+| Server | The same vLLM 0.20.1 and the same launcher with other values: `MODEL_DIR=~/models/Qwen3.8-27B SERVED_NAME=qwen3.8-27b MAX_NUM_SEQS=16 LOG=~/vllm_logs/qwen38-27b.log tools/serve_qwen35_35b.sh`. No other flag changed (bf16, `--reasoning-parser qwen3`, `--max-model-len 65536`, `--gpu-memory-utilization 0.75`, port 9009). |
+| Loading | Weights load in 324 s (50.2 GiB); the server answers about 7 min after start. GPU memory in use 88.5 GiB. KV cache 35.1 GiB = 533,754 tokens, i.e. 8.1 full 65,536-token sequences; 16 sequences fit because trial contexts stay far below the maximum (KV cache usage 11–19% with 16 running requests in the first 15 min). |
+| Sampling | `generation_config.json`: temperature 1.0, top_p 0.95, top_k 20; the harness sends `temperature: 0.7` as for Qwen3.5. Thinking on. |
+| Throughput | About **59 output tokens/s in total with 16 running requests** (89 ten-second samples of the first 15 min: mean 59.1, range 38–62), i.e. about 3.7 tokens/s per request; prefix cache hit rate 82%. The MoE Qwen3.5-35B-A3B gave 55–90 tokens/s with 8 requests, so each request is two to three times slower here. Lower concurrency was not measured 🔶. |
+| Time limit | A trial of the solver-checks harness writes about 54k output tokens (Qwen3.5 run), which at 3.7 tokens/s is about 4 h, the default agent limit (600 s × 24). The first start (15:03 UTC) was stopped after 16 min for that reason and the run restarted with `AGENT_TIMEOUT_MULT=96` (16 h), so that the cost budget stays the only stopping rule. |
+| Harness | `MODEL=qwen3.8-27b AGENT=t2sc SUBSET=numeric N_CONCURRENT=16 AGENT_TIMEOUT_MULT=96 tools/run_dar_qwen35_35b.sh direct --job-name sc-run1-numeric`; jobs under `harbor-deonticbench/jobs/qwen3.8-27b/`. |
+| Price | OpenRouter `qwen/qwen3.8-27b`, fetched 2026-11-17: 0.15 / 1.875 / 0.0375 USD per million input / output / cache-read tokens (`tools/pricing/price_card_qwen3.8-27b.json`). Used for reporting only ([04](04_initial_proposal.md) §8). |

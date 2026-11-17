@@ -42,9 +42,12 @@ deontic-reasoning-with-harness/
 │
 ├── tools/                        ✅ project-owned scripts; nothing of ours goes in the subtrees
 │   ├── serve_qwen35_35b.sh          start vLLM for Qwen3.5-35B-A3B on 0238 (bf16, thinking
-│   │                                parser, qwen3_xml tool parser, 16k max_new_tokens)
-│   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|t2verify{,2,3}|t2rv|t2rvc|kira,
-│   │                                SUBSET=sara|all; writes harbor-deonticbench/jobs/...
+│   │                                parser, qwen3_xml tool parser, 16k max_new_tokens); MODEL_DIR,
+│   │                                SERVED_NAME, MAX_NUM_SEQS and LOG serve another local model
+│   │                                (Qwen3.8-27B, 2026-11-17, 06)
+│   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|t2verify{,2,3}|t2rv|t2rvc|t2sc|kira,
+│   │                                SUBSET=sara|numeric|binary|all, MODEL=<served name>; writes
+│   │                                harbor-deonticbench/jobs/<MODEL>/...
 │   ├── dar_terminus2_local.py       Terminus2 subclass with a truthful truncation marker
 │   │                                (AGENT=t2fix): same 10 KB limit, idempotent limiter
 │   ├── dar_terminus2_verifier.py    Terminus2RubricVerifier (AGENT=t2verify): t2fix whose
@@ -86,15 +89,38 @@ deontic-reasoning-with-harness/
 │   │                            tokens, how the reply ended, prefix shared with earlier prompts) and
 │   │                            stops the trial at cost_budget_usd; writes agent/cost_budget.json
 │   │                            (claude_docs/09 §10.12)
+│   ├── dar_terminus2_checks.py      Terminus2SolverChecks (AGENT=t2sc, 2026-11-17): the solver-checks
+│   │                            harness. Rule document in the solver's first message when it is small,
+│   │                            verifier = a list of check skills, each a sub-agent with one report
+│   │                            format; the harness validates the shape, searches the rule document
+│   │                            for every quote, merges the reports and gates task_complete; rebuttal,
+│   │                            answer-format guard; logs under <trial>/agent/rubric_verifier/
+│   │                            (claude_docs/10)
+│   ├── skills/solver_v4/SKILL.md    solver skill of AGENT=t2sc: go through every top-level unit and
+│   │                            every case fact, four-section answer file, correct or rebut a finding
+│   ├── skills/check_report_v1/FORMAT.md  ground rules and report format shared by all checks (default);
+│   │                            check_report_v2/ reads the case text as complete (10 §6.3), passed with
+│   │                            --ak check_format_path=<abs path>
+│   ├── skills/check_<name>_v1/SKILL.md  the checks: section_table, fact_table, grounded_reasoning
+│   │                            (default list) and process (optional, reads the solver trajectory)
+│   ├── templates/terminus-json-multiagent-v4.txt  solver template of AGENT=t2sc ({rule_document} slot
+│   │                            before the skill)
+│   ├── sc_run_report.py             summary of a t2sc job: accuracy, finish reasons, rounds, check status
+│   │                            by round, quote checks, repairs and fallbacks, tokens per check,
+│   │                            first report vs reward; --trials, --findings (10 §4)
 │   ├── pricing/price_card.json      the fixed price card of the inference-cost metric: USD per million
 │   │                            input / output / cache-read tokens (0.14 / 1.00 / 0.05); next to it the
 │   │                            OpenRouter responses it was read from, fetched 2026-11-11
+│   ├── pricing/price_card_qwen3.8-27b.json  OpenRouter price of qwen/qwen3.8-27b fetched 2026-11-17
+│   │                            (0.15 / 1.875 / 0.0375), for reporting only; the cost budget of a run
+│   │                            always uses price_card.json (10 §7.3)
 │   ├── inference_cost.py            inference cost of job dirs: tokens and cents per task and per role,
 │   │                            without a cache and with a simulated prompt cache inside each trial,
 │   │                            as a multiple of a baseline job; reads the ledger, or the debug logs
 │   │                            and sub-agent trajectories of runs made before it (09 §10.12);
 │   │                            --json wrote outputs/cost1_numeric_inference_cost.json (the three
 │   │                            reruns of 2026-11-12, per trial and per role)
+│   │                            and outputs/sc_run1_{numeric,binary}_inference_cost.json (10 §7)
 │   ├── rv_run_report.py             aggregate numbers of a t2rv/t2rvc numeric run vs a baseline run:
 │   │                            accuracy with intervals, paired comparison, time per role, time-limit
 │   │                            fallbacks, compactions, what follows the first verifier report;
@@ -158,6 +184,7 @@ serve_qwen35_35b.sh ──► vLLM at :9009 ◄── run_dar_qwen35_35b.sh ─�
                                    │            │ AGENT=t2verify* dar_terminus2_verifier.py (+ skills/rubric_verifier*, templates/)
                                    │            │ AGENT=t2rv      dar_terminus2_multiagent.py (+ skills/solver_v1, reader_v1, rubric_verifier_v4, templates/)
                                    │            │ AGENT=t2rvc     dar_terminus2_compactor.py (+ skills/solver_v3, compactor_v1, reader_v1, rubric_verifier_v4)
+                                   │            │ AGENT=t2sc      dar_terminus2_checks.py (+ skills/solver_v4, check_report_v1|v2, check_*_v1, templates/)
                                    │            └ AGENT=kira      dar_kira_local.py
                                    │
           verbalized_confidence.py ┘ (reads jobs/<...>/, writes outputs/verbalized_confidence/)

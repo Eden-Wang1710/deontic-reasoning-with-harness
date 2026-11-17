@@ -1,0 +1,1637 @@
+{
+  "price_usd_per_token": {
+    "input": 1.4e-07,
+    "output": 1e-06,
+    "cache_read": 5.0000000000000004e-08
+  },
+  "jobs": [
+    {
+      "job": "jobs/qwen3.5-35b-a3b/t2sc-direct/sc-run1-binary",
+      "n_trials": 30,
+      "accuracy": 0.7666666666666667,
+      "n_correct": 23.0,
+      "exceptions": 0,
+      "budget_exhausted": 1,
+      "cut_off_calls": 34,
+      "unknown_calls": 0,
+      "source": [
+        "ledger"
+      ],
+      "totals_differ_from_harbor": 0,
+      "mean": {
+        "calls": 15.6,
+        "input": 187149.8,
+        "cached": 158196.1,
+        "output": 29720.7,
+        "usd_no_cache": 0.055921672,
+        "usd_cache": 0.041684023
+      },
+      "usd_no_cache": {
+        "median": 0.04225502,
+        "p95": 0.12488954,
+        "max": 0.15694128
+      },
+      "usd_cache": {
+        "median": 0.032845485,
+        "p95": 0.09178142,
+        "max": 0.09405738
+      },
+      "roles": {
+        "solver": {
+          "calls": 278,
+          "input": 3891413,
+          "cached": 3391684,
+          "output": 195143,
+          "usd_no_cache": 0.7399408199999998,
+          "usd_cache": 0.4346892599999999
+        },
+        "verifier.section_table": {
+          "calls": 76,
+          "input": 692002,
+          "cached": 408103,
+          "output": 307411,
+          "usd_no_cache": 0.40429128,
+          "usd_cache": 0.36756201000000005
+        },
+        "verifier.fact_table": {
+          "calls": 59,
+          "input": 534811,
+          "cached": 491337,
+          "output": 198377,
+          "usd_no_cache": 0.27325054,
+          "usd_cache": 0.22903021
+        },
+        "verifier.grounded_reasoning": {
+          "calls": 55,
+          "input": 496268,
+          "cached": 454759,
+          "output": 190690,
+          "usd_no_cache": 0.26016752,
+          "usd_cache": 0.21923921000000005
+        }
+      },
+      "trials": [
+        {
+          "trial": "deonticbench-direct-sara-binary__28AyaFx",
+          "task": "deonticbench-direct-sara-binary-s2-b-1-b-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 112807,
+          "harbor_output": 25694,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 76178,
+              "cached": 60840,
+              "output": 5417,
+              "usd_no_cache": 0.01608192,
+              "usd_cache": 0.01060632
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 18394,
+              "cached": 9197,
+              "output": 8887,
+              "usd_no_cache": 0.011462159999999999,
+              "usd_cache": 0.01063443
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9138,
+              "cached": 7919,
+              "output": 7476,
+              "usd_no_cache": 0.00875532,
+              "usd_cache": 0.00804261
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 9097,
+              "cached": 7922,
+              "output": 3914,
+              "usd_no_cache": 0.00518758,
+              "usd_cache": 0.0044746000000000005
+            }
+          },
+          "calls": 10,
+          "input": 112807,
+          "cached": 85878,
+          "output": 25694,
+          "usd_no_cache": 0.04148698,
+          "usd_cache": 0.033757960000000004
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__2XkKWQL",
+          "task": "deonticbench-direct-sara-binary-s152-d-2-h-pos",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": true,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 743952,
+          "harbor_output": 52788,
+          "roles": {
+            "solver": {
+              "calls": 31,
+              "input": 635708,
+              "cached": 604288,
+              "output": 12912,
+              "usd_no_cache": 0.10191112,
+              "usd_cache": 0.047525200000000004
+            },
+            "verifier.section_table": {
+              "calls": 5,
+              "input": 45892,
+              "cached": 35640,
+              "output": 20425,
+              "usd_no_cache": 0.02684988,
+              "usd_cache": 0.023642279999999998
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26785,
+              "cached": 24979,
+              "output": 2963,
+              "usd_no_cache": 0.006712900000000001,
+              "usd_cache": 0.00446479
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 35567,
+              "cached": 33803,
+              "output": 16488,
+              "usd_no_cache": 0.02146738,
+              "usd_cache": 0.018425109999999998
+            }
+          },
+          "calls": 43,
+          "input": 743952,
+          "cached": 698710,
+          "output": 52788,
+          "usd_no_cache": 0.15694128,
+          "usd_cache": 0.09405738
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__42WLbwX",
+          "task": "deonticbench-direct-sara-binary-s3306-a-2-b-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 159661,
+          "harbor_output": 30301,
+          "roles": {
+            "solver": {
+              "calls": 7,
+              "input": 89458,
+              "cached": 73460,
+              "output": 4461,
+              "usd_no_cache": 0.01698512,
+              "usd_cache": 0.01037372
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 9480,
+              "cached": 1,
+              "output": 7663,
+              "usd_no_cache": 0.0089902,
+              "usd_cache": 0.008990109999999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9422,
+              "cached": 8107,
+              "output": 7414,
+              "usd_no_cache": 0.008733079999999999,
+              "usd_cache": 0.008003449999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 5,
+              "input": 51301,
+              "cached": 47291,
+              "output": 10763,
+              "usd_no_cache": 0.017945140000000002,
+              "usd_cache": 0.01368895
+            }
+          },
+          "calls": 14,
+          "input": 159661,
+          "cached": 128859,
+          "output": 30301,
+          "usd_no_cache": 0.05265354,
+          "usd_cache": 0.04105623
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__6zzpZti",
+          "task": "deonticbench-direct-sara-binary-s2-b-1-a-ii-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 216018,
+          "harbor_output": 40581,
+          "roles": {
+            "solver": {
+              "calls": 9,
+              "input": 131653,
+              "cached": 111790,
+              "output": 9189,
+              "usd_no_cache": 0.02762042,
+              "usd_cache": 0.01755932
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 27545,
+              "cached": 17607,
+              "output": 12844,
+              "usd_no_cache": 0.0167003,
+              "usd_cache": 0.01511567
+            },
+            "verifier.fact_table": {
+              "calls": 4,
+              "input": 38651,
+              "cached": 34559,
+              "output": 13478,
+              "usd_no_cache": 0.01888914,
+              "usd_cache": 0.01577883
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 18169,
+              "cached": 16271,
+              "output": 5070,
+              "usd_no_cache": 0.0076136599999999995,
+              "usd_cache": 0.00614927
+            }
+          },
+          "calls": 18,
+          "input": 216018,
+          "cached": 180227,
+          "output": 40581,
+          "usd_no_cache": 0.07082352,
+          "usd_cache": 0.05460309
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__7D725AK",
+          "task": "deonticbench-direct-sara-binary-s1-a-2-iv-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 83001,
+          "harbor_output": 12262,
+          "roles": {
+            "solver": {
+              "calls": 5,
+              "input": 56428,
+              "cached": 44246,
+              "output": 2636,
+              "usd_no_cache": 0.01053592,
+              "usd_cache": 0.00655378
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8910,
+              "cached": 1,
+              "output": 7149,
+              "usd_no_cache": 0.0083964,
+              "usd_cache": 0.00839631
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8852,
+              "cached": 7921,
+              "output": 949,
+              "usd_no_cache": 0.00218828,
+              "usd_cache": 0.00147539
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8811,
+              "cached": 7924,
+              "output": 1528,
+              "usd_no_cache": 0.00276154,
+              "usd_cache": 0.00204838
+            }
+          },
+          "calls": 8,
+          "input": 83001,
+          "cached": 60092,
+          "output": 12262,
+          "usd_no_cache": 0.02388214,
+          "usd_cache": 0.01847386
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__BE5J7oN",
+          "task": "deonticbench-direct-sara-binary-s2-b-2-c-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 150257,
+          "harbor_output": 32894,
+          "roles": {
+            "solver": {
+              "calls": 8,
+              "input": 97079,
+              "cached": 81597,
+              "output": 4886,
+              "usd_no_cache": 0.01847706,
+              "usd_cache": 0.01113333
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 17934,
+              "cached": 8533,
+              "output": 10324,
+              "usd_no_cache": 0.01283476,
+              "usd_cache": 0.01206679
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 17663,
+              "cached": 16264,
+              "output": 11936,
+              "usd_no_cache": 0.01440882,
+              "usd_cache": 0.012945059999999998
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 17581,
+              "cached": 16226,
+              "output": 5748,
+              "usd_no_cache": 0.008209339999999999,
+              "usd_cache": 0.006749
+            }
+          },
+          "calls": 14,
+          "input": 150257,
+          "cached": 122620,
+          "output": 32894,
+          "usd_no_cache": 0.05392998,
+          "usd_cache": 0.04289418
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__DqtkHrS",
+          "task": "deonticbench-direct-sara-binary-s3306-a-1-b-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 140447,
+          "harbor_output": 19208,
+          "roles": {
+            "solver": {
+              "calls": 8,
+              "input": 94967,
+              "cached": 79977,
+              "output": 4684,
+              "usd_no_cache": 0.01797938,
+              "usd_cache": 0.01078145
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8993,
+              "cached": 1,
+              "output": 1876,
+              "usd_no_cache": 0.0031350199999999996,
+              "usd_cache": 0.0031349299999999997
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8935,
+              "cached": 7914,
+              "output": 3890,
+              "usd_no_cache": 0.0051409,
+              "usd_cache": 0.00442864
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 27552,
+              "cached": 25708,
+              "output": 8758,
+              "usd_no_cache": 0.01261528,
+              "usd_cache": 0.010301560000000001
+            }
+          },
+          "calls": 13,
+          "input": 140447,
+          "cached": 113600,
+          "output": 19208,
+          "usd_no_cache": 0.03887058,
+          "usd_cache": 0.02864658
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__Ky29SC6",
+          "task": "deonticbench-direct-sara-binary-s152-d-2-d-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 406011,
+          "harbor_output": 68048,
+          "roles": {
+            "solver": {
+              "calls": 17,
+              "input": 262626,
+              "cached": 239496,
+              "output": 9555,
+              "usd_no_cache": 0.046322640000000005,
+              "usd_cache": 0.024768
+            },
+            "verifier.section_table": {
+              "calls": 7,
+              "input": 63324,
+              "cached": 52902,
+              "output": 26498,
+              "usd_no_cache": 0.035363359999999996,
+              "usd_cache": 0.03060218
+            },
+            "verifier.fact_table": {
+              "calls": 6,
+              "input": 53773,
+              "cached": 51051,
+              "output": 18377,
+              "usd_no_cache": 0.02590522,
+              "usd_cache": 0.021310629999999997
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 26288,
+              "cached": 24419,
+              "output": 13618,
+              "usd_no_cache": 0.01729832,
+              "usd_cache": 0.01510061
+            }
+          },
+          "calls": 33,
+          "input": 406011,
+          "cached": 367868,
+          "output": 68048,
+          "usd_no_cache": 0.12488954,
+          "usd_cache": 0.09178142
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__MGqHXLH",
+          "task": "deonticbench-direct-sara-binary-s2-a-2-b-neg",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 115791,
+          "harbor_output": 15838,
+          "roles": {
+            "solver": {
+              "calls": 7,
+              "input": 88885,
+              "cached": 73303,
+              "output": 5331,
+              "usd_no_cache": 0.0177749,
+              "usd_cache": 0.011177630000000001
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 9021,
+              "cached": 1,
+              "output": 3149,
+              "usd_no_cache": 0.00441194,
+              "usd_cache": 0.00441185
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8963,
+              "cached": 7795,
+              "output": 1270,
+              "usd_no_cache": 0.0025248199999999997,
+              "usd_cache": 0.0018232699999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8922,
+              "cached": 7798,
+              "output": 6088,
+              "usd_no_cache": 0.007337079999999999,
+              "usd_cache": 0.00663526
+            }
+          },
+          "calls": 10,
+          "input": 115791,
+          "cached": 88897,
+          "output": 15838,
+          "usd_no_cache": 0.03204874,
+          "usd_cache": 0.02404801
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__NSbPLnb",
+          "task": "deonticbench-direct-sara-binary-s68-b-1-c-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 269807,
+          "harbor_output": 58142,
+          "roles": {
+            "solver": {
+              "calls": 12,
+              "input": 160946,
+              "cached": 142677,
+              "output": 5535,
+              "usd_no_cache": 0.02806744,
+              "usd_cache": 0.01522651
+            },
+            "verifier.section_table": {
+              "calls": 5,
+              "input": 46164,
+              "cached": 35911,
+              "output": 21372,
+              "usd_no_cache": 0.02783496,
+              "usd_cache": 0.02460297
+            },
+            "verifier.fact_table": {
+              "calls": 4,
+              "input": 35902,
+              "cached": 34042,
+              "output": 15041,
+              "usd_no_cache": 0.02006728,
+              "usd_cache": 0.017003499999999998
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 26795,
+              "cached": 24982,
+              "output": 16194,
+              "usd_no_cache": 0.0199453,
+              "usd_cache": 0.01769692
+            }
+          },
+          "calls": 24,
+          "input": 269807,
+          "cached": 237612,
+          "output": 58142,
+          "usd_no_cache": 0.09591498,
+          "usd_cache": 0.0745299
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__Paew6cb",
+          "task": "deonticbench-direct-sara-binary-s63-c-2-a-ii-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 110007,
+          "harbor_output": 12963,
+          "roles": {
+            "solver": {
+              "calls": 7,
+              "input": 83299,
+              "cached": 69019,
+              "output": 4365,
+              "usd_no_cache": 0.01602686,
+              "usd_cache": 0.009815150000000002
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8955,
+              "cached": 1,
+              "output": 2974,
+              "usd_no_cache": 0.0042277,
+              "usd_cache": 0.00422761
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8897,
+              "cached": 7821,
+              "output": 1202,
+              "usd_no_cache": 0.00244758,
+              "usd_cache": 0.00174369
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8856,
+              "cached": 7824,
+              "output": 4422,
+              "usd_no_cache": 0.00566184,
+              "usd_cache": 0.00495768
+            }
+          },
+          "calls": 10,
+          "input": 110007,
+          "cached": 84665,
+          "output": 12963,
+          "usd_no_cache": 0.02836398,
+          "usd_cache": 0.02074413
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__PnPNA85",
+          "task": "deonticbench-direct-sara-binary-s3306-b-10-b-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 98084,
+          "harbor_output": 16098,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 71328,
+              "cached": 57205,
+              "output": 2813,
+              "usd_no_cache": 0.01279892,
+              "usd_cache": 0.0076504699999999995
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8971,
+              "cached": 1,
+              "output": 1667,
+              "usd_no_cache": 0.0029229399999999997,
+              "usd_cache": 0.00292285
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8913,
+              "cached": 7842,
+              "output": 5045,
+              "usd_no_cache": 0.00629282,
+              "usd_cache": 0.00558704
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8872,
+              "cached": 7845,
+              "output": 6573,
+              "usd_no_cache": 0.00781508,
+              "usd_cache": 0.00710903
+            }
+          },
+          "calls": 9,
+          "input": 98084,
+          "cached": 72893,
+          "output": 16098,
+          "usd_no_cache": 0.02982976,
+          "usd_cache": 0.023269389999999997
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__SrPznXa",
+          "task": "deonticbench-direct-sara-binary-s1-c-iii-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 261958,
+          "harbor_output": 35407,
+          "roles": {
+            "solver": {
+              "calls": 10,
+              "input": 144100,
+              "cached": 124747,
+              "output": 6284,
+              "usd_no_cache": 0.026458000000000002,
+              "usd_cache": 0.015230770000000001
+            },
+            "verifier.section_table": {
+              "calls": 6,
+              "input": 55409,
+              "cached": 44525,
+              "output": 21538,
+              "usd_no_cache": 0.029295259999999997,
+              "usd_cache": 0.02528801
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26775,
+              "cached": 25034,
+              "output": 3408,
+              "usd_no_cache": 0.0071565,
+              "usd_cache": 0.00490344
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 35674,
+              "cached": 33836,
+              "output": 4177,
+              "usd_no_cache": 0.00917136,
+              "usd_cache": 0.0061261200000000005
+            }
+          },
+          "calls": 23,
+          "input": 261958,
+          "cached": 228142,
+          "output": 35407,
+          "usd_no_cache": 0.07208112,
+          "usd_cache": 0.05154834
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__U8Xkw7J",
+          "task": "deonticbench-direct-sara-binary-s152-a-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 102517,
+          "harbor_output": 15649,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 76103,
+              "cached": 61338,
+              "output": 2759,
+              "usd_no_cache": 0.01341342,
+              "usd_cache": 0.007893
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8857,
+              "cached": 1,
+              "output": 6599,
+              "usd_no_cache": 0.00783898,
+              "usd_cache": 0.00783889
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8799,
+              "cached": 7804,
+              "output": 984,
+              "usd_no_cache": 0.00221586,
+              "usd_cache": 0.0015134999999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8758,
+              "cached": 7807,
+              "output": 5307,
+              "usd_no_cache": 0.00653312,
+              "usd_cache": 0.00583049
+            }
+          },
+          "calls": 9,
+          "input": 102517,
+          "cached": 76950,
+          "output": 15649,
+          "usd_no_cache": 0.03000138,
+          "usd_cache": 0.02307588
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__VDuS3iK",
+          "task": "deonticbench-direct-sara-binary-s151-b-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 124825,
+          "harbor_output": 30925,
+          "roles": {
+            "solver": {
+              "calls": 9,
+              "input": 98612,
+              "cached": 85625,
+              "output": 22732,
+              "usd_no_cache": 0.03653768,
+              "usd_cache": 0.028831429999999998
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8790,
+              "cached": 1,
+              "output": 1988,
+              "usd_no_cache": 0.0032186,
+              "usd_cache": 0.00321851
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8732,
+              "cached": 7798,
+              "output": 4119,
+              "usd_no_cache": 0.005341479999999999,
+              "usd_cache": 0.0046396599999999994
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8691,
+              "cached": 7801,
+              "output": 2086,
+              "usd_no_cache": 0.0033027399999999998,
+              "usd_cache": 0.00260065
+            }
+          },
+          "calls": 12,
+          "input": 124825,
+          "cached": 101225,
+          "output": 30925,
+          "usd_no_cache": 0.0484005,
+          "usd_cache": 0.03929025
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__VzVAbm5",
+          "task": "deonticbench-direct-sara-binary-s1-a-1-i-pos",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 100303,
+          "harbor_output": 19902,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 65086,
+              "cached": 52829,
+              "output": 2780,
+              "usd_no_cache": 0.01189204,
+              "usd_cache": 0.00713743
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 17688,
+              "cached": 8844,
+              "output": 9066,
+              "usd_no_cache": 0.01154232,
+              "usd_cache": 0.01074636
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8785,
+              "cached": 7900,
+              "output": 1318,
+              "usd_no_cache": 0.0025479,
+              "usd_cache": 0.0018369
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8744,
+              "cached": 7903,
+              "output": 6738,
+              "usd_no_cache": 0.00796216,
+              "usd_cache": 0.00725089
+            }
+          },
+          "calls": 10,
+          "input": 100303,
+          "cached": 77476,
+          "output": 19902,
+          "usd_no_cache": 0.033944419999999996,
+          "usd_cache": 0.026971580000000002
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__ZvtcTad",
+          "task": "deonticbench-direct-sara-binary-s152-c-2-a-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 105412,
+          "harbor_output": 17297,
+          "roles": {
+            "solver": {
+              "calls": 7,
+              "input": 79508,
+              "cached": 66324,
+              "output": 2637,
+              "usd_no_cache": 0.013768120000000002,
+              "usd_cache": 0.007798960000000001
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8687,
+              "cached": 1,
+              "output": 1061,
+              "usd_no_cache": 0.00227718,
+              "usd_cache": 0.00227709
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8629,
+              "cached": 7789,
+              "output": 7956,
+              "usd_no_cache": 0.00916406,
+              "usd_cache": 0.00846305
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8588,
+              "cached": 7792,
+              "output": 5643,
+              "usd_no_cache": 0.006845319999999999,
+              "usd_cache": 0.00614404
+            }
+          },
+          "calls": 10,
+          "input": 105412,
+          "cached": 81906,
+          "output": 17297,
+          "usd_no_cache": 0.03205468,
+          "usd_cache": 0.02468314
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__ahGef7m",
+          "task": "deonticbench-direct-sara-binary-s152-b-1-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 152206,
+          "harbor_output": 20784,
+          "roles": {
+            "solver": {
+              "calls": 10,
+              "input": 116641,
+              "cached": 102535,
+              "output": 4885,
+              "usd_no_cache": 0.021214740000000003,
+              "usd_cache": 0.01198659
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 17862,
+              "cached": 8931,
+              "output": 8654,
+              "usd_no_cache": 0.01115468,
+              "usd_cache": 0.01035089
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8872,
+              "cached": 7869,
+              "output": 1124,
+              "usd_no_cache": 0.00236608,
+              "usd_cache": 0.00165787
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8831,
+              "cached": 7872,
+              "output": 6121,
+              "usd_no_cache": 0.0073573399999999995,
+              "usd_cache": 0.0066488599999999995
+            }
+          },
+          "calls": 14,
+          "input": 152206,
+          "cached": 127207,
+          "output": 20784,
+          "usd_no_cache": 0.04209284,
+          "usd_cache": 0.030644209999999998
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__cL97fQ7",
+          "task": "deonticbench-direct-sara-binary-s3306-c-1-pos",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 387161,
+          "harbor_output": 58670,
+          "roles": {
+            "solver": {
+              "calls": 16,
+              "input": 267530,
+              "cached": 241407,
+              "output": 20363,
+              "usd_no_cache": 0.0578172,
+              "usd_cache": 0.03609057
+            },
+            "verifier.section_table": {
+              "calls": 6,
+              "input": 55931,
+              "cached": 44591,
+              "output": 21780,
+              "usd_no_cache": 0.02961034,
+              "usd_cache": 0.025597150000000003
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26899,
+              "cached": 24681,
+              "output": 5872,
+              "usd_no_cache": 0.00963786,
+              "usd_cache": 0.00741657
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 36801,
+              "cached": 33600,
+              "output": 10655,
+              "usd_no_cache": 0.01580714,
+              "usd_cache": 0.01278314
+            }
+          },
+          "calls": 29,
+          "input": 387161,
+          "cached": 344279,
+          "output": 58670,
+          "usd_no_cache": 0.11287254,
+          "usd_cache": 0.08188743000000001
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__dDpwfJr",
+          "task": "deonticbench-direct-sara-binary-s3306-a-2-b-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 229200,
+          "harbor_output": 34707,
+          "roles": {
+            "solver": {
+              "calls": 10,
+              "input": 148674,
+              "cached": 128409,
+              "output": 11327,
+              "usd_no_cache": 0.03214136,
+              "usd_cache": 0.02058455
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 19601,
+              "cached": 9537,
+              "output": 4729,
+              "usd_no_cache": 0.00747314,
+              "usd_cache": 0.00661481
+            },
+            "verifier.fact_table": {
+              "calls": 5,
+              "input": 51480,
+              "cached": 47862,
+              "output": 17137,
+              "usd_no_cache": 0.0243442,
+              "usd_cache": 0.020036619999999998
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 9445,
+              "cached": 8159,
+              "output": 1514,
+              "usd_no_cache": 0.0028363,
+              "usd_cache": 0.0021019899999999998
+            }
+          },
+          "calls": 18,
+          "input": 229200,
+          "cached": 193967,
+          "output": 34707,
+          "usd_no_cache": 0.066795,
+          "usd_cache": 0.049337969999999995
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__e9QqWE2",
+          "task": "deonticbench-direct-sara-binary-s3306-c-10-a-ii-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 180158,
+          "harbor_output": 14485,
+          "roles": {
+            "solver": {
+              "calls": 10,
+              "input": 153603,
+              "cached": 134492,
+              "output": 3849,
+              "usd_no_cache": 0.02535342,
+              "usd_cache": 0.013249140000000001
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8904,
+              "cached": 1,
+              "output": 7353,
+              "usd_no_cache": 0.00859956,
+              "usd_cache": 0.00859947
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8846,
+              "cached": 7831,
+              "output": 2236,
+              "usd_no_cache": 0.0034744399999999996,
+              "usd_cache": 0.00276965
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8805,
+              "cached": 7834,
+              "output": 1047,
+              "usd_no_cache": 0.0022797,
+              "usd_cache": 0.00157464
+            }
+          },
+          "calls": 13,
+          "input": 180158,
+          "cached": 150158,
+          "output": 14485,
+          "usd_no_cache": 0.03970712,
+          "usd_cache": 0.0261929
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__fgc3Dna",
+          "task": "deonticbench-direct-sara-binary-s152-d-2-a-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 118100,
+          "harbor_output": 11429,
+          "roles": {
+            "solver": {
+              "calls": 8,
+              "input": 91965,
+              "cached": 78174,
+              "output": 3462,
+              "usd_no_cache": 0.0163371,
+              "usd_cache": 0.009301440000000001
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8764,
+              "cached": 1,
+              "output": 1269,
+              "usd_no_cache": 0.00249596,
+              "usd_cache": 0.00249587
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8706,
+              "cached": 7774,
+              "output": 1162,
+              "usd_no_cache": 0.0023808400000000004,
+              "usd_cache": 0.00168118
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8665,
+              "cached": 7777,
+              "output": 5536,
+              "usd_no_cache": 0.0067491,
+              "usd_cache": 0.00604917
+            }
+          },
+          "calls": 11,
+          "input": 118100,
+          "cached": 93726,
+          "output": 11429,
+          "usd_no_cache": 0.027963000000000002,
+          "usd_cache": 0.019527660000000002
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__gteePUa",
+          "task": "deonticbench-direct-sara-binary-s63-f-3-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 58944,
+          "harbor_output": 10480,
+          "roles": {
+            "solver": {
+              "calls": 3,
+              "input": 32299,
+              "cached": 20585,
+              "output": 3523,
+              "usd_no_cache": 0.00804486,
+              "usd_cache": 0.00619221
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8934,
+              "cached": 1,
+              "output": 4225,
+              "usd_no_cache": 0.00547576,
+              "usd_cache": 0.005475669999999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8876,
+              "cached": 7855,
+              "output": 1567,
+              "usd_no_cache": 0.0028096400000000004,
+              "usd_cache": 0.00210269
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8835,
+              "cached": 7859,
+              "output": 1165,
+              "usd_no_cache": 0.0024019,
+              "usd_cache": 0.0016945900000000002
+            }
+          },
+          "calls": 6,
+          "input": 58944,
+          "cached": 36300,
+          "output": 10480,
+          "usd_no_cache": 0.018732159999999998,
+          "usd_cache": 0.015465159999999999
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__njUnWow",
+          "task": "deonticbench-direct-sara-binary-s152-d-1-d-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 278587,
+          "harbor_output": 58614,
+          "roles": {
+            "solver": {
+              "calls": 11,
+              "input": 168780,
+              "cached": 148184,
+              "output": 8134,
+              "usd_no_cache": 0.031763200000000005,
+              "usd_cache": 0.01842664
+            },
+            "verifier.section_table": {
+              "calls": 7,
+              "input": 65543,
+              "cached": 53228,
+              "output": 26057,
+              "usd_no_cache": 0.035233020000000004,
+              "usd_cache": 0.0304425
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26608,
+              "cached": 25050,
+              "output": 11257,
+              "usd_no_cache": 0.01498212,
+              "usd_cache": 0.01272762
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 17656,
+              "cached": 16145,
+              "output": 13166,
+              "usd_no_cache": 0.01563784,
+              "usd_cache": 0.01418479
+            }
+          },
+          "calls": 23,
+          "input": 278587,
+          "cached": 242607,
+          "output": 58614,
+          "usd_no_cache": 0.09761618000000001,
+          "usd_cache": 0.07578155
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__nqRMBpq",
+          "task": "deonticbench-direct-sara-binary-s152-d-2-f-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 92131,
+          "harbor_output": 10878,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 65966,
+              "cached": 53418,
+              "output": 3127,
+              "usd_no_cache": 0.01236224,
+              "usd_cache": 0.00755462
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 8774,
+              "cached": 1,
+              "output": 5464,
+              "usd_no_cache": 0.0066923600000000005,
+              "usd_cache": 0.00669227
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 8716,
+              "cached": 7771,
+              "output": 1118,
+              "usd_no_cache": 0.00233824,
+              "usd_cache": 0.0016388499999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8675,
+              "cached": 7774,
+              "output": 1169,
+              "usd_no_cache": 0.0023835,
+              "usd_cache": 0.0016838399999999998
+            }
+          },
+          "calls": 9,
+          "input": 92131,
+          "cached": 68964,
+          "output": 10878,
+          "usd_no_cache": 0.02377634,
+          "usd_cache": 0.01756958
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__pBr4ssM",
+          "task": "deonticbench-direct-sara-binary-s68-a-2-pos",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 142580,
+          "harbor_output": 22456,
+          "roles": {
+            "solver": {
+              "calls": 9,
+              "input": 106351,
+              "cached": 91491,
+              "output": 6158,
+              "usd_no_cache": 0.02104714,
+              "usd_cache": 0.01281295
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 18194,
+              "cached": 9097,
+              "output": 8788,
+              "usd_no_cache": 0.011335159999999999,
+              "usd_cache": 0.010516429999999998
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9038,
+              "cached": 7950,
+              "output": 1179,
+              "usd_no_cache": 0.00244432,
+              "usd_cache": 0.0017288199999999998
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8997,
+              "cached": 7953,
+              "output": 6331,
+              "usd_no_cache": 0.0075905799999999995,
+              "usd_cache": 0.00687481
+            }
+          },
+          "calls": 13,
+          "input": 142580,
+          "cached": 116491,
+          "output": 22456,
+          "usd_no_cache": 0.042417199999999995,
+          "usd_cache": 0.03193301
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__taRtZYs",
+          "task": "deonticbench-direct-sara-binary-s152-c-2-neg",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 230640,
+          "harbor_output": 43180,
+          "roles": {
+            "solver": {
+              "calls": 12,
+              "input": 152517,
+              "cached": 136222,
+              "output": 4826,
+              "usd_no_cache": 0.02617838,
+              "usd_cache": 0.013918400000000001
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 34832,
+              "cached": 25863,
+              "output": 17563,
+              "usd_no_cache": 0.022439479999999998,
+              "usd_cache": 0.02011181
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26075,
+              "cached": 24759,
+              "output": 13679,
+              "usd_no_cache": 0.0173295,
+              "usd_cache": 0.01510119
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 17216,
+              "cached": 16107,
+              "output": 7112,
+              "usd_no_cache": 0.00952224,
+              "usd_cache": 0.00807261
+            }
+          },
+          "calls": 21,
+          "input": 230640,
+          "cached": 202951,
+          "output": 43180,
+          "usd_no_cache": 0.0754696,
+          "usd_cache": 0.05720401
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__wnM5w7C",
+          "task": "deonticbench-direct-sara-binary-s1-a-2-ii-neg",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 160993,
+          "harbor_output": 45861,
+          "roles": {
+            "solver": {
+              "calls": 7,
+              "input": 90111,
+              "cached": 74525,
+              "output": 6193,
+              "usd_no_cache": 0.018808540000000002,
+              "usd_cache": 0.01210129
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 35740,
+              "cached": 26360,
+              "output": 19013,
+              "usd_no_cache": 0.0240166,
+              "usd_cache": 0.0216442
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 17612,
+              "cached": 16349,
+              "output": 13664,
+              "usd_no_cache": 0.01612968,
+              "usd_cache": 0.01465827
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 17530,
+              "cached": 16311,
+              "output": 6991,
+              "usd_no_cache": 0.0094452,
+              "usd_cache": 0.00797721
+            }
+          },
+          "calls": 15,
+          "input": 160993,
+          "cached": 133545,
+          "output": 45861,
+          "usd_no_cache": 0.06840002,
+          "usd_cache": 0.05638097
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__xvdGSz3",
+          "task": "deonticbench-direct-sara-binary-s152-c-1-pos",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 95887,
+          "harbor_output": 22341,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 68801,
+              "cached": 55295,
+              "output": 5309,
+              "usd_no_cache": 0.01494114,
+              "usd_cache": 0.009964589999999999
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 9081,
+              "cached": 1,
+              "output": 6180,
+              "usd_no_cache": 0.00745134,
+              "usd_cache": 0.0074512499999999995
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9023,
+              "cached": 8043,
+              "output": 6554,
+              "usd_no_cache": 0.00781722,
+              "usd_cache": 0.00709335
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 8982,
+              "cached": 8048,
+              "output": 4298,
+              "usd_no_cache": 0.00555548,
+              "usd_cache": 0.004831159999999999
+            }
+          },
+          "calls": 9,
+          "input": 95887,
+          "cached": 71387,
+          "output": 22341,
+          "usd_no_cache": 0.03576518,
+          "usd_cache": 0.029340349999999998
+        },
+        {
+          "trial": "deonticbench-direct-sara-binary__yxxYuGr",
+          "task": "deonticbench-direct-sara-binary-s3306-c-2-neg",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 187049,
+          "harbor_output": 33739,
+          "roles": {
+            "solver": {
+              "calls": 9,
+              "input": 116211,
+              "cached": 98186,
+              "output": 5011,
+              "usd_no_cache": 0.02128054,
+              "usd_cache": 0.0124438
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 26828,
+              "cached": 17323,
+              "output": 11256,
+              "usd_no_cache": 0.015011919999999998,
+              "usd_cache": 0.013452849999999999
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26446,
+              "cached": 25004,
+              "output": 15002,
+              "usd_no_cache": 0.01870444,
+              "usd_cache": 0.01645408
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 17564,
+              "cached": 16168,
+              "output": 2470,
+              "usd_no_cache": 0.00492896,
+              "usd_cache": 0.0034738399999999997
+            }
+          },
+          "calls": 17,
+          "input": 187049,
+          "cached": 156681,
+          "output": 33739,
+          "usd_no_cache": 0.05992586,
+          "usd_cache": 0.045824569999999995
+        }
+      ]
+    }
+  ]
+}
