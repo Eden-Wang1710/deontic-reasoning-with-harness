@@ -314,6 +314,32 @@ default 4 h per trial was stopped after 16 min, because at this speed a normal t
 run into the time limit (its partial job dir is kept as
 `sc-run1-numeric-aborted-agent-timeout`, not used). No baseline of this model exists.
 
+### 7.4 Prompt-based direct reasoning on the same price card (estimate, 2026-11-18) ✅
+
+Question from the owner: what does direct reasoning (DeonticBench `generate_e2e.py --task
+direct`: whole statute in the prompt, one call, no tools; run of 2026-10-16, `06`) cost under
+the cost protocol? Estimated from the token counts stored in `source.json`, without new
+generations, by `tools/db_direct_cost.py` (detail in `outputs/db_direct_qwen35_inference_cost.json`).
+Qwen3.5-35B-A3B, thinking on.
+
+| SARA | Accuracy, mean of 4 draws (exact match) | Prompt tokens | Output tokens per generation | Cents per task, one generation | p95 | All 4 generations, no cache / with cache |
+|---|---|---|---|---|---|---|
+| numeric (35) | 0.435, i.e. 15.2/35 [0.343, 0.543] | 6,848 | 12,057 | **1.30** | 1.59 | 5.21 / 5.02 |
+| binary (30) | 0.823, i.e. 24.7/30 [0.767, 0.867] | 6,851 | 6,292 | **0.73** | 1.07 | 2.90 / 2.72 |
+
+- **How it is computed.** One generation per task: prompt x input price + output x output
+  price. A task has one call, so the with-cache cost equals the no-cache cost. Output is 93%
+  (numeric) and 87% (binary) of the cost.
+- **Limits of the estimate** 🔶. The script stored one output total per case for its four
+  generations (one request with `n=4`), so "one generation" is the case mean, and the p95 is
+  taken over case means, not over single generations. The run had the server's default cap of
+  16,384 output tokens and no cost budget; 2 of 140 numeric generations came back empty.
+- **Reading** 🔶. On numeric, one direct generation reaches about 15/35 at 1.30 cents; the
+  solver-checks harness reaches 19/35 at 9.40 cents (7.2 times the cost), and the intervals
+  overlap. A majority vote over the four direct generations scores 0.486 (17/35, `06`) at 5.21
+  cents. On binary, direct reasoning is at 0.823 for 0.73 cents against 23/30 (0.767) for 5.59
+  cents. The harness runs are one draw each, the direct figure is a mean of four.
+
 ## 8. Open points
 
 - **Cost.** Checks cost more than the verifier they replace because three contexts each think

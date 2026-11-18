@@ -120,7 +120,8 @@ deontic-reasoning-with-harness/
 │   │                            and sub-agent trajectories of runs made before it (09 §10.12);
 │   │                            --json wrote outputs/cost1_numeric_inference_cost.json (the three
 │   │                            reruns of 2026-11-12, per trial and per role)
-│   │                            and outputs/sc_run1_{numeric,binary}_inference_cost.json (10 §7)
+│   │                            and outputs/sc_run1_{numeric,binary}_inference_cost.json (10 §7);
+│   │                            outputs/db_direct_qwen35_inference_cost.json from db_direct_cost.py (10 §7.4)
 │   ├── rv_run_report.py             aggregate numbers of a t2rv/t2rvc numeric run vs a baseline run:
 │   │                            accuracy with intervals, paired comparison, time per role, time-limit
 │   │                            fallbacks, compactions, what follows the first verifier report;
@@ -152,6 +153,8 @@ deontic-reasoning-with-harness/
 │   ├── db_direct_score.py           score a DeonticBench prompt-based direct run under both
 │   │                                grading rules (DAR exact match / DeonticBench ±1, macro-F1),
 │   │                                bootstrap CI; reuses DeonticBench's parser (needs pandas)
+│   ├── db_direct_cost.py            inference cost of a prompt-based direct run on the price card,
+│   │                                estimated from the token totals in source.json (no new generations)
 │   ├── deonticbench_stats.py        dataset statistics behind claude_docs/03 Part III
 │   └── db_stats.json             ✅ output of deonticbench_stats.py (regenerable; committed since 2026-10-27)
 │
