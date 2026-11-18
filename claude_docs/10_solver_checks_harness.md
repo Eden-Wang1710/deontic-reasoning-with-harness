@@ -340,6 +340,32 @@ Qwen3.5-35B-A3B, thinking on.
   cents. On binary, direct reasoning is at 0.823 for 0.73 cents against 23/30 (0.767) for 5.59
   cents. The harness runs are one draw each, the direct figure is a mean of four.
 
+### 7.5 Rough error attribution of `sc-run1-numeric` (2026-11-18) ✅
+
+The 16 wrong final answers, each read against a derivation that reproduces the gold value
+(offline analysis; gold values never reach a prompt). One primary error per task; 29, 39, 58,
+60 and 94 carry a second one.
+
+| Primary error | n | Tasks |
+|---|---|---|
+| Filing status: head of household assumed although the case does not say that the taxpayer maintains the household (35, 39, 61, 64, 94); §7703(b) not applied (78) | 6 | 35, 39, 61, 64, 78, 94 |
+| Number of exemptions: the spouse's exemption denied on a joint return, from a literal reading of §151(b) (2, 29, 58, 60); a qualifying relative not counted (18, 49; also 39, 60) | 6 | 2, 18, 29, 49, 58, 60 |
+| §3301 tax on wages paid: left out (47; second error in 29, 58, 94), applied where gold does not apply it (51) | 2 | 47, 51 |
+| Other: additional standard deduction for age granted (63); one dollar from gold (10) | 2 | 10, 63 |
+
+- **The errors are now judgments about status and persons, not arithmetic and not missing
+  text.** Every answer file lists all nine sections, and the arithmetic of all 16 reproduces.
+  12 of 16 are decided by who counts (filing status, spouse, dependents).
+- **§3301 is looked at and dismissed.** In the four trials that omit its tax, the `## Sections`
+  line reads "employer excise tax, not individual income tax": the walk-through forces a line
+  per section, and the solver decides it from the heading. In `rvc-run1-numeric` (`09` §10.11)
+  this omission decided 5 answers; here it decides 1.
+- **The checks agree with the solver on these judgments.** 9 of the 16 finished `verified`
+  (all three checks passed), 6 used up the rounds, 1 was stopped by the cost budget. Task 61
+  was right at first and moved to head of household after the first report.
+- 🔶 Five of the six filing-status errors rest on a fact the case does not state. This run used
+  check format v1; whether v2 (the case text is complete, §6.3) removes them is untested.
+
 ## 8. Open points
 
 - **Cost.** Checks cost more than the verifier they replace because three contexts each think
