@@ -121,6 +121,8 @@ deontic-reasoning-with-harness/
 │   │                            --json wrote outputs/cost1_numeric_inference_cost.json (the three
 │   │                            reruns of 2026-11-12, per trial and per role)
 │   │                            and outputs/sc_run1_{numeric,binary}_inference_cost.json (10 §7);
+│   │                            outputs/sc_run1_numeric_qwen38_27b_inference_cost.json (both models,
+│   │                            Qwen3.5 card) and ..._own_card.json (Qwen3.8-27B price) (10 §7.3);
 │   │                            outputs/db_direct_qwen35_inference_cost.json from db_direct_cost.py (10 §7.4)
 │   ├── rv_run_report.py             aggregate numbers of a t2rv/t2rvc numeric run vs a baseline run:
 │   │                            accuracy with intervals, paired comparison, time per role, time-limit

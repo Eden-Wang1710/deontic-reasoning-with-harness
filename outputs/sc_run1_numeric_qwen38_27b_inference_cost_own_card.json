@@ -1,0 +1,1897 @@
+{
+  "price_usd_per_token": {
+    "input": 1.5e-07,
+    "output": 1.875e-06,
+    "cache_read": 3.75e-08
+  },
+  "jobs": [
+    {
+      "job": "jobs/qwen3.8-27b/t2sc-direct/sc-run1-numeric",
+      "n_trials": 35,
+      "accuracy": 0.6857142857142857,
+      "n_correct": 24.0,
+      "exceptions": 0,
+      "budget_exhausted": 4,
+      "cut_off_calls": 113,
+      "unknown_calls": 0,
+      "source": [
+        "ledger"
+      ],
+      "totals_differ_from_harbor": 0,
+      "mean": {
+        "calls": 14.914285714285715,
+        "input": 171895.42857142858,
+        "cached": 140154.2857142857,
+        "output": 55819.05714285714,
+        "usd_no_cache": 0.13044504642857144,
+        "usd_cache": 0.11467768928571427
+      },
+      "usd_no_cache": {
+        "median": 0.105309825,
+        "p95": 0.26340562500000003,
+        "max": 0.286158075
+      },
+      "usd_cache": {
+        "median": 0.0927084375,
+        "p95": 0.2317357875,
+        "max": 0.25797705000000004
+      },
+      "roles": {
+        "solver": {
+          "calls": 208,
+          "input": 2881172,
+          "cached": 2297538,
+          "output": 932473,
+          "usd_no_cache": 2.1805626749999996,
+          "usd_cache": 1.9220896500000002
+        },
+        "verifier.section_table": {
+          "calls": 108,
+          "input": 1079879,
+          "cached": 714364,
+          "output": 356564,
+          "usd_no_cache": 0.83053935,
+          "usd_cache": 0.7501734000000001
+        },
+        "verifier.fact_table": {
+          "calls": 86,
+          "input": 849778,
+          "cached": 776375,
+          "output": 302813,
+          "usd_no_cache": 0.695241075,
+          "usd_cache": 0.6078988875000001
+        },
+        "verifier.grounded_reasoning": {
+          "calls": 120,
+          "input": 1205511,
+          "cached": 1117123,
+          "output": 361817,
+          "usd_no_cache": 0.8592335249999999,
+          "usd_cache": 0.7335571875
+        }
+      },
+      "trials": [
+        {
+          "trial": "deonticbench-direct-sara-numeric__2LoK8bS",
+          "task": "deonticbench-direct-sara-numeric-tax-case-56",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 125035,
+          "harbor_output": 35883,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 53708,
+              "cached": 37095,
+              "output": 11929,
+              "usd_no_cache": 0.030423075,
+              "usd_cache": 0.0262498875
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 30591,
+              "cached": 19969,
+              "output": 9117,
+              "usd_no_cache": 0.021683025,
+              "usd_cache": 0.019436512500000003
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9966,
+              "cached": 8160,
+              "output": 5461,
+              "usd_no_cache": 0.011734275,
+              "usd_cache": 0.010816275
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 30770,
+              "cached": 27935,
+              "output": 9376,
+              "usd_no_cache": 0.0221955,
+              "usd_cache": 0.019052812500000002
+            }
+          },
+          "calls": 11,
+          "input": 125035,
+          "cached": 93159,
+          "output": 35883,
+          "usd_no_cache": 0.086035875,
+          "usd_cache": 0.0755554875
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__6nGqer7",
+          "task": "deonticbench-direct-sara-numeric-tax-case-93",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 97467,
+          "harbor_output": 36842,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 50207,
+              "cached": 34886,
+              "output": 18364,
+              "usd_no_cache": 0.041963549999999995,
+              "usd_cache": 0.038038875
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 9328,
+              "cached": 1,
+              "output": 6546,
+              "usd_no_cache": 0.01367295,
+              "usd_cache": 0.0136728375
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9270,
+              "cached": 8059,
+              "output": 2620,
+              "usd_no_cache": 0.0063030000000000004,
+              "usd_cache": 0.0053963625
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 28662,
+              "cached": 26442,
+              "output": 9312,
+              "usd_no_cache": 0.0217593,
+              "usd_cache": 0.018784575
+            }
+          },
+          "calls": 9,
+          "input": 97467,
+          "cached": 69388,
+          "output": 36842,
+          "usd_no_cache": 0.08369879999999999,
+          "usd_cache": 0.07589265
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__7AzfMdb",
+          "task": "deonticbench-direct-sara-numeric-tax-case-61",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 94135,
+          "harbor_output": 35377,
+          "roles": {
+            "solver": {
+              "calls": 2,
+              "input": 23216,
+              "cached": 9149,
+              "output": 13621,
+              "usd_no_cache": 0.029021775,
+              "usd_cache": 0.0279925125
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 30516,
+              "cached": 20087,
+              "output": 9023,
+              "usd_no_cache": 0.021495524999999998,
+              "usd_cache": 0.0192357375
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 10025,
+              "cached": 8122,
+              "output": 4214,
+              "usd_no_cache": 0.009405,
+              "usd_cache": 0.008491275
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 30378,
+              "cached": 28288,
+              "output": 8519,
+              "usd_no_cache": 0.020529825,
+              "usd_cache": 0.017347425
+            }
+          },
+          "calls": 9,
+          "input": 94135,
+          "cached": 65646,
+          "output": 35377,
+          "usd_no_cache": 0.080452125,
+          "usd_cache": 0.07306694999999999
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__7gjpPTK",
+          "task": "deonticbench-direct-sara-numeric-tax-case-69",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 166403,
+          "harbor_output": 42853,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 84184,
+              "cached": 67315,
+              "output": 15683,
+              "usd_no_cache": 0.042033225,
+              "usd_cache": 0.0344602875
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 31323,
+              "cached": 20103,
+              "output": 9627,
+              "usd_no_cache": 0.022749075,
+              "usd_cache": 0.020487487500000002
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 20026,
+              "cached": 18167,
+              "output": 8348,
+              "usd_no_cache": 0.0186564,
+              "usd_cache": 0.0166126125
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 30870,
+              "cached": 28083,
+              "output": 9195,
+              "usd_no_cache": 0.021871124999999998,
+              "usd_cache": 0.0187117875
+            }
+          },
+          "calls": 14,
+          "input": 166403,
+          "cached": 133668,
+          "output": 42853,
+          "usd_no_cache": 0.105309825,
+          "usd_cache": 0.090272175
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__9qfcVjR",
+          "task": "deonticbench-direct-sara-numeric-tax-case-10",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 119067,
+          "harbor_output": 44566,
+          "roles": {
+            "solver": {
+              "calls": 5,
+              "input": 60906,
+              "cached": 45809,
+              "output": 23586,
+              "usd_no_cache": 0.053359649999999995,
+              "usd_cache": 0.048206137499999996
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 9703,
+              "cached": 1,
+              "output": 3316,
+              "usd_no_cache": 0.0076729499999999996,
+              "usd_cache": 0.0076728375
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 19250,
+              "cached": 17948,
+              "output": 8822,
+              "usd_no_cache": 0.01942875,
+              "usd_cache": 0.0174096
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 29208,
+              "cached": 27477,
+              "output": 8842,
+              "usd_no_cache": 0.020959949999999998,
+              "usd_cache": 0.0178687875
+            }
+          },
+          "calls": 11,
+          "input": 119067,
+          "cached": 91235,
+          "output": 44566,
+          "usd_no_cache": 0.10142129999999999,
+          "usd_cache": 0.09115736249999999
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__Ajm2Tew",
+          "task": "deonticbench-direct-sara-numeric-tax-case-74",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 99364,
+          "harbor_output": 52984,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 50783,
+              "cached": 34850,
+              "output": 27490,
+              "usd_no_cache": 0.0591612,
+              "usd_cache": 0.055240575
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 29626,
+              "cached": 19033,
+              "output": 11618,
+              "usd_no_cache": 0.02622765,
+              "usd_cache": 0.024086437500000002
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9498,
+              "cached": 7999,
+              "output": 7222,
+              "usd_no_cache": 0.01496595,
+              "usd_cache": 0.0140660625
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 9457,
+              "cached": 8003,
+              "output": 6654,
+              "usd_no_cache": 0.013894799999999999,
+              "usd_cache": 0.0129944625
+            }
+          },
+          "calls": 9,
+          "input": 99364,
+          "cached": 69885,
+          "output": 52984,
+          "usd_no_cache": 0.11424959999999999,
+          "usd_cache": 0.1063875375
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__BbyvPL8",
+          "task": "deonticbench-direct-sara-numeric-tax-case-29",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": true,
+          "cut_off_calls": 9,
+          "unknown_calls": 0,
+          "harbor_input": 285674,
+          "harbor_output": 115590,
+          "roles": {
+            "solver": {
+              "calls": 8,
+              "input": 96808,
+              "cached": 80531,
+              "output": 56164,
+              "usd_no_cache": 0.1198287,
+              "usd_cache": 0.1107689625
+            },
+            "verifier.section_table": {
+              "calls": 7,
+              "input": 72374,
+              "cached": 58111,
+              "output": 21870,
+              "usd_no_cache": 0.05186235,
+              "usd_cache": 0.0453248625
+            },
+            "verifier.fact_table": {
+              "calls": 6,
+              "input": 56840,
+              "cached": 53392,
+              "output": 18797,
+              "usd_no_cache": 0.043770375,
+              "usd_cache": 0.037763775
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 6,
+              "input": 59652,
+              "cached": 55491,
+              "output": 18759,
+              "usd_no_cache": 0.044120925,
+              "usd_cache": 0.0378781875
+            }
+          },
+          "calls": 27,
+          "input": 285674,
+          "cached": 247525,
+          "output": 115590,
+          "usd_no_cache": 0.25958235,
+          "usd_cache": 0.2317357875
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__EqqfzA9",
+          "task": "deonticbench-direct-sara-numeric-tax-case-51",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": true,
+          "cut_off_calls": 9,
+          "unknown_calls": 0,
+          "harbor_input": 292458,
+          "harbor_output": 129221,
+          "roles": {
+            "solver": {
+              "calls": 7,
+              "input": 94572,
+              "cached": 75990,
+              "output": 69845,
+              "usd_no_cache": 0.14514517500000002,
+              "usd_cache": 0.1365963
+            },
+            "verifier.section_table": {
+              "calls": 6,
+              "input": 62594,
+              "cached": 49873,
+              "output": 19585,
+              "usd_no_cache": 0.046110975,
+              "usd_cache": 0.0405002625
+            },
+            "verifier.fact_table": {
+              "calls": 7,
+              "input": 73330,
+              "cached": 67508,
+              "output": 20608,
+              "usd_no_cache": 0.0496395,
+              "usd_cache": 0.04204485
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 6,
+              "input": 61962,
+              "cached": 57127,
+              "output": 19183,
+              "usd_no_cache": 0.045262425,
+              "usd_cache": 0.038835637500000006
+            }
+          },
+          "calls": 26,
+          "input": 292458,
+          "cached": 250498,
+          "output": 129221,
+          "usd_no_cache": 0.286158075,
+          "usd_cache": 0.25797705000000004
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__F3e7oJs",
+          "task": "deonticbench-direct-sara-numeric-tax-case-95",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 82428,
+          "harbor_output": 31736,
+          "roles": {
+            "solver": {
+              "calls": 2,
+              "input": 24161,
+              "cached": 9194,
+              "output": 8630,
+              "usd_no_cache": 0.0198054,
+              "usd_cache": 0.018771075
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 19416,
+              "cached": 9689,
+              "output": 8629,
+              "usd_no_cache": 0.019091775,
+              "usd_cache": 0.0180017625
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9670,
+              "cached": 8047,
+              "output": 5450,
+              "usd_no_cache": 0.01166925,
+              "usd_cache": 0.0107639625
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 29181,
+              "cached": 27229,
+              "output": 9027,
+              "usd_no_cache": 0.021302775,
+              "usd_cache": 0.0182395125
+            }
+          },
+          "calls": 8,
+          "input": 82428,
+          "cached": 54159,
+          "output": 31736,
+          "usd_no_cache": 0.0718692,
+          "usd_cache": 0.0657763125
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__JYrBeKs",
+          "task": "deonticbench-direct-sara-numeric-tax-case-91",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 176053,
+          "harbor_output": 58888,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 81003,
+              "cached": 63840,
+              "output": 32479,
+              "usd_no_cache": 0.073048575,
+              "usd_cache": 0.06586657500000001
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 30099,
+              "cached": 19779,
+              "output": 9908,
+              "usd_no_cache": 0.02309235,
+              "usd_cache": 0.0208672125
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 31989,
+              "cached": 29004,
+              "output": 7670,
+              "usd_no_cache": 0.019179599999999998,
+              "usd_cache": 0.01591665
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 32962,
+              "cached": 29824,
+              "output": 8831,
+              "usd_no_cache": 0.021502425,
+              "usd_cache": 0.018147225
+            }
+          },
+          "calls": 15,
+          "input": 176053,
+          "cached": 142447,
+          "output": 58888,
+          "usd_no_cache": 0.13682295,
+          "usd_cache": 0.12079766250000001
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__KK9bwC2",
+          "task": "deonticbench-direct-sara-numeric-tax-case-71",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 135788,
+          "harbor_output": 45047,
+          "roles": {
+            "solver": {
+              "calls": 5,
+              "input": 59503,
+              "cached": 44678,
+              "output": 18506,
+              "usd_no_cache": 0.0436242,
+              "usd_cache": 0.038597925
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 28722,
+              "cached": 18827,
+              "output": 9156,
+              "usd_no_cache": 0.0214758,
+              "usd_cache": 0.0193577625
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 18750,
+              "cached": 17488,
+              "output": 8321,
+              "usd_no_cache": 0.018414375,
+              "usd_cache": 0.016446975000000003
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 28813,
+              "cached": 26766,
+              "output": 9064,
+              "usd_no_cache": 0.02131695,
+              "usd_cache": 0.018305775
+            }
+          },
+          "calls": 13,
+          "input": 135788,
+          "cached": 107759,
+          "output": 45047,
+          "usd_no_cache": 0.104831325,
+          "usd_cache": 0.0927084375
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__KxSBjgK",
+          "task": "deonticbench-direct-sara-numeric-tax-case-2",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 5,
+          "unknown_calls": 0,
+          "harbor_input": 163160,
+          "harbor_output": 96268,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 67442,
+              "cached": 53269,
+              "output": 62472,
+              "usd_no_cache": 0.1272513,
+              "usd_cache": 0.1212585375
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 28415,
+              "cached": 18710,
+              "output": 15290,
+              "usd_no_cache": 0.032931,
+              "usd_cache": 0.030826125
+            },
+            "verifier.fact_table": {
+              "calls": 4,
+              "input": 39586,
+              "cached": 37034,
+              "output": 9280,
+              "usd_no_cache": 0.023337899999999998,
+              "usd_cache": 0.019171575
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 27717,
+              "cached": 26139,
+              "output": 9226,
+              "usd_no_cache": 0.0214563,
+              "usd_cache": 0.018515662500000002
+            }
+          },
+          "calls": 16,
+          "input": 163160,
+          "cached": 135152,
+          "output": 96268,
+          "usd_no_cache": 0.2049765,
+          "usd_cache": 0.1897719
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__NWrjhVE",
+          "task": "deonticbench-direct-sara-numeric-tax-case-60",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 5,
+          "unknown_calls": 0,
+          "harbor_input": 286155,
+          "harbor_output": 90138,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 107006,
+              "cached": 81683,
+              "output": 36065,
+              "usd_no_cache": 0.083672775,
+              "usd_cache": 0.0744834375
+            },
+            "verifier.section_table": {
+              "calls": 6,
+              "input": 61151,
+              "cached": 49133,
+              "output": 17717,
+              "usd_no_cache": 0.042392025,
+              "usd_cache": 0.0368645625
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 20176,
+              "cached": 16802,
+              "output": 7848,
+              "usd_no_cache": 0.0177414,
+              "usd_cache": 0.015851175000000002
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 9,
+              "input": 97822,
+              "cached": 90882,
+              "output": 28508,
+              "usd_no_cache": 0.0681258,
+              "usd_cache": 0.057901575
+            }
+          },
+          "calls": 23,
+          "input": 286155,
+          "cached": 238500,
+          "output": 90138,
+          "usd_no_cache": 0.211932,
+          "usd_cache": 0.18510075
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__NfSJS2y",
+          "task": "deonticbench-direct-sara-numeric-tax-case-97",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 122361,
+          "harbor_output": 39809,
+          "roles": {
+            "solver": {
+              "calls": 5,
+              "input": 64280,
+              "cached": 48130,
+              "output": 18495,
+              "usd_no_cache": 0.044320125,
+              "usd_cache": 0.0389055
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 19496,
+              "cached": 9594,
+              "output": 7747,
+              "usd_no_cache": 0.017450025,
+              "usd_cache": 0.016370700000000002
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9535,
+              "cached": 8200,
+              "output": 4737,
+              "usd_no_cache": 0.010312125,
+              "usd_cache": 0.009389625
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 29050,
+              "cached": 27457,
+              "output": 8830,
+              "usd_no_cache": 0.020913750000000002,
+              "usd_cache": 0.017824837500000003
+            }
+          },
+          "calls": 11,
+          "input": 122361,
+          "cached": 93381,
+          "output": 39809,
+          "usd_no_cache": 0.09299602500000001,
+          "usd_cache": 0.0824906625
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__NqTML2u",
+          "task": "deonticbench-direct-sara-numeric-tax-case-58",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 120289,
+          "harbor_output": 42463,
+          "roles": {
+            "solver": {
+              "calls": 3,
+              "input": 39152,
+              "cached": 21283,
+              "output": 16848,
+              "usd_no_cache": 0.0374628,
+              "usd_cache": 0.0350684625
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 40774,
+              "cached": 30241,
+              "output": 10491,
+              "usd_no_cache": 0.025786725,
+              "usd_cache": 0.0223846125
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9964,
+              "cached": 8231,
+              "output": 5802,
+              "usd_no_cache": 0.01237335,
+              "usd_cache": 0.011447362499999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 30399,
+              "cached": 28002,
+              "output": 9322,
+              "usd_no_cache": 0.022038600000000002,
+              "usd_cache": 0.018888375000000002
+            }
+          },
+          "calls": 11,
+          "input": 120289,
+          "cached": 87757,
+          "output": 42463,
+          "usd_no_cache": 0.097661475,
+          "usd_cache": 0.08778881250000001
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__VPcYPiA",
+          "task": "deonticbench-direct-sara-numeric-tax-case-73",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 121956,
+          "harbor_output": 53011,
+          "roles": {
+            "solver": {
+              "calls": 3,
+              "input": 32017,
+              "cached": 18534,
+              "output": 26250,
+              "usd_no_cache": 0.0540213,
+              "usd_cache": 0.051936224999999996
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 29906,
+              "cached": 19749,
+              "output": 8809,
+              "usd_no_cache": 0.021002775,
+              "usd_cache": 0.0187810125
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 29807,
+              "cached": 27771,
+              "output": 8947,
+              "usd_no_cache": 0.021246675,
+              "usd_cache": 0.018122437499999998
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 30226,
+              "cached": 27694,
+              "output": 9005,
+              "usd_no_cache": 0.021418275,
+              "usd_cache": 0.0183027
+            }
+          },
+          "calls": 12,
+          "input": 121956,
+          "cached": 93748,
+          "output": 53011,
+          "usd_no_cache": 0.117689025,
+          "usd_cache": 0.107142375
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__Wty6aeD",
+          "task": "deonticbench-direct-sara-numeric-tax-case-85",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 105398,
+          "harbor_output": 63833,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 41028,
+              "cached": 27783,
+              "output": 40166,
+              "usd_no_cache": 0.08146545,
+              "usd_cache": 0.0783398625
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 27695,
+              "cached": 18349,
+              "output": 8753,
+              "usd_no_cache": 0.020566124999999998,
+              "usd_cache": 0.0185018625
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9156,
+              "cached": 7966,
+              "output": 6064,
+              "usd_no_cache": 0.0127434,
+              "usd_cache": 0.011847225
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 27519,
+              "cached": 26120,
+              "output": 8850,
+              "usd_no_cache": 0.0207216,
+              "usd_cache": 0.0177831
+            }
+          },
+          "calls": 11,
+          "input": 105398,
+          "cached": 80218,
+          "output": 63833,
+          "usd_no_cache": 0.13549657499999998,
+          "usd_cache": 0.12647205
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__XguATwz",
+          "task": "deonticbench-direct-sara-numeric-tax-case-70",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 128176,
+          "harbor_output": 36463,
+          "roles": {
+            "solver": {
+              "calls": 3,
+              "input": 42191,
+              "cached": 25382,
+              "output": 12401,
+              "usd_no_cache": 0.029580525000000003,
+              "usd_cache": 0.02672505
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 31895,
+              "cached": 20893,
+              "output": 9496,
+              "usd_no_cache": 0.02258925,
+              "usd_cache": 0.0202387875
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 31916,
+              "cached": 29064,
+              "output": 9337,
+              "usd_no_cache": 0.022294275000000002,
+              "usd_cache": 0.019024575000000002
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 22174,
+              "cached": 18680,
+              "output": 5229,
+              "usd_no_cache": 0.013130475,
+              "usd_cache": 0.011028975
+            }
+          },
+          "calls": 11,
+          "input": 128176,
+          "cached": 94019,
+          "output": 36463,
+          "usd_no_cache": 0.087594525,
+          "usd_cache": 0.0770173875
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__YDM8oND",
+          "task": "deonticbench-direct-sara-numeric-tax-case-44",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 259407,
+          "harbor_output": 61821,
+          "roles": {
+            "solver": {
+              "calls": 8,
+              "input": 114229,
+              "cached": 94932,
+              "output": 18874,
+              "usd_no_cache": 0.0525231,
+              "usd_cache": 0.041843250000000005
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 38821,
+              "cached": 27881,
+              "output": 14095,
+              "usd_no_cache": 0.032251275,
+              "usd_cache": 0.0291146625
+            },
+            "verifier.fact_table": {
+              "calls": 5,
+              "input": 48387,
+              "cached": 45269,
+              "output": 11357,
+              "usd_no_cache": 0.028552425,
+              "usd_cache": 0.0234596625
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 6,
+              "input": 57970,
+              "cached": 54824,
+              "output": 17495,
+              "usd_no_cache": 0.041498625000000004,
+              "usd_cache": 0.035330925
+            }
+          },
+          "calls": 23,
+          "input": 259407,
+          "cached": 222906,
+          "output": 61821,
+          "usd_no_cache": 0.15482542500000002,
+          "usd_cache": 0.1297485
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__akN75MF",
+          "task": "deonticbench-direct-sara-numeric-tax-case-67",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 86443,
+          "harbor_output": 26347,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 56684,
+              "cached": 38412,
+              "output": 11678,
+              "usd_no_cache": 0.030398849999999998,
+              "usd_cache": 0.0260775
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 9972,
+              "cached": 1,
+              "output": 2271,
+              "usd_no_cache": 0.005753925,
+              "usd_cache": 0.005753812499999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9914,
+              "cached": 8185,
+              "output": 5656,
+              "usd_no_cache": 0.0120921,
+              "usd_cache": 0.0111712875
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 9873,
+              "cached": 8190,
+              "output": 6742,
+              "usd_no_cache": 0.0141222,
+              "usd_cache": 0.013200825
+            }
+          },
+          "calls": 7,
+          "input": 86443,
+          "cached": 54788,
+          "output": 26347,
+          "usd_no_cache": 0.062367074999999994,
+          "usd_cache": 0.056203425
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__dAFguuW",
+          "task": "deonticbench-direct-sara-numeric-tax-case-35",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 99537,
+          "harbor_output": 42852,
+          "roles": {
+            "solver": {
+              "calls": 3,
+              "input": 34868,
+              "cached": 20613,
+              "output": 17715,
+              "usd_no_cache": 0.038445824999999996,
+              "usd_cache": 0.036126862499999995
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 18322,
+              "cached": 9142,
+              "output": 8517,
+              "usd_no_cache": 0.018717675,
+              "usd_cache": 0.017689200000000002
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 18827,
+              "cached": 17167,
+              "output": 4893,
+              "usd_no_cache": 0.011998425,
+              "usd_cache": 0.0100671375
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 27520,
+              "cached": 26133,
+              "output": 11727,
+              "usd_no_cache": 0.026116125,
+              "usd_cache": 0.0231761625
+            }
+          },
+          "calls": 10,
+          "input": 99537,
+          "cached": 73055,
+          "output": 42852,
+          "usd_no_cache": 0.09527805,
+          "usd_cache": 0.0870593625
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__dgMDntF",
+          "task": "deonticbench-direct-sara-numeric-tax-case-18",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 73978,
+          "harbor_output": 39368,
+          "roles": {
+            "solver": {
+              "calls": 2,
+              "input": 24344,
+              "cached": 9170,
+              "output": 16020,
+              "usd_no_cache": 0.0336891,
+              "usd_cache": 0.032657475000000005
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 9861,
+              "cached": 1,
+              "output": 6819,
+              "usd_no_cache": 0.014264775,
+              "usd_cache": 0.0142646625
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9803,
+              "cached": 8091,
+              "output": 7364,
+              "usd_no_cache": 0.01527795,
+              "usd_cache": 0.014367712500000001
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 29970,
+              "cached": 27540,
+              "output": 9165,
+              "usd_no_cache": 0.021679875,
+              "usd_cache": 0.018581625
+            }
+          },
+          "calls": 7,
+          "input": 73978,
+          "cached": 44802,
+          "output": 39368,
+          "usd_no_cache": 0.0849117,
+          "usd_cache": 0.07987147500000001
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__eFbjdvK",
+          "task": "deonticbench-direct-sara-numeric-tax-case-6",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 178885,
+          "harbor_output": 60716,
+          "roles": {
+            "solver": {
+              "calls": 8,
+              "input": 108571,
+              "cached": 90356,
+              "output": 39420,
+              "usd_no_cache": 0.09019815,
+              "usd_cache": 0.08003310000000001
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 9462,
+              "cached": 1,
+              "output": 6538,
+              "usd_no_cache": 0.01367805,
+              "usd_cache": 0.0136779375
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9404,
+              "cached": 8182,
+              "output": 5444,
+              "usd_no_cache": 0.0116181,
+              "usd_cache": 0.010697624999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 5,
+              "input": 51448,
+              "cached": 48493,
+              "output": 9314,
+              "usd_no_cache": 0.02518095,
+              "usd_cache": 0.0197254875
+            }
+          },
+          "calls": 15,
+          "input": 178885,
+          "cached": 147032,
+          "output": 60716,
+          "usd_no_cache": 0.14067525,
+          "usd_cache": 0.12413415000000001
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__eSmR8Uh",
+          "task": "deonticbench-direct-sara-numeric-tax-case-75",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 121212,
+          "harbor_output": 41093,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 50198,
+              "cached": 34711,
+              "output": 16303,
+              "usd_no_cache": 0.038097825,
+              "usd_cache": 0.0341928375
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 30591,
+              "cached": 20103,
+              "output": 9164,
+              "usd_no_cache": 0.02177115,
+              "usd_cache": 0.0195095625
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 10033,
+              "cached": 8142,
+              "output": 6733,
+              "usd_no_cache": 0.014129325,
+              "usd_cache": 0.01321335
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 30390,
+              "cached": 28051,
+              "output": 8893,
+              "usd_no_cache": 0.021232875000000002,
+              "usd_cache": 0.0180771375
+            }
+          },
+          "calls": 11,
+          "input": 121212,
+          "cached": 91007,
+          "output": 41093,
+          "usd_no_cache": 0.095231175,
+          "usd_cache": 0.0849928875
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__hYmTUnX",
+          "task": "deonticbench-direct-sara-numeric-tax-case-64",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 146755,
+          "harbor_output": 43629,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 55912,
+              "cached": 37780,
+              "output": 18447,
+              "usd_no_cache": 0.042974925000000004,
+              "usd_cache": 0.03872467500000001
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 29845,
+              "cached": 19729,
+              "output": 8941,
+              "usd_no_cache": 0.021241125,
+              "usd_cache": 0.0190216125
+            },
+            "verifier.fact_table": {
+              "calls": 4,
+              "input": 41135,
+              "cached": 38116,
+              "output": 9148,
+              "usd_no_cache": 0.02332275,
+              "usd_cache": 0.0190347
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 19863,
+              "cached": 17879,
+              "output": 7093,
+              "usd_no_cache": 0.016278825,
+              "usd_cache": 0.0142674375
+            }
+          },
+          "calls": 13,
+          "input": 146755,
+          "cached": 113504,
+          "output": 43629,
+          "usd_no_cache": 0.103817625,
+          "usd_cache": 0.09104842500000002
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__iLv6734",
+          "task": "deonticbench-direct-sara-numeric-tax-case-78",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 121463,
+          "harbor_output": 40346,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 49990,
+              "cached": 34652,
+              "output": 14506,
+              "usd_no_cache": 0.03469725,
+              "usd_cache": 0.0307989
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 20424,
+              "cached": 10193,
+              "output": 8525,
+              "usd_no_cache": 0.019047975,
+              "usd_cache": 0.0179012625
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 20308,
+              "cached": 18304,
+              "output": 8498,
+              "usd_no_cache": 0.01897995,
+              "usd_cache": 0.01692075
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 30741,
+              "cached": 28360,
+              "output": 8817,
+              "usd_no_cache": 0.021143025000000003,
+              "usd_cache": 0.017952525
+            }
+          },
+          "calls": 11,
+          "input": 121463,
+          "cached": 91509,
+          "output": 40346,
+          "usd_no_cache": 0.0938682,
+          "usd_cache": 0.0835734375
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__n3HCouJ",
+          "task": "deonticbench-direct-sara-numeric-tax-case-84",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 198838,
+          "harbor_output": 46251,
+          "roles": {
+            "solver": {
+              "calls": 7,
+              "input": 92552,
+              "cached": 76010,
+              "output": 19555,
+              "usd_no_cache": 0.050548425,
+              "usd_cache": 0.0419973
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 30101,
+              "cached": 19945,
+              "output": 9320,
+              "usd_no_cache": 0.02199015,
+              "usd_cache": 0.019746337500000002
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 19868,
+              "cached": 18075,
+              "output": 8536,
+              "usd_no_cache": 0.0189852,
+              "usd_cache": 0.016951762500000002
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 5,
+              "input": 56317,
+              "cached": 52272,
+              "output": 8840,
+              "usd_no_cache": 0.025022549999999998,
+              "usd_cache": 0.019141949999999998
+            }
+          },
+          "calls": 17,
+          "input": 198838,
+          "cached": 166302,
+          "output": 46251,
+          "usd_no_cache": 0.116546325,
+          "usd_cache": 0.09783735
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__nHAAnJZ",
+          "task": "deonticbench-direct-sara-numeric-tax-case-63",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 158530,
+          "harbor_output": 57672,
+          "roles": {
+            "solver": {
+              "calls": 6,
+              "input": 71524,
+              "cached": 56820,
+              "output": 30224,
+              "usd_no_cache": 0.0673986,
+              "usd_cache": 0.06100635
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 29097,
+              "cached": 18885,
+              "output": 9298,
+              "usd_no_cache": 0.0217983,
+              "usd_cache": 0.0196737375
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 28766,
+              "cached": 26824,
+              "output": 9071,
+              "usd_no_cache": 0.021323025,
+              "usd_cache": 0.018305324999999997
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 29143,
+              "cached": 26747,
+              "output": 9079,
+              "usd_no_cache": 0.021394575,
+              "usd_cache": 0.0183855375
+            }
+          },
+          "calls": 15,
+          "input": 158530,
+          "cached": 129276,
+          "output": 57672,
+          "usd_no_cache": 0.1319145,
+          "usd_cache": 0.11737095
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__nNasYBM",
+          "task": "deonticbench-direct-sara-numeric-tax-case-90",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 126068,
+          "harbor_output": 31794,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 48294,
+              "cached": 34945,
+              "output": 6762,
+              "usd_no_cache": 0.01992285,
+              "usd_cache": 0.0159915375
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 39485,
+              "cached": 28808,
+              "output": 9674,
+              "usd_no_cache": 0.024061500000000003,
+              "usd_cache": 0.0208206
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9484,
+              "cached": 8062,
+              "output": 6867,
+              "usd_no_cache": 0.014298225,
+              "usd_cache": 0.01339125
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 28805,
+              "cached": 27171,
+              "output": 8491,
+              "usd_no_cache": 0.020241375,
+              "usd_cache": 0.017184637500000002
+            }
+          },
+          "calls": 12,
+          "input": 126068,
+          "cached": 98986,
+          "output": 31794,
+          "usd_no_cache": 0.07852395,
+          "usd_cache": 0.067388025
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__rKu8cPb",
+          "task": "deonticbench-direct-sara-numeric-tax-case-49",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 183737,
+          "harbor_output": 48349,
+          "roles": {
+            "solver": {
+              "calls": 5,
+              "input": 64577,
+              "cached": 49019,
+              "output": 14804,
+              "usd_no_cache": 0.03744405,
+              "usd_cache": 0.031929412500000004
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 39872,
+              "cached": 29413,
+              "output": 9289,
+              "usd_no_cache": 0.023397675,
+              "usd_cache": 0.0200887125
+            },
+            "verifier.fact_table": {
+              "calls": 6,
+              "input": 59306,
+              "cached": 56569,
+              "output": 17757,
+              "usd_no_cache": 0.042190275,
+              "usd_cache": 0.0358262625
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 19982,
+              "cached": 17666,
+              "output": 6499,
+              "usd_no_cache": 0.015182925,
+              "usd_cache": 0.0131955
+            }
+          },
+          "calls": 17,
+          "input": 183737,
+          "cached": 152667,
+          "output": 48349,
+          "usd_no_cache": 0.118214925,
+          "usd_cache": 0.10103988750000001
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__smAs3b4",
+          "task": "deonticbench-direct-sara-numeric-tax-case-94",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": true,
+          "cut_off_calls": 5,
+          "unknown_calls": 0,
+          "harbor_input": 383279,
+          "harbor_output": 97047,
+          "roles": {
+            "solver": {
+              "calls": 21,
+              "input": 285001,
+              "cached": 264700,
+              "output": 68558,
+              "usd_no_cache": 0.17129640000000002,
+              "usd_cache": 0.14151765
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 29436,
+              "cached": 18779,
+              "output": 10014,
+              "usd_no_cache": 0.02319165,
+              "usd_cache": 0.0210790125
+            },
+            "verifier.fact_table": {
+              "calls": 4,
+              "input": 40408,
+              "cached": 37674,
+              "output": 9386,
+              "usd_no_cache": 0.02365995,
+              "usd_cache": 0.019421625
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 28434,
+              "cached": 26718,
+              "output": 9089,
+              "usd_no_cache": 0.021306975000000002,
+              "usd_cache": 0.0183012
+            }
+          },
+          "calls": 31,
+          "input": 383279,
+          "cached": 347871,
+          "output": 97047,
+          "usd_no_cache": 0.23945497500000001,
+          "usd_cache": 0.2003194875
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__sshbWZM",
+          "task": "deonticbench-direct-sara-numeric-tax-case-83",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": true,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 578475,
+          "harbor_output": 94205,
+          "roles": {
+            "solver": {
+              "calls": 27,
+              "input": 506087,
+              "cached": 481276,
+              "output": 65121,
+              "usd_no_cache": 0.198014925,
+              "usd_cache": 0.143871375
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 17764,
+              "cached": 8863,
+              "output": 10599,
+              "usd_no_cache": 0.022537725,
+              "usd_cache": 0.0215406375
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26931,
+              "cached": 25698,
+              "output": 9794,
+              "usd_no_cache": 0.0224034,
+              "usd_cache": 0.019512375000000002
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 27693,
+              "cached": 26322,
+              "output": 8691,
+              "usd_no_cache": 0.020449575,
+              "usd_cache": 0.01748835
+            }
+          },
+          "calls": 35,
+          "input": 578475,
+          "cached": 542159,
+          "output": 94205,
+          "usd_no_cache": 0.26340562500000003,
+          "usd_cache": 0.2024127375
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__vBcmvWx",
+          "task": "deonticbench-direct-sara-numeric-tax-case-15",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 107756,
+          "harbor_output": 31085,
+          "roles": {
+            "solver": {
+              "calls": 4,
+              "input": 57033,
+              "cached": 38690,
+              "output": 12164,
+              "usd_no_cache": 0.03136245,
+              "usd_cache": 0.027009825
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 10114,
+              "cached": 1,
+              "output": 4113,
+              "usd_no_cache": 0.009228975,
+              "usd_cache": 0.0092288625
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 10056,
+              "cached": 8211,
+              "output": 6164,
+              "usd_no_cache": 0.0130659,
+              "usd_cache": 0.0121421625
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 30553,
+              "cached": 28480,
+              "output": 8644,
+              "usd_no_cache": 0.02079045,
+              "usd_cache": 0.01758645
+            }
+          },
+          "calls": 9,
+          "input": 107756,
+          "cached": 75382,
+          "output": 31085,
+          "usd_no_cache": 0.074447775,
+          "usd_cache": 0.0659673
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__weyXtcp",
+          "task": "deonticbench-direct-sara-numeric-tax-case-39",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 7,
+          "unknown_calls": 0,
+          "harbor_input": 319750,
+          "harbor_output": 93372,
+          "roles": {
+            "solver": {
+              "calls": 9,
+              "input": 127507,
+              "cached": 109531,
+              "output": 34706,
+              "usd_no_cache": 0.08419979999999999,
+              "usd_cache": 0.0718775625
+            },
+            "verifier.section_table": {
+              "calls": 9,
+              "input": 92961,
+              "cached": 80962,
+              "output": 23268,
+              "usd_no_cache": 0.05757165,
+              "usd_cache": 0.048463425
+            },
+            "verifier.fact_table": {
+              "calls": 4,
+              "input": 39000,
+              "cached": 37230,
+              "output": 17062,
+              "usd_no_cache": 0.03784125,
+              "usd_cache": 0.033652875
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 6,
+              "input": 60282,
+              "cached": 57101,
+              "output": 18336,
+              "usd_no_cache": 0.0434223,
+              "usd_cache": 0.0369984375
+            }
+          },
+          "calls": 28,
+          "input": 319750,
+          "cached": 284824,
+          "output": 93372,
+          "usd_no_cache": 0.22303499999999998,
+          "usd_cache": 0.1909923
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__ypSadDY",
+          "task": "deonticbench-direct-sara-numeric-tax-case-47",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 150860,
+          "harbor_output": 46748,
+          "roles": {
+            "solver": {
+              "calls": 5,
+              "input": 61634,
+              "cached": 46520,
+              "output": 18622,
+              "usd_no_cache": 0.04416135,
+              "usd_cache": 0.03892785
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 30127,
+              "cached": 19515,
+              "output": 9421,
+              "usd_no_cache": 0.022183425,
+              "usd_cache": 0.0199879875
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 29394,
+              "cached": 27614,
+              "output": 9535,
+              "usd_no_cache": 0.022287225,
+              "usd_cache": 0.01918065
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 29705,
+              "cached": 27537,
+              "output": 9170,
+              "usd_no_cache": 0.021649500000000002,
+              "usd_cache": 0.0185515875
+            }
+          },
+          "calls": 14,
+          "input": 150860,
+          "cached": 121186,
+          "output": 46748,
+          "usd_no_cache": 0.1102815,
+          "usd_cache": 0.096648075
+        }
+      ]
+    }
+  ]
+}

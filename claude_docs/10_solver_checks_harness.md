@@ -10,9 +10,10 @@
   knows nothing about the task: it validates the shape of a report, searches the rule document
   for every quote, gates `task_complete` on the verdicts, and lets the solver either correct the
   file or rebut a finding. There is no compactor and no reader for small rule documents.
-- **Status (2026-11-17)**: implemented, four smoke runs, three full runs under the cost protocol
+- **Status (2026-11-18)**: implemented, four smoke runs, three full runs under the cost protocol
   of `09` §10.12 (§7). SARA numeric with Qwen3.5-35B-A3B: **19/35** at 9.40 cents per task
-  (reader-verifier-compactor: 17/35 at 6.51).
+  (reader-verifier-compactor: 17/35 at 6.51); with Qwen3.8-27B: **24/35** at 7.99 cents on the
+  same price card, where the checks changed no outcome (§7.3).
 
 ## 1. Why this version
 
@@ -303,16 +304,52 @@ trials rarely reached that time limit, so the numbers are roughly comparable �
   cap (23 fallbacks in 48 runs).
 - **Rebuttals**: 3.
 
-### 7.3 `sc-run1-numeric` with Qwen3.8-27B (SARA numeric, started 2026-11-17 15:20 UTC)
+### 7.3 `sc-run1-numeric` with Qwen3.8-27B (SARA numeric, 35 tasks, 2026-11-17/18) ✅
 
-Running when this section was written; results follow. Same code and default skills as §7.1
-(check format v1). Serving in `06` §2: 16 concurrent trials, about 59 output tokens/s in total.
-The budget of 0.15 USD per task is computed with the Qwen3.5 price card, so both models get the
-same token allowance; cost is reported with that card and with the model's own price
-(`tools/pricing/price_card_qwen3.8-27b.json`). `AGENT_TIMEOUT_MULT=96`: a first start with the
-default 4 h per trial was stopped after 16 min, because at this speed a normal trial would have
-run into the time limit (its partial job dir is kept as
-`sc-run1-numeric-aborted-agent-timeout`, not used). No baseline of this model exists.
+Same code and default skills as §7.1 (check format v1). Serving in `06` §2: 16 concurrent
+trials, 15:20–06:07 UTC (14 h 47 min), 0 exceptions. The budget of 0.15 USD per task is computed
+with the Qwen3.5 price card, so both models get the same token allowance; cost is reported with
+that card and with the model's own price (`tools/pricing/price_card_qwen3.8-27b.json`).
+`AGENT_TIMEOUT_MULT=96`: a first start with the default 4 h per trial was stopped after 16 min,
+because at this speed a normal trial would have run into the time limit (its partial job dir is
+kept as `sc-run1-numeric-aborted-agent-timeout`, not used). No baseline of this model exists.
+
+| Solver-checks, SARA numeric (one draw each) | Correct | Wilson 95% | Cents per task, no cache | with cache | p95 | Model calls | Output tokens |
+|---|---|---|---|---|---|---|---|
+| Qwen3.5-35B-A3B (§7.1) | 19/35 | 38.2%–69.5% | 9.40 | 7.20 | 14.95 | 21.6 | 54,303 |
+| **Qwen3.8-27B**, Qwen3.5 price card | **24/35** | 52.0%–81.4% | **7.99** | 6.73 | 17.02 | 14.9 | 55,819 |
+| Qwen3.8-27B, its own price card | 24/35 | | 13.04 | 11.47 | 26.34 | | |
+
+Cost detail in `outputs/sc_run1_numeric_qwen38_27b_inference_cost.json` (both models, Qwen3.5
+card) and `outputs/sc_run1_numeric_qwen38_27b_inference_cost_own_card.json`. The intervals
+overlap: 24 vs 19 is not a significant difference on 35 tasks and one draw 🔶.
+
+- **The gain is in the solver, the checks changed no outcome** ✅. First checked answer correct
+  in 24/35, final answer correct in 24/35: no wrong answer became right and no right answer
+  became wrong. After a first report that did not pass (10 trials): 6 kept a correct answer, 2
+  kept a wrong one, 2 changed a wrong answer into another wrong one (29, 51). With Qwen3.5 the
+  same checks moved 12/35 to 19/35.
+- **Against Qwen3.5, task by task** ✅: newly correct 2, 18, 49, 60, 63, 94; newly wrong 73.
+  Wrong with both models: 10, 29, 35, 39, 47, 51, 58, 61, 64, 78. Tasks 18, 60 and 94 had not
+  been solved by any harness with Qwen3.5.
+- **Rounds** ✅: 1 round in 27 trials, 2 in 6, 3 in 2. Round 1 passed in 25 trials (18 correct).
+  Finish reasons: `verified` 30 (21 correct), rounds used up 1 (task 60, correct), stopped by
+  the cost budget 4 (29, 51, 83, 94; 83 and 94 correct, their answer files were already
+  written). Of the 11 wrong answers 9 finished `verified`.
+- **Checks** ✅: round-1 FAIL rate: section table 5/35, grounded reasoning 4/35, fact table
+  2/35 (3 without a report). Quotes: 25 found, 0 not found, 8 without a quote. 4 rebuttals,
+  1 repair request.
+- **Most check runs ended without thinking** ✅: 89 of 125 check runs (71%) reached the
+  8,000-token cap while thinking and were sent again with thinking off (Qwen3.5: 90 of 235,
+  38%). The solver reached its 16,384-token limit in 24 replies (Qwen3.5: 1). In total 113
+  replies were cut off, and they hold 52% of all output tokens (Qwen3.5: 94 replies, 38%).
+  🔶 Whether the low FAIL rate comes from better answers or from checks that mostly ran without
+  thinking is not separated by this run.
+- **Cost** ✅: solver 3.82 cents, grounded reasoning 1.52, section table 1.45, fact table 1.21
+  on the Qwen3.5 card (52% of the cost is the checks). Fewer calls than Qwen3.5 (14.9 vs 21.6)
+  with the same output volume: 3,743 output tokens per call against 2,511.
+- **Speed** ✅: 49 output tokens/s in total with 16 running requests, 3.1 per request; a single
+  request gets 4.3 (`06` §2). Wall time per trial: mean 296 min, median 250, longest 631.
 
 ### 7.4 Prompt-based direct reasoning on the same price card (estimate, 2026-11-18) ✅
 
@@ -374,6 +411,13 @@ The 16 wrong final answers, each read against a derivation that reproduces the g
   full round after a small correction.
 - **Output cap of a check.** A check that reaches `check_max_output_tokens` (8,000) while
   thinking is sent again without thinking; the tokens of the first attempt are spent.
+  With Qwen3.8-27B this happened in 71% of the check runs (§7.3), so the cap decides how the
+  checks of that model work. Candidates, none tried: a higher cap for models that think longer,
+  or a thinking budget set in the request.
+- **What the checks add depends on the model.** They moved Qwen3.5 from 12/35 to 19/35 and
+  changed no outcome for Qwen3.8-27B (24/35 before and after, §7.3), at 59% and 52% of the
+  cost. A run of the solver skill alone (no verifier) per model would give the
+  comparison directly; not run.
 - **Rebuttals are rare.** The solver almost always edits the file after a finding
   (3 rebuttals in 35 numeric trials, 3 in 30 binary trials).
 - **Three weaknesses seen in `sc-run1-binary`** (§7.2), none fixed yet: a check that falls back
