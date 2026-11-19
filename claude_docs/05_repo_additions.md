@@ -106,6 +106,7 @@ deontic-reasoning-with-harness/
 │   ├── templates/terminus-json-multiagent-v4.txt  solver template of AGENT=t2sc ({rule_document} slot
 │   │                            before the skill)
 │   ├── sc_run_report.py             summary of a t2sc job: accuracy, finish reasons, rounds, check status
+│   ├── sc_check_stats.py            what the checks of a t2sc job cost and tell apart: cap waste, rounds, FAIL on right vs wrong files, solver context (11 §2)
 │   │                            by round, quote checks, repairs and fallbacks, tokens per check,
 │   │                            first report vs reward; --trials, --findings (10 §4)
 │   ├── pricing/price_card.json      the fixed price card of the inference-cost metric: USD per million
