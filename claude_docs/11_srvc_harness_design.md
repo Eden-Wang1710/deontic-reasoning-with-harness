@@ -8,6 +8,14 @@ owner confirmed all six points of §8 on 2026-11-20 and asked for SARA numeric a
 full, then the KIRA adapter. The numbers in §2 are measured on finished runs with
 `tools/sc_check_stats.py`.
 
+**Names of the two versions (owner, 2026-11-20).** The harness on the terminus-2 loop is the
+**solver-reader-verifier-compaction terminus-2-harness v0.1** (`AGENT=t2srvc`); the harness on
+KIRA's loop is the **solver-reader-verifier-compaction terminus-kira-harness v0.1**
+(`AGENT=kirasrvc`). Where this document says "the harness" or "v0.1" without a base agent it
+means the architecture common to both. The identifiers in code and logs are unchanged
+(`t2srvc`, `kirasrvc`, and `"harness": "srvc-v0.1"` in a trial's summary, which
+`tools/sc_run_report.py` reads).
+
 **Naming.** From v0.1 on a check of the verifier is called a **rubric**, and the table it fills
 is its **rubric table** (owner, 2026-11-20). §2 keeps the word *check* because it describes the
 runs of the solver-checks harness.

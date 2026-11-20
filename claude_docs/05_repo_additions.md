@@ -105,7 +105,8 @@ deontic-reasoning-with-harness/
 │   │                            (default list) and process (optional, reads the solver trajectory)
 │   ├── templates/terminus-json-multiagent-v4.txt  solver template of AGENT=t2sc ({rule_document} slot
 │   │                            before the skill)
-│   ├── dar_terminus2_srvc.py        Terminus2SRVC (AGENT=t2srvc, 2026-11-20): the
+│   ├── dar_terminus2_srvc.py        Terminus2SRVC (AGENT=t2srvc, 2026-11-20; "solver-reader-verifier-compaction
+│   │                            terminus-2-harness v0.1"): the
 │   │                            solver-reader-verifier-compaction harness v0.1. Reader survey before
 │   │                            the first step; reader queries and compaction as branches of the
 │   │                            solver's conversation (prefix read from the prompt cache); direct line
@@ -113,7 +114,8 @@ deontic-reasoning-with-harness/
 │   │                            of the rubric table with kept thinking; budget at the with-cache
 │   │                            price; logs under <trial>/agent/{reader,compaction,write_file,
 │   │                            rubric_verifier}/ (claude_docs/11 §9)
-│   ├── dar_kira_srvc.py             KiraSRVC (AGENT=kirasrvc, 2026-11-20): the same harness on KIRA's
+│   ├── dar_kira_srvc.py             KiraSRVC (AGENT=kirasrvc, 2026-11-20; "solver-reader-verifier-compaction
+│   │                            terminus-kira-harness v0.1"): the same harness on KIRA's
 │   │                            loop. Sub-agents and write_file are native tools; branches carry the
 │   │                            tool definitions with tool_choice="none"; harness messages reworded
 │   │                            from JSON fields to tool calls (claude_docs/11 §11)
