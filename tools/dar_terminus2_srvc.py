@@ -106,6 +106,7 @@ from dar_terminus2_multiagent import (
     READER_HEADER,
     VERIFIER_HEADER,
     _sha,
+    reply_object,
 )
 from dar_terminus2_verifier import (
     SubagentClock,
@@ -513,7 +514,7 @@ class Terminus2SRVC(Terminus2SolverChecks):
         self._compacted_this_step = False
         self._pending_writes, self._write_notes = [], []
         if not (feedback and "ERROR:" in feedback):
-            self._parse_write_file(_extract_json_object(llm_response.content) or {})
+            self._parse_write_file(reply_object(llm_response.content))
         return out
 
     async def _execute_commands(

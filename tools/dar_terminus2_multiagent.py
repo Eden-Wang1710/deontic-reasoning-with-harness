@@ -157,6 +157,53 @@ MISPLACED_IN_TEXT_RE = re.compile(
     r"|"
     r'"subagent"\s*:\s*\{[^{}]*\}\s*,\s*(?:"duration"\s*:\s*[\d.]+\s*,\s*)?"keystrokes"\s*:'
 )
+def _unclosed_depth(text: str) -> int:
+    """How many objects are still open at the end of ``text`` (braces inside strings are not
+    counted); 0 when the text ends inside a string."""
+    depth, in_str, esc = 0, False, False
+    for ch in text:
+        if in_str:
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == '"':
+                in_str = False
+        elif ch == '"':
+            in_str = True
+        elif ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return 0
+    return 0 if in_str else max(depth, 0)
+
+
+def reply_object(text: str | None) -> dict:
+    """The solver's reply as a JSON object, read the way the stock parser reads it.
+
+    The stock parser accepts a reply whose closing braces are missing by appending them
+    (srvc-run1, 2026-11-20: a "write_file" object that was never closed; the stock parser took
+    the commands, while ``_extract_json_object`` returned the first balanced object, which
+    was the inner one, and the file write was dropped without a word). The same repair is
+    done here. A "subagent" that the repair leaves inside "write_file" is moved back to the
+    top level, where the solver meant it.
+    """
+    text = text or ""
+    start = text.find("{")
+    if start == -1:
+        return {}
+    depth = _unclosed_depth(text[start:])
+    if not depth:
+        return _extract_json_object(text) or {}
+    obj = _extract_json_object(text[start:].rstrip() + "}" * depth) or {}
+    inner = obj.get("write_file")
+    if isinstance(inner, dict) and "subagent" in inner and "subagent" not in obj:
+        obj["subagent"] = inner.pop("subagent")
+    return obj
+
+
 SUBAGENT_FORM = (
     '"subagent" is a top-level field of the JSON response, next to "commands"; it is never a '
     'keystroke and never a field inside a command object. Correct form: {"analysis": "...", '
@@ -341,7 +388,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
                 )
             return commands, is_task_complete, feedback, analysis, plan, llm_response
 
-        obj = _extract_json_object(llm_response.content) or {}
+        obj = reply_object(llm_response.content)
         commands = self._drop_misplaced_calls(obj, commands)
         sub = self._normalise_subagent(obj.get("subagent"))
         self._pending_subagent = sub

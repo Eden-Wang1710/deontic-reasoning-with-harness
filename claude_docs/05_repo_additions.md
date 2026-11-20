@@ -45,7 +45,7 @@ deontic-reasoning-with-harness/
 │   │                                parser, qwen3_xml tool parser, 16k max_new_tokens); MODEL_DIR,
 │   │                                SERVED_NAME, MAX_NUM_SEQS and LOG serve another local model
 │   │                                (Qwen3.8-27B, 2026-11-17, 06)
-│   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|t2verify{,2,3}|t2rv|t2rvc|t2sc|kira,
+│   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|t2verify{,2,3}|t2rv|t2rvc|t2sc|t2srvc|kirasrvc|kira,
 │   │                                SUBSET=sara|numeric|binary|all, MODEL=<served name>; writes
 │   │                                harbor-deonticbench/jobs/<MODEL>/...
 │   ├── dar_terminus2_local.py       Terminus2 subclass with a truthful truncation marker
@@ -105,7 +105,28 @@ deontic-reasoning-with-harness/
 │   │                            (default list) and process (optional, reads the solver trajectory)
 │   ├── templates/terminus-json-multiagent-v4.txt  solver template of AGENT=t2sc ({rule_document} slot
 │   │                            before the skill)
-│   ├── sc_run_report.py             summary of a t2sc job: accuracy, finish reasons, rounds, check status
+│   ├── dar_terminus2_srvc.py        Terminus2SRVC (AGENT=t2srvc, 2026-11-20): the
+│   │                            solver-reader-verifier-compaction harness v0.1. Reader survey before
+│   │                            the first step; reader queries and compaction as branches of the
+│   │                            solver's conversation (prefix read from the prompt cache); direct line
+│   │                            ranges without a model call; "write_file" field; one verifier round
+│   │                            of the rubric table with kept thinking; budget at the with-cache
+│   │                            price; logs under <trial>/agent/{reader,compaction,write_file,
+│   │                            rubric_verifier}/ (claude_docs/11 §9)
+│   ├── dar_kira_srvc.py             KiraSRVC (AGENT=kirasrvc, 2026-11-20): the same harness on KIRA's
+│   │                            loop. Sub-agents and write_file are native tools; branches carry the
+│   │                            tool definitions with tool_choice="none"; harness messages reworded
+│   │                            from JSON fields to tool calls (claude_docs/11 §11)
+│   ├── skills/solver_v5/SKILL.md    solver skill of AGENT=t2srvc (outline first, reader on request,
+│   │                            write_file, one verifier round); solver_v5_tools/ = the same for
+│   │                            tool calls (AGENT=kirasrvc)
+│   ├── skills/reader_v2/SKILL.md    reader skill: survey (outline + passages) and query, line ranges only
+│   ├── skills/compaction_v1/SKILL.md  compaction skill: the state page that replaces the middle steps
+│   ├── skills/rubric_<name>_v1/SKILL.md  the rubric table: section_table, fact_table,
+│   │                            grounded_reasoning; shared report format skills/rubric_report_v3/FORMAT.md
+│   ├── templates/terminus-json-multiagent-v5.txt  solver template of AGENT=t2srvc;
+│   │                            terminus-kira-srvc.txt = solver template of AGENT=kirasrvc
+│   ├── sc_run_report.py             summary of a t2sc or t2srvc job: accuracy, finish reasons, rounds, check status
 │   ├── sc_check_stats.py            what the checks of a t2sc job cost and tell apart: cap waste, rounds, FAIL on right vs wrong files, solver context (11 §2)
 │   │                            by round, quote checks, repairs and fallbacks, tokens per check,
 │   │                            first report vs reward; --trials, --findings (10 §4)
@@ -191,6 +212,8 @@ serve_qwen35_35b.sh ──► vLLM at :9009 ◄── run_dar_qwen35_35b.sh ─�
                                    │            │ AGENT=t2rv      dar_terminus2_multiagent.py (+ skills/solver_v1, reader_v1, rubric_verifier_v4, templates/)
                                    │            │ AGENT=t2rvc     dar_terminus2_compactor.py (+ skills/solver_v3, compactor_v1, reader_v1, rubric_verifier_v4)
                                    │            │ AGENT=t2sc      dar_terminus2_checks.py (+ skills/solver_v4, check_report_v1|v2, check_*_v1, templates/)
+                                   │            │ AGENT=t2srvc    dar_terminus2_srvc.py (+ skills/solver_v5, reader_v2, compaction_v1, rubric_*_v1, rubric_report_v3)
+                                   │            │ AGENT=kirasrvc  dar_kira_srvc.py (the same skills, solver_v5_tools, templates/terminus-kira-srvc.txt)
                                    │            └ AGENT=kira      dar_kira_local.py
                                    │
           verbalized_confidence.py ┘ (reads jobs/<...>/, writes outputs/verbalized_confidence/)
