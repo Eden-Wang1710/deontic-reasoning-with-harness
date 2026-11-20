@@ -1,0 +1,221 @@
+{
+  "price_usd_per_token": {
+    "input": 1.4e-07,
+    "output": 1e-06,
+    "cache_read": 5.0000000000000004e-08
+  },
+  "jobs": [
+    {
+      "job": "jobs/qwen3.5-35b-a3b/kirasrvc-direct/kirasrvc-smoke2",
+      "n_trials": 2,
+      "accuracy": 1.0,
+      "n_correct": 2.0,
+      "exceptions": 0,
+      "budget_exhausted": 0,
+      "cut_off_calls": 1,
+      "unknown_calls": 0,
+      "source": [
+        "ledger"
+      ],
+      "totals_differ_from_harbor": 0,
+      "mean": {
+        "calls": 18.5,
+        "input": 220057.0,
+        "cached": 164437.0,
+        "output": 32181.5,
+        "usd_no_cache": 0.06298948,
+        "usd_cache": 0.04819015
+      },
+      "usd_no_cache": {
+        "median": 0.06298948,
+        "p95": 0.07228474,
+        "max": 0.07228474
+      },
+      "usd_cache": {
+        "median": 0.04819015,
+        "p95": 0.05349355,
+        "max": 0.05349355
+      },
+      "roles": {
+        "reader": {
+          "calls": 3,
+          "input": 48699,
+          "cached": 8579,
+          "output": 3267,
+          "usd_no_cache": 0.010084860000000001,
+          "usd_cache": 0.009312750000000002
+        },
+        "solver": {
+          "calls": 18,
+          "input": 213171,
+          "cached": 178938,
+          "output": 25390,
+          "usd_no_cache": 0.05523394,
+          "usd_cache": 0.03912952
+        },
+        "verifier.section_table": {
+          "calls": 4,
+          "input": 45360,
+          "cached": 18176,
+          "output": 13384,
+          "usd_no_cache": 0.0197344,
+          "usd_cache": 0.01809856
+        },
+        "verifier.fact_table": {
+          "calls": 3,
+          "input": 27747,
+          "cached": 24734,
+          "output": 9751,
+          "usd_no_cache": 0.013635580000000001,
+          "usd_cache": 0.01140952
+        },
+        "verifier.grounded_reasoning": {
+          "calls": 6,
+          "input": 55291,
+          "cached": 52183,
+          "output": 10594,
+          "usd_no_cache": 0.018334740000000002,
+          "usd_cache": 0.013638270000000001
+        },
+        "compaction": {
+          "calls": 3,
+          "input": 49846,
+          "cached": 46264,
+          "output": 1977,
+          "usd_no_cache": 0.00895544,
+          "usd_cache": 0.0047916799999999996
+        }
+      },
+      "trials": [
+        {
+          "trial": "deonticbench-direct-sara-numeric__AUUWbQ3",
+          "task": "deonticbench-direct-sara-numeric-tax-case-93",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 265791,
+          "harbor_output": 35074,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 14388,
+              "cached": 0,
+              "output": 1332,
+              "usd_no_cache": 0.00334632,
+              "usd_cache": 0.00334632
+            },
+            "solver": {
+              "calls": 10,
+              "input": 136064,
+              "cached": 110519,
+              "output": 15149,
+              "usd_no_cache": 0.03419796,
+              "usd_cache": 0.024251250000000002
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 19029,
+              "cached": 9054,
+              "output": 4499,
+              "usd_no_cache": 0.00716306,
+              "usd_cache": 0.0063482
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 18683,
+              "cached": 16858,
+              "output": 7758,
+              "usd_no_cache": 0.01037362,
+              "usd_cache": 0.008856399999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 27781,
+              "cached": 26096,
+              "output": 4359,
+              "usd_no_cache": 0.00824834,
+              "usd_cache": 0.0058997
+            },
+            "compaction": {
+              "calls": 3,
+              "input": 49846,
+              "cached": 46264,
+              "output": 1977,
+              "usd_no_cache": 0.00895544,
+              "usd_cache": 0.0047916799999999996
+            }
+          },
+          "calls": 21,
+          "input": 265791,
+          "cached": 208791,
+          "output": 35074,
+          "usd_no_cache": 0.07228474,
+          "usd_cache": 0.05349355
+        },
+        {
+          "trial": "deonticbench-direct-sara-numeric__gsKW2ev",
+          "task": "deonticbench-direct-sara-numeric-tax-case-44",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 174323,
+          "harbor_output": 29289,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 34311,
+              "cached": 8579,
+              "output": 1935,
+              "usd_no_cache": 0.00673854,
+              "usd_cache": 0.005966430000000001
+            },
+            "solver": {
+              "calls": 8,
+              "input": 77107,
+              "cached": 68419,
+              "output": 10241,
+              "usd_no_cache": 0.021035980000000003,
+              "usd_cache": 0.01487827
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 26331,
+              "cached": 9122,
+              "output": 8885,
+              "usd_no_cache": 0.012571339999999999,
+              "usd_cache": 0.01175036
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 9064,
+              "cached": 7876,
+              "output": 1993,
+              "usd_no_cache": 0.0032619600000000004,
+              "usd_cache": 0.00255312
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 27510,
+              "cached": 26087,
+              "output": 6235,
+              "usd_no_cache": 0.0100864,
+              "usd_cache": 0.00773857
+            }
+          },
+          "calls": 16,
+          "input": 174323,
+          "cached": 120083,
+          "output": 29289,
+          "usd_no_cache": 0.05369422,
+          "usd_cache": 0.04288675
+        }
+      ]
+    }
+  ]
+}

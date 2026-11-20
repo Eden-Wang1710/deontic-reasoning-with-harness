@@ -1,7 +1,8 @@
 # 11 · Solver-reader-verifier-compaction harness: design of v0.1
 
 **Status (2026-11-20): implemented as `AGENT=t2srvc`** (`tools/dar_terminus2_srvc.py`; §9
-describes the implementation and where it differs from this design). §1 records what the owner
+describes the implementation and where it differs from this design), **run in full on SARA
+numeric and binary (§10) and put on KIRA's loop as `AGENT=kirasrvc` (§11)**. §1 records what the owner
 has decided (2026-11-19 the frame, 2026-11-20 the verifier, the window, the cost column). The
 owner confirmed all six points of §8 on 2026-11-20 and asked for SARA numeric and binary in
 full, then the KIRA adapter. The numbers in §2 are measured on finished runs with
@@ -351,3 +352,199 @@ Differences from §3 and §4:
   context holds excerpts and not the document. 🔶 Putting the numbered source at a fixed place
   of the branch prefix would not help either: the prefix is the solver's context, which grows.
 - The parent's messages for calls that use no round still say "check" in two places.
+
+## 10. Smoke runs and the first full runs (2026-11-20)
+
+All runs: Qwen3.5-35B-A3B on the local vLLM server, T 0.7, thinking on, no time-outs, cost
+budget 0.15 USD per task at the with-cache price. Cost is in US cents per task on the price
+card of `09` §10.12, written *no cache / with cache*; the with-cache number is the headline
+(§5). Reports: `tools/sc_run_report.py` and `tools/inference_cost.py`.
+
+### 10.1 Smoke runs
+
+| Job | Tasks | Settings | Correct | Cost | What it showed |
+| --- | --- | --- | --- | --- | --- |
+| `srvc-smoke1` | 2 | defaults | 2/2 | 7.19 / 5.84 | ✅ Survey, `write_file`, one verifier round with three rubrics, completion gate. |
+| `srvc-smoke2` | 4 | `context_window=12000` | 2/4 | 5.51 / 4.51 | ✅ 13.2 model calls per task. Five compaction calls, all declined (2 `nothing_to_remove`, 3 `not_smaller`): the decline paths work, the applied path was not reached. |
+| `srvc-smoke3` | 2 | `context_window=12000 compaction_min_saving=0.03`, turn-based compaction | 1/2 | 4.79 / 4.15 | Two compaction calls, both `nothing_to_remove` (three turns). The applied path was first reached in `kirasrvc-smoke2` (§11) and once in the full numeric run (§10.4). |
+
+### 10.2 Full runs: accuracy and cost ✅
+
+`srvc-run1-numeric` (35 tasks) and `srvc-run1-binary` (30 tasks), started 05:09 UTC from commit
+`b158eddd`, 8 trials at a time each on one server, default 32K window. No trial ended with an
+exception, none was stopped by the cost budget. Binary ended 10:12 UTC, numeric 11:22 UTC.
+Cost detail per trial and role: `outputs/srvc_run1_{numeric,binary}_inference_cost.json`.
+
+| Run | Correct | Wilson 95% | Calls per task | Cost no cache | Cost with cache |
+| --- | --- | --- | --- | --- | --- |
+| `srvc-run1-numeric` | 17/35 (48.6%) | 33.0-64.4% | 14.7 | 6.01 | **4.74** |
+| `sc-run1-numeric` (solver-checks, `10` §7) | 19/35 (54.3%) | | | 9.40 | 7.20 |
+| reader-verifier-compactor (`09` §10.12) | 17/35 | | | 6.51 | |
+| solver-verifier (`08` §10) | 15/35 | | | 7.07 | |
+| terminus-2, our rerun under the cost protocol | 2/35 | | | 1.75 | |
+| `srvc-run1-binary` | 24/30 (80.0%) | 62.7-90.5% | 11.9 | 3.68 | **3.04** |
+| `sc-run1-binary` | 23/30 (76.7%) | | | 5.59 | 4.17 |
+
+- ✅ **Cost fell by about a third against the solver-checks harness**: numeric 7.20 to 4.74
+  cents with cache (-34%; -36% without), binary 4.17 to 3.04 (-27%; -34% without).
+- **Accuracy is not distinguishable from the solver-checks harness.** Task by task on numeric:
+  15 correct in both runs, 4 only in `sc-run1`, 2 only in `srvc-run1`; on binary 21 / 2 / 3.
+  With 35 and 30 tasks, one run each at T 0.7, a difference of two tasks is noise. 🔶 The claim
+  the runs support is "same accuracy range at two thirds of the cost", not an accuracy gain or
+  loss.
+
+Per role, mean per task (share of the no-cache cost):
+
+| Role | Numeric: calls | no cache | with cache | Binary: calls | no cache | with cache |
+| --- | --- | --- | --- | --- | --- | --- |
+| solver | 7.7 | 2.65 (44%) | 1.87 | 6.0 | 1.11 (30%) | 0.79 |
+| reader | 2.1 | 1.02 (17%) | 0.85 | 1.9 | 0.73 (20%) | 0.64 |
+| rubric: section table | 1.7 | 0.86 (14%) | 0.80 | 1.3 | 0.66 (18%) | 0.64 |
+| rubric: grounded reasoning | 1.8 | 0.78 (13%) | 0.65 | 1.5 | 0.57 (15%) | 0.46 |
+| rubric: fact table | 1.4 | 0.67 (11%) | 0.56 | 1.3 | 0.61 (17%) | 0.51 |
+| compaction | 0.03 | 0.02 (0%) | 0.01 | 0 | 0 | 0 |
+
+### 10.3 What the verifier round did ✅
+
+The answer in the file when the verifier was called, against the final answer:
+
+| | Numeric | Binary |
+| --- | --- | --- |
+| Correct before the verifier | 13/35 | 26/30 |
+| Correct at the end | 17/35 | 24/30 |
+| Wrong before, right after | 7 | 1 |
+| Right before, wrong after | 3 | 3 |
+| First report passed: trials (correct before) | 9 (6) | 17 (15) |
+| First report did not pass: trials (correct before) | 26 (7) | 13 (11) |
+
+- ✅ **Same pattern as the solver-checks harness, smaller on numeric.** On numeric the one
+  round is worth four tasks net (7 gained, 3 lost; 13 to 17). `sc-run1-numeric`, with up to
+  three rounds and rebuttals, gained 8 and lost 1 (12 to 19, `10` §7.1). The solver before the
+  verifier is at the same level in both (13 and 12 of 35): what differs is the round, at a
+  third less cost.
+- ✅ On binary the round costs two tasks net (1 gained, 3 lost; 26 to 24), as it did in
+  `sc-run1-binary` (0 gained, 2 lost; 25 to 23, `10` §7.2). The solver is right before the verifier in
+  26 of 30 cases, and the rubrics still report findings in 11 of those 26. A report that does
+  not pass says little there: 11 of the 13 answers it was raised against were correct.
+- 🔶 One round with no second look means a wrong revision is final. Whether the solver should
+  be told how often findings are wrong, or the report should carry a severity, is a skill
+  question and is open.
+
+Finish reasons (trials, correct): numeric `revised_after_report` 25 (11), `verified` 9 (6),
+`unrevised_not_passed` 1 (0); binary `verified` 17 (15), `revised_after_report` 10 (6),
+`unrevised_not_passed` 3 (3).
+
+### 10.4 How the parts were used ✅
+
+- **Reader.** One survey per trial. The solver asked for more text in 11 of 35 numeric trials
+  (18 calls, 2 served as direct ranges) and 9 of 30 binary trials (12 calls).
+- **Compaction.** One call in 65 trials, applied (numeric): 7 steps removed, 102,596 to 55,730
+  characters, solver prompt 31,541 to 19,200 tokens. The solver's prompt at the last step has
+  a median of 15,925 tokens on numeric (max 27,980) and 8,534 on binary (max 14,207): with a
+  32K window SARA does not need compaction. No solver called it by itself.
+- **Kept thinking.** 40 cut replies on numeric and 11 on binary had their thinking handed to
+  the next call (numeric: section table 16, grounded reasoning 10, fact table 8, reader 6).
+  Under the solver-checks harness that output was paid for and thrown away (§2).
+- **`write_file` is used by fewer than half of the solvers.** Numeric: 10 trials wrote the
+  answer file only through the field, 21 only from the terminal (heredoc, then `cat`), 4 both
+  ways; binary 11 / 16 / 3. Template and skill ask for the field in both runs, and all six
+  smoke trials used it. 🔶 On numeric the terminal-only trials cost more (6.49 / 5.02 cents
+  and 8.6 solver calls against 4.77 / 3.91 and 5.9) and were right as often or more (12 of 21
+  against 4 of 10); on binary there is no cost difference (3.47 / 2.89 against 3.52 / 2.93).
+  This is a comparison of self-selected groups, not an effect of the field. A generic note
+  ("the answer file changed without `write_file`") was considered and not added.
+
+### 10.5 A harness bug in these runs: a `write_file` lost without a note ✅
+
+Found while the runs were going, fixed in commit `1eafe0a0`; **the runs above are on the code
+before the fix.**
+
+- **What happened.** A solver reply that never closes its `"write_file"` object
+  (`"write_file": {"path": ..., "content": "...", "task_complete": false }`) is repaired by
+  the stock terminus-2 parser, which appends the missing brace and runs the commands. Our
+  reading of the same reply (`_extract_json_object`) returned the first balanced object, which
+  is the inner one, so the harness saw no `write_file` field: the file was not written and the
+  solver was not told. In one trial the inner object also held the `subagent` field, so the
+  verifier was called while the write was dropped.
+- **Fix.** `reply_object()` in `dar_terminus2_multiagent.py`: when objects are left open at
+  the end of the reply, close them the way the stock parser does and read the top-level
+  object. Checked against all 841 solver replies of the earlier jobs: 37 are read differently,
+  each time the top-level object instead of an inner one.
+- **Extent in the full runs.** 7 of 65 trials have at least one reply that the two readings
+  disagree on: numeric 2 (1 correct, 1 wrong), binary 5 (all correct). Six of the seven wrote
+  the file from the terminal afterwards, one with a later `write_file`. 🔶 The effect on the
+  outcome is not established; the affected numeric trials cost 9.46 cents against a mean of
+  6.01, which is two trials. The runs were not restarted: the fix landed 85 minutes into a
+  six-hour run, and a rerun on the fixed code is the clean number (§10.6).
+
+### 10.6 Not done, and run notes
+
+- 🔶 **No rerun on the fixed code.** `srvc-run1` is one run per subset on the code before
+  `1eafe0a0`. The table for the paper should come from a rerun (`srvc-run2-*`).
+- 🔶 **Only SARA.** Airline and USCIS have not been run with this harness.
+- **Server.** vLLM was started for these runs and stopped at 16:26 UTC, five hours after the
+  last run ended at 11:22 UTC. The waiter that was to announce the end used
+  `pgrep -f "job-name srvc-run1"`, which matched its own command line and never returned. The
+  server held GPU memory idle for that time, against the rule for this machine.
+
+## 11. The harness on KIRA's loop (2026-11-20)
+
+`tools/dar_kira_srvc.py`, class `KiraSRVC`, run with `AGENT=kirasrvc`. KIRA
+(`agents.baseline_kira`, DAR's second harness) is a terminus-2 subclass with native tool
+calls and its own agent loop. The adapter does not copy the harness: it puts KIRA *under* the
+SRVC classes in the class order,
+
+    KiraSRVC -> Terminus2SRVC -> ... -> CostLedgerMixin -> _KiraUnderSRVC
+             -> dar_kira_local.AgentHarness -> baseline_kira.AgentHarness -> Terminus2
+
+so the two hooks in which the harness lives (`_handle_llm_interaction`: what did the solver
+ask for; `_execute_commands`: do it and build the next message) end in KIRA's versions, and
+KIRA's loop, marker polling and tool-call history stay as they are. ✅ This is the evidence
+for the claim of §6 that the harness is separate from the base agent: the adapter is about
+300 lines, and the shared code needed two generic changes (below), none specific to KIRA.
+
+| Part | What the adapter does |
+| --- | --- |
+| Tools | `write_file`, `reader`, `verifier`, `compaction` are added to `execute_commands` and `task_complete`. `image_read` is not offered: its path through KIRA's loop does not pass `_execute_commands`, where the completion gate is. |
+| Reply | `_KiraUnderSRVC` takes the four tools out of the reply's tool calls and hands the classes above a JSON object of the shape they read from a terminus-2 reply (`commands`, `subagent`, `write_file`, `task_complete`). One sub-agent per response; a second one is not run and the solver is told. |
+| Model calls | Through harbor's LLM object instead of KIRA's direct `litellm` call, so `max_tokens`, the request time-out and the cost ledger are those of the terminus-2 version. Tool calls are read from the raw reply. |
+| Branches | The reader and compaction requests carry the same tool definitions with `tool_choice="none"`. ✅ vLLM keeps the definitions in the prompt in that case (26 prompt tokens without tools, 281 with tools, 281 with tools and `tool_choice="none"`), so the branch shares the solver's prefix. The rubrics have their own context and no tools. |
+| Wording | The harness's messages name JSON fields (`"subagent": {"name": "verifier"}`). `tool_wording` and `branch_wording` rewrite those phrases for a solver that calls tools. 🔶 A phrase table, not parameterised messages: a message added to the harness later has to be checked against it. |
+| Skill and template | `tools/skills/solver_v5_tools` (solver v5 with the calls as tools) and `tools/templates/terminus-kira-srvc.txt` (KIRA's own text plus the rule and skill slots). Reader, compaction and rubric skills are the same files. |
+| Time limits | KIRA's 600 s limit per step is switched off: a verifier round takes longer, and the protocol has no wall-clock limits. |
+| Cut solver reply | KIRA asks once for a shorter reply. A second cut reply in the same step would end the trial with an exception in KIRA; the adapter passes it on as a reply without tool calls. |
+
+Generic changes to shared code that the adapter needed:
+
+- **Compaction counts turns, not message pairs** (`split_turns` in `dar_terminus2_srvc.py`).
+  A turn is a user message, the assistant's reply and the tool messages that close its calls.
+  For a terminus-2 context (strict user/assistant alternation) the result is the same.
+- **The ledger's prompt text includes tool definitions and tool calls** (`prompt_text` in
+  `dar_cost_ledger.py`), so that the simulated cache does not count a request with tools and
+  one without as sharing a prefix. Unchanged for requests without tools.
+- **Misplaced calls**: the patterns for a sub-agent call typed as a keystroke are a class
+  attribute; the adapter adds "a keystroke that starts with a tool name".
+
+Smoke runs (Qwen3.5-35B-A3B, SARA numeric; cost in US cents per task, no cache / with cache):
+
+| Job | Tasks | Settings | Correct | Cost | What it showed |
+| --- | --- | --- | --- | --- | --- |
+| `kirasrvc-smoke1` | 1 | defaults | 0/1 | 12.27 / 8.82 | ✅ The loop runs end to end: survey, tool calls, reader branches that share the solver's prefix (9,137 of 20,452 prompt tokens read from the cache), verifier round, completion. The reader took 54% of the cost: five queries, 13 model calls, no line inserted, because the solver asked for units the survey had already put in its context ("lines 95-179 of /app/statute.txt · §152. Dependent defined"). With nothing to return, the branch went on as the solver in two of the calls (worked the case out, wrote tool calls as text). The calls reached nothing, but they cost. |
+| `kirasrvc-smoke2` | 2 | `context_window=12000 compaction_min_tokens=4000 compaction_min_saving=-1` (compaction forced) | 2/2 | 6.30 / 4.82 | ✅ After the two reader fixes below: two queries that began with a line range were answered by the harness without a model call, one query went to a branch. ✅ Compaction applied three times on a tool-call conversation (15 messages to 9; the rebuilt context keeps each assistant message with its tool message) and the solver went on after each one. |
+
+Changes after `kirasrvc-smoke1`, all in the shared reader code and none specific to KIRA:
+
+- **A query that begins with line ranges is a direct range** (`direct_range_text`): the
+  outline prints "lines a-b" next to each unit and the solver copies the row. Text after the
+  ranges is ignored unless it names another file.
+- **A reader result that inserts nothing says why**: "The reader leaves out lines that are
+  already in your context: ...", with the ranges. Before, the result said only "No rule text
+  was inserted" and the solver asked again in other words.
+
+🔶 Not run in full: on this machine the server is saturated at about 100 output tokens per
+second in total, and the two SARA runs of §10 took the night. Two tasks say nothing about
+accuracy or cost against the terminus-2 version.
+
+One of the three applied compactions in `kirasrvc-smoke2` made the solver's prompt longer
+(14,748 to 14,848 tokens): the run switched the saving guard off (`compaction_min_saving=-1`)
+to force the applied path. With the default guard (0.2) that call is declined.
