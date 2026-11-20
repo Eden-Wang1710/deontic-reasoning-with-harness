@@ -1,9 +1,11 @@
 # 11 · Solver-reader-verifier-compaction harness: design of v0.1
 
-**Status (2026-11-20): design, not implemented.** §1 records what the owner has decided
-(2026-11-19 the frame, 2026-11-20 the verifier, the window, the cost column). §8 lists what the
-owner still has to confirm before the implementation starts. The numbers in §2 are measured on
-finished runs with `tools/sc_check_stats.py`.
+**Status (2026-11-20): implemented as `AGENT=t2srvc`** (`tools/dar_terminus2_srvc.py`; §9
+describes the implementation and where it differs from this design). §1 records what the owner
+has decided (2026-11-19 the frame, 2026-11-20 the verifier, the window, the cost column). The
+owner confirmed all six points of §8 on 2026-11-20 and asked for SARA numeric and binary in
+full, then the KIRA adapter. The numbers in §2 are measured on finished runs with
+`tools/sc_check_stats.py`.
 
 **Naming.** From v0.1 on a check of the verifier is called a **rubric**, and the table it fills
 is its **rubric table** (owner, 2026-11-20). §2 keeps the word *check* because it describes the
@@ -273,16 +275,79 @@ the budget per task (0.15 USD, `09` §10.12) is computed at the price with cache
    now comes from a run in which the reader was never called.
 3. KIRA adapter. Then BrowseComp-Plus.
 
-## 8. To confirm before the implementation starts
+## 8. Confirmed before the implementation (owner, 2026-11-20) ✅
+
+The owner confirmed every point below on 2026-11-20 ("可以，先把 SARA numeric 和 binary 全量，
+再接 KIRA").
 
 - **The rule document leaves the solver's first message on SARA** and comes through the reader
   (outline plus excerpts). This is what "with a reader" means on a 6,097-token document, and it
-  is the main accuracy risk of v0.1 (§3.2).
-- **Naming**: check becomes rubric, its table a rubric table (as read from the owner's message).
-- **The file-write channel** of §3.4 as the answer to the repeated answer file.
+  is the main accuracy risk of v0.1 (§3.2). The verifier keeps the complete text.
+- **Naming**: check becomes rubric, its table a rubric table; the skill directories are
+  `rubric_*`.
+- **The file-write channel** of §3.4 (`"write_file"`) as the answer to the repeated answer file.
 - **Rubric output limit** stays 8,000 (§4.1).
-- **Budget** at the price with cache (§5).
-- **Thinking in the branches.** Proposed: the reader thinks, with the same keep-the-thinking
-  rule as the rubrics; compaction writes the state page without thinking.
-- Still open from `10` §8: report format v2 (the case text read as complete), which the binary
-  run used and the owner has not confirmed.
+- **Budget** of 0.15 USD per task at the price with cache (§5).
+- **Thinking in the branches**: the reader thinks, with the same keep-the-thinking rule as the
+  rubrics; compaction writes the state page without thinking.
+
+Still open from `10` §8 🔶: report format v2 (the case text read as complete), which the binary
+run of the solver-checks harness used and the owner has not confirmed. `rubric_report_v3` carries
+the same wording for both subsets; if the owner judges it beyond a harness-level hint, the bullet
+is removed and both subsets are rerun.
+
+## 9. Implementation and where it differs from this design (2026-11-20) ✅
+
+`tools/dar_terminus2_srvc.py`, class `Terminus2SRVC`, on top of the solver-checks class
+(`10`). Run with `AGENT=t2srvc` (`tools/run_dar_qwen35_35b.sh`); every number below is an
+`--ak` argument. Skills: `tools/skills/solver_v5`, `reader_v2`, `compaction_v1`,
+`rubric_section_table_v1`, `rubric_fact_table_v1`, `rubric_grounded_reasoning_v1`,
+`rubric_report_v3`; solver template `tools/templates/terminus-json-multiagent-v5.txt`.
+
+| Part | What the code does | Tunables (default) |
+| --- | --- | --- |
+| First message | Task and the solver skill. The rule document is replaced by a note that it comes through the reader, unless it is at most `solver_rule_inline_max_chars`. | `solver_rule_inline_max_chars` (0) |
+| Survey | One reader call before the solver's first step, as a branch of the first message. Its outline and excerpts are appended to the first message. If it returns nothing, the first message says so and tells the solver to call the reader. | `reader_survey` (true), `reader_survey_max_chars` (20,000) |
+| Reader call by the solver | A branch of the solver's messages. The source is printed with line numbers in the branch message up to `reader_inline_max_chars`; a larger one is read with commands. Ranges already in the solver's context are dropped. | `reader_inline_max_chars` (60,000), `reader_max_steps` |
+| Direct range | A query that is only line ranges ("lines 40-80") is answered by the harness from the file, without a model call. | `reader_direct_ranges` (true) |
+| File write | `"write_file": {"path", "content"}` in the solver's reply (a list for several files). The harness uploads the file and answers with one line: path, lines, characters, last line. | none |
+| Verifier | One round, three rubrics in independent contexts, thinking kept on a cut reply. A second call returns the stored report and uses no model call. | `max_verify_rounds` (1), `rubric_max_output_tokens` (8,000) |
+| Completion | After the round: accepted (`verified`, `revised_after_report` or `unrevised_not_passed`). Before a round: bounced up to `max_unverified_claims` times, then accepted as `unverified_accepted`. | `max_unverified_claims` |
+| Compaction | Called by the solver, or by the harness when the next solver prompt is estimated above the window. A branch writes the state page without thinking; the harness rebuilds the context as first message, state page with pinned items, last turns. | `context_window` (32,000), `compaction_keep_turns` (2), `compaction_min_tokens` (window / 2), `compaction_max_output_tokens` (2,000), `compaction_min_saving` (0.2) |
+| Kept thinking | A reply cut at its output limit is resent without thinking, with the cut reply's reasoning and partial content as "your notes so far". | `keep_thinking` (true), `keep_thinking_max_chars` (40,000) |
+| Cost | Ledger per call and role; the budget counts the with-cache price. | `cost_budget_usd` (0.15), `cost_budget_basis` (`cache`) |
+
+Logs per trial under `agent/`: `llm_calls.jsonl`, `reader/call-N.json`,
+`compaction/call-N.json` (with the context before and after and the state page),
+`write_file/NNN.txt`, `rubric_verifier/round-1.json`, `rubric_verifier/summary.json`
+(`"harness": "srvc-v0.1"`). `tools/sc_run_report.py` prints the SRVC lines when it sees that
+field; `tools/inference_cost.py` reports cost per role.
+
+Differences from §3 and §4:
+
+- **Compaction output limit** is 2,000 tokens, not 1,500, as a margin for the JSON wrapping of
+  the state page. 🔶 Not tuned.
+- **Direct line ranges** are new. The outline gives the solver line ranges; fetching one is a
+  lookup, so it does not need a model.
+- **Outline coverage** is checked by the harness: the outline rows must cover the document's
+  non-blank lines (up to 2% or 5 lines), else the reader is asked once to repair it.
+- **Every message of a branch ends with the role and its reply format.** In the first smoke
+  (`srvc-smoke1`, 2 tasks) one survey reply was cut at the output limit inside its thinking;
+  the resend without thinking then answered in the solver's format three times and the survey
+  returned nothing. The branch message ended with "as described in the skill", and the solver's
+  own instructions are also a skill. The reader and compaction closing lines now name the role
+  and the fields that do not belong in the reply, and the notes block is followed by the same
+  line.
+- **Reader skill, two additions after the first smoke** (generic, no task content): the reader
+  does not work the case out in its reasoning; and when a unit sets out parallel alternatives
+  and the choice depends on a determination about the case, it returns all of them. In the
+  smoke the reader had returned one rate table of four and the solver used it without question;
+  the rubrics caught it.
+- **JSON decoder hint.** When a solver reply is not valid JSON, the stock message says only "No
+  valid JSON found". The harness adds the decoder's position and the text around it. Three of
+  the 11 solver replies of one smoke trial had a mismatched bracket in a long command.
+- **Later reader calls are not cheap.** A reader branch after the survey carries the numbered
+  source again (about 8,000 tokens not in the cache, about 0.11 cents), because the solver's
+  context holds excerpts and not the document. 🔶 Putting the numbered source at a fixed place
+  of the branch prefix would not help either: the prefix is the solver's context, which grows.
+- The parent's messages for calls that use no round still say "check" in two places.

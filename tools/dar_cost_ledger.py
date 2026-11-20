@@ -16,11 +16,15 @@ model). This mixin gives every harness built on terminus-2 the two things that n
    ``tools/inference_cost.py`` prices the ledger.
 
 2. **Cost budget.** With ``cost_budget_usd`` set, the trial stops before the next solver
-   step once the calls so far cost that much at the no-cache price (input and output
-   tokens times the card's prices). The step in progress, with the sub-agent runs it
-   started, is finished first, so a trial can end slightly above the budget. Whatever is
-   in the answer file at that point is graded. ``agent/cost_budget.json`` records the
-   budget, the amount spent and whether the budget ended the trial.
+   step once the calls so far cost that much. ``cost_budget_basis`` says at which price:
+   ``no_cache`` (default; input and output tokens times the card's prices) or ``cache``
+   (the simulated prompt cache of ``tools/inference_cost.py``: the part of a prompt that is
+   a prefix of an earlier prompt of the trial is billed at the cache-read price; the
+   headline cost since 2026-11-20, claude_docs/11 §5). The step in progress, with the
+   sub-agent runs it started, is finished first, so a trial can end slightly above the
+   budget. Whatever is in the answer file at that point is graded.
+   ``agent/cost_budget.json`` records the budget, its basis, both amounts spent and whether
+   the budget ended the trial.
 
 At the end of the trial the token totals of the trial result (``n_input_tokens``,
 ``n_output_tokens``, ``cost_usd``) are taken from the ledger, so they include cut-off calls;
@@ -28,6 +32,11 @@ At the end of the trial the token totals of the trial result (``n_input_tokens``
 
 The mixin wraps two methods of the agent's LLM object (``call`` and
 ``_extract_usage_info``). Calls of one trial are sequential, which the bookkeeping relies on.
+
+A reply that the server cut off at an output limit is kept in ``_last_cut_reply`` (content
+and reasoning as far as they got). The LLM layer drops both when it raises
+``OutputLengthExceededError``; a harness that wants to hand the thinking of a cut reply to
+the next call (claude_docs/11 §4.1) reads it from there.
 """
 
 from __future__ import annotations
@@ -70,18 +79,39 @@ def common_prefix_len(a: str, b: str) -> int:
     return lo
 
 
-def prompt_text(messages: list[Any]) -> str:
+def cached_tokens(
+    prompt_tokens: int, prompt_chars: int, lcp_chars: int, earlier
+) -> int:
+    """Tokens of a prompt that an earlier prompt covers (simulated prompt cache).
+    ``earlier`` is (chars, tokens) of the prompt the prefix is shared with, or None. A
+    shared prefix is converted to tokens exactly when it is a whole earlier prompt and in
+    proportion to the characters otherwise."""
+    if not prompt_tokens or not prompt_chars or lcp_chars <= 0:
+        return 0
+    if earlier and earlier[1] and lcp_chars >= earlier[0]:
+        return min(prompt_tokens, earlier[1])
+    return min(prompt_tokens, int(prompt_tokens * lcp_chars / prompt_chars))
+
+
+def prompt_text(messages: list[Any], tools: Any = None) -> str:
     """One string per request, in message order, for prefix comparison between requests.
 
-    Only roles and contents are rendered; the chat template's own tokens are the same for
-    every request and add a few tokens per message.
+    Roles, contents and tool calls are rendered; the chat template's own tokens are the
+    same for every request and add a few tokens per message. ``tools``, the tool
+    definitions of the request, come first, where the chat template prints them: a request
+    with tools and one without share no prefix.
     """
     parts = []
+    if tools:
+        parts.append(f"<tools>\n{json.dumps(tools, ensure_ascii=False, default=str)}\n")
     for m in messages:
         role = m.get("role") if isinstance(m, dict) else getattr(m, "role", "")
         content = m.get("content") if isinstance(m, dict) else getattr(m, "content", "")
         if not isinstance(content, str):
             content = json.dumps(content, ensure_ascii=False, default=str)
+        calls = m.get("tool_calls") if isinstance(m, dict) else None
+        if calls:
+            content += "\n" + json.dumps(calls, ensure_ascii=False, default=str)
         parts.append(f"<{role}>\n{content}\n")
     return "".join(parts)
 
@@ -102,19 +132,27 @@ class CostLedgerMixin:
         self,
         *args,
         cost_budget_usd: float | str | None = None,
+        cost_budget_basis: str = "no_cache",
         price_card_path: str | None = None,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self._price = load_price_card(price_card_path)
+        basis = str(cost_budget_basis).strip().lower().replace("-", "_")
+        if basis not in ("no_cache", "cache"):
+            raise ValueError(f"cost_budget_basis must be no_cache or cache, got {basis!r}")
+        self._cost_budget_basis = basis
         self._cost_budget_usd = (
             float(cost_budget_usd)
             if str(cost_budget_usd).strip().lower() not in {"", "none", "off"}
             and float(cost_budget_usd) > 0
             else None
         )
-        self._spent_usd = 0.0
+        self._spent_usd = 0.0  # no-cache price
+        self._spent_cache_usd = 0.0  # with the simulated prompt cache
         self._budget_exhausted = False
+        # Content and reasoning of the last reply cut off at an output limit (module docstring).
+        self._last_cut_reply: dict[str, str] | None = None
         self._llm_role = "solver"
         self._ledger: list[dict[str, Any]] = []
         self._ledger_prompts: list[str] = []
@@ -138,6 +176,18 @@ class CostLedgerMixin:
                 info = inner_usage(response)
                 if info is not None:
                     self._ledger_usages.append(info)
+                try:
+                    choice = response["choices"][0]
+                    if choice.get("finish_reason") == "length":
+                        message = choice["message"]
+                        self._last_cut_reply = {
+                            "content": message.get("content") or "",
+                            "reasoning_content": message.get("reasoning_content")
+                            or message.get("reasoning")
+                            or "",
+                        }
+                except Exception:  # an unexpected response shape must not end a call
+                    pass
                 return info
 
             llm._extract_usage_info = extract_usage_info
@@ -147,7 +197,10 @@ class CostLedgerMixin:
             history = kwargs.get("message_history")
             if history is None:
                 history = args[1] if len(args) > 1 else []
-            text = prompt_text(list(history) + [{"role": "user", "content": prompt}])
+            text = prompt_text(
+                list(history) + [{"role": "user", "content": prompt}],
+                kwargs.get("tools"),
+            )
             lcp_chars, lcp_call = 0, None
             for i, earlier in enumerate(self._ledger_prompts):
                 shared = common_prefix_len(text, earlier)
@@ -199,6 +252,31 @@ class CostLedgerMixin:
                     + entry["completion_tokens"] * self._price["output"]
                 )
                 entry["spent_usd"] = round(self._spent_usd, 6)
+                # The same call with the simulated prompt cache (as tools/inference_cost.py).
+                replies = max(1, len(usages))
+                one_prompt = entry["prompt_tokens"] // replies
+                earlier = next(
+                    (e for e in self._ledger if e["n"] == lcp_call), None
+                )
+                cached = cached_tokens(
+                    one_prompt,
+                    entry["prompt_chars"],
+                    lcp_chars,
+                    (
+                        earlier["prompt_chars"],
+                        earlier["prompt_tokens"] // max(1, earlier.get("n_replies") or 1),
+                    )
+                    if earlier
+                    else None,
+                )
+                cached += one_prompt * (replies - 1) if entry["prompt_tokens"] else 0
+                entry["sim_cached_tokens"] = cached
+                self._spent_cache_usd += (
+                    (entry["prompt_tokens"] - cached) * self._price["input"]
+                    + cached * self._price["cache_read"]
+                    + entry["completion_tokens"] * self._price["output"]
+                )
+                entry["spent_cache_usd"] = round(self._spent_cache_usd, 6)
                 self._ledger.append(entry)
                 try:
                     with (self.logs_dir / "llm_calls.jsonl").open("a") as f:
@@ -210,13 +288,23 @@ class CostLedgerMixin:
 
     # ----------------------------------------------------------------- budget
 
-    async def _handle_llm_interaction(self, *args, **kwargs):
-        if (
+    def _budget_spent(self) -> float:
+        """What counts against the budget: the spend at the price the basis names."""
+        if self._cost_budget_basis == "cache":
+            return self._spent_cache_usd
+        return self._spent_usd
+
+    def _budget_used_up(self) -> bool:
+        return (
             self._cost_budget_usd is not None
-            and self._spent_usd >= self._cost_budget_usd
-        ):
+            and self._budget_spent() >= self._cost_budget_usd
+        )
+
+    async def _handle_llm_interaction(self, *args, **kwargs):
+        if self._budget_used_up():
             raise CostBudgetExhausted(
-                f"spent {self._spent_usd:.4f} USD of {self._cost_budget_usd:.4f} USD"
+                f"spent {self._budget_spent():.4f} USD of {self._cost_budget_usd:.4f} USD "
+                f"({self._cost_budget_basis} price)"
             )
         return await super()._handle_llm_interaction(*args, **kwargs)
 
@@ -247,7 +335,9 @@ class CostLedgerMixin:
         context.cost_usd = self._spent_usd
         record = {
             "cost_budget_usd": self._cost_budget_usd,
+            "cost_budget_basis": self._cost_budget_basis,
             "spent_usd": round(self._spent_usd, 6),
+            "spent_cache_usd": round(self._spent_cache_usd, 6),
             "budget_exhausted": self._budget_exhausted,
             "usd_per_token": self._price,
             "n_llm_calls": len(self._ledger),

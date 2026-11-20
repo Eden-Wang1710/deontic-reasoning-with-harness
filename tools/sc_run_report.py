@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""Aggregate numbers of solver-checks runs (AGENT=t2sc, tools/dar_terminus2_checks.py).
+"""Aggregate numbers of solver-checks runs (AGENT=t2sc, tools/dar_terminus2_checks.py) and of
+SRVC runs (AGENT=t2srvc, tools/dar_terminus2_srvc.py; adds reader, compaction, file-write and
+kept-thinking lines).
 
     tools/sc_run_report.py <job_dir> [<job_dir> ...] [--trials] [--findings]
 
@@ -159,6 +161,10 @@ def report(job: str, show_trials: bool, show_findings: bool) -> None:
     print("first report (trials, correct):", {a: tuple(b) for a, b in first.items()})
     print("after a first report that did not pass:", dict(after))
 
+    srvc = {t: x for t, x in d.items() if x["summary"].get("harness") == "srvc-v0.1"}
+    if srvc:
+        report_srvc(srvc)
+
     if show_trials:
         for t, x in sorted(d.items()):
             rs = " | ".join(
@@ -186,6 +192,57 @@ def report(job: str, show_trials: bool, show_findings: bool) -> None:
                             f"  {short(t)} r{r['round']} {c['check']} [{c['status']}, quote "
                             f"{f.get('quote_found')}] {f['issue'][:300]}"
                         )
+
+
+def report_srvc(d: dict[str, dict]) -> None:
+    """Reader, compaction, file writes and kept thinking of an SRVC run (AGENT=t2srvc)."""
+    S = [x["summary"] for x in d.values()]
+    kinds = Counter(k for s in S for k in s.get("reader_kinds") or [])
+    print("reader calls by kind:", dict(kinds))
+    sv = [s["survey"] for s in S if s.get("survey")]
+    if sv:
+        engaged = Counter(r["engaged"] for v in sv for r in v["outline"])
+        print(
+            f"survey: {len(sv)} trials, outline rows median "
+            f"{st.median(len(v['outline']) for v in sv):.1f} (engaged {dict(engaged)}), "
+            f"characters inserted median {st.median(v['chars_inserted'] for v in sv):.0f}, "
+            f"prompt / completion tokens median "
+            f"{st.median(v['prompt_tokens'] for v in sv):.0f} / "
+            f"{st.median(v['completion_tokens'] for v in sv):.0f}, "
+            f"no-thinking fallbacks {sum(bool(v['thinking_fallback']) for v in sv)}, "
+            f"no result {sum(not v['outline'] for v in sv)}, "
+            f"timed out {sum(bool(v['timed_out']) for v in sv)}"
+        )
+    q = [sum(k != "survey" for k in s.get("reader_kinds") or []) for s in S]
+    print("reader calls by the solver per trial:", dict(sorted(Counter(q).items())))
+    comp = [c for s in S for c in s.get("compactions") or []]
+    print(
+        "compaction calls:",
+        dict(Counter((c["trigger"], c.get("outcome")) for c in comp)) or "none",
+    )
+    for c in comp:
+        if c.get("applied"):
+            print(
+                f"  applied: {c['steps_removed']} steps removed, "
+                f"{c['chars_before']:,} to {c['chars_after']:,} characters, solver prompt "
+                f"{c.get('solver_prompt_tokens_before')} to "
+                f"{c.get('solver_prompt_tokens_after')} tokens"
+            )
+    last = [s.get("last_solver_prompt_tokens") or 0 for s in S]
+    print(
+        f"solver prompt at the last step: median {st.median(last):.0f}, max {max(last)} "
+        "tokens"
+    )
+    print(
+        "write_file: files",
+        sum(s.get("n_write_file") or 0 for s in S),
+        "| failed",
+        sum(s.get("n_write_file_failed") or 0 for s in S),
+        "| answer-file writes per trial",
+        dict(sorted(Counter(s.get("n_answer_file_writes") or 0 for s in S).items())),
+    )
+    notes = Counter(n["role"] for s in S for n in s.get("notes_handed_over") or [])
+    print("cut replies whose thinking was handed over, by role:", dict(notes) or "none")
 
 
 def main() -> None:

@@ -69,6 +69,31 @@
 #          check_max_steps_file=6 check_max_output_tokens=8000 check_thinking=true
 #          check_fallback=true max_verify_rounds=3 max_unverified_claims=2
 #          answer_headings="## Sections,## Facts,## Reasoning,## Answer" max_format_rejections=2.
+#   t2srvc = solver-reader-verifier-compaction harness v0.1
+#          (claude_docs/11_srvc_harness_design.md, tools/dar_terminus2_srvc.py): the rule
+#          document is not in the solver's first message; the reader surveys it before the
+#          first step and answers later queries as a branch of the solver's conversation;
+#          compaction is a branch too (32K window, or called by the solver); the verifier is
+#          independent, runs one round of the rubric table; files are written through the
+#          "write_file" field; the budget is counted at the with-cache price. Solver prompt =
+#          templates/terminus-json-multiagent-v5.txt + skills/solver_v5/SKILL.md; reader =
+#          skills/reader_v2; compaction = skills/compaction_v1; rubrics =
+#          skills/rubric_<name>_v1 with skills/rubric_report_v3/FORMAT.md.
+#          Jobs under jobs/<model>/t2srvc-<framing>/.
+#          Tunables via --ak: rubrics=rubric_section_table_v1,rubric_fact_table_v1,rubric_grounded_reasoning_v1
+#          rubric_max_output_tokens=8000 solver_rule_inline_max_chars=0 reader_survey=true
+#          reader_survey_max_chars=20000 reader_inline_max_chars=60000 reader_direct_ranges=true
+#          context_window=32000 compaction_keep_turns=2 compaction_min_tokens=16000
+#          compaction_max_output_tokens=2000 compaction_min_saving=0.2 keep_thinking=true
+#          max_verify_rounds=1 max_unverified_claims=2 cost_budget_basis=cache.
+#   kirasrvc = the same harness on KIRA's loop (tools/dar_kira_srvc.py): the solver replies
+#          with native tool calls (execute_commands, task_complete, write_file, reader,
+#          verifier, compaction) instead of one JSON object; reader and compaction branches
+#          are sent with the same tool definitions and tool_choice="none" so that the
+#          solver's prefix is still a cache read. Solver prompt =
+#          templates/terminus-kira-srvc.txt + skills/solver_v5_tools/SKILL.md; the other
+#          skills and all --ak tunables are those of t2srvc.
+#          Jobs under jobs/<model>/kirasrvc-<framing>/.
 #
 # Examples:
 #   tools/run_dar_qwen35_35b.sh direct --n-tasks 2 --job-name smoke   # smoke test
@@ -78,6 +103,8 @@
 #   AGENT=t2rv tools/run_dar_qwen35_35b.sh direct                        # reader-verifier harness
 #   AGENT=t2rvc SUBSET=numeric tools/run_dar_qwen35_35b.sh direct        # + compactor
 #   AGENT=t2sc SUBSET=binary tools/run_dar_qwen35_35b.sh direct          # solver-checks harness
+#   AGENT=t2srvc SUBSET=numeric tools/run_dar_qwen35_35b.sh direct      # SRVC harness v0.1
+#   AGENT=kirasrvc SUBSET=numeric tools/run_dar_qwen35_35b.sh direct    # SRVC harness on KIRA's loop
 #   tools/run_dar_qwen35_35b.sh direct                                  # SARA numeric + binary (65 tasks)
 #   SUBSET=all tools/run_dar_qwen35_35b.sh direct                       # all 173 tasks
 #
@@ -167,13 +194,23 @@ case "$AGENT" in
         JOBS="jobs/$MODEL/t2sc-$FRAMING"
         N_CONCURRENT="${N_CONCURRENT:-2}"
         export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
+  t2srvc) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
+        AGENT_ARGS="--agent-import-path dar_terminus2_srvc:Terminus2SRVC"
+        JOBS="jobs/$MODEL/t2srvc-$FRAMING"
+        N_CONCURRENT="${N_CONCURRENT:-2}"
+        export PYTHONPATH="$TOOLS_DIR${PYTHONPATH:+:$PYTHONPATH}" ;;
+  kirasrvc) TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"   # the SRVC harness on KIRA's loop (tool calls)
+        AGENT_ARGS="--agent-import-path dar_kira_srvc:KiraSRVC"
+        JOBS="jobs/$MODEL/kirasrvc-$FRAMING"
+        N_CONCURRENT="${N_CONCURRENT:-2}"
+        export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}" ;;
   kira) AGENT_ARGS="--agent-import-path dar_kira_local:AgentHarness"   # tools/dar_kira_local.py wraps agents.baseline_kira
         JOBS="jobs/$MODEL/kira-$FRAMING"
         TOOLS_DIR="$(cd "$(dirname "$0")" && pwd)"
         export PYTHONPATH="$TOOLS_DIR:meta-harness/reference_examples/terminal_bench_2${PYTHONPATH:+:$PYTHONPATH}"
         BUDGET_ARGS=""
         export HOSTED_VLLM_API_KEY=token-abc123 ;;
-  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|t2rv|t2rvc|t2sc|kira)" >&2; exit 1 ;;
+  *) echo "unknown AGENT=$AGENT (t2|t2fix|t2verify|t2verify2|t2verify3|t2rv|t2rvc|t2sc|t2srvc|kirasrvc|kira)" >&2; exit 1 ;;
 esac
 N_CONCURRENT="${N_CONCURRENT:-4}"
 

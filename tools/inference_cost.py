@@ -49,19 +49,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from dar_cost_ledger import common_prefix_len, load_price_card, prompt_text  # noqa: E402
-
-
-def _cached_tokens(
-    prompt_tokens: int, prompt_chars: int, lcp_chars: int, earlier
-) -> int:
-    """Tokens of a prompt that an earlier prompt covers. ``earlier`` is (chars, tokens) of
-    the prompt the prefix is shared with, or None."""
-    if not prompt_tokens or not prompt_chars or lcp_chars <= 0:
-        return 0
-    if earlier and earlier[1] and lcp_chars >= earlier[0]:
-        return min(prompt_tokens, earlier[1])
-    return min(prompt_tokens, int(prompt_tokens * lcp_chars / prompt_chars))
+from dar_cost_ledger import (  # noqa: E402
+    cached_tokens as _cached_tokens,
+    common_prefix_len,
+    load_price_card,
+    prompt_text,
+)
 
 
 def calls_from_ledger(path: Path) -> list[dict]:

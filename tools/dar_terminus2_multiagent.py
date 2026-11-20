@@ -186,6 +186,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
     SUBAGENT_NAMES: tuple[str, ...] = ("reader", "verifier")
     SUBAGENT_HELP = '"reader" (with a "query") and "verifier" (no arguments)'
     SUBAGENT_FORM = SUBAGENT_FORM
+    MISPLACED_KEYSTROKE_RES = MISPLACED_KEYSTROKE_RES
 
     def __init__(
         self,
@@ -619,7 +620,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         for i, cmd in enumerate(commands):
             ks = cmd.keystrokes or ""
             raw = raw_cmds[i] if i < len(raw_cmds) and isinstance(raw_cmds[i], dict) else {}
-            if any(r.search(ks) for r in MISPLACED_KEYSTROKE_RES):
+            if any(r.search(ks) for r in self.MISPLACED_KEYSTROKE_RES):
                 where.append(f'the "keystrokes" of command {i + 1}')
             elif "subagent" in raw:
                 where.append(f"a field of command object {i + 1}")
@@ -850,6 +851,9 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         prefix: str = "",
         validate: Callable[[dict], str | None] | None = None,
         lift: Callable[[dict], dict | None] | None = None,
+        history: list[dict[str, Any]] | None = None,
+        allow_commands: bool = True,
+        begin: str | None = None,
     ) -> dict[str, Any]:
         """Command-step loop of a sub-agent that answers with a JSON ``result`` object.
 
@@ -866,8 +870,22 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         accept; the sub-agent is told once and may send a corrected result (the second
         result is returned as it is, the caller decides what an invalid one means). ``lift``
         is asked for the result when a reply has no ``result`` object, for a sub-agent that
-        writes the fields of its result at the top level of the reply."""
+        writes the fields of its result at the top level of the reply.
+
+        ``history`` (dar_terminus2_srvc.py) makes the run a *branch*: its chat starts from a
+        copy of these messages, usually the solver's, and the skill and packet follow as one
+        more user message, so the request shares its prefix with the solver's requests. The
+        copy is the branch's own; the solver's chat is not touched. With ``allow_commands``
+        false, commands in a reply are not run and the sub-agent is asked for its result
+        (with ``closing``). ``begin`` replaces the last line of the first message, for a
+        branch, where "the skill" would also name the solver's.
+
+        When a reply is cut at the clock's output limit and the call is sent again without
+        thinking, ``_cut_reply_notes`` may add text to the second request (nothing in this
+        class; the SRVC harness hands over the thinking of the cut reply)."""
         rchat = Chat(self._llm, interleaved_thinking=self._interleaved_thinking)
+        if history:
+            rchat._messages = [dict(m) for m in history]
         rsteps: list[Step] = []
         session_id = str(uuid.uuid4())
         prompt = (
@@ -875,7 +893,11 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             + skill_text
             + "\n\n"
             + packet
-            + "\n\nBegin. Respond with exactly one JSON object as described in the skill."
+            + "\n\n"
+            + (
+                begin
+                or "Begin. Respond with exactly one JSON object as described in the skill."
+            )
         )
         rsteps.append(self._user_step(rsteps, prompt))
 
@@ -886,6 +908,7 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
         context_exceeded = False
         timed_out = False
         n_calls = 0
+        notes_chars = 0
         repairs: list[str] = []
         base_kwargs = self._llm_call_kwargs if llm_kwargs is None else llm_kwargs
         repair_request = (
@@ -899,12 +922,19 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             return lift(parsed) if lift else None
 
         async def send(p: str, thinking: bool, cap: int | None) -> LLMResponse:
+            nonlocal notes_chars
             kw = capped_kwargs(base_kwargs, cap)
+            if not thinking and clock is not None and clock.fell_back:
+                notes = self._cut_reply_notes()
+                if notes:
+                    notes_chars += len(notes)
+                    p = p + notes
             return await rchat.chat(p, **(kw if thinking else no_thinking_kwargs(kw)))
 
         async def call(p: str) -> LLMResponse:
             nonlocal n_calls
             t0 = time.time()
+            self._last_cut_reply = None  # only a cut inside this call is handed over
             with self._llm_role_as(role):
                 if clock is None:
                     resp = await rchat.chat(p, **base_kwargs)
@@ -955,7 +985,21 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             cmds = parsed.get("commands") or []
             if not isinstance(cmds, list):
                 cmds = [str(cmds)]
+            if history:
+                # A branch has the solver's replies before it and may answer in their form.
+                cmds = [
+                    c.get("keystrokes", "") if isinstance(c, dict) else c for c in cmds
+                ]
             cmds = [str(c) for c in cmds if str(c).strip()]
+            if not allow_commands:
+                steps_used += 1
+                observation = (
+                    "Your reply carried no result. Commands are not available in this call "
+                    f"and none was run. {closing}"
+                )
+                self._append_verifier_step(rsteps, resp, [], observation)
+                prompt = observation
+                continue
             if not cmds:
                 steps_used += 1
                 observation = (
@@ -1033,7 +1077,13 @@ class Terminus2ReaderVerifier(Terminus2RubricVerifier):
             "timed_out": timed_out,
             "n_calls": n_calls,
             "repairs": repairs,
+            "notes_chars": notes_chars,
         }
+
+    def _cut_reply_notes(self) -> str:
+        """Text for the request that follows a reply cut at the output limit (see
+        ``_run_tool_subagent``). Nothing here: the second request is the first one again."""
+        return ""
 
     async def _exec_capped(self, environment, command: str, limit: int) -> str:
         try:
