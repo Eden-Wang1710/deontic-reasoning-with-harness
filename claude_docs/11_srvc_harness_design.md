@@ -136,7 +136,7 @@ solver's next observation. The main line never contains the branch's work, only 
 - **Known risk.** In `rvc-run1-numeric` about 9 wrong answers came from provisions the reader
   never delivered (`09` §10.11). Two things answer it in v0.1: the outline lists every unit, so
   an omission is visible and can be fetched; and the verifier works from the full source in its
-  own context (§3.4), so a missing provision can be found by an agent that did not depend on the
+  own context (§3.5), so a missing provision can be found by an agent that did not depend on the
   reader.
 - **SARA.** The rule document is 6,097 tokens, so the reader adds calls without relieving the
   context much. Its case on DAR has to be measured (`rule_inline_max_chars=0` forces it).
