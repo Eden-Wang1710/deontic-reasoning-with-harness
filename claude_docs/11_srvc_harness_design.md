@@ -1,8 +1,13 @@
 # 11 · Solver-reader-verifier-compaction harness: design of v0.1
 
-**Status (2026-11-19): design proposal. Nothing in this document is implemented.** §1 records what
-the owner has decided. §4 (changes to the verifier) and §8 (open decisions) wait for the owner.
-The numbers in §2 are measured on finished runs with `tools/sc_check_stats.py`.
+**Status (2026-11-20): design, not implemented.** §1 records what the owner has decided
+(2026-11-19 the frame, 2026-11-20 the verifier, the window, the cost column). §8 lists what the
+owner still has to confirm before the implementation starts. The numbers in §2 are measured on
+finished runs with `tools/sc_check_stats.py`.
+
+**Naming.** From v0.1 on a check of the verifier is called a **rubric**, and the table it fills
+is its **rubric table** (owner, 2026-11-20). §2 keeps the word *check* because it describes the
+runs of the solver-checks harness.
 
 The harness that exists today is the solver-checks harness (`10`, `AGENT=t2sc`): a solver with the
 rule document in its first message and a verifier made of three independent checks. v0.1 is the
@@ -24,7 +29,15 @@ complete harness: solver, reader, verifier and compaction.
   about 97K, to study compaction. Tens of thousands of tokens with much repetition is a fair
   setting for it.
 - The harness is to be carried over to KIRA after terminus-2.
-- The cost of the verifier is to come down. Its design is under discussion (§4).
+- The cost of the verifier is to come down (§4).
+
+Added on 2026-11-20:
+
+- **Thinking of a rubric is never thrown away** (§4.1).
+- **The verifier runs one round per task** (§4.2).
+- **All three rubrics stay**: section table, fact table, grounded reasoning (§4.3).
+- **Compaction: a 32K window, and the solver may call it itself** (§3.3).
+- **The price with cache is the headline cost** (§5).
 
 ## 2. What the finished runs say (2026-11-19) ✅
 
@@ -130,9 +143,10 @@ solver's next observation. The main line never contains the branch's work, only 
 
 ### 3.3 Compaction
 
-- **Trigger.** The harness, when the next solver prompt would pass `context_window` tokens. The
-  solver may also ask for it. No call is made below the window, so an unused compaction costs
-  nothing.
+- **Trigger.** The harness, when the next solver prompt would pass `context_window` tokens
+  (32,000 in v0.1). The solver may also call it (`"subagent": {"name": "compaction"}`); the
+  solver skill says when that is worth it (the context holds work that is finished and no longer
+  needed word for word). No call is made otherwise, so an unused compaction costs nothing.
 - **Step 1, branch call.** The compaction skill asks for a state page: what is established, what
   is open, which decisions were taken and why. Sources are named by line range and earlier work
   by step number; rule text and the answer file are not restated. Output limit
@@ -150,87 +164,125 @@ solver's next observation. The main line never contains the branch's work, only 
   cents per later call), so compaction about pays for itself and no more. Its case is the window
   and, possibly, accuracy from a cleaner context. 🔶 The second is unproven: compactor v1 gave no
   gain (`09` §10.10).
-- **SARA.** A 32K window never fires (largest prompt 31,879 tokens with the rule document
-  inline). A 16K window fires in most trials and is the setting to study compaction on SARA.
+- **SARA.** The 32K window does not fire there (largest prompt 31,879 tokens with the rule
+  document inline, and one verifier round makes the context shorter). On SARA compaction
+  therefore happens only when the solver calls it, which is what v0.1 tries out. A 16K window
+  would fire in most trials and remains the setting for a forced study.
 
-### 3.4 Verifier
+### 3.4 The answer file in the context
 
-Independent contexts, as today: each check sees the task, the source, the report format, its own
-skill and the packet (answer file, earlier findings, rebuttal). It never sees the solver's
-reasoning. The prefix (task, source, format) is the same for every check and every round, so it
-is a cache read after the first call; 86% of check input already is.
+In the Qwen3.5 numeric run the solver's last prompt holds about 7 copies of the answer file per
+trial: 2.7 in the solver's own replies (the heredoc that writes it), 2.5 as the terminal's echo
+of that heredoc, 2.5 as later displays (a `cat`, or the screen still showing it). Together that
+is roughly 19,000 of 80,000 characters. v0.1 removes the copies it can:
+
+- **Writes go through the harness, not the terminal.** The solver's reply gets a field
+  `"write_file": {"path": "...", "content": "..."}` (a tool in the KIRA adapter). The harness
+  writes the file and answers with one line (path, number of lines, the last line). The terminal
+  never echoes the content, and there is nothing to check with `cat`.
+- **One verifier round** leaves at most two writes: the first file and one correction.
+- **The verifier's result message** does not print the file back (as today).
+- **Compaction** keeps one copy, read from disk.
+
+What stays is one copy per write in the solver's own reply. 🔶 A new reply field is one more
+thing the model can misplace (the `subagent` field needed a guard for that, `09` §5).
+
+### 3.5 Verifier
+
+Independent contexts, as today: each rubric sees the task, the source, the report format, its
+own skill and the packet (the answer file). It never sees the solver's reasoning. The prefix
+(task, source, format) is the same for every rubric, so it is a cache read after the first call.
 
 The verifier keeps the full source even when the solver works from reader excerpts. Where the
-source is too large for that (BrowseComp-Plus), a check reads it through its own tool steps.
+source is too large for that (BrowseComp-Plus), a rubric reads it through its own tool steps.
 
-## 4. Proposed changes to the verifier (to discuss)
+## 4. The verifier in v0.1 (owner, 2026-11-20)
 
-1. **No paid thinking is thrown away.** Today a check reply that reaches 8,000 tokens inside its
-   thinking is discarded and the check is sent again without thinking. Proposed: a thinking
-   budget `check_thinking_budget`; when a reply ends inside its thinking, the second call gets
-   that thinking as "your notes so far" and writes the report without thinking again. The report
-   then rests on the thinking that was paid for. The budget is per model: 4,000 tokens covers 79%
-   of Qwen3.5's finished thinking replies and 38% of Qwen3.8's. 🔶 A server-side variant
-   (continue the same reply after closing the thinking block) would save the second read; whether
-   our vLLM build supports it is not checked.
-2. **Later rounds are follow-ups, not repeats.** Round 1 runs every check in full. A later round
-   on a changed file gives each check its own earlier findings and the diff of the answer file
-   and asks, per finding, whether it is resolved, and whether a changed line breaks the property.
-   No new full table.
-3. **Two checks instead of three, if the replay confirms it.** Fact table and grounded reasoning
-   stay. The unit-by-unit pass over the source moves to the reader's outline. The fact table
-   keeps the test that catches a missing provision from the other side (a stated fact that no
-   provision uses). The section-table skill stays in the repo; the list of checks is a setting.
-4. **Settle these offline before any full run.** A replay tool (`tools/replay_checks.py`, to be
-   written) runs a check configuration on the saved packets of finished trials and reports the
-   FAIL rate on right and on wrong answer files and the tokens used. Material: 100 round-1 answer
-   files (Qwen3.5 numeric 12 right and 23 wrong, Qwen3.8 numeric 24 and 11, Qwen3.5 binary 25 and
-   5) and the round-2 files with their round-1 findings. One variant is 100 to 300 calls; a full
-   run is about 760. Expected values are used to score the replay and nowhere else.
+### 4.1 Thinking is kept
 
-🔶 **Estimate, not a result.** On the Qwen3.5 numeric run the three changes together would take
-the check output from 1.39M tokens to roughly 0.5M (section table 0.51M; half of the cap waste of
-the other two checks 0.2M; half of what remains of rounds 2 and 3 about 0.2M). That is about 2.5
-cents per task less, so about 4.5 cents with cache before the reader and compaction are added.
-The old separate reader cost 1.43 cents per task with cache at 12.6 calls per task.
+A rubric call runs with thinking and an output limit (`rubric_max_output_tokens`, 8,000 as
+today). When the reply ends inside its thinking, the second call gets that thinking as "your
+notes so far" in an appended message and writes the report without thinking again. Nothing that
+was paid for is discarded, and no report is written from nothing. The second call reads the
+notes as input (8,000 tokens, about 0.11 cents at the uncached price).
+
+The limit is a separate setting. 4,000 would cover 79% of Qwen3.5's finished thinking replies
+and 38% of Qwen3.8's (§2); v0.1 keeps 8,000 so that the only change is that thinking is kept.
+
+### 4.2 One round
+
+- The solver calls the verifier once, on an answer file with the required sections. Every rubric
+  runs once.
+- The report goes to the solver. For each finding it reads the quoted text and either corrects
+  the file or leaves it. Then it finishes. The corrected file is not checked again.
+- `task_complete` is accepted once the verifier has run. A second call is answered with the
+  report that exists, as today for an unchanged file.
+- The rebuttal exchange and the round budget are gone, with their text in the solver skill and
+  the "later rounds" part of the report format.
+
+✅ Looking back at the Qwen3.5 numeric run: taking each trial's answer file after its first
+correction gives 18/35, against 19/35 with three rounds (paths over the rounds, right R and wrong
+W: R 5, RR 3, RRR 2, RWR 1, RWW 1, W 2, WR 2, WRR 5, WRW 1, WW 5, WWW 8). Round 1 holds 622k of
+the 1,387k check output tokens, so the rubric output per task falls from 3.96 to about 1.78
+cents. 🔶 This assumes the solver corrects as it did when a second round was coming.
+
+### 4.3 Three rubrics
+
+Section table, fact table and grounded reasoning stay, each with its rubric table. The section
+table fails right and wrong files at a similar rate (§2), and with one round a FAIL no longer
+costs another round; what it costs is a correction the solver may make to a right answer (1 of
+the 7 right files that did not pass round 1 ended wrong). The solver skill keeps the rule that a
+finding is a claim to be read against the quoted text, not an order.
+
+Skill directories are renamed from `check_*` to `rubric_*` in the v0.1 skills
+(`rubric_section_table_v1`, `rubric_fact_table_v1`, `rubric_grounded_reasoning_v1`,
+`rubric_report_v3`); the `check_*` directories stay for `AGENT=t2sc`.
+
+### 4.4 Rough cost 🔶
+
+Estimate from the Qwen3.5 numeric run, not a result: rubric cost with cache falls from 4.66 to
+about 2.2 cents per task, so about 4.7 cents per task with cache before the reader and
+compaction are added. The old separate reader cost 1.43 cents per task with cache at 12.6 calls
+per task; one compaction costs about 0.3 cents.
 
 ## 5. Cost columns
 
-Branches resend the solver's context on every call. With cache that is cheap by design. Without
-cache it is the most expensive way to call a sub-agent. So the no-cache column will make v0.1
-look worse than it is under the pricing it is built for, and the budget per task (0.15 USD at
-the no-cache price, `09` §10.12) would stop branches early. Proposed: the price with cache
-becomes the headline and the basis of the budget; the no-cache price stays in the table.
+Branches resend the solver's context on every call. With cache that is cheap by design; without
+cache it is the most expensive way to call a sub-agent. **The price with cache is the headline
+cost from v0.1 on (owner, 2026-11-20); the no-cache price stays in the table.** 🔶 To confirm:
+the budget per task (0.15 USD, `09` §10.12) is computed at the price with cache as well.
 
 ## 6. What is harness and what is skill
 
 - **Harness (no benchmark-specific code):** main line and branches, the verifier's contexts,
-  shape validation, the quote search, the completion gate, rounds and rebuttals, the rebuild
+  shape validation, the quote search, the completion gate, the file-write channel, the rebuild
   after compaction, the ledger and the budget.
-- **Skills (per benchmark):** solver, reader, compaction, each check, the report format.
+- **Skills (per benchmark):** solver, reader, compaction, each rubric, the report format.
 - **Source adapter (per benchmark):** how a piece of the source is addressed and copied. File and
   line range for DAR; document and passage for BrowseComp-Plus.
 - **Agent adapter:** terminus-2 calls sub-agents through the `subagent` field of its JSON reply.
-  KIRA uses native tool calling, so `reader`, `verifier` and `compaction` become tools. The core
-  is written once and the two adapters stay thin.
+  KIRA uses native tool calling, so `reader`, `verifier`, `compaction` and the file write become
+  tools. The core is written once and the two adapters stay thin.
 
 ## 7. Order of work
 
-1. `tools/replay_checks.py`, then the verifier settings of §4 chosen offline.
-2. Core and terminus-2 adapter (`AGENT=t2srvc`), skills `solver_v5`, `reader_v2`,
-   `compaction_v1`, report format v3 with the follow-up reply.
-3. Smoke runs, then SARA numeric and binary with Qwen3.5-35B-A3B. This gives the row
+1. Core and terminus-2 adapter (`AGENT=t2srvc`), skills `solver_v5`, `reader_v2`,
+   `compaction_v1`, the three `rubric_*_v1` and `rubric_report_v3`.
+2. Smoke runs, then SARA numeric and binary with Qwen3.5-35B-A3B. This gives the row
    "solver-reader-verifier-compaction" of the paper table; the 19/35 at 9.40 cents printed there
    now comes from a run in which the reader was never called.
-4. KIRA adapter. Then BrowseComp-Plus.
+3. KIRA adapter. Then BrowseComp-Plus.
 
-## 8. Open decisions
+## 8. To confirm before the implementation starts
 
-- Headline cost and budget on the price with cache (§5).
-- `context_window`: 32K as the default; 16K for the SARA experiments, where 32K never fires.
-- The verifier changes of §4, and whether the replay may be run (it needs the model server on
-  0238 for the length of the replay).
-- Thinking in the branches. Proposed: the reader thinks under the same budget rule as the checks;
-  compaction writes the state page without thinking.
-- Still open from `10` §8: check format v2 (the case text read as complete), which the binary run
-  used and the owner has not confirmed.
+- **The rule document leaves the solver's first message on SARA** and comes through the reader
+  (outline plus excerpts). This is what "with a reader" means on a 6,097-token document, and it
+  is the main accuracy risk of v0.1 (§3.2).
+- **Naming**: check becomes rubric, its table a rubric table (as read from the owner's message).
+- **The file-write channel** of §3.4 as the answer to the repeated answer file.
+- **Rubric output limit** stays 8,000 (§4.1).
+- **Budget** at the price with cache (§5).
+- **Thinking in the branches.** Proposed: the reader thinks, with the same keep-the-thinking
+  rule as the rubrics; compaction writes the state page without thinking.
+- Still open from `10` §8: report format v2 (the case text read as complete), which the binary
+  run used and the owner has not confirmed.
