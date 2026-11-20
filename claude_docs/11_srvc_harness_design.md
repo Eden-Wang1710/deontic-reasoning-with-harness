@@ -2,7 +2,7 @@
 
 **Status (2026-11-20): implemented as `AGENT=t2srvc`** (`tools/dar_terminus2_srvc.py`; §9
 describes the implementation and where it differs from this design), **run in full on SARA
-numeric and binary (§10) and put on KIRA's loop as `AGENT=kirasrvc` (§11)**. §1 records what the owner
+numeric and binary (§10) and put on KIRA's loop as `AGENT=kirasrvc` (§11; full SARA runs in §11.1)**. §1 records what the owner
 has decided (2026-11-19 the frame, 2026-11-20 the verifier, the window, the cost column). The
 owner confirmed all six points of §8 on 2026-11-20 and asked for SARA numeric and binary in
 full, then the KIRA adapter. The numbers in §2 are measured on finished runs with
@@ -541,10 +541,68 @@ Changes after `kirasrvc-smoke1`, all in the shared reader code and none specific
   already in your context: ...", with the ranges. Before, the result said only "No rule text
   was inserted" and the solver asked again in other words.
 
-🔶 Not run in full: on this machine the server is saturated at about 100 output tokens per
-second in total, and the two SARA runs of §10 took the night. Two tasks say nothing about
-accuracy or cost against the terminus-2 version.
-
 One of the three applied compactions in `kirasrvc-smoke2` made the solver's prompt longer
 (14,748 to 14,848 tokens): the run switched the saving guard off (`compaction_min_saving=-1`)
 to force the applied path. With the default guard (0.2) that call is declined.
+
+### 11.1 Full runs on SARA (2026-11-20) ✅
+
+`kirasrvc-run1-numeric` (35 tasks) and `kirasrvc-run1-binary` (30 tasks), started 16:35 UTC
+from commit `46499edd` (with the `reply_object` fix of §10.5 and the two reader fixes above),
+8 trials at a time each on one server, default settings, same protocol as §10. No trial ended
+with an exception, none was stopped by the cost budget. Binary ended 20:53 UTC, numeric 22:13
+UTC; the waiter stopped the server in the same command (22:14 UTC, no vLLM process, no GPU
+process). No KIRA baseline was run (owner, 2026-11-20: the harness only). Cost detail:
+`outputs/kirasrvc_run1_{numeric,binary}_inference_cost.json`.
+
+| Run | Correct | Wilson 95% | Calls per task | Cost no cache | Cost with cache |
+| --- | --- | --- | --- | --- | --- |
+| `kirasrvc-run1-numeric` | 18/35 (51.4%) | 35.6-67.0% | 16.0 | 5.78 | **4.40** |
+| `srvc-run1-numeric` (terminus-2 loop, §10) | 17/35 (48.6%) | 33.0-64.4% | 14.7 | 6.01 | 4.74 |
+| `kirasrvc-run1-binary` | 26/30 (86.7%) | 70.3-94.7% | 11.4 | 3.37 | **2.77** |
+| `srvc-run1-binary` (terminus-2 loop, §10) | 24/30 (80.0%) | 62.7-90.5% | 11.9 | 3.68 | 3.04 |
+
+- ✅ **The harness gives the same result on the second base agent**: accuracy within one or
+  two tasks of the terminus-2 version on both subsets, cost 7% and 9% lower with cache. Task
+  by task against `srvc-run1`: numeric 14 correct in both, 3 only on terminus-2, 4 only on
+  KIRA; binary 22 / 2 / 4. 🔶 One run each; the differences between the two base agents are
+  not significant, and `srvc-run1` carries the bug of §10.5 while this run does not.
+- **The hard tasks are the same ones.** On numeric, 12 tasks are right in all three runs
+  (`sc-run1`, `srvc-run1`, `kirasrvc-run1`) and 12 in none; on binary 20 and 2.
+
+What the verifier round did (the answer in the file when the verifier was called, against the
+final answer):
+
+| | Numeric | Binary |
+| --- | --- | --- |
+| Correct before the verifier | 13/35 | 24/30 |
+| Correct at the end | 18/35 | 26/30 |
+| Wrong before, right after | 9 | 3 |
+| Right before, wrong after | 4 | 1 |
+| First report passed: trials (correct before) | 8 (4) | 19 (16) |
+| First report did not pass: trials (correct before) | 27 (9) | 11 (8) |
+
+- ✅ Numeric: five tasks net (13 to 18), the same direction and size as on terminus-2 (13 to
+  17). The solver before the verifier is at 13 of 35 on both base agents.
+- 🔶 Binary: two tasks net *gained* (24 to 26), where both terminus-2 runs lost two (§10.3).
+  With three or four changed answers per run this is not a difference between base agents;
+  taken together the three binary runs (`sc-run1` -2, `srvc-run1` -2, this run +2) say that
+  the verifier changes the outcome of two to four answers and that no gain on binary is shown.
+
+How the parts were used:
+
+- ✅ **`write_file` as a tool is used by almost every solver**: 35 of 35 numeric trials and 29
+  of 30 binary trials wrote the answer file through it (66 and 42 files); 4 and 5 trials also
+  wrote it from the terminal at some point. On the terminus-2 loop, where it is a field of the
+  JSON reply, fewer than half did (§10.4). A native tool is a stronger signal to this model
+  than a field described in the prompt.
+- **Reader.** One survey per trial. The solver called the reader in 19 of 35 numeric trials
+  (43 calls: 35 direct ranges, 8 model branches) and 16 of 30 binary trials (27 calls: 24
+  direct, 3 branches). 22 and 16 of those calls inserted nothing because the lines were
+  already in the solver's context: the solver still asks for what it has, but since the fix
+  after `kirasrvc-smoke1` such a call costs a solver step and no reader branch. The reader's
+  share of the cost is 14% and 16% (17% and 20% on terminus-2).
+- **Compaction** was not called in either run (solver prompt at the last step: median 14,753
+  tokens on numeric, max 25,550; median 7,843 on binary). The applied path on a tool-call
+  conversation is covered by `kirasrvc-smoke2` only.
+- **Kept thinking.** 33 cut replies on numeric and 15 on binary were handed to the next call.
