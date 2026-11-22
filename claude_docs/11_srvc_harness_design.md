@@ -614,3 +614,31 @@ How the parts were used:
   tokens on numeric, max 25,550; median 7,843 on binary). The applied path on a tool-call
   conversation is covered by `kirasrvc-smoke2` only.
 - **Kept thinking.** 33 cut replies on numeric and 15 on binary were handed to the next call.
+
+### 11.2 Cost of the KIRA baseline from the runs of 2026-10-16 (estimate, 2026-11-22) 🔶
+
+No KIRA baseline was run under the cost protocol. The only baseline KIRA trials with this model
+are `sara-kira-run1` plus `sara-kira-rerun9` (`06` §1, wrapper-repaired set: 56 finished trials
+and the 9 that were rerun after the crash fix). Priced on the same price card:
+
+| Run | Correct | Calls per task | Input / output tokens | Cost no cache | Cost with cache |
+| --- | --- | --- | --- | --- | --- |
+| KIRA baseline, numeric | 11/35 | 8.9 | 83,052 / 8,556 | 2.02 | 1.37 |
+| terminus-kira-harness v0.1, numeric (§11.1) | 18/35 | 16.0 | 201,184 / 29,618 | 5.78 | 4.40 |
+| KIRA baseline, binary | 26/30 | 7.3 | 63,172 / 3,646 | 1.25 | 0.78 |
+| terminus-kira-harness v0.1, binary (§11.1) | 26/30 | 11.4 | 101,699 / 19,449 | 3.37 | 2.77 |
+
+- **How it was computed.** `tools/inference_cost.py` does not read these trials (KIRA calls the
+  model outside harbor's LLM object, so there is no ledger and no `debug.json`). The token
+  counts are the per-step `metrics` of `agent/trajectory.json`, whose sums equal the totals in
+  `result.json` in all 65 trials ✅. The no-cache cost is exact. The with-cache cost assumes
+  that each request reads the previous request's prompt from the cache; the prompts grow
+  strictly in all 65 trials, so this is the same rule the ledger applies to an append-only
+  conversation, but it was not computed by the ledger.
+- 🔶 **Not the same protocol.** These trials ran with the 1,800 s limit (none timed out) and
+  before the cost budget existed; nine tasks are a second draw. For terminus-2 the rerun under
+  the cost protocol moved the baseline from 7/35 to 2/35 (`09` §10.12), so a number from an
+  older run is an estimate, not the baseline row of a table.
+- **What it says if it holds.** On numeric the harness is worth seven tasks (11 to 18) at 3.2
+  times the with-cache cost. On binary the baseline is already at 26/30 and the harness costs
+  3.6 times as much for the same count.
