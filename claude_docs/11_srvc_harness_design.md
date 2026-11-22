@@ -401,6 +401,12 @@ Cost detail per trial and role: `outputs/srvc_run1_{numeric,binary}_inference_co
   the runs support is "same accuracy range at two thirds of the cost", not an accuracy gain or
   loss.
 
+- ✅ **SARA binary macro-F1** (the DAR paper's metric for this subset; rule of
+  `harbor-deonticbench/evaluate_deonticbench.py`): `srvc-run1-binary` **0.799** (contradiction
+  P 0.812 / R 0.812, entailment P 0.786 / R 0.786; gold 16 contradiction, 14 entailment; every
+  trial gave one of the two labels, so there is no abstention to map). `sc-run1-binary` by the
+  same rule: 0.777.
+
 Per role, mean per task (share of the no-cache cost):
 
 | Role | Numeric: calls | no cache | with cache | Binary: calls | no cache | with cache |
@@ -575,6 +581,9 @@ process). No KIRA baseline was run (owner, 2026-11-20: the harness only). Cost d
   by task against `srvc-run1`: numeric 14 correct in both, 3 only on terminus-2, 4 only on
   KIRA; binary 22 / 2 / 4. 🔶 One run each; the differences between the two base agents are
   not significant, and `srvc-run1` carries the bug of §10.5 while this run does not.
+- ✅ **SARA binary macro-F1**, same rule as in §10.2: `kirasrvc-run1-binary` **0.866**
+  (contradiction P 0.875 / R 0.875, entailment P 0.857 / R 0.857; no abstention), against
+  0.799 on the terminus-2 loop.
 - **The hard tasks are the same ones.** On numeric, 12 tasks are right in all three runs
   (`sc-run1`, `srvc-run1`, `kirasrvc-run1`) and 12 in none; on binary 20 and 2.
 
