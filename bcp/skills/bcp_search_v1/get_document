@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+"""get_document <docid>: the text of one document of the BrowseComp-Plus collection."""
+import json, os, sys, urllib.request
+
+def main() -> int:
+    if len(sys.argv) != 2 or not sys.argv[1].strip():
+        print("Usage: get_document <docid>")
+        return 2
+    addr = os.environ.get("BCP_TOOLS_ADDR", "172.17.0.1:9010")
+    body = json.dumps({"docid": sys.argv[1].strip(), "qid": os.environ.get("BCP_QID", "")}).encode()
+    req = urllib.request.Request(f"http://{addr}/get_document", data=body,
+                                 headers={"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=100) as resp:
+            print(json.load(resp)["text"])
+    except Exception as exc:  # noqa: BLE001
+        print(f"get_document: the request failed ({exc}). Try again.", file=sys.stderr)
+        return 1
+    return 0
+
+if __name__ == "__main__":
+    sys.exit(main())

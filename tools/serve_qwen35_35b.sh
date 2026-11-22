@@ -16,6 +16,8 @@
 # Another local model of the same family (2026-11-17, Qwen3.8-27B):
 #   MODEL_DIR=$HOME/models/Qwen3.8-27B SERVED_NAME=qwen3.8-27b LOG=$HOME/vllm_logs/qwen38-27b.log \
 #     tools/serve_qwen35_35b.sh
+# Qwen3.5-9B for BrowseComp-Plus (2026-11-21, bcp/servers.sh): the same script with
+#   MAX_NUM_SEQS=16 GPU_MEM_UTIL=0.5 (the embedding model of the tools server shares the memory).
 set -euo pipefail
 PREFIX_CACHE="${PREFIX_CACHE:-1}"
 EXTRA_ARGS=""
@@ -41,7 +43,7 @@ exec "$PY/vllm" serve "$MODEL_DIR" \
   --dtype bfloat16 \
   --max-model-len 65536 \
   --max-num-seqs "${MAX_NUM_SEQS:-8}" \
-  --gpu-memory-utilization 0.75 \
+  --gpu-memory-utilization "${GPU_MEM_UTIL:-0.75}" \
   --reasoning-parser qwen3 \
   --enable-auto-tool-choice --tool-call-parser qwen3_xml \
   --override-generation-config '{"max_new_tokens": 16384}' \

@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+"""verify: have the verifier check /app/answer.md against the cited lines (one round)."""
+import sys
+from _bcp import ANSWER, post, read_file
+
+if __name__ == "__main__":
+    sys.exit(post("/v01/verify", "verify", answer=read_file(ANSWER)))

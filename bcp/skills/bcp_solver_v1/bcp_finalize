@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""Run by the agent class when the run ends. If there is no answer file and the state table
+has a Best answer, the answer file is written from it (claude_docs/12 §5.5)."""
+import sys
+from _bcp import ANSWER, STATE, best_answer, post, read_file
+
+if __name__ == "__main__":
+    source = "answer_file"
+    if not read_file(ANSWER).strip():
+        best = best_answer(read_file(STATE))
+        if best:
+            with open(ANSWER, "w", encoding="utf-8") as fh:
+                fh.write(best + "\n")
+            source = "state_table"
+        else:
+            source = "none"
+    post("/v01/finalize", "finalize", source=source); sys.exit(0)

@@ -44,3 +44,11 @@ harbor-deonticbench/jobs/
 # Re-include the small run summaries (overrides the nested DeonticBench ignore)
 !outputs/
 !DeonticBench/outputs/
+
+# BrowseComp-Plus (claude_docs/12 §3.6): decrypted questions, task directories, jobs and judge
+# outputs live under ~/data/browsecomp-plus, outside the repository. These lines are a guard
+# in case something is written below bcp/ by mistake.
+bcp/data/
+bcp/tasks/
+bcp/jobs/
+bcp/**/*.jsonl

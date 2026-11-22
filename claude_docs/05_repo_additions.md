@@ -33,6 +33,9 @@ deontic-reasoning-with-harness/
 │   ├── 09_reader_verifier_harness.md  the reader-verifier harness (v1 of reader-verifier-compactor):
 │   │                            sub-agents as tools, completion gate, reader/verifier skills, runs;
 │   │                            §10 = version 2, the compactor (design, replay debugging, smokes)
+│   ├── 12_bcp_harness_design.md     BrowseComp-Plus: baseline (CLM agent) and the
+│   │                                solver-reader-verifier-compaction BCP-harness v0.1, design and as built
+│   ├── 13_bcp_results.md            every BrowseComp-Plus result: accuracy, cost, where the gain comes from
 │   └── figures/                     reader.{svg,png}, compactor.{svg,png}: overview figures of the two
 │                                sub-agents (from tools/make_harness_figures.py)
 │
@@ -138,6 +141,8 @@ deontic-reasoning-with-harness/
 │   ├── pricing/price_card_qwen3.8-27b.json  OpenRouter price of qwen/qwen3.8-27b fetched 2026-11-17
 │   │                            (0.15 / 1.875 / 0.0375), for reporting only; the cost budget of a run
 │   │                            always uses price_card.json (10 §7.3)
+│   ├── pricing/price_card_qwen3.5-9b.json  OpenRouter price of qwen/qwen3.5-9b fetched 2026-11-22
+│   │                            (0.17 / 0.25, no cache-read price), for reporting the BCP runs (13 §4)
 │   ├── inference_cost.py            inference cost of job dirs: tokens and cents per task and per role,
 │   │                            without a cache and with a simulated prompt cache inside each trial,
 │   │                            as a multiple of a baseline job; reads the ledger, or the debug logs
@@ -187,7 +192,21 @@ deontic-reasoning-with-harness/
 │   ├── deonticbench_stats.py        dataset statistics behind claude_docs/03 Part III
 │   └── db_stats.json             ✅ output of deonticbench_stats.py (regenerable; committed since 2026-10-27)
 │
+├── bcp/                          ✅ BrowseComp-Plus with Qwen3.5-9B (12 §6 describes every file)
+│   ├── download.sh, prepare_data.py, build_tasks.py, query_order.json   data, index and Harbor tasks
+│   │                             (everything decrypted stays under ~/data/browsecomp-plus, never here)
+│   ├── tools_server.py           search / get_document server; with --roles the v0.1 commands
+│   ├── roles_v01.py, bcp_srvc.py reader, verifier, gate (v0.1) and the thin ClmAgent subclass
+│   ├── skills/                   bcp_search_v1 (baseline), bcp_solver_v1, reader_excerpt_bcp_v1,
+│   │                             verifier_bcp_v1
+│   ├── sandbox/Dockerfile, servers.sh, run_clm_base.sh, run_bcpsrvc.sh   image, serving, the two runs
+│   ├── judge.py, report.py       judging with BCP's template; per-question report of a job
+│   └── analysis/cost.py, funnel.py   list-price cost with and without cache (13 §4); retrieved ->
+│                                 shown -> answered -> correct, and command output sizes (13 §3)
+│
 ├── outputs/                      ✅ our run artifacts outside the subtrees (committed since 2026-10-27)
+│   ├── bcp/<job>/                scores.json and report.json of a BCP job; dev50_cost.json,
+│   │                             dev50_funnel.json (ids and numbers only, no question or answer text)
 │   └── verbalized_confidence/<run>/ per-trial JSON + summary.json from verbalized_confidence.py
 │
 ├── DeonticBench/                 upstream subtree (prompt-based benchmark)
