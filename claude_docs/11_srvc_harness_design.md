@@ -501,6 +501,28 @@ before the fix.**
   `pgrep -f "job-name srvc-run1"`, which matched its own command line and never returned. The
   server held GPU memory idle for that time, against the rule for this machine.
 
+### 10.7 Cost of the terminus-2 baseline on SARA binary (2026-11-22) 🔶
+
+No terminus-2 baseline was run on binary under the cost protocol (`t2fix-cost1-numeric` is
+numeric only). The two older baseline runs hold the 30 binary tasks; `tools/inference_cost.py`
+prices them from the request logs with the same simulated cache as the ledger
+(`--match sara-binary`):
+
+| Run | Correct | Macro-F1 | Calls per task | Cost no cache | Cost with cache |
+| --- | --- | --- | --- | --- | --- |
+| `sara-t2fix-run1` (terminus-2 with the truthful marker, the baseline of `09` §10.12) | 27/30 | 0.900 | 6.0 | 0.80 | **0.59** |
+| `sara-t2-run1` (stock terminus-2) | 26/30 | 0.867 | 6.2 | 0.82 | 0.59 |
+| `srvc-run1-binary` (terminus-2-harness v0.1, §10.2) | 24/30 | 0.799 | 11.9 | 3.68 | 3.04 |
+| `kirasrvc-run1-binary` (terminus-kira-harness v0.1, §11.1) | 26/30 | 0.866 | 11.4 | 3.37 | 2.77 |
+
+- 🔶 **Older protocol**: these runs had the 1,800 s limit and no cost budget. All 30 binary
+  trials of both finished without an exception or a time-out and no reply was cut, so the
+  limit did not bind on binary; on numeric the same run and its rerun under the cost protocol
+  differ in accuracy (7/35 and 2/35) but little in cost (1.38 and 1.54 cents with cache).
+- **What it says.** On SARA binary the baseline is at or above the harness (26 or 27 of 30
+  against 24 and 26) at about a fifth of the with-cache cost. The gain of the harness is on
+  numeric; on binary it buys nothing with this model.
+
 ## 11. The harness on KIRA's loop (2026-11-20)
 
 `tools/dar_kira_srvc.py`, class `KiraSRVC`, run with `AGENT=kirasrvc`. KIRA
