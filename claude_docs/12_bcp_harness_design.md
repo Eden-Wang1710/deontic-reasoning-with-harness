@@ -2,7 +2,7 @@
 
 **Status (2026-11-21): the baseline is built and run on `dev50` (28.0%, §11.4). v0.1 (§5) is
 implemented (§12) and run on `dev50` (54.0% at 11.3 PFLOPs per question, §12.4); the
-baseline on the remaining 780 questions (`clm-base-rest780`) is running.** All results, with the cost at list prices and the analysis of the gain, are collected in [13](13_bcp_results.md). §1 records what the owner decided on 2026-11-20 and
+baseline on all 830 questions is 24.0% (199/830) at 3.23 PFLOPs (`13` §6). v0.2 (2026-11-23, §13): the reader sees the first 512 tokens of a document and opens more itself; built, measured offline and run on `dev50` (`bcpsrvc2-dev50`: 52.0% at 9.21 PFLOPs by v0.1's counting, 6.79 with a reader conversation's repeated prefix counted once, §13.4).** All results, with the cost at list prices and the analysis of the gain, are collected in [13](13_bcp_results.md). §1 records what the owner decided on 2026-11-20 and
 2026-11-21. Everything else is proposed; the points that need the owner's word are collected in
 §10. Facts marked ✅ were read in the papers or in the two repositories
 (BrowseComp-Plus at commit `0469490`, CLM at commit `3c89408`); 🔶 marks an estimate or a
@@ -579,4 +579,225 @@ Summaries: `outputs/bcp/bcpsrvc-dev50/`.
   before `verify`; 3 are correct and 3 wrong. These are the only wrong answers of the run.
 - **State table.** Written 1.4 times per trial on average after the template; 15 of the 50
   trials never wrote it (6 of the 20 trials without an answer).
+
+
+## 13. v0.2: the selective reader, which sees the beginning and opens more itself (2026-11-23)
+
+**Owner's decision (2026-11-23).** v0.1's accuracy is wanted, its cost is not; v0.2 lowers
+the cost at the reader, and a small loss of accuracy is accepted. The reader sees only the
+first 512 tokens of a document and then decides itself whether to open more, how much and
+which part. This replaces the v0.2 planned in §8 (a summary instead of excerpts), which
+saves no reading. Everything else is v0.1: solver loop, state table, cards, `read_document`,
+verifier, gate, compaction.
+
+**Why the reader.** In `bcpsrvc-dev50` the reader is 9.65 of 11.32 PFLOPs per question, its
+cost is input (676K prompt tokens against 17K output), and 87% of that input goes to
+documents it then grades `none` (counted from the run's tool log). The baseline's solver decides from a 512-token
+snippet whether to open a document, and pays for both in its own context; v0.2 moves that
+decision into the reader's disposable context.
+
+### 13.0 The selective reader, in one page ✅
+
+**What it is.** In v0.2 the reader is a *selective reader*: it does not read a retrieved
+document, it decides how much of it to read. It sees the beginning (512 tokens), grades the
+document, and only when the beginning gives a reason does it ask the harness for more: a
+line range (`OPEN`) or the lines that contain a phrase (`FIND`). The solver still never
+sees a document; it gets a card with the title, the grade and the few lines the reader
+picked, word for word.
+
+| | Baseline (CLM agent) | v0.1 reader | v0.2 selective reader |
+| --- | --- | --- | --- |
+| Who decides whether a document is worth reading | the solver, from a 512-token snippet in its own context | nobody: every new document is read | the reader, from the first 512 tokens, in its own context |
+| How much of a document is read | the snippet; the whole document when the solver opens it | up to 8,192 tokens of every new document | 512 tokens; more only on the reader's own `OPEN` / `FIND`, at most 3 times |
+| What enters the solver's context per search | 10 snippets, about 19,400 characters | cards, about 2,300 characters | cards, about 2,400 characters |
+| Model calls per document | none (the solver's own turns) | 1 | 1 to 4 turns of one conversation (1.43 on average) |
+| Reader tokens per document (`dev50`) | | 4,598 | 2,178 |
+| Share of the lines of the given documents that were read (`dev50`) | | | 5.6% |
+
+**The flow of one `search`.**
+
+```
+solver (bash, in the sandbox)          tools server (host)                    reader (same 9B model, own context)
+-----------------------------          -------------------                    ------------------------------------
+search "<query>"  ───────────────────► retrieve top 10 (Qwen3-Embedding-8B)
+  (sends /app/state.md along)          keep the documents not yet read in
+                                       this trial; for each, in parallel:
+                                         first 512 tokens, numbered lines ───► turn 0: SCAN / MATCH / LINES  [+ one action]
+                                         OPEN a-b  -> those lines (≤2,000 tok) ◄── OPEN: 120-160
+                                         FIND x; y -> lines containing x or y ◄── FIND: <phrase>; <phrase>
+                                           with one line before and after
+                                           (≤800 tok), other hits as numbers
+                                         send the lines back ─────────────────► turn 1..3: SCAN / MATCH / LINES [+ action]
+                                         no action line -> reading ends
+                                       build one card per document:
+                                         grade = highest grade given with lines
+                                         lines = the LINES of all turns
+                                                 (≤4 rows, ≤8 lines)
+cards of the 10 documents ◄──────────  copy those lines from the corpus
+```
+
+**One reading, schematically** (placeholders, not benchmark text):
+
+```
+[user, turn 0]   # Question ... # State table of the solver ... # Request: The solver searched for: <query>
+                 # Document <docid>: 310 lines in total. Shown: lines 1-14 (the beginning); 296 more lines are not shown.
+                 1: <title> ... 14: <text>
+[reader]         SCAN: Biography of <person>; lines 3-5 give birth year and profession, which fit condition 1. The award is not in the beginning.
+                 MATCH: weak
+                 LINES: 3-5 | <person>, born <year>, <profession>
+                 FIND: <award name>; <year>
+[user, turn 1]   2 line(s) contain <award name>; <year>.
+                 187: <text>   188: <text with the phrase>   189: <text>
+                 Reply in the same form: SCAN, MATCH, LINES for useful lines you have newly found, and an action only if you need one (2 left).
+[reader]         SCAN: Line 188 states that <person> received <award> in <year>, which fits condition 2.
+                 MATCH: strong
+                 LINES: 188-188 | received <award> in <year>
+```
+
+The card the solver then gets for this document:
+
+```
+[3] docid <docid> | <title> | read lines 1-14, 187-189 of 310 | match: strong
+  lines 188-188: received <award> in <year>
+  188: <text of line 188, copied from the corpus>
+  lines 3-5: <person>, born <year>, <profession>
+  3: <text> ...
+```
+
+**Four properties that matter.**
+
+1. *The decision is the reader's, the lookup is the harness's.* The harness numbers lines,
+   returns the lines asked for and copies the lines pointed to. It does not rank, filter or
+   judge. `FIND` is a substring lookup.
+2. *Every turn carries a grade and lines, and the result accumulates.* A later turn cannot
+   take back what an earlier one found. Without this the reader graded like a verifier
+   after its own `FIND`s and the share of gold documents passed on fell from 92% to 68%
+   (§13.2).
+3. *Only lines that were shown can be passed on.* A `LINES` range is cut to what the
+   reader has seen, so a card cannot contain text the reader did not read.
+4. *The actions are turns of one conversation.* The prefix of each turn is what the model
+   server has already processed, so a further look costs the new lines only (`13` §10.1 on
+   how this is counted).
+
+**What it costs and what it keeps** (`dev50`, `13` §10): 52.0% against v0.1's 54.0%
+(paired 4 gained, 5 lost); 6.79 PFLOPs per question against 11.32 with a conversation's
+repeated prefix counted once, 3.87 against 9.56 when the prefix shared by the reader calls
+of a trial is counted once too; baseline 3.20. The reader takes no action on 80% of the
+documents. Its weakness: 9 of 104 gold documents were graded `none` from the first window
+without an action.
+
+### 13.1 As built ✅
+
+- **Code.** `bcp/roles_v02.py` (`Roles2`, a subclass of v0.1's `Roles`: it replaces
+  `read_one`, the wording of the card's "read lines" part and the merging in
+  `read_document`), the reader skill `bcp/skills/reader_open_bcp_v2/`, the solver skill
+  `bcp/skills/bcp_solver_v2/` (the commands of `bcp_solver_v1`; only its text on what the
+  reader does differs), `tools_server.py --reader-mode open`, and
+  `VERSION=v02 bcp/run_bcpsrvc.sh <set> <job>`. v0.1 runs as before.
+- **First prompt.** Reader skill, question, state table, request, then the header
+  `Document <docid>: N lines in total. Shown: lines 1-k (the beginning); M more lines are
+  not shown` and the first 512 tokens as numbered lines (`--first-tokens`).
+- **Every reply** has a scratch line, a grade and lines (`SCAN`, `MATCH`, `LINES`, as in
+  v0.1) and may end with one action:
+  - `OPEN: a-b` shows these lines, at most 2,000 tokens per action (`--open-tokens`);
+  - `FIND: phrase; phrase` shows every line that contains one of the phrases (substring,
+    case ignored) with the line before and after, at most 800 tokens, and gives the line
+    numbers of the matches that did not fit (`--find-tokens`).
+  At most 3 actions per document (`--reader-actions`). A reply without an action ends the
+  reading. Each action is one more turn of the same conversation, so the model server reuses
+  the prefix it has processed.
+- **The result of a document** is the highest grade that a reply gave together with valid
+  lines, and the lines of all replies, the latest first, within v0.1's limits (4 rows, 8
+  lines). A later reply does not take back what an earlier one found; `read_document` treats
+  earlier readings the same way since v0.1. Only lines that were shown to the reader can be
+  passed on; a range is cut where they end.
+- **What the harness does** is what it did in v0.1: number lines, look lines up, copy the
+  lines the reader points to, count tokens. FIND is a text lookup. What to look for, whether
+  to open and what a line is worth are the reader's decisions.
+- **`read_document`** uses the same reader: 512 tokens from line 1 or from `from_line`, then
+  the reader's actions. The card says which line ranges were read (`read lines 1-18, 40-80
+  of 155`).
+- **Logged** per reader call: its turn and the prompt tokens that repeat the same
+  conversation (`cached_prompt_tokens`); per document (`reader_doc`): actions, grade, lines
+  seen. `bcp/report.py` gives the roles' compute by v0.1's rule (every prompt token counted)
+  and with the repeated prefix of a conversation counted once
+  (`role_pflops_conversation_cache`).
+- **Also new:** every sandbox has a 4 GB memory limit (`13` §6); the task sets `val5` and
+  `val20` (positions 150 and later of the fixed order, outside `dev150`).
+
+### 13.2 The reader was measured before the run, and changed twice ✅
+
+`bcp/analysis/reader_check.py`: 120 questions outside `dev150`; for each, the first search
+of the baseline that returned a gold document gives that document and two documents of the
+same result that are neither gold nor evidence (359 documents). Both readers read each
+document with the empty state table. `outputs/bcp/reader_check_v02.json`.
+
+| Reader | Gold passed on (strong or weak) | Answer string in the lines passed on (of 111 gold documents that hold it) | Other documents passed on | Tokens per document, gold / other |
+| --- | ---: | ---: | ---: | ---: |
+| v0.1 (up to 8,192 tokens) | 91.7% (102 + 8 of 120) | 77 | 19.7% | 3,355 / 4,630 |
+| v0.2, first form | 68.3% | 55 | 5.4% | 2,577 / 2,432 |
+| v0.2, second form | 70.0% | 64 | 7.1% | 2,613 / 2,351 |
+| **v0.2, as run** | **90.0%** (94 + 14 of 120) | **81** | 25.5% | 2,817 / 2,211 |
+
+Tokens: prompt and completion, a conversation's repeated prefix counted once. With every
+prompt token counted, v0.2 as run is 6,121 / 3,578.
+
+- **First form:** the reader either asked for more or gave its result. After its own FINDs
+  it graded like a verifier: "the document does not mention the other conditions", so
+  `none`, for documents that are the answer (the mineral's own article; the album's own
+  article). It had seen the answer string in 102 of the 111 gold documents and passed it on
+  in 55.
+- **Second form:** a paragraph on grading added to the skill (one document covers one link
+  of the chain; a FIND that finds nothing does not lower the grade). Nearly no change.
+- **As run:** every reply carries a grade and lines, also the first one, and the result of
+  a document accumulates (§13.1). The grade of the first reply is made as in v0.1, before
+  the reader starts looking for the rest of the question.
+- **What the actions bring:** the answer string is within the first 512 tokens in 86 of the
+  111 gold documents, within what the v0.2 reader has seen at the end in 103, within v0.1's
+  8,192-token window in 106.
+- **How often it opens:** no action on 74% of the other documents and 34% of the gold ones.
+- 🔶 One sample of documents, one draw at temperature 0.7, empty state table. The reader was
+  changed against this sample, so the 90.0% is not a held-out number; `dev50` is.
+
+### 13.3 `bcpsrvc2-smoke-val5` ✅
+
+5 questions outside `dev150`, 30 steps each, not judged: a check that the parts work
+together. No failed tool or role call. 2 trials submitted after a verifier round, 3 reached
+the 30 steps. 429 documents read: 330 `none`, 31 `weak`, 68 `strong`; the reader used an
+action on 83 (19%). 2,218 tokens per document (repeated prefix counted once).
+
+### 13.4 `bcpsrvc2-dev50` ✅
+
+Run on 2026-11-23, 06:28 to 12:19 UTC, with `VERSION=v02 bcp/run_bcpsrvc.sh dev50
+bcpsrvc2-dev50`; no error in the tools log, no failed reader call, no trial exception. The
+full tables are in [13](13_bcp_results.md) §10.
+
+| `dev50` | Baseline | v0.1 | v0.2 |
+| --- | ---: | ---: | ---: |
+| Accuracy | 28.0% (14/50) | 54.0% (27/50) | **52.0%** (26/50), interval 38.5 to 65.2 |
+| PFLOPs per question, every role prompt token counted | 3.20 | 11.32 | **9.21** |
+| … a reader conversation's repeated prefix counted once | 3.20 | 11.32 | **6.79** |
+| … and the prefix shared by the reader calls of a trial counted once (`13` §10.1) | 3.20 | 9.56 | **3.87** |
+| Reader tokens per document (second rule) | | 4,598 | 2,178 |
+| Gold documents passed on at their first reading | | 95.2% (100 of 105) | 91.3% (95 of 104) |
+
+- Against v0.1: both right 22, v0.1 only 5, v0.2 only 4, both wrong 19 (McNemar p = 1.0).
+  Against the baseline: 13 gained, 1 lost (p = 0.002).
+- The reader took no action on 80% of the documents, read 5.6% of the lines of the
+  documents it was given, and acted on 87.5% of the documents it graded strong but on 1.7%
+  of those it graded `none`. The 9 gold documents it graded `none` were all graded from the
+  first window without an action; 2 questions (q61, q1110) were lost that way.
+- The first prompt of the v0.2 reader is 70% fixed text (skill, question, state
+  table: about 1,280 of 1,820 tokens), so counting every prompt token gives a saving of 19%
+  only. What the model server computes is closer to the third row, since vLLM reuses a
+  shared prefix.
+- The failures have the shape of v0.1's: 14 without a gold document from any search, 2 at
+  the reader, 8 with a gold document on a card and no correct answer. 33 trials ran to the
+  100-call limit (78% of the compute, 9 correct); 7 answer files left at the limit are
+  wrong (v0.1: 3), none of the 17 submitted answers.
+
+**For the owner to decide** 🔶: (1) which of the three rules counts the reader's compute in
+the thesis; (2) whether v0.2 replaces v0.1 as the harness that goes to more questions;
+(3) the next target: the trials that run to the limit (a text-only stop signal, the
+verifier and the fallback answer), or the reader's `none` from the first window.
 

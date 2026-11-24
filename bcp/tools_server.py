@@ -181,9 +181,13 @@ def run_serve(args) -> None:
         # commands search, read, verify, and the completion gate.
         import sys
         sys.path.insert(0, str(Path(__file__).resolve().parent))
-        from roles_v01 import Roles
         args.queries = str(prepared / "queries.jsonl")
-        roles = Roles(corpus, retriever, args, log)
+        if args.reader_mode == "open":      # v0.2: the reader sees the beginning and opens more itself
+            from roles_v02 import Roles2
+            roles = Roles2(corpus, retriever, args, log)
+        else:
+            from roles_v01 import Roles
+            roles = Roles(corpus, retriever, args, log)
 
         class RoleReq(BaseModel):
             qid: str = ""
@@ -267,6 +271,13 @@ if __name__ == "__main__":
     s.add_argument("--llm-timeout", type=int, default=1500)
     s.add_argument("--role-temperature", type=float, default=0.7)
     s.add_argument("--reader-skill", default="reader_excerpt_bcp_v1")
+    s.add_argument("--reader-mode", choices=["full", "open"], default="full",
+                   help="full: v0.1, the reader gets up to --doc-tokens of a document. open: v0.2 (roles_v02), "
+                        "it gets --first-tokens and opens more itself; use with --reader-skill reader_open_bcp_v2")
+    s.add_argument("--first-tokens", type=int, default=512, help="open mode: tokens of the first window")
+    s.add_argument("--open-tokens", type=int, default=2000, help="open mode: tokens one OPEN shows")
+    s.add_argument("--find-tokens", type=int, default=800, help="open mode: tokens one FIND shows")
+    s.add_argument("--reader-actions", type=int, default=3, help="open mode: OPEN/FIND actions per document")
     s.add_argument("--verifier-skill", default="verifier_bcp_v1")
     s.add_argument("--reader-workers", type=int, default=32)
     s.add_argument("--reader-max-tokens", type=int, default=600)

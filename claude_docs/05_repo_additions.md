@@ -197,16 +197,23 @@ deontic-reasoning-with-harness/
 │   │                             (everything decrypted stays under ~/data/browsecomp-plus, never here)
 │   ├── tools_server.py           search / get_document server; with --roles the v0.1 commands
 │   ├── roles_v01.py, bcp_srvc.py reader, verifier, gate (v0.1) and the thin ClmAgent subclass
+│   ├── roles_v02.py              v0.2's reader: first 512 tokens, then OPEN/FIND (12 §13)
 │   ├── skills/                   bcp_search_v1 (baseline), bcp_solver_v1, reader_excerpt_bcp_v1,
-│   │                             verifier_bcp_v1
+│   │                             verifier_bcp_v1; v0.2: bcp_solver_v2, reader_open_bcp_v2
 │   ├── sandbox/Dockerfile, servers.sh, run_clm_base.sh, run_bcpsrvc.sh   image, serving, the two runs
 │   ├── judge.py, report.py       judging with BCP's template; per-question report of a job
 │   └── analysis/cost.py, funnel.py   list-price cost with and without cache (13 §4); retrieved ->
-│                                 shown -> answered -> correct, and command output sizes (13 §3)
+│                                 shown -> answered -> correct, and command output sizes (13 §3);
+│                                 reader_check.py: two readers on the same documents (12 §13.2);
+│                                 failures.py: wrong trials by end and by gold documents, paired
+│                                 tables of jobs (13 §3.7, §10.4); shared_prefix.py: the reader's
+│                                 compute with the prefix shared inside a trial counted once (13 §10.1)
 │
 ├── outputs/                      ✅ our run artifacts outside the subtrees (committed since 2026-10-27)
 │   ├── bcp/<job>/                scores.json and report.json of a BCP job; dev50_cost.json,
-│   │                             dev50_funnel.json (ids and numbers only, no question or answer text)
+│   │                             dev50_funnel.json, dev50_funnel_v01_v02.json, dev50_failures.json, dev50_shared_prefix.json,
+│   │                             reader_check_v02.json (ids and numbers only, no question or
+│   │                             answer text)
 │   └── verbalized_confidence/<run>/ per-trial JSON + summary.json from verbalized_confidence.py
 │
 ├── DeonticBench/                 upstream subtree (prompt-based benchmark)

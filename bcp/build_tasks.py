@@ -3,10 +3,16 @@
 
   build_tasks.py order                 write bcp/query_order.json (once; committed, ids only)
   build_tasks.py tasks --set dev50     write <data>/tasks/dev50/bcp-q<id>/ for every id of the set
+  build_tasks.py tasks --set rest780 --without-job <data>/jobs/clm-base-rest780 --name rest780b
+                                       the ids of the set that have no finished trial in that job
 
 Sets are prefixes of one fixed order: smoke5, dev50, dev150, or any `first<N>`; `dev150-50`
 is dev150 without dev50, `rest780` is everything after dev50. Task directories hold the decrypted question, so they are written
 under <data> (outside the repository) and never committed. Standard library only.
+
+Every sandbox container gets a memory limit (--memory-mb, 4096 by default; 0 = no limit).
+Tasks built before 2026-11-22 had none, and on that day one command written by the solver
+grew to 32 GB and the run was stopped for lack of memory (claude_docs/13 §6).
 """
 import argparse, json, random, shutil, sys
 from pathlib import Path
@@ -15,7 +21,9 @@ HERE = Path(__file__).resolve().parent
 ORDER = HERE / "query_order.json"
 SEED = 20261121
 SETS = {"smoke5": (0, 5), "dev50": (0, 50), "dev150": (0, 150), "dev150-50": (50, 150),
-        "rest780": (50, 830), "all": (0, 830)}
+        "rest780": (50, 830), "all": (0, 830),
+        # outside dev150: for smoke runs and checks that must not touch the development questions
+        "val5": (150, 155), "val20": (150, 170)}
 
 INSTRUCTION = """You are a deep research agent. You need to answer the given question by searching a fixed \
 document collection with the {commands} commands. Please perform reasoning and \
@@ -54,7 +62,7 @@ timeout_sec = {agent_timeout}.0
 [environment]
 docker_image = "bcp-sandbox:1"
 network_mode = "{network_mode}"
-{allowed}build_timeout_sec = 600.0
+{allowed}{memory}build_timeout_sec = 600.0
 os = "linux"
 
 [environment.env]
@@ -102,20 +110,26 @@ def cmd_tasks(args) -> None:
     queries = {}
     for line in open(Path(args.data) / "prepared/queries.jsonl", encoding="utf-8"):
         row = json.loads(line); queries[row["query_id"]] = row["query"]
-    out = Path(args.data) / "tasks" / (args.set if args.variant == "base" else f"{args.set}-{args.variant}")
+    name = args.name or args.set
+    out = Path(args.data) / "tasks" / (name if args.variant == "base" else f"{name}-{args.variant}")
+    ids = set_ids(args.set)
+    if args.without_job:      # leave out the questions that already have a finished trial there
+        done = {p.parent.name.split("__")[0][len("bcp-q"):] for p in Path(args.without_job).glob("bcp-q*/result.json")}
+        ids = [q for q in ids if q not in done]
+    memory = f"memory_mb = {args.memory_mb}\n" if args.memory_mb else ""
     if out.exists():
         shutil.rmtree(out)
     allowed = f'allowed_hosts = ["{args.tools_addr.split(":")[0]}"]\n' if args.network_mode == "allowlist" else ""
-    for qid in set_ids(args.set):
+    for qid in ids:
         d = out / f"bcp-q{qid}"
         (d / "environment").mkdir(parents=True); (d / "tests").mkdir()
         (d / "instruction.md").write_text(INSTRUCTION.format(question=queries[qid].strip(), commands=COMMANDS[args.variant]), encoding="utf-8")
         (d / "task.toml").write_text(TASK_TOML.format(qid=qid, agent_timeout=args.agent_timeout,
-                                                      network_mode=args.network_mode, allowed=allowed,
+                                                      network_mode=args.network_mode, allowed=allowed, memory=memory,
                                                       tools_addr=args.tools_addr))
         shutil.copy(HERE / "sandbox/Dockerfile", d / "environment/Dockerfile")
         (d / "tests/test.sh").write_text(TEST_SH); (d / "tests/test.sh").chmod(0o755)
-    print(f"{args.set} ({args.variant}): {len(set_ids(args.set))} tasks in {out}")
+    print(f"{name} ({args.variant}): {len(ids)} tasks in {out}")
 
 
 if __name__ == "__main__":
@@ -129,5 +143,8 @@ if __name__ == "__main__":
     t.add_argument("--network-mode", choices=["allowlist", "public"], default="allowlist")
     t.add_argument("--agent-timeout", type=int, default=14400)
     t.add_argument("--variant", choices=["base", "v01"], default="base")
+    t.add_argument("--name", default=None, help="directory name of the task set (default: the set name)")
+    t.add_argument("--without-job", default=None, help="job directory: skip ids with a result.json there")
+    t.add_argument("--memory-mb", type=int, default=4096, help="memory limit of the sandbox container; 0 = none")
     a = ap.parse_args()
     cmd_order(a) if a.cmd == "order" else cmd_tasks(a)

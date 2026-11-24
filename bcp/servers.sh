@@ -4,6 +4,7 @@
 #
 #   bcp/servers.sh start <tag>     tag names the call log: <data>/jobs/<tag>.tools.jsonl
 #                                  ROLES=1 also serves the reader and the verifier of v0.1
+#                                  TOOLS_ARGS: further arguments of the tools server (v0.2's reader)
 #   bcp/servers.sh stop
 #   bcp/servers.sh status
 #   bcp/servers.sh judge-start     vLLM with the judge model (Qwen3.5-35B-A3B) alone
@@ -43,7 +44,7 @@ case "${1:?start <tag> | stop | status | judge-start}" in
   start)
     TAG="${2:?tag}"
     [ -f "$RUN/vllm.pid" ] || [ -f "$RUN/tools.pid" ] && { echo "servers already started; run stop first" >&2; exit 1; }
-    setsid "$PY" -I "$REPO/bcp/tools_server.py" serve ${ROLES:+--roles} --log "$DATA/jobs/$TAG.tools.jsonl" \
+    setsid "$PY" -I "$REPO/bcp/tools_server.py" serve ${ROLES:+--roles} ${TOOLS_ARGS:-} --log "$DATA/jobs/$TAG.tools.jsonl" \
       >"$DATA/jobs/$TAG.tools.log" 2>&1 &
     echo $! > "$RUN/tools.pid"
     wait_http "http://172.17.0.1:9010/health" 600

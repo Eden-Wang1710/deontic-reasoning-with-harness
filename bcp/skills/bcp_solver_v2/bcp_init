@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""Run by the agent class before the first step: the empty state table."""
+import os
+from _bcp import STATE, STATE_TEMPLATE
+
+if __name__ == "__main__":
+    if not os.path.exists(STATE):
+        os.makedirs(os.path.dirname(STATE), exist_ok=True)
+        with open(STATE, "w", encoding="utf-8") as fh:
+            fh.write(STATE_TEMPLATE)

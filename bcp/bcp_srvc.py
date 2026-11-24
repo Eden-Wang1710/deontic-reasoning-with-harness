@@ -10,6 +10,7 @@ its budget control, unchanged) with two additions that cannot be made from a ski
   the run ended without one.
 
 Reader and verifier are commands of the skill `bcp_solver_v1`, served by bcp/tools_server.py.
+v0.2 uses the same class with `solver_skill_name=bcp_solver_v2` (bcp/run_bcpsrvc.sh, VERSION=v02).
 Run with bcp/run_bcpsrvc.sh (needs ~/envs/clm, where the CLM package is installed).
 """
 from __future__ import annotations

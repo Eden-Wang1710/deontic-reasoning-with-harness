@@ -1,0 +1,7 @@
+#!/usr/bin/env python3
+"""Run by the agent class in place of the submit command: the completion gate decides."""
+import sys
+from _bcp import ANSWER, post, read_file
+
+if __name__ == "__main__":
+    post("/v01/submit", "submit", answer=read_file(ANSWER)); sys.exit(0)

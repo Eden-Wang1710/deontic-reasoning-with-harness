@@ -14,6 +14,10 @@ Where the token counts come from:
   the cached part is an ESTIMATE: for every reader call but the first of a trial, the reader
   skill and the question, plus the state table when an earlier call had the same one; for the
   verifier, a prompt identical in size to the previous one (the retry without thinking).
+- reader of v0.2 (rows with "cached_prompt_tokens"): the later turns of a document's
+  conversation reuse its prefix, which the log records exactly; the first turn is estimated
+  as for v0.1, from the "reader_doc" row of the document (the characters of skill, question
+  and state table over the characters of the first prompt).
 
 Usage: cost.py JOB [JOB ...] [--json OUT]      (JOB is a job name under <data>/jobs)
 """
@@ -41,6 +45,7 @@ def solver(job):
 
 def roles(job, question_chars):
     calls, states = collections.defaultdict(list), collections.defaultdict(list)
+    open_turn0 = collections.defaultdict(list)          # v0.2: first turns waiting for their reader_doc row
     for line in open(JOBS / f"{job}.tools.jsonl"):
         try:
             d = json.loads(line)
@@ -48,6 +53,10 @@ def roles(job, question_chars):
             continue
         if d.get("op") == "llm":
             calls[str(d["qid"])].append(d)
+            if d.get("turn") == 0:
+                open_turn0[(d["qid"], d["docid"])].append(d)
+        elif d.get("op") == "reader_doc" and open_turn0[(d["qid"], d["docid"])]:
+            open_turn0[(d["qid"], d["docid"])].pop(0)["doc"] = d
         elif d.get("op") == "state_version":
             states[str(d["qid"])].append((d["t"], d["sha"], d["chars"]))
     out = {}
@@ -59,13 +68,21 @@ def roles(job, question_chars):
         for d in cs:
             x = r[d["role"]]; p = d["prompt_tokens"] or 0
             x["calls"] += 1; x["inp"] += p; x["out"] += d["completion_tokens"] or 0
-            ratio = p / max(1, d["system_chars"] + d["user_chars"])
-            if d["role"] == "reader":
+            if d["role"] == "reader" and d.get("turn"):                  # v0.2, a later turn of a document
+                x["cached"] += d.get("cached_prompt_tokens") or 0
+            elif d["role"] == "reader":
                 i = bisect.bisect_right(ts, d["t"]) - 1
                 sha, chars = (sv[i][1], sv[i][2]) if i >= 0 else ("none", 7)
-                prefix = d["system_chars"] + len("# Question\n\n\n") + question_chars.get(q, 0)
-                if sha in seen:
-                    prefix += len("# State table of the solver\n\n\n") + chars
+                state_chars = len("# State table of the solver\n\n\n") + chars
+                if "doc" in d:                                           # v0.2, first turn
+                    ratio = p / max(1, d["doc"]["first_prompt_chars"])
+                    prefix = d["doc"]["shared_prefix_chars"] - (0 if sha in seen else state_chars)
+                elif "system_chars" in d:                                # v0.1
+                    ratio = p / max(1, d["system_chars"] + d["user_chars"])
+                    prefix = d["system_chars"] + len("# Question\n\n\n") + question_chars.get(q, 0)
+                    prefix += state_chars if sha in seen else 0
+                else:
+                    ratio = prefix = 0
                 if not first:
                     x["cached"] += min(p, int(prefix * ratio))
                 first = False; seen.add(sha)

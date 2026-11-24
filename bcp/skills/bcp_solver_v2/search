@@ -1,0 +1,10 @@
+#!/usr/bin/env python3
+"""search "<query>": top documents for a query, each read by the reader."""
+import sys
+from _bcp import post
+
+if __name__ == "__main__":
+    query = " ".join(sys.argv[1:]).strip()
+    if not query:
+        print('Usage: search "<query>"'); sys.exit(2)
+    sys.exit(post("/v01/search", "search", query=query))

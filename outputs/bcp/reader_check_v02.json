@@ -1,0 +1,243 @@
+{
+ "note": "bcp/analysis/reader_check.py, 120 questions outside dev150, 359 documents, empty state table. v01: reader_excerpt_bcp_v1 on up to 8,192 tokens. v02: reader_open_bcp_v2 as run on dev50 (first 512 tokens, up to 3 OPEN/FIND actions, a grade and lines in every reply). v02_earlier_*: the two earlier forms of the v0.2 reader, in which only the last reply carried the grade (claude_docs/12 \u00a713.2).",
+ "questions": 120,
+ "triples": 359,
+ "readers": {
+  "v01": {
+   "gold": {
+    "documents": 120,
+    "match": {
+     "strong": 102,
+     "none": 10,
+     "weak": 8
+    },
+    "passed_on_pct": 91.7,
+    "prompt_tokens_per_doc": 3168,
+    "prompt_tokens_cache_aware_per_doc": 3168,
+    "completion_tokens_per_doc": 187,
+    "calls_per_doc": 1.0,
+    "actions": {
+     "(none)": 120
+    },
+    "share_of_lines_seen_pct": 51.0,
+    "answer_string_in_document": 111,
+    "answer_string_seen": 106,
+    "answer_string_passed_on": 77
+   },
+   "other": {
+    "documents": 239,
+    "match": {
+     "none": 192,
+     "weak": 19,
+     "strong": 28
+    },
+    "passed_on_pct": 19.7,
+    "prompt_tokens_per_doc": 4508,
+    "prompt_tokens_cache_aware_per_doc": 4508,
+    "completion_tokens_per_doc": 122,
+    "calls_per_doc": 1.0,
+    "actions": {
+     "(none)": 239
+    },
+    "share_of_lines_seen_pct": 53.9,
+    "answer_string_in_document": 14,
+    "answer_string_seen": 12,
+    "answer_string_passed_on": 3
+   },
+   "failed_calls": 0
+  },
+  "v02": {
+   "gold": {
+    "documents": 120,
+    "match": {
+     "strong": 94,
+     "none": 12,
+     "weak": 14
+    },
+    "passed_on_pct": 90.0,
+    "prompt_tokens_per_doc": 5723,
+    "prompt_tokens_cache_aware_per_doc": 2419,
+    "completion_tokens_per_doc": 398,
+    "calls_per_doc": 2.34,
+    "actions": {
+     "OPEN": 13,
+     "(none)": 41,
+     "FIND OPEN FIND": 5,
+     "FIND FIND": 5,
+     "FIND FIND OPEN": 7,
+     "FIND FIND FIND": 14,
+     "FIND": 17,
+     "OPEN FIND": 2,
+     "FIND OPEN OPEN": 2,
+     "OPEN OPEN": 3,
+     "OPEN OPEN OPEN": 2,
+     "FIND OPEN": 6,
+     "OPEN OPEN FIND": 1,
+     "OPEN FIND FIND": 2
+    },
+    "share_of_lines_seen_pct": 20.1,
+    "answer_string_in_document": 111,
+    "answer_string_seen": 103,
+    "answer_string_passed_on": 81
+   },
+   "other": {
+    "documents": 239,
+    "match": {
+     "none": 178,
+     "strong": 21,
+     "weak": 40
+    },
+    "passed_on_pct": 25.5,
+    "prompt_tokens_per_doc": 3408,
+    "prompt_tokens_cache_aware_per_doc": 2041,
+    "completion_tokens_per_doc": 170,
+    "calls_per_doc": 1.55,
+    "actions": {
+     "(none)": 177,
+     "FIND": 16,
+     "FIND FIND FIND": 19,
+     "FIND OPEN FIND": 2,
+     "FIND FIND": 6,
+     "FIND FIND OPEN": 1,
+     "OPEN OPEN FIND": 1,
+     "FIND OPEN": 3,
+     "OPEN FIND": 1,
+     "OPEN FIND OPEN": 1,
+     "FIND OPEN OPEN": 2,
+     "OPEN": 6,
+     "OPEN FIND FIND": 2,
+     "OPEN OPEN OPEN": 2
+    },
+    "share_of_lines_seen_pct": 10.2,
+    "answer_string_in_document": 14,
+    "answer_string_seen": 6,
+    "answer_string_passed_on": 2
+   },
+   "failed_calls": 0
+  },
+  "v02_earlier_1": {
+   "gold": {
+    "documents": 120,
+    "match": {
+     "strong": 51,
+     "none": 37,
+     "weak": 31,
+     "failed": 1
+    },
+    "passed_on_pct": 68.3,
+    "prompt_tokens_per_doc": 5798,
+    "prompt_tokens_cache_aware_per_doc": 2219,
+    "completion_tokens_per_doc": 358,
+    "calls_per_doc": 2.68,
+    "actions": {
+     "(none)": 34,
+     "FIND FIND OPEN": 5,
+     "OPEN": 4,
+     "FIND FIND FIND": 34,
+     "FIND FIND": 21,
+     "FIND OPEN": 6,
+     "FIND": 10,
+     "FIND OPEN FIND": 4,
+     "FIND OPEN OPEN": 1,
+     "OPEN FIND": 1
+    },
+    "share_of_lines_seen_pct": 16.8,
+    "answer_string_in_document": 111,
+    "answer_string_seen": 102,
+    "answer_string_passed_on": 55
+   },
+   "other": {
+    "documents": 239,
+    "match": {
+     "none": 223,
+     "weak": 10,
+     "strong": 3,
+     "failed": 3
+    },
+    "passed_on_pct": 5.4,
+    "prompt_tokens_per_doc": 4864,
+    "prompt_tokens_cache_aware_per_doc": 2160,
+    "completion_tokens_per_doc": 272,
+    "calls_per_doc": 2.26,
+    "actions": {
+     "(none)": 89,
+     "FIND": 50,
+     "FIND FIND": 34,
+     "FIND FIND FIND": 39,
+     "FIND FIND OPEN": 11,
+     "OPEN": 3,
+     "FIND OPEN": 8,
+     "FIND OPEN OPEN": 2,
+     "FIND OPEN FIND": 3
+    },
+    "share_of_lines_seen_pct": 11.8,
+    "answer_string_in_document": 14,
+    "answer_string_seen": 7,
+    "answer_string_passed_on": 1
+   },
+   "failed_calls": 0
+  },
+  "v02_earlier_2": {
+   "gold": {
+    "documents": 120,
+    "match": {
+     "strong": 65,
+     "none": 30,
+     "weak": 19,
+     "failed": 6
+    },
+    "passed_on_pct": 70.0,
+    "prompt_tokens_per_doc": 5040,
+    "prompt_tokens_cache_aware_per_doc": 2290,
+    "completion_tokens_per_doc": 323,
+    "calls_per_doc": 2.21,
+    "actions": {
+     "(none)": 47,
+     "FIND FIND": 16,
+     "FIND": 21,
+     "OPEN": 7,
+     "FIND FIND FIND": 19,
+     "FIND OPEN OPEN": 2,
+     "FIND OPEN": 2,
+     "FIND FIND OPEN": 3,
+     "FIND OPEN FIND": 2,
+     "OPEN FIND OPEN": 1
+    },
+    "share_of_lines_seen_pct": 16.0,
+    "answer_string_in_document": 111,
+    "answer_string_seen": 98,
+    "answer_string_passed_on": 64
+   },
+   "other": {
+    "documents": 239,
+    "match": {
+     "none": 221,
+     "strong": 5,
+     "failed": 1,
+     "weak": 12
+    },
+    "passed_on_pct": 7.1,
+    "prompt_tokens_per_doc": 4010,
+    "prompt_tokens_cache_aware_per_doc": 2145,
+    "completion_tokens_per_doc": 206,
+    "calls_per_doc": 1.8,
+    "actions": {
+     "(none)": 140,
+     "FIND FIND": 27,
+     "FIND": 31,
+     "FIND FIND FIND": 27,
+     "OPEN": 6,
+     "FIND OPEN": 4,
+     "FIND FIND OPEN": 1,
+     "OPEN FIND": 1,
+     "FIND OPEN FIND": 2
+    },
+    "share_of_lines_seen_pct": 10.4,
+    "answer_string_in_document": 14,
+    "answer_string_seen": 6,
+    "answer_string_passed_on": 0
+   },
+   "failed_calls": 0
+  }
+ }
+}

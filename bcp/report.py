@@ -36,7 +36,9 @@ def main() -> None:
     def R(q):
         return role.setdefault(q, {"reader_calls": 0, "reader_prompt_tokens": 0, "reader_completion_tokens": 0,
                                    "verifier_calls": 0, "verifier_prompt_tokens": 0, "verifier_completion_tokens": 0,
-                                   "rereads": 0, "submits_refused": 0})
+                                   "rereads": 0, "submits_refused": 0,
+                                   "reader_cached_prompt_tokens": 0, "reader_docs": 0,
+                                   "reader_docs_opened_further": 0, "reader_actions": 0})
     log = job.parent / f"{job.name}.tools.jsonl"
     if log.exists():
         for line in open(log, encoding="utf-8"):
@@ -51,6 +53,11 @@ def main() -> None:
                 x = R(q); k = r["role"]
                 x[f"{k}_calls"] += 1; x[f"{k}_prompt_tokens"] += r.get("prompt_tokens") or 0
                 x[f"{k}_completion_tokens"] += r.get("completion_tokens") or 0
+                if k == "reader":       # v0.2: the part of a prompt that repeats the same conversation
+                    x["reader_cached_prompt_tokens"] += r.get("cached_prompt_tokens") or 0
+            elif r["op"] == "reader_doc":
+                x = R(q); x["reader_docs"] += 1; x["reader_actions"] += len(r["actions"])
+                x["reader_docs_opened_further"] += bool(r["actions"])
             elif r["op"] == "read" and r.get("found"):
                 R(q)["rereads"] += 1; opened.setdefault(q, set()).add(r["docid"])
                 if r.get("match") in ("strong", "weak"):
@@ -108,6 +115,10 @@ def main() -> None:
             row["role_pflops"] = round(2 * 6.9196e9 * sum(x[f"{k}_{t}_tokens"] for k in ("reader", "verifier")
                                                           for t in ("prompt", "completion")) / 1e15, 3)
             row["total_pflops"] = round(row.get("pflops", 0) + row["role_pflops"], 3)
+            # The same with the prefix a reader conversation repeats counted once (v0.2's reader
+            # makes several calls on one document; in v0.1 every call is a new conversation).
+            row["role_pflops_conversation_cache"] = round(row["role_pflops"] - 2 * 6.9196e9 * x["reader_cached_prompt_tokens"] / 1e15, 3)
+            row["total_pflops_conversation_cache"] = round(row.get("pflops", 0) + row["role_pflops_conversation_cache"], 3)
             pd = passed.get(qid, set())
             row["evidence_recall_passed_on"] = round(len(pd & ev[qid]) / len(ev[qid]), 3) if ev.get(qid) else None
             row["gold_recall_passed_on"] = round(len(pd & gd[qid]) / len(gd[qid]), 3) if gd.get(qid) else None
@@ -129,6 +140,9 @@ def main() -> None:
                                              "evidence_recall", "gold_recall", "reader_calls",
                                              "reader_prompt_tokens", "reader_completion_tokens", "rereads",
                                              "verifier_calls", "state_versions", "role_pflops", "total_pflops",
+                                             "reader_cached_prompt_tokens", "reader_docs", "reader_docs_opened_further",
+                                             "reader_actions", "role_pflops_conversation_cache",
+                                             "total_pflops_conversation_cache",
                                              "evidence_recall_passed_on", "gold_recall_passed_on")}}
     if role:
         count = lambda key: {str(v): sum(1 for r in rows if r.get(key) == v) for v in {r.get(key) for r in rows}}  # noqa: E731
