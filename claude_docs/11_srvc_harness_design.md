@@ -673,3 +673,29 @@ and the 9 that were rerun after the crash fix). Priced on the same price card:
 - **What it says if it holds.** On numeric the harness is worth seven tasks (11 to 18) at 3.2
   times the with-cache cost. On binary the baseline is already at 26/30 and the harness costs
   3.6 times as much for the same count.
+
+### 11.3 Which rubric failed in the trials that flipped (2026-11-24) 🔶
+
+Read from `agent/rubric_verifier/summary.json` of the four v0.1 runs (round 1 status per rubric;
+the answer before the round against the final answer and the gold label). Numeric is
+`srvc-run1-numeric` plus `kirasrvc-run1-numeric` (70 trials), binary the two binary runs (60).
+
+| Rubric | Numeric: FAIL on answers right before / wrong before | Numeric: FAIL in the 16 wrong-to-right / 7 right-to-wrong trials | Binary: FAIL in the 4 wrong-to-right / 4 right-to-wrong trials |
+| --- | --- | --- | --- |
+| Section table | 10/26, 26/44 | 13 / 5 | 3 / 1 |
+| Fact table | 8/26, 20/44 | 9 / 5 | 1 / 4 |
+| Grounded reasoning | 10/26, 27/44 | 14 / 5 | 4 / 1 |
+
+- 🔶 Co-occurrence, not attribution: the rubrics mostly fail together (a rubric was the only one
+  to fail in 3 of the 16 wrong-to-right trials), and the counts are small.
+- On numeric the section table and grounded reasoning are present in most corrections; the fact
+  table in about half. No rubric separates right from wrong answers well (it fails 31 to 38% of
+  right answers and 45 to 61% of wrong ones).
+- On binary the fact table failed in all 4 trials that went from right to wrong and in 1 of the
+  4 that went from wrong to right. It is the first candidate to drop or to tighten on
+  two-valued tasks; 4 trials do not decide that.
+- **Other DAR subsets.** Grounded reasoning has no wording tied to the shape of the document.
+  The section table, the reader's outline and the solver's `## Sections` all rest on "every
+  top-level unit of the rule document": SARA has 9, the Airline document has one first-level
+  heading with five levels below it, the USCIS-AAO documents are unheaded prose of 574 to 3,231
+  characters. Whether the model picks a useful level there by itself is not tested.
