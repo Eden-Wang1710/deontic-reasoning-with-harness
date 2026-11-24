@@ -110,7 +110,8 @@
 #
 # SUBSET (default "sara") selects subdomains by task-name glob:
 #   sara = sara-numeric + sara-binary (decision 2026-10-15: only SARA for now), numeric / binary =
-#   one SARA subdomain (smoke tests), all = no filter
+#   one SARA subdomain (smoke tests), airline = the 80 Airline tasks, uscis = the 28 USCIS-AAO
+#   tasks, all = no filter
 #
 # MODEL (default qwen3.5-35b-a3b) is the served model name (SERVED_NAME of
 #   serve_qwen35_35b.sh); jobs go under jobs/$MODEL/. Example for another local model:
@@ -143,8 +144,10 @@ case "$SUBSET" in
   sara) INCLUDE="--include-task-name '*-sara-numeric-*' --include-task-name '*-sara-binary-*'" ;;
   numeric) INCLUDE="--include-task-name '*-sara-numeric-*'" ;;
   binary)  INCLUDE="--include-task-name '*-sara-binary-*'" ;;
+  airline) INCLUDE="--include-task-name '*-airline-*'" ;;
+  uscis)   INCLUDE="--include-task-name '*-uscis-aao-*'" ;;
   all)  INCLUDE="" ;;
-  *) echo "unknown SUBSET=$SUBSET (sara|numeric|binary|all)" >&2; exit 1 ;;
+  *) echo "unknown SUBSET=$SUBSET (sara|numeric|binary|airline|uscis|all)" >&2; exit 1 ;;
 esac
 MODEL_INFO='{"max_input_tokens": 49152, "max_output_tokens": 16384, "max_tokens": 65536, "input_cost_per_token": 0.0, "output_cost_per_token": 0.0}'
 COST_BUDGET_USD="${COST_BUDGET_USD:-0.15}"

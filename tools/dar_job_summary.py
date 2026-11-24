@@ -3,7 +3,8 @@
 
 Usage: python tools/dar_job_summary.py <jobs_dir>/<job_name> [--trials]
 
-Prints per-subdomain accuracy (and macro-F1 for sara-binary), timing and token usage, counting
+Prints per-subdomain accuracy (and macro-F1 for sara-binary and uscis-aao), timing and token
+usage, counting
 unfinished trials separately. With --trials, also one line per trial. Works while a job is running.
 """
 import glob
@@ -83,7 +84,7 @@ def main():
         line = f"  {sub:14s} finished {len(done):3d}/{len(ts):3d}  correct {correct:3d}/{len(ok):3d}"
         if ok:
             line += f"  acc {correct/len(ok):.3f}"
-            if sub == "sara-binary":
+            if sub in ("sara-binary", "uscis-aao"):
                 line += f"  macroF1 {macro_f1([(t.get('expected',''), t.get('got','')) for t in ok]):.3f}"
             walls = [t["wall_s"] for t in ok if "wall_s" in t]
             comps = [t["compl_tok"] for t in ok if t.get("compl_tok") is not None]

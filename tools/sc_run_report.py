@@ -67,9 +67,16 @@ def load(job: str) -> dict[str, dict]:
 
 
 def short(task: str) -> str:
-    return re.sub(r"^deonticbench-\w+-sara-", "", task).replace(
-        "numeric-tax-case-", "n"
-    )
+    task = re.sub(r"^deonticbench-[a-z]+-", "", task)
+    for long, brief in (
+        ("sara-numeric-tax-case-", "n"),
+        ("sara-", ""),
+        ("airline-airline-cases-complexity-", "air-c"),
+        ("uscis-aao-uscis-", "uscis-"),
+    ):
+        if task.startswith(long):
+            return brief + task[len(long):]
+    return task
 
 
 def report(job: str, show_trials: bool, show_findings: bool) -> None:
