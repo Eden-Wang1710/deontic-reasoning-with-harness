@@ -699,3 +699,53 @@ the answer before the round against the final answer and the gold label). Numeri
   top-level unit of the rule document": SARA has 9, the Airline document has one first-level
   heading with five levels below it, the USCIS-AAO documents are unheaded prose of 574 to 3,231
   characters. Whether the model picks a useful level there by itself is not tested.
+
+## 12. Airline and USCIS-AAO (2026-11-24)
+
+The other two subsets of the DAR Harbor dataset, run with the terminus-2 version
+(`AGENT=t2srvc`, `SUBSET=airline` and `SUBSET=uscis`). No baseline is run on them (owner).
+
+| | Airline | USCIS-AAO |
+| --- | --- | --- |
+| Tasks | 80 | 28 |
+| Answer | whole number of dollars, exact match | `Accepted` or `Dismissed` (14 and 14) |
+| Rule document | one for all tasks, 19,624 characters, markdown with one first-level heading and five levels below | one per task, 574 to 3,231 characters, unheaded prose |
+| DAR paper, Qwen3.5-35B-A3B: direct, terminus-2, KIRA | 0.14, 0.01, 0.01 (accuracy) | 0.48, 0.61, 0.72 (macro-F1) |
+
+**v0.1 is frozen for these runs**: the skills, the rubric table and every parameter are the
+ones of §9, so the two subsets are tasks the skills were not written against. The harness code
+is the current one (with the `write_file` fix of §10.5). The only change is in the tooling: the
+two `SUBSET` values, macro-F1 for `uscis-aao` in `dar_job_summary.py`, short task names in
+`sc_run_report.py`.
+
+### 12.1 Smoke runs ✅
+
+Two tasks of each subset (`airline-smoke1`, `uscis-smoke1`), read for whether the parts work
+on these documents, not for accuracy.
+
+| | `airline-smoke1` | `uscis-smoke1` |
+| --- | --- | --- |
+| Correct | 1/2 | 1/2 |
+| Rows in the reader's outline | 8 and 11 | 1 and 2 |
+| Characters of rule text the survey delivered | 16,025 and 18,718 of 19,624 | the whole document |
+| Rows in the section table of the verifier | 8 and 13 | 4 and 6 |
+| Rubrics that did not pass | 5 of 6, 13 findings, every quote found | 0 of 6 |
+| Finish | both revised after the report (one right, one wrong) | both verified |
+| Cost per task, no cache / with cache (cents) | 9.94 / 7.94 | 3.06 / 2.75 |
+
+- ✅ **"Top-level unit" needs no change.** On the Airline document the reader and the verifier
+  take the second and third heading levels as units by themselves; on the USCIS documents the
+  verifier splits the prose into its requirements. The question of §11.3 is answered for the
+  smoke tasks, and no skill was changed.
+- 🔶 On USCIS the reader has nothing to select: its outline has one or two rows and the survey
+  hands over the whole document. It costs one call per task.
+- 🔶 Airline costs more than SARA numeric in these two tasks (about 60,000 output tokens per
+  task against 33,000), so the full run is estimated at 15 hours or more.
+- As on SARA with the terminus-2 version, the solver wrote the answer file from the terminal in
+  all four trials and did not use `write_file`.
+
+### 12.2 Full runs
+
+Queued on 2026-11-24, 20:53 UTC: `srvc-airline-run1` and `srvc-uscis-run1` together, then
+`srvc-run2-numeric` and `srvc-run2-binary` (SARA again on the current code, so that every row
+of the table comes from one version of the code; §10.6). Results are added here.
