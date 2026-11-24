@@ -746,6 +746,10 @@ on these documents, not for accuracy.
 
 ### 12.2 Full runs
 
-Queued on 2026-11-24, 20:53 UTC: `srvc-airline-run1` and `srvc-uscis-run1` together, then
-`srvc-run2-numeric` and `srvc-run2-binary` (SARA again on the current code, so that every row
-of the table comes from one version of the code; §10.6). Results are added here.
+Started on 2026-11-24, 20:53 UTC: `srvc-airline-run1` and `srvc-uscis-run1` together. Results
+are added here.
+
+SARA is not run again (owner, 2026-11-24): the SARA rows of the terminus-2 version stay those of
+`srvc-run1`, which ran before the `write_file` fix (§10.5: 7 of 65 trials met the bug, 6 of them
+ended right), while Airline and USCIS-AAO run on the fixed code. A table that holds both needs a
+note saying so.
