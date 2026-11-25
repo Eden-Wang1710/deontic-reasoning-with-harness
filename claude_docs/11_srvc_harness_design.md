@@ -744,10 +744,74 @@ on these documents, not for accuracy.
 - As on SARA with the terminus-2 version, the solver wrote the answer file from the terminal in
   all four trials and did not use `write_file`.
 
-### 12.2 Full runs
+### 12.2 Full runs (2026-11-25) ✅
 
-Started on 2026-11-24, 20:53 UTC: `srvc-airline-run1` and `srvc-uscis-run1` together. Results
-are added here.
+`srvc-airline-run1` (80 tasks, 8 at a time) and `srvc-uscis-run1` (28 tasks, 4 at a time) ran
+together from 2026-11-24 20:53 UTC; USCIS-AAO ended at 05:27 and Airline at 14:44 on the 25th.
+Every trial finished without an exception, and the server was stopped when the second run ended.
+
+| | Airline | USCIS-AAO |
+| --- | --- | --- |
+| Correct | 9/80 (11.3%, Wilson 95% 6.0% to 20.0%) | 17/28 (60.7%, 42.4% to 76.4%) |
+| Macro-F1 | | 0.607 |
+| DAR paper: direct, terminus-2, KIRA | 0.14, 0.01, 0.01 | 0.48, 0.61, 0.72 |
+| Correct before the verifier's report | 5/80 | 17/28 |
+| Calls per task | 17.3 | 11.7 |
+| Output tokens per task | 56,386 | 28,213 |
+| Cost per task, no cache / with cache (cents) | 9.03 / 7.38 | 3.86 / 3.44 |
+| Dearest trial, no cache (cents) | 19.23 | 5.86 |
+
+The paper's numbers are single runs of other harness code with a time limit; ours are single
+runs at temperature 0.7. On USCIS-AAO one task is 3.6 points.
+
+- ✅ **Airline: the result is the paper's direct number, not its terminus-2 number.** 9/80 lies
+  within sampling distance of the 0.14 of direct reasoning and well above the 0.01 the paper
+  reports for both agent harnesses. The set stays unsolved: no task of complexity 2 is right.
+
+  | Complexity | Tasks | Right before the report | Right at the end |
+  | --- | --- | --- | --- |
+  | 0 | 23 | 1 | 7 |
+  | 1 | 23 | 4 | 2 |
+  | 2 | 34 | 0 | 0 |
+
+- ✅ **Airline: the verifier round carries the gain, as on SARA numeric.** 76 of 80 first reports
+  did not pass. After them 7 wrong answers became right and 3 right answers became wrong (5 to
+  9 right). The answers that stay wrong also move toward the label: the median relative error
+  goes from 9.1% to 4.9%, and the share of answers within 5% of the label from 28% to 51%
+  (within 10%: 55% to 76%).
+- 🔶 **Airline: the rubrics do not tell right from wrong answers.** Each rubric failed on 4 of
+  the 5 answers that were right before the report and on 50 to 59 of the 75 that were wrong.
+  The round helps because almost every answer is wrong and a second pass with findings repairs
+  some, not because a FAIL marks the wrong ones (the same reading as §11.3).
+- ✅ **USCIS-AAO: the verifier changed nothing.** 16 reports passed and 12 did not; after the
+  12 the solver kept its answer every time (8 right, 4 wrong). A FAIL was no more frequent on
+  wrong answers than on right ones (section table 1/11 against 4/17, fact table 2/11 against
+  5/17, grounded reasoning 2/11 against 2/17). The verifier is 2.07 of the 3.44 cents.
+  The errors are balanced: 6 `Dismissed` cases answered `Accepted`, 5 the other way.
+- 🔶 **USCIS-AAO equals the paper's terminus-2 number (0.61) and is below its KIRA number
+  (0.72).** With 28 tasks the interval covers both. Without a baseline of our own on this set
+  the run does not show a gain from the harness.
+- ✅ **Compaction is used on Airline**: 13 automatic calls (the solver's prompt goes from about
+  31,000 to about 17,000 tokens), against one call in all 65 SARA trials. None on USCIS-AAO.
+- 🔶 **Half of the verifier's calls on Airline reach the output limit.** 124 of 240 rubric runs
+  (and 35 of 84 on USCIS-AAO) had a reply cut at its output limit and the report was then
+  written without thinking from the cut reply's notes ("kept thinking", §9). The rubric tables are still built
+  (median 11 rows for the section table and 10 for the fact table on Airline; 3 and 10 on
+  USCIS-AAO), but the cut replies are paid for: the verifier is 2.76 of the 7.38 cents on Airline.
+- One Airline trial was stopped by the cost budget of 0.15 USD before it finished and is
+  counted as wrong.
+- The solver asked the reader again in 12 of 80 Airline trials and in 1 of 28 USCIS-AAO trials.
+  `write_file` was used in 26 of 80 Airline trials (52 files, none failed) and 4 of 28 USCIS-AAO
+  trials; elsewhere the answer file was written from the terminal.
+
+Cost per task by role, with cache (cents):
+
+| | Solver | Reader | Section table | Fact table | Grounded reasoning | Compaction |
+| --- | --- | --- | --- | --- | --- | --- |
+| Airline | 3.75 | 0.83 | 0.97 | 0.87 | 0.92 | 0.04 |
+| USCIS-AAO | 1.11 | 0.26 | 0.62 | 0.79 | 0.66 | 0 |
+
+Files: `outputs/srvc_airline_run1_inference_cost.json`, `outputs/srvc_uscis_run1_inference_cost.json`.
 
 SARA is not run again (owner, 2026-11-24): the SARA rows of the terminus-2 version stay those of
 `srvc-run1`, which ran before the `write_file` fix (§10.5: 7 of 65 trials met the bug, 6 of them

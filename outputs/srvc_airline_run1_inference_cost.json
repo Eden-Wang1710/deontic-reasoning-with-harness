@@ -1,0 +1,4997 @@
+{
+  "price_usd_per_token": {
+    "input": 1.4e-07,
+    "output": 1e-06,
+    "cache_read": 5.0000000000000004e-08
+  },
+  "jobs": [
+    {
+      "job": "jobs/qwen3.5-35b-a3b/t2srvc-direct/srvc-airline-run1",
+      "n_trials": 80,
+      "accuracy": 0.1125,
+      "n_correct": 9.0,
+      "exceptions": 0,
+      "budget_exhausted": 1,
+      "cut_off_calls": 170,
+      "unknown_calls": 0,
+      "source": [
+        "ledger"
+      ],
+      "totals_differ_from_harbor": 0,
+      "mean": {
+        "calls": 17.275,
+        "input": 242430.1125,
+        "cached": 183409.3,
+        "output": 56386.2375,
+        "usd_no_cache": 0.09032645325,
+        "usd_cache": 0.07381961625
+      },
+      "usd_no_cache": {
+        "median": 0.08390436,
+        "p95": 0.14122553999999998,
+        "max": 0.19225028
+      },
+      "usd_cache": {
+        "median": 0.07056327000000001,
+        "p95": 0.11097343,
+        "max": 0.15246596
+      },
+      "roles": {
+        "reader": {
+          "calls": 133,
+          "input": 1929323,
+          "cached": 869792,
+          "output": 474278,
+          "usd_no_cache": 0.7443832200000001,
+          "usd_cache": 0.66610194
+        },
+        "solver": {
+          "calls": 729,
+          "input": 12110330,
+          "cached": 10244785,
+          "output": 2224914,
+          "usd_no_cache": 3.9203601999999993,
+          "usd_cache": 2.9983295500000002
+        },
+        "verifier.section_table": {
+          "calls": 160,
+          "input": 1555602,
+          "cached": 624767,
+          "output": 615003,
+          "usd_no_cache": 0.8327872799999997,
+          "usd_cache": 0.77655825
+        },
+        "verifier.fact_table": {
+          "calls": 154,
+          "input": 1542192,
+          "cached": 1109167,
+          "output": 581908,
+          "usd_no_cache": 0.7978148799999998,
+          "usd_cache": 0.69798985
+        },
+        "verifier.grounded_reasoning": {
+          "calls": 193,
+          "input": 1826998,
+          "cached": 1419255,
+          "output": 604446,
+          "usd_no_cache": 0.86022572,
+          "usd_cache": 0.73249277
+        },
+        "compaction": {
+          "calls": 13,
+          "input": 429964,
+          "cached": 404978,
+          "output": 10350,
+          "usd_no_cache": 0.07054496,
+          "usd_cache": 0.03409693999999999
+        }
+      },
+      "trials": [
+        {
+          "trial": "deonticbench-direct-airline-airl__2td4gJ6",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-7",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 190761,
+          "harbor_output": 62901,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9602,
+              "cached": 0,
+              "output": 1645,
+              "usd_no_cache": 0.00298928,
+              "usd_cache": 0.00298928
+            },
+            "solver": {
+              "calls": 11,
+              "input": 132815,
+              "cached": 117614,
+              "output": 42857,
+              "usd_no_cache": 0.0614511,
+              "usd_cache": 0.05086584
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 13979,
+              "cached": 6424,
+              "output": 4771,
+              "usd_no_cache": 0.00672806,
+              "usd_cache": 0.0061499
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 13626,
+              "cached": 11811,
+              "output": 4725,
+              "usd_no_cache": 0.00663264,
+              "usd_cache": 0.00556965
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 20739,
+              "cached": 11773,
+              "output": 8903,
+              "usd_no_cache": 0.01180646,
+              "usd_cache": 0.01074689
+            }
+          },
+          "calls": 18,
+          "input": 190761,
+          "cached": 147622,
+          "output": 62901,
+          "usd_no_cache": 0.08960754,
+          "usd_cache": 0.07632156
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__5TEhDET",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-30",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 237771,
+          "harbor_output": 50488,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9751,
+              "cached": 0,
+              "output": 4672,
+              "usd_no_cache": 0.00603714,
+              "usd_cache": 0.00603714
+            },
+            "solver": {
+              "calls": 9,
+              "input": 124435,
+              "cached": 106918,
+              "output": 16140,
+              "usd_no_cache": 0.0335609,
+              "usd_cache": 0.02393828
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 26081,
+              "cached": 15137,
+              "output": 8760,
+              "usd_no_cache": 0.01241134,
+              "usd_cache": 0.011049010000000001
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 39280,
+              "cached": 28045,
+              "output": 11370,
+              "usd_no_cache": 0.0168692,
+              "usd_cache": 0.014345150000000001
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 38224,
+              "cached": 27969,
+              "output": 9546,
+              "usd_no_cache": 0.014897359999999998,
+              "usd_cache": 0.01238015
+            }
+          },
+          "calls": 19,
+          "input": 237771,
+          "cached": 178069,
+          "output": 50488,
+          "usd_no_cache": 0.08377594,
+          "usd_cache": 0.06774973000000001
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__7HffjZf",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-87",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 346030,
+          "harbor_output": 71417,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9755,
+              "cached": 0,
+              "output": 1398,
+              "usd_no_cache": 0.0027637,
+              "usd_cache": 0.0027637
+            },
+            "solver": {
+              "calls": 13,
+              "input": 257307,
+              "cached": 230049,
+              "output": 41591,
+              "usd_no_cache": 0.07761398,
+              "usd_cache": 0.05690956999999999
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14509,
+              "cached": 6846,
+              "output": 7392,
+              "usd_no_cache": 0.00942326,
+              "usd_cache": 0.00880712
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 37566,
+              "cached": 27332,
+              "output": 9846,
+              "usd_no_cache": 0.015105239999999999,
+              "usd_cache": 0.01264536
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 26893,
+              "cached": 20461,
+              "output": 11190,
+              "usd_no_cache": 0.014955020000000001,
+              "usd_cache": 0.01311353
+            }
+          },
+          "calls": 22,
+          "input": 346030,
+          "cached": 284688,
+          "output": 71417,
+          "usd_no_cache": 0.1198612,
+          "usd_cache": 0.09423928
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__7WnsJUZ",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-96",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 211928,
+          "harbor_output": 45934,
+          "roles": {
+            "reader": {
+              "calls": 3,
+              "input": 47078,
+              "cached": 29133,
+              "output": 4220,
+              "usd_no_cache": 0.01081092,
+              "usd_cache": 0.00818895
+            },
+            "solver": {
+              "calls": 8,
+              "input": 84979,
+              "cached": 73781,
+              "output": 20635,
+              "usd_no_cache": 0.03253206,
+              "usd_cache": 0.02589177
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 37210,
+              "cached": 21430,
+              "output": 9859,
+              "usd_no_cache": 0.0150684,
+              "usd_cache": 0.0131397
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14297,
+              "cached": 12043,
+              "output": 5254,
+              "usd_no_cache": 0.00725558,
+              "usd_cache": 0.00617171
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 28364,
+              "cached": 25905,
+              "output": 5966,
+              "usd_no_cache": 0.00993696,
+              "usd_cache": 0.00760551
+            }
+          },
+          "calls": 20,
+          "input": 211928,
+          "cached": 162292,
+          "output": 45934,
+          "usd_no_cache": 0.07560392,
+          "usd_cache": 0.060997640000000006
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__9oQyHyV",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-16",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 201452,
+          "harbor_output": 57403,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27560,
+              "cached": 9681,
+              "output": 9513,
+              "usd_no_cache": 0.013371399999999999,
+              "usd_cache": 0.012500109999999998
+            },
+            "solver": {
+              "calls": 9,
+              "input": 135543,
+              "cached": 116166,
+              "output": 32679,
+              "usd_no_cache": 0.051655019999999996,
+              "usd_cache": 0.04120008
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7306,
+              "cached": 1,
+              "output": 4234,
+              "usd_no_cache": 0.0052568400000000005,
+              "usd_cache": 0.00525675
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7248,
+              "cached": 5839,
+              "output": 4483,
+              "usd_no_cache": 0.00549772,
+              "usd_cache": 0.00497221
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 23795,
+              "cached": 20967,
+              "output": 6494,
+              "usd_no_cache": 0.0098253,
+              "usd_cache": 0.00793827
+            }
+          },
+          "calls": 16,
+          "input": 201452,
+          "cached": 152654,
+          "output": 57403,
+          "usd_no_cache": 0.08560627999999999,
+          "usd_cache": 0.07186742
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__ACyc6YM",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-49",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 239196,
+          "harbor_output": 57069,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9674,
+              "cached": 0,
+              "output": 1710,
+              "usd_no_cache": 0.0030643600000000003,
+              "usd_cache": 0.0030643600000000003
+            },
+            "solver": {
+              "calls": 11,
+              "input": 200667,
+              "cached": 175344,
+              "output": 38115,
+              "usd_no_cache": 0.06620838,
+              "usd_cache": 0.05042742
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 6912,
+              "cached": 1,
+              "output": 6884,
+              "usd_no_cache": 0.00785168,
+              "usd_cache": 0.00785159
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15128,
+              "cached": 12516,
+              "output": 6786,
+              "usd_no_cache": 0.00890392,
+              "usd_cache": 0.00777748
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6815,
+              "cached": 5664,
+              "output": 3574,
+              "usd_no_cache": 0.0045281,
+              "usd_cache": 0.00401834
+            }
+          },
+          "calls": 16,
+          "input": 239196,
+          "cached": 193525,
+          "output": 57069,
+          "usd_no_cache": 0.09055644,
+          "usd_cache": 0.07313919
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__AiwCq8J",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-75",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 179220,
+          "harbor_output": 41185,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9600,
+              "cached": 0,
+              "output": 1522,
+              "usd_no_cache": 0.002866,
+              "usd_cache": 0.002866
+            },
+            "solver": {
+              "calls": 7,
+              "input": 98087,
+              "cached": 79667,
+              "output": 13437,
+              "usd_no_cache": 0.02716918,
+              "usd_cache": 0.01999915
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21115,
+              "cached": 6515,
+              "output": 8741,
+              "usd_no_cache": 0.011697099999999998,
+              "usd_cache": 0.011110749999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 13862,
+              "cached": 11912,
+              "output": 7358,
+              "usd_no_cache": 0.00929868,
+              "usd_cache": 0.0082266
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 36556,
+              "cached": 26378,
+              "output": 10127,
+              "usd_no_cache": 0.015244839999999999,
+              "usd_cache": 0.012870819999999998
+            }
+          },
+          "calls": 15,
+          "input": 179220,
+          "cached": 124472,
+          "output": 41185,
+          "usd_no_cache": 0.0662758,
+          "usd_cache": 0.055073319999999995
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__BRTcx89",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-7",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 181050,
+          "harbor_output": 52115,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27560,
+              "cached": 9681,
+              "output": 9120,
+              "usd_no_cache": 0.0129784,
+              "usd_cache": 0.01210711
+            },
+            "solver": {
+              "calls": 7,
+              "input": 115764,
+              "cached": 89664,
+              "output": 24815,
+              "usd_no_cache": 0.041021959999999996,
+              "usd_cache": 0.0329522
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7463,
+              "cached": 1,
+              "output": 4545,
+              "usd_no_cache": 0.00558982,
+              "usd_cache": 0.005589729999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22897,
+              "cached": 13278,
+              "output": 8968,
+              "usd_no_cache": 0.01217358,
+              "usd_cache": 0.01097856
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 7366,
+              "cached": 5877,
+              "output": 4667,
+              "usd_no_cache": 0.00569824,
+              "usd_cache": 0.00516931
+            }
+          },
+          "calls": 13,
+          "input": 181050,
+          "cached": 118501,
+          "output": 52115,
+          "usd_no_cache": 0.07746199999999999,
+          "usd_cache": 0.06679691
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__DWPnzbE",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-12",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 440823,
+          "harbor_output": 90500,
+          "roles": {
+            "reader": {
+              "calls": 8,
+              "input": 195638,
+              "cached": 158202,
+              "output": 25078,
+              "usd_no_cache": 0.05246732,
+              "usd_cache": 0.03822914
+            },
+            "solver": {
+              "calls": 12,
+              "input": 189414,
+              "cached": 160760,
+              "output": 43080,
+              "usd_no_cache": 0.06959796,
+              "usd_cache": 0.05512956
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 24011,
+              "cached": 7963,
+              "output": 9145,
+              "usd_no_cache": 0.01250654,
+              "usd_cache": 0.011789870000000001
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 23895,
+              "cached": 13993,
+              "output": 9020,
+              "usd_no_cache": 0.012365300000000001,
+              "usd_cache": 0.01110593
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 7865,
+              "cached": 6094,
+              "output": 4177,
+              "usd_no_cache": 0.0052781,
+              "usd_cache": 0.00472964
+            }
+          },
+          "calls": 25,
+          "input": 440823,
+          "cached": 347012,
+          "output": 90500,
+          "usd_no_cache": 0.15221522,
+          "usd_cache": 0.12098414
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__DpkkFxW",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-15",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 113297,
+          "harbor_output": 38210,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9605,
+              "cached": 0,
+              "output": 2257,
+              "usd_no_cache": 0.0036017,
+              "usd_cache": 0.0036017
+            },
+            "solver": {
+              "calls": 5,
+              "input": 70833,
+              "cached": 55637,
+              "output": 20431,
+              "usd_no_cache": 0.03034762,
+              "usd_cache": 0.025340289999999998
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 6253,
+              "cached": 1,
+              "output": 3395,
+              "usd_no_cache": 0.0042704200000000005,
+              "usd_cache": 0.00427033
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6195,
+              "cached": 5386,
+              "output": 3376,
+              "usd_no_cache": 0.0042433,
+              "usd_cache": 0.0037585599999999998
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 20411,
+              "cached": 11543,
+              "output": 8751,
+              "usd_no_cache": 0.01160854,
+              "usd_cache": 0.01056967
+            }
+          },
+          "calls": 10,
+          "input": 113297,
+          "cached": 72567,
+          "output": 38210,
+          "usd_no_cache": 0.05407158,
+          "usd_cache": 0.04754055
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__EQBZFBr",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-43",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 500061,
+          "harbor_output": 71217,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9678,
+              "cached": 0,
+              "output": 7645,
+              "usd_no_cache": 0.00899992,
+              "usd_cache": 0.00899992
+            },
+            "solver": {
+              "calls": 17,
+              "input": 373370,
+              "cached": 330058,
+              "output": 34793,
+              "usd_no_cache": 0.0870648,
+              "usd_cache": 0.05735958
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22929,
+              "cached": 7416,
+              "output": 9415,
+              "usd_no_cache": 0.01262506,
+              "usd_cache": 0.01195762
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22800,
+              "cached": 13212,
+              "output": 9182,
+              "usd_no_cache": 0.012374,
+              "usd_cache": 0.01118492
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 38627,
+              "cached": 28582,
+              "output": 9382,
+              "usd_no_cache": 0.014789779999999999,
+              "usd_cache": 0.0122174
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 32657,
+              "cached": 29662,
+              "output": 800,
+              "usd_no_cache": 0.00537198,
+              "usd_cache": 0.0027024
+            }
+          },
+          "calls": 26,
+          "input": 500061,
+          "cached": 408930,
+          "output": 71217,
+          "usd_no_cache": 0.14122553999999998,
+          "usd_cache": 0.10442184
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__EcSWALc",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-61",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 99486,
+          "harbor_output": 30381,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9753,
+              "cached": 0,
+              "output": 6366,
+              "usd_no_cache": 0.00773142,
+              "usd_cache": 0.00773142
+            },
+            "solver": {
+              "calls": 5,
+              "input": 68666,
+              "cached": 54874,
+              "output": 11653,
+              "usd_no_cache": 0.02126624,
+              "usd_cache": 0.01632758
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7074,
+              "cached": 1,
+              "output": 4713,
+              "usd_no_cache": 0.00570336,
+              "usd_cache": 0.00570327
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7016,
+              "cached": 5686,
+              "output": 4278,
+              "usd_no_cache": 0.005260239999999999,
+              "usd_cache": 0.004748499999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6977,
+              "cached": 5688,
+              "output": 3371,
+              "usd_no_cache": 0.00434778,
+              "usd_cache": 0.00383586
+            }
+          },
+          "calls": 9,
+          "input": 99486,
+          "cached": 66249,
+          "output": 30381,
+          "usd_no_cache": 0.04430904,
+          "usd_cache": 0.03834663
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__FghY5in",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-26",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 124906,
+          "harbor_output": 44514,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9748,
+              "cached": 0,
+              "output": 7437,
+              "usd_no_cache": 0.00880172,
+              "usd_cache": 0.00880172
+            },
+            "solver": {
+              "calls": 4,
+              "input": 44370,
+              "cached": 30908,
+              "output": 13549,
+              "usd_no_cache": 0.0197608,
+              "usd_cache": 0.01697908
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 40081,
+              "cached": 23336,
+              "output": 9897,
+              "usd_no_cache": 0.015508339999999999,
+              "usd_cache": 0.0134081
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7566,
+              "cached": 5960,
+              "output": 4828,
+              "usd_no_cache": 0.00588724,
+              "usd_cache": 0.00535084
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 23141,
+              "cached": 13491,
+              "output": 8803,
+              "usd_no_cache": 0.01204274,
+              "usd_cache": 0.01082855
+            }
+          },
+          "calls": 11,
+          "input": 124906,
+          "cached": 73695,
+          "output": 44514,
+          "usd_no_cache": 0.06200084,
+          "usd_cache": 0.05536829
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__GybuK7Z",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-2",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 274044,
+          "harbor_output": 51760,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9674,
+              "cached": 0,
+              "output": 2051,
+              "usd_no_cache": 0.00340536,
+              "usd_cache": 0.00340536
+            },
+            "solver": {
+              "calls": 11,
+              "input": 213124,
+              "cached": 185930,
+              "output": 27410,
+              "usd_no_cache": 0.057247360000000004,
+              "usd_cache": 0.04051366
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21891,
+              "cached": 6903,
+              "output": 8813,
+              "usd_no_cache": 0.01187774,
+              "usd_cache": 0.011256470000000001
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14944,
+              "cached": 12449,
+              "output": 7113,
+              "usd_no_cache": 0.00920516,
+              "usd_cache": 0.00808475
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 14411,
+              "cached": 12412,
+              "output": 6373,
+              "usd_no_cache": 0.008390539999999998,
+              "usd_cache": 0.007273459999999999
+            }
+          },
+          "calls": 18,
+          "input": 274044,
+          "cached": 217694,
+          "output": 51760,
+          "usd_no_cache": 0.09012616,
+          "usd_cache": 0.0705337
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__HwFe7Ec",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-59",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 140691,
+          "harbor_output": 36644,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9605,
+              "cached": 0,
+              "output": 1586,
+              "usd_no_cache": 0.0029307,
+              "usd_cache": 0.0029307
+            },
+            "solver": {
+              "calls": 6,
+              "input": 81894,
+              "cached": 63485,
+              "output": 11794,
+              "usd_no_cache": 0.02325916,
+              "usd_cache": 0.01754551
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21395,
+              "cached": 6655,
+              "output": 8851,
+              "usd_no_cache": 0.0118463,
+              "usd_cache": 0.01124735
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6596,
+              "cached": 5468,
+              "output": 5344,
+              "usd_no_cache": 0.00626744,
+              "usd_cache": 0.00577532
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 21201,
+              "cached": 12026,
+              "output": 9069,
+              "usd_no_cache": 0.012037139999999998,
+              "usd_cache": 0.010954799999999999
+            }
+          },
+          "calls": 12,
+          "input": 140691,
+          "cached": 87634,
+          "output": 36644,
+          "usd_no_cache": 0.05634074,
+          "usd_cache": 0.04845368
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__KVZyxJd",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-40",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 180957,
+          "harbor_output": 55365,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 20027,
+              "cached": 9749,
+              "output": 3385,
+              "usd_no_cache": 0.00618878,
+              "usd_cache": 0.00531137
+            },
+            "solver": {
+              "calls": 9,
+              "input": 109499,
+              "cached": 94378,
+              "output": 33181,
+              "usd_no_cache": 0.048510859999999996,
+              "usd_cache": 0.04001684
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14879,
+              "cached": 7015,
+              "output": 5223,
+              "usd_no_cache": 0.00730606,
+              "usd_cache": 0.0066747099999999995
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6956,
+              "cached": 5797,
+              "output": 6340,
+              "usd_no_cache": 0.007313839999999999,
+              "usd_cache": 0.00679211
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 29596,
+              "cached": 27196,
+              "output": 7236,
+              "usd_no_cache": 0.01137944,
+              "usd_cache": 0.0089318
+            }
+          },
+          "calls": 18,
+          "input": 180957,
+          "cached": 144135,
+          "output": 55365,
+          "usd_no_cache": 0.08069897999999999,
+          "usd_cache": 0.06772683
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__LucsccV",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-76",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 141379,
+          "harbor_output": 44864,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9603,
+              "cached": 0,
+              "output": 6847,
+              "usd_no_cache": 0.00819142,
+              "usd_cache": 0.00819142
+            },
+            "solver": {
+              "calls": 7,
+              "input": 87503,
+              "cached": 71703,
+              "output": 19277,
+              "usd_no_cache": 0.03152742,
+              "usd_cache": 0.02507415
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 15095,
+              "cached": 6870,
+              "output": 4914,
+              "usd_no_cache": 0.0070273,
+              "usd_cache": 0.006409
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14794,
+              "cached": 12344,
+              "output": 7067,
+              "usd_no_cache": 0.00913816,
+              "usd_cache": 0.0080272
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 14384,
+              "cached": 12307,
+              "output": 6759,
+              "usd_no_cache": 0.00877276,
+              "usd_cache": 0.007665129999999999
+            }
+          },
+          "calls": 14,
+          "input": 141379,
+          "cached": 103224,
+          "output": 44864,
+          "usd_no_cache": 0.06465706,
+          "usd_cache": 0.0553669
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__MXMEjw6",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-30",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 178330,
+          "harbor_output": 47630,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9680,
+              "cached": 0,
+              "output": 3909,
+              "usd_no_cache": 0.0052642,
+              "usd_cache": 0.0052642
+            },
+            "solver": {
+              "calls": 6,
+              "input": 102664,
+              "cached": 80017,
+              "output": 16972,
+              "usd_no_cache": 0.03134496,
+              "usd_cache": 0.024143429999999997
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22098,
+              "cached": 7007,
+              "output": 8950,
+              "usd_no_cache": 0.01204372,
+              "usd_cache": 0.01141309
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 21983,
+              "cached": 12605,
+              "output": 8852,
+              "usd_no_cache": 0.011929619999999998,
+              "usd_cache": 0.01079517
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 21905,
+              "cached": 12569,
+              "output": 8947,
+              "usd_no_cache": 0.0120137,
+              "usd_cache": 0.01088249
+            }
+          },
+          "calls": 13,
+          "input": 178330,
+          "cached": 112198,
+          "output": 47630,
+          "usd_no_cache": 0.0725962,
+          "usd_cache": 0.06249838
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Mb3BsEn",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-11",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 327023,
+          "harbor_output": 67255,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9754,
+              "cached": 0,
+              "output": 2453,
+              "usd_no_cache": 0.00381856,
+              "usd_cache": 0.00381856
+            },
+            "solver": {
+              "calls": 12,
+              "input": 233131,
+              "cached": 198833,
+              "output": 41824,
+              "usd_no_cache": 0.07446234,
+              "usd_cache": 0.056567370000000006
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22819,
+              "cached": 7367,
+              "output": 9168,
+              "usd_no_cache": 0.01236266,
+              "usd_cache": 0.011699629999999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7308,
+              "cached": 5854,
+              "output": 4201,
+              "usd_no_cache": 0.00522412,
+              "usd_cache": 0.00469726
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 22625,
+              "cached": 13126,
+              "output": 8744,
+              "usd_no_cache": 0.0119115,
+              "usd_cache": 0.010730159999999999
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 31386,
+              "cached": 28933,
+              "output": 865,
+              "usd_no_cache": 0.00525904,
+              "usd_cache": 0.0026550700000000003
+            }
+          },
+          "calls": 19,
+          "input": 327023,
+          "cached": 254113,
+          "output": 67255,
+          "usd_no_cache": 0.11303822,
+          "usd_cache": 0.09016805
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__MzYwRFh",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-69",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 343458,
+          "harbor_output": 57371,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 20633,
+              "cached": 9754,
+              "output": 4559,
+              "usd_no_cache": 0.00744762,
+              "usd_cache": 0.00656976
+            },
+            "solver": {
+              "calls": 11,
+              "input": 218350,
+              "cached": 181535,
+              "output": 28530,
+              "usd_no_cache": 0.059099,
+              "usd_cache": 0.04276085
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 16238,
+              "cached": 7594,
+              "output": 7222,
+              "usd_no_cache": 0.00949532,
+              "usd_cache": 0.00881186
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 16416,
+              "cached": 13384,
+              "output": 6733,
+              "usd_no_cache": 0.00903124,
+              "usd_cache": 0.007826679999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 39430,
+              "cached": 28929,
+              "output": 9522,
+              "usd_no_cache": 0.015042199999999999,
+              "usd_cache": 0.01243859
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 32391,
+              "cached": 31435,
+              "output": 805,
+              "usd_no_cache": 0.005339740000000001,
+              "usd_cache": 0.00251059
+            }
+          },
+          "calls": 21,
+          "input": 343458,
+          "cached": 272631,
+          "output": 57371,
+          "usd_no_cache": 0.10545512,
+          "usd_cache": 0.08091833
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Nixj4am",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-67",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 128282,
+          "harbor_output": 41243,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9674,
+              "cached": 0,
+              "output": 2934,
+              "usd_no_cache": 0.00428836,
+              "usd_cache": 0.00428836
+            },
+            "solver": {
+              "calls": 5,
+              "input": 65041,
+              "cached": 51951,
+              "output": 17906,
+              "usd_no_cache": 0.02701174,
+              "usd_cache": 0.02233615
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22322,
+              "cached": 7119,
+              "output": 8356,
+              "usd_no_cache": 0.01148108,
+              "usd_cache": 0.010840369999999998
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7060,
+              "cached": 5713,
+              "output": 2983,
+              "usd_no_cache": 0.0039714,
+              "usd_cache": 0.00345723
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 24185,
+              "cached": 19914,
+              "output": 9064,
+              "usd_no_cache": 0.0124499,
+              "usd_cache": 0.01065764
+            }
+          },
+          "calls": 12,
+          "input": 128282,
+          "cached": 84697,
+          "output": 41243,
+          "usd_no_cache": 0.05920248,
+          "usd_cache": 0.051579749999999994
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Nva8sdC",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-93",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 200908,
+          "harbor_output": 48094,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9749,
+              "cached": 0,
+              "output": 3639,
+              "usd_no_cache": 0.00500386,
+              "usd_cache": 0.00500386
+            },
+            "solver": {
+              "calls": 8,
+              "input": 129716,
+              "cached": 107827,
+              "output": 19241,
+              "usd_no_cache": 0.03740124,
+              "usd_cache": 0.02769681
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22847,
+              "cached": 7381,
+              "output": 8887,
+              "usd_no_cache": 0.012085579999999999,
+              "usd_cache": 0.011421289999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22731,
+              "cached": 13164,
+              "output": 9420,
+              "usd_no_cache": 0.01260234,
+              "usd_cache": 0.01141758
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15865,
+              "cached": 13129,
+              "output": 6907,
+              "usd_no_cache": 0.0091281,
+              "usd_cache": 0.00794649
+            }
+          },
+          "calls": 15,
+          "input": 200908,
+          "cached": 141501,
+          "output": 48094,
+          "usd_no_cache": 0.07622112,
+          "usd_cache": 0.06348603
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__PosgARJ",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-67",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 120159,
+          "harbor_output": 41967,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9603,
+              "cached": 0,
+              "output": 2979,
+              "usd_no_cache": 0.00432342,
+              "usd_cache": 0.00432342
+            },
+            "solver": {
+              "calls": 6,
+              "input": 75069,
+              "cached": 59626,
+              "output": 21455,
+              "usd_no_cache": 0.03196466,
+              "usd_cache": 0.026598319999999998
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14546,
+              "cached": 6742,
+              "output": 4648,
+              "usd_no_cache": 0.00668444,
+              "usd_cache": 0.00607766
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6683,
+              "cached": 5480,
+              "output": 7665,
+              "usd_no_cache": 0.00860062,
+              "usd_cache": 0.00810742
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 14258,
+              "cached": 12126,
+              "output": 5220,
+              "usd_no_cache": 0.0072161199999999995,
+              "usd_cache": 0.00612478
+            }
+          },
+          "calls": 12,
+          "input": 120159,
+          "cached": 83974,
+          "output": 41967,
+          "usd_no_cache": 0.058789259999999996,
+          "usd_cache": 0.0512316
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__PqnrZtW",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-52",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 158136,
+          "harbor_output": 52402,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9608,
+              "cached": 0,
+              "output": 2039,
+              "usd_no_cache": 0.00338412,
+              "usd_cache": 0.00338412
+            },
+            "solver": {
+              "calls": 8,
+              "input": 92013,
+              "cached": 78535,
+              "output": 31968,
+              "usd_no_cache": 0.04484982,
+              "usd_cache": 0.037781669999999996
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14284,
+              "cached": 6567,
+              "output": 5136,
+              "usd_no_cache": 0.00713576,
+              "usd_cache": 0.00654473
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14072,
+              "cached": 11863,
+              "output": 6696,
+              "usd_no_cache": 0.00866608,
+              "usd_cache": 0.00759841
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 28159,
+              "cached": 25739,
+              "output": 6563,
+              "usd_no_cache": 0.010505259999999999,
+              "usd_cache": 0.00818875
+            }
+          },
+          "calls": 17,
+          "input": 158136,
+          "cached": 122704,
+          "output": 52402,
+          "usd_no_cache": 0.07454104,
+          "usd_cache": 0.06349768
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Q7Ms92k",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-41",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 374016,
+          "harbor_output": 73246,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27710,
+              "cached": 9750,
+              "output": 9018,
+              "usd_no_cache": 0.0128974,
+              "usd_cache": 0.0120199
+            },
+            "solver": {
+              "calls": 14,
+              "input": 258986,
+              "cached": 226594,
+              "output": 40706,
+              "usd_no_cache": 0.07696404000000001,
+              "usd_cache": 0.05657058
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22216,
+              "cached": 7066,
+              "output": 8981,
+              "usd_no_cache": 0.01209124,
+              "usd_cache": 0.0114553
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 25500,
+              "cached": 20812,
+              "output": 8983,
+              "usd_no_cache": 0.012553,
+              "usd_cache": 0.010679919999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6968,
+              "cached": 5748,
+              "output": 4691,
+              "usd_no_cache": 0.0056665199999999995,
+              "usd_cache": 0.0051492
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 32636,
+              "cached": 31542,
+              "output": 867,
+              "usd_no_cache": 0.00543604,
+              "usd_cache": 0.00259726
+            }
+          },
+          "calls": 23,
+          "input": 374016,
+          "cached": 301512,
+          "output": 73246,
+          "usd_no_cache": 0.12560824,
+          "usd_cache": 0.09847216
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__QESSf9z",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-13",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 131734,
+          "harbor_output": 50734,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9604,
+              "cached": 0,
+              "output": 1585,
+              "usd_no_cache": 0.00292956,
+              "usd_cache": 0.00292956
+            },
+            "solver": {
+              "calls": 7,
+              "input": 86121,
+              "cached": 69578,
+              "output": 25167,
+              "usd_no_cache": 0.03722394,
+              "usd_cache": 0.030961919999999997
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22126,
+              "cached": 7020,
+              "output": 8891,
+              "usd_no_cache": 0.01198864,
+              "usd_cache": 0.01135684
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6961,
+              "cached": 5550,
+              "output": 7346,
+              "usd_no_cache": 0.00832054,
+              "usd_cache": 0.00782104
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6922,
+              "cached": 5552,
+              "output": 7745,
+              "usd_no_cache": 0.008714079999999999,
+              "usd_cache": 0.0082144
+            }
+          },
+          "calls": 12,
+          "input": 131734,
+          "cached": 87700,
+          "output": 50734,
+          "usd_no_cache": 0.06917675999999999,
+          "usd_cache": 0.06128376
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__QgeuEvS",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-42",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 5,
+          "unknown_calls": 0,
+          "harbor_input": 198280,
+          "harbor_output": 67095,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27560,
+              "cached": 9681,
+              "output": 8965,
+              "usd_no_cache": 0.012823399999999999,
+              "usd_cache": 0.011952109999999998
+            },
+            "solver": {
+              "calls": 9,
+              "input": 89934,
+              "cached": 78406,
+              "output": 30232,
+              "usd_no_cache": 0.04282276,
+              "usd_cache": 0.03576622
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21777,
+              "cached": 6846,
+              "output": 9460,
+              "usd_no_cache": 0.01250878,
+              "usd_cache": 0.01189264
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 21659,
+              "cached": 12469,
+              "output": 8821,
+              "usd_no_cache": 0.01185326,
+              "usd_cache": 0.010731049999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 37350,
+              "cached": 27280,
+              "output": 9617,
+              "usd_no_cache": 0.014845999999999998,
+              "usd_cache": 0.012390799999999999
+            }
+          },
+          "calls": 18,
+          "input": 198280,
+          "cached": 134682,
+          "output": 67095,
+          "usd_no_cache": 0.0948542,
+          "usd_cache": 0.08273282
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Qzmz2Q5",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-16",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 188052,
+          "harbor_output": 43699,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27420,
+              "cached": 9605,
+              "output": 9067,
+              "usd_no_cache": 0.0129058,
+              "usd_cache": 0.012041350000000001
+            },
+            "solver": {
+              "calls": 7,
+              "input": 125349,
+              "cached": 98361,
+              "output": 20387,
+              "usd_no_cache": 0.03793586,
+              "usd_cache": 0.029083369999999997
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 6862,
+              "cached": 1,
+              "output": 2914,
+              "usd_no_cache": 0.00387468,
+              "usd_cache": 0.00387459
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6804,
+              "cached": 5544,
+              "output": 2558,
+              "usd_no_cache": 0.0035105600000000002,
+              "usd_cache": 0.0030116
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 21617,
+              "cached": 12311,
+              "output": 8773,
+              "usd_no_cache": 0.01179938,
+              "usd_cache": 0.01069139
+            }
+          },
+          "calls": 13,
+          "input": 188052,
+          "cached": 125822,
+          "output": 43699,
+          "usd_no_cache": 0.07002628,
+          "usd_cache": 0.0587023
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__R3Y6afA",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-46",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 112788,
+          "harbor_output": 43356,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9604,
+              "cached": 0,
+              "output": 7884,
+              "usd_no_cache": 0.00922856,
+              "usd_cache": 0.00922856
+            },
+            "solver": {
+              "calls": 5,
+              "input": 62858,
+              "cached": 49446,
+              "output": 19516,
+              "usd_no_cache": 0.02831612,
+              "usd_cache": 0.02386598
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14046,
+              "cached": 6541,
+              "output": 7367,
+              "usd_no_cache": 0.00933344,
+              "usd_cache": 0.008744749999999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6482,
+              "cached": 5491,
+              "output": 3470,
+              "usd_no_cache": 0.00437748,
+              "usd_cache": 0.00388329
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 19798,
+              "cached": 18545,
+              "output": 5119,
+              "usd_no_cache": 0.00789072,
+              "usd_cache": 0.0062216699999999995
+            }
+          },
+          "calls": 12,
+          "input": 112788,
+          "cached": 80023,
+          "output": 43356,
+          "usd_no_cache": 0.05914632,
+          "usd_cache": 0.05194425
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__RAHeZfF",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-66",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 149497,
+          "harbor_output": 48326,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9608,
+              "cached": 0,
+              "output": 1856,
+              "usd_no_cache": 0.00320112,
+              "usd_cache": 0.00320112
+            },
+            "solver": {
+              "calls": 7,
+              "input": 98446,
+              "cached": 79151,
+              "output": 26861,
+              "usd_no_cache": 0.04064344,
+              "usd_cache": 0.033519850000000004
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21081,
+              "cached": 6498,
+              "output": 9194,
+              "usd_no_cache": 0.01214534,
+              "usd_cache": 0.01156052
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6439,
+              "cached": 5434,
+              "output": 4712,
+              "usd_no_cache": 0.00561346,
+              "usd_cache": 0.0051244
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 13923,
+              "cached": 11835,
+              "output": 5703,
+              "usd_no_cache": 0.0076522199999999995,
+              "usd_cache": 0.0065870699999999996
+            }
+          },
+          "calls": 13,
+          "input": 149497,
+          "cached": 102918,
+          "output": 48326,
+          "usd_no_cache": 0.06925558,
+          "usd_cache": 0.059992960000000005
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__T453wAV",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-50",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 209081,
+          "harbor_output": 41551,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9756,
+              "cached": 0,
+              "output": 2075,
+              "usd_no_cache": 0.00344084,
+              "usd_cache": 0.00344084
+            },
+            "solver": {
+              "calls": 7,
+              "input": 113079,
+              "cached": 93741,
+              "output": 16779,
+              "usd_no_cache": 0.032610059999999996,
+              "usd_cache": 0.02417337
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22809,
+              "cached": 7362,
+              "output": 9190,
+              "usd_no_cache": 0.01238326,
+              "usd_cache": 0.01172068
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7303,
+              "cached": 5853,
+              "output": 3082,
+              "usd_no_cache": 0.004104419999999999,
+              "usd_cache": 0.00357765
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 56134,
+              "cached": 44670,
+              "output": 10425,
+              "usd_no_cache": 0.018283760000000003,
+              "usd_cache": 0.01426346
+            }
+          },
+          "calls": 15,
+          "input": 209081,
+          "cached": 151626,
+          "output": 41551,
+          "usd_no_cache": 0.07082234,
+          "usd_cache": 0.057176
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Tia8qq8",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-54",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 148030,
+          "harbor_output": 50122,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9755,
+              "cached": 0,
+              "output": 4950,
+              "usd_no_cache": 0.0063157,
+              "usd_cache": 0.0063157
+            },
+            "solver": {
+              "calls": 6,
+              "input": 76197,
+              "cached": 59905,
+              "output": 20421,
+              "usd_no_cache": 0.031088579999999998,
+              "usd_cache": 0.02569713
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 39268,
+              "cached": 22495,
+              "output": 10774,
+              "usd_no_cache": 0.016271519999999998,
+              "usd_cache": 0.01424697
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15703,
+              "cached": 12918,
+              "output": 6671,
+              "usd_no_cache": 0.00886942,
+              "usd_cache": 0.0077068
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 7107,
+              "cached": 5775,
+              "output": 7306,
+              "usd_no_cache": 0.00830098,
+              "usd_cache": 0.00778123
+            }
+          },
+          "calls": 13,
+          "input": 148030,
+          "cached": 101093,
+          "output": 50122,
+          "usd_no_cache": 0.0708462,
+          "usd_cache": 0.06174783
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__VLwmV7E",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-38",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 366787,
+          "harbor_output": 84731,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9752,
+              "cached": 0,
+              "output": 1476,
+              "usd_no_cache": 0.00284128,
+              "usd_cache": 0.00284128
+            },
+            "solver": {
+              "calls": 11,
+              "input": 217398,
+              "cached": 174307,
+              "output": 51851,
+              "usd_no_cache": 0.08228672,
+              "usd_cache": 0.06659909
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 39285,
+              "cached": 22712,
+              "output": 10181,
+              "usd_no_cache": 0.015680899999999998,
+              "usd_cache": 0.01363682
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 39847,
+              "cached": 28456,
+              "output": 11650,
+              "usd_no_cache": 0.01722858,
+              "usd_cache": 0.01466754
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 25310,
+              "cached": 21239,
+              "output": 8841,
+              "usd_no_cache": 0.0123844,
+              "usd_cache": 0.01047289
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 35195,
+              "cached": 32261,
+              "output": 732,
+              "usd_no_cache": 0.0056593,
+              "usd_cache": 0.00275581
+            }
+          },
+          "calls": 22,
+          "input": 366787,
+          "cached": 278975,
+          "output": 84731,
+          "usd_no_cache": 0.13608118,
+          "usd_cache": 0.11097343
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__VeL8iBe",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-70",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": true,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 524202,
+          "harbor_output": 118862,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9762,
+              "cached": 0,
+              "output": 2849,
+              "usd_no_cache": 0.00421568,
+              "usd_cache": 0.00421568
+            },
+            "solver": {
+              "calls": 19,
+              "input": 409007,
+              "cached": 361973,
+              "output": 91973,
+              "usd_no_cache": 0.14923398,
+              "usd_cache": 0.11665641
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 23105,
+              "cached": 7510,
+              "output": 9024,
+              "usd_no_cache": 0.012258699999999999,
+              "usd_cache": 0.011582799999999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7451,
+              "cached": 5928,
+              "output": 5272,
+              "usd_no_cache": 0.00631514,
+              "usd_cache": 0.0057816199999999995
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 40698,
+              "cached": 34401,
+              "output": 9035,
+              "usd_no_cache": 0.014732720000000001,
+              "usd_cache": 0.01163663
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 34179,
+              "cached": 32236,
+              "output": 709,
+              "usd_no_cache": 0.00549406,
+              "usd_cache": 0.00259282
+            }
+          },
+          "calls": 28,
+          "input": 524202,
+          "cached": 442048,
+          "output": 118862,
+          "usd_no_cache": 0.19225028,
+          "usd_cache": 0.15246596
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Wode7mb",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-10",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 499811,
+          "harbor_output": 67819,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27554,
+              "cached": 9678,
+              "output": 9391,
+              "usd_no_cache": 0.01324856,
+              "usd_cache": 0.01237754
+            },
+            "solver": {
+              "calls": 16,
+              "input": 368069,
+              "cached": 321172,
+              "output": 36587,
+              "usd_no_cache": 0.08811666000000001,
+              "usd_cache": 0.05921118
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22915,
+              "cached": 7415,
+              "output": 8900,
+              "usd_no_cache": 0.0121081,
+              "usd_cache": 0.01144075
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15699,
+              "cached": 13156,
+              "output": 3302,
+              "usd_no_cache": 0.0054998600000000005,
+              "usd_cache": 0.00431582
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 31535,
+              "cached": 28387,
+              "output": 8869,
+              "usd_no_cache": 0.013283900000000001,
+              "usd_cache": 0.01072907
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 34039,
+              "cached": 32214,
+              "output": 770,
+              "usd_no_cache": 0.00553546,
+              "usd_cache": 0.0026362
+            }
+          },
+          "calls": 27,
+          "input": 499811,
+          "cached": 412022,
+          "output": 67819,
+          "usd_no_cache": 0.13779254000000002,
+          "usd_cache": 0.10071056
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__X23D64c",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-56",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 208816,
+          "harbor_output": 44903,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9681,
+              "cached": 0,
+              "output": 2355,
+              "usd_no_cache": 0.00371034,
+              "usd_cache": 0.00371034
+            },
+            "solver": {
+              "calls": 7,
+              "input": 116392,
+              "cached": 91031,
+              "output": 17715,
+              "usd_no_cache": 0.03400988,
+              "usd_cache": 0.02581709
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7039,
+              "cached": 1,
+              "output": 6117,
+              "usd_no_cache": 0.00710246,
+              "usd_cache": 0.00710237
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 37755,
+              "cached": 27755,
+              "output": 8972,
+              "usd_no_cache": 0.014257699999999998,
+              "usd_cache": 0.01175975
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 37949,
+              "cached": 27679,
+              "output": 9744,
+              "usd_no_cache": 0.015056859999999998,
+              "usd_cache": 0.01256575
+            }
+          },
+          "calls": 15,
+          "input": 208816,
+          "cached": 146466,
+          "output": 44903,
+          "usd_no_cache": 0.07413724,
+          "usd_cache": 0.060955300000000004
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__XH2hfSB",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-67",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 231352,
+          "harbor_output": 68224,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9753,
+              "cached": 0,
+              "output": 5689,
+              "usd_no_cache": 0.00705442,
+              "usd_cache": 0.00705442
+            },
+            "solver": {
+              "calls": 9,
+              "input": 152745,
+              "cached": 129258,
+              "output": 36854,
+              "usd_no_cache": 0.0582383,
+              "usd_cache": 0.04660508
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 22139,
+              "cached": 14615,
+              "output": 5547,
+              "usd_no_cache": 0.00864646,
+              "usd_cache": 0.00733111
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 39588,
+              "cached": 28215,
+              "output": 12348,
+              "usd_no_cache": 0.01789032,
+              "usd_cache": 0.01535097
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 7127,
+              "cached": 5799,
+              "output": 7786,
+              "usd_no_cache": 0.00878378,
+              "usd_cache": 0.00826187
+            }
+          },
+          "calls": 17,
+          "input": 231352,
+          "cached": 177887,
+          "output": 68224,
+          "usd_no_cache": 0.10061328,
+          "usd_cache": 0.08460345
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__XUSWko5",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-64",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 158269,
+          "harbor_output": 45305,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9602,
+              "cached": 0,
+              "output": 1521,
+              "usd_no_cache": 0.00286528,
+              "usd_cache": 0.00286528
+            },
+            "solver": {
+              "calls": 6,
+              "input": 100681,
+              "cached": 81764,
+              "output": 21925,
+              "usd_no_cache": 0.03602034,
+              "usd_cache": 0.02866158
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 20897,
+              "cached": 6406,
+              "output": 9294,
+              "usd_no_cache": 0.01221958,
+              "usd_cache": 0.01164304
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 20781,
+              "cached": 11851,
+              "output": 9139,
+              "usd_no_cache": 0.01204834,
+              "usd_cache": 0.01098175
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6308,
+              "cached": 5506,
+              "output": 3426,
+              "usd_no_cache": 0.00430912,
+              "usd_cache": 0.0038135799999999996
+            }
+          },
+          "calls": 12,
+          "input": 158269,
+          "cached": 105527,
+          "output": 45305,
+          "usd_no_cache": 0.06746266,
+          "usd_cache": 0.05796523
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__XwcvJXF",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-49",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 408377,
+          "harbor_output": 72157,
+          "roles": {
+            "reader": {
+              "calls": 5,
+              "input": 83993,
+              "cached": 57188,
+              "output": 15678,
+              "usd_no_cache": 0.02743702,
+              "usd_cache": 0.0222901
+            },
+            "solver": {
+              "calls": 14,
+              "input": 252212,
+              "cached": 231427,
+              "output": 32836,
+              "usd_no_cache": 0.06814568,
+              "usd_cache": 0.04731725
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 34561,
+              "cached": 22987,
+              "output": 8826,
+              "usd_no_cache": 0.01366454,
+              "usd_cache": 0.011595709999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22437,
+              "cached": 12976,
+              "output": 9220,
+              "usd_no_cache": 0.01236118,
+              "usd_cache": 0.01119334
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15174,
+              "cached": 12940,
+              "output": 5597,
+              "usd_no_cache": 0.00772136,
+              "usd_cache": 0.00655676
+            }
+          },
+          "calls": 27,
+          "input": 408377,
+          "cached": 337518,
+          "output": 72157,
+          "usd_no_cache": 0.12932978,
+          "usd_cache": 0.09895316
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__YPsHoP9",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-58",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 182278,
+          "harbor_output": 65355,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27714,
+              "cached": 9758,
+              "output": 8645,
+              "usd_no_cache": 0.01252496,
+              "usd_cache": 0.01164674
+            },
+            "solver": {
+              "calls": 8,
+              "input": 92812,
+              "cached": 78958,
+              "output": 31388,
+              "usd_no_cache": 0.04438168,
+              "usd_cache": 0.037275459999999996
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7266,
+              "cached": 1,
+              "output": 7673,
+              "usd_no_cache": 0.008690239999999998,
+              "usd_cache": 0.008690149999999999
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 39201,
+              "cached": 28366,
+              "output": 10730,
+              "usd_no_cache": 0.01621814,
+              "usd_cache": 0.0136652
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15285,
+              "cached": 13035,
+              "output": 6919,
+              "usd_no_cache": 0.0090589,
+              "usd_cache": 0.00788575
+            }
+          },
+          "calls": 16,
+          "input": 182278,
+          "cached": 130118,
+          "output": 65355,
+          "usd_no_cache": 0.09087392,
+          "usd_cache": 0.07916329999999999
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Yr4jJiU",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-83",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 270670,
+          "harbor_output": 56905,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9673,
+              "cached": 0,
+              "output": 3479,
+              "usd_no_cache": 0.00483322,
+              "usd_cache": 0.00483322
+            },
+            "solver": {
+              "calls": 10,
+              "input": 198870,
+              "cached": 172799,
+              "output": 28168,
+              "usd_no_cache": 0.0560098,
+              "usd_cache": 0.040457889999999996
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 24993,
+              "cached": 15459,
+              "output": 9120,
+              "usd_no_cache": 0.01261902,
+              "usd_cache": 0.01122771
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 21979,
+              "cached": 12605,
+              "output": 9026,
+              "usd_no_cache": 0.012103059999999999,
+              "usd_cache": 0.01096861
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15155,
+              "cached": 12568,
+              "output": 7112,
+              "usd_no_cache": 0.0092337,
+              "usd_cache": 0.00810258
+            }
+          },
+          "calls": 18,
+          "input": 270670,
+          "cached": 213431,
+          "output": 56905,
+          "usd_no_cache": 0.0947988,
+          "usd_cache": 0.07559001
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__ZEnuiPP",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-33",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 200729,
+          "harbor_output": 52259,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9754,
+              "cached": 0,
+              "output": 1703,
+              "usd_no_cache": 0.0030685599999999997,
+              "usd_cache": 0.0030685599999999997
+            },
+            "solver": {
+              "calls": 8,
+              "input": 137437,
+              "cached": 114614,
+              "output": 28186,
+              "usd_no_cache": 0.04742718,
+              "usd_cache": 0.03711192
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 23980,
+              "cached": 15268,
+              "output": 8666,
+              "usd_no_cache": 0.012023200000000001,
+              "usd_cache": 0.01064908
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22431,
+              "cached": 12988,
+              "output": 9286,
+              "usd_no_cache": 0.01242634,
+              "usd_cache": 0.011257419999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 7127,
+              "cached": 5826,
+              "output": 4418,
+              "usd_no_cache": 0.00541578,
+              "usd_cache": 0.00489144
+            }
+          },
+          "calls": 15,
+          "input": 200729,
+          "cached": 148696,
+          "output": 52259,
+          "usd_no_cache": 0.08036106,
+          "usd_cache": 0.06697842
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__ZSkK97D",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-29",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 256632,
+          "harbor_output": 44212,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9605,
+              "cached": 0,
+              "output": 3914,
+              "usd_no_cache": 0.0052587,
+              "usd_cache": 0.0052587
+            },
+            "solver": {
+              "calls": 13,
+              "input": 196711,
+              "cached": 178184,
+              "output": 19095,
+              "usd_no_cache": 0.04663454,
+              "usd_cache": 0.030597980000000004
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21829,
+              "cached": 6872,
+              "output": 8863,
+              "usd_no_cache": 0.011919059999999999,
+              "usd_cache": 0.01130058
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 21713,
+              "cached": 12325,
+              "output": 8933,
+              "usd_no_cache": 0.01197282,
+              "usd_cache": 0.01086357
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6774,
+              "cached": 5514,
+              "output": 3407,
+              "usd_no_cache": 0.00435536,
+              "usd_cache": 0.0038591
+            }
+          },
+          "calls": 19,
+          "input": 256632,
+          "cached": 202895,
+          "output": 44212,
+          "usd_no_cache": 0.08014048,
+          "usd_cache": 0.06187993
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__Zv2NCx3",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-79",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 173118,
+          "harbor_output": 56522,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9676,
+              "cached": 0,
+              "output": 6484,
+              "usd_no_cache": 0.00783864,
+              "usd_cache": 0.00783864
+            },
+            "solver": {
+              "calls": 7,
+              "input": 103554,
+              "cached": 80073,
+              "output": 24711,
+              "usd_no_cache": 0.03920856,
+              "usd_cache": 0.03200199
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22491,
+              "cached": 7203,
+              "output": 9267,
+              "usd_no_cache": 0.01241574,
+              "usd_cache": 0.011767469999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15100,
+              "cached": 12856,
+              "output": 7301,
+              "usd_no_cache": 0.009415,
+              "usd_cache": 0.00825796
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 22297,
+              "cached": 12820,
+              "output": 8759,
+              "usd_no_cache": 0.01188058,
+              "usd_cache": 0.01072678
+            }
+          },
+          "calls": 14,
+          "input": 173118,
+          "cached": 112952,
+          "output": 56522,
+          "usd_no_cache": 0.08075852,
+          "usd_cache": 0.07059284
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__b7ZK6ci",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-100",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 179846,
+          "harbor_output": 63829,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27552,
+              "cached": 9677,
+              "output": 9004,
+              "usd_no_cache": 0.01286128,
+              "usd_cache": 0.01199035
+            },
+            "solver": {
+              "calls": 8,
+              "input": 116335,
+              "cached": 95467,
+              "output": 38851,
+              "usd_no_cache": 0.0551379,
+              "usd_cache": 0.046545869999999996
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7031,
+              "cached": 1,
+              "output": 4049,
+              "usd_no_cache": 0.00503334,
+              "usd_cache": 0.0050332499999999995
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6973,
+              "cached": 5715,
+              "output": 3345,
+              "usd_no_cache": 0.00432122,
+              "usd_cache": 0.00380687
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 21955,
+              "cached": 12652,
+              "output": 8580,
+              "usd_no_cache": 0.0116537,
+              "usd_cache": 0.01051502
+            }
+          },
+          "calls": 14,
+          "input": 179846,
+          "cached": 123512,
+          "output": 63829,
+          "usd_no_cache": 0.08900744,
+          "usd_cache": 0.07789135999999999
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__bqEr5oR",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-2",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 217090,
+          "harbor_output": 57936,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9754,
+              "cached": 0,
+              "output": 7510,
+              "usd_no_cache": 0.00887556,
+              "usd_cache": 0.00887556
+            },
+            "solver": {
+              "calls": 8,
+              "input": 129300,
+              "cached": 101904,
+              "output": 24346,
+              "usd_no_cache": 0.042448,
+              "usd_cache": 0.033276639999999996
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22897,
+              "cached": 7406,
+              "output": 8902,
+              "usd_no_cache": 0.01210758,
+              "usd_cache": 0.01144104
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 16070,
+              "cached": 13289,
+              "output": 7426,
+              "usd_no_cache": 0.0096758,
+              "usd_cache": 0.00847979
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 39069,
+              "cached": 28649,
+              "output": 9752,
+              "usd_no_cache": 0.015221660000000001,
+              "usd_cache": 0.01264325
+            }
+          },
+          "calls": 16,
+          "input": 217090,
+          "cached": 151248,
+          "output": 57936,
+          "usd_no_cache": 0.08832860000000001,
+          "usd_cache": 0.07471628
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__cn3uED5",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-81",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 431455,
+          "harbor_output": 64399,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9756,
+              "cached": 0,
+              "output": 1772,
+              "usd_no_cache": 0.0031378400000000002,
+              "usd_cache": 0.0031378400000000002
+            },
+            "solver": {
+              "calls": 15,
+              "input": 291086,
+              "cached": 249206,
+              "output": 32711,
+              "usd_no_cache": 0.07346304000000001,
+              "usd_cache": 0.0510345
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 37345,
+              "cached": 25258,
+              "output": 10371,
+              "usd_no_cache": 0.0155993,
+              "usd_cache": 0.01332608
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22259,
+              "cached": 12826,
+              "output": 9304,
+              "usd_no_cache": 0.012420259999999999,
+              "usd_cache": 0.011265919999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 38078,
+              "cached": 27935,
+              "output": 9495,
+              "usd_no_cache": 0.01482592,
+              "usd_cache": 0.01231177
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 32931,
+              "cached": 31934,
+              "output": 746,
+              "usd_no_cache": 0.00535634,
+              "usd_cache": 0.00248228
+            }
+          },
+          "calls": 26,
+          "input": 431455,
+          "cached": 347159,
+          "output": 64399,
+          "usd_no_cache": 0.1248027,
+          "usd_cache": 0.09355838999999999
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__cwarMvH",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-34",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 99783,
+          "harbor_output": 44868,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9606,
+              "cached": 0,
+              "output": 1833,
+              "usd_no_cache": 0.0031778400000000004,
+              "usd_cache": 0.0031778400000000004
+            },
+            "solver": {
+              "calls": 4,
+              "input": 40183,
+              "cached": 29786,
+              "output": 19514,
+              "usd_no_cache": 0.02513962,
+              "usd_cache": 0.02245888
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 6826,
+              "cached": 1,
+              "output": 6040,
+              "usd_no_cache": 0.006995639999999999,
+              "usd_cache": 0.00699555
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 21623,
+              "cached": 12259,
+              "output": 8915,
+              "usd_no_cache": 0.01194222,
+              "usd_cache": 0.01083891
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 21545,
+              "cached": 12222,
+              "output": 8566,
+              "usd_no_cache": 0.0115823,
+              "usd_cache": 0.01048232
+            }
+          },
+          "calls": 10,
+          "input": 99783,
+          "cached": 54268,
+          "output": 44868,
+          "usd_no_cache": 0.05883762,
+          "usd_cache": 0.0539535
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__dkuKtoo",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-3",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 186539,
+          "harbor_output": 36311,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9605,
+              "cached": 0,
+              "output": 2305,
+              "usd_no_cache": 0.0036496999999999996,
+              "usd_cache": 0.0036496999999999996
+            },
+            "solver": {
+              "calls": 9,
+              "input": 134511,
+              "cached": 115543,
+              "output": 16379,
+              "usd_no_cache": 0.03521054,
+              "usd_cache": 0.02481167
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14338,
+              "cached": 6738,
+              "output": 6087,
+              "usd_no_cache": 0.008094319999999999,
+              "usd_cache": 0.0074879
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 21445,
+              "cached": 12213,
+              "output": 9010,
+              "usd_no_cache": 0.0120123,
+              "usd_cache": 0.01091313
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6640,
+              "cached": 5536,
+              "output": 2530,
+              "usd_no_cache": 0.0034595999999999997,
+              "usd_cache": 0.0029613599999999997
+            }
+          },
+          "calls": 15,
+          "input": 186539,
+          "cached": 140030,
+          "output": 36311,
+          "usd_no_cache": 0.062426459999999996,
+          "usd_cache": 0.04982376
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__f9zNW3V",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-75",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 330197,
+          "harbor_output": 52198,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9753,
+              "cached": 0,
+              "output": 2397,
+              "usd_no_cache": 0.00376242,
+              "usd_cache": 0.00376242
+            },
+            "solver": {
+              "calls": 12,
+              "input": 226609,
+              "cached": 190998,
+              "output": 26525,
+              "usd_no_cache": 0.058250260000000005,
+              "usd_cache": 0.041060440000000004
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 23247,
+              "cached": 7581,
+              "output": 8970,
+              "usd_no_cache": 0.012224579999999999,
+              "usd_cache": 0.011542289999999998
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 23131,
+              "cached": 13496,
+              "output": 9304,
+              "usd_no_cache": 0.012542339999999999,
+              "usd_cache": 0.0113277
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15200,
+              "cached": 13461,
+              "output": 4207,
+              "usd_no_cache": 0.006335,
+              "usd_cache": 0.0051235099999999995
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 32257,
+              "cached": 31277,
+              "output": 795,
+              "usd_no_cache": 0.00531098,
+              "usd_cache": 0.00249605
+            }
+          },
+          "calls": 20,
+          "input": 330197,
+          "cached": 256813,
+          "output": 52198,
+          "usd_no_cache": 0.09842558,
+          "usd_cache": 0.07531241
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__fLx7g6R",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-100",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 243703,
+          "harbor_output": 45510,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9604,
+              "cached": 0,
+              "output": 8000,
+              "usd_no_cache": 0.00934456,
+              "usd_cache": 0.00934456
+            },
+            "solver": {
+              "calls": 11,
+              "input": 170791,
+              "cached": 150449,
+              "output": 16873,
+              "usd_no_cache": 0.04078374,
+              "usd_cache": 0.02724333
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21566,
+              "cached": 6741,
+              "output": 8857,
+              "usd_no_cache": 0.01187624,
+              "usd_cache": 0.01126955
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 21451,
+              "cached": 12221,
+              "output": 8708,
+              "usd_no_cache": 0.01171114,
+              "usd_cache": 0.010611250000000001
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 20291,
+              "cached": 18941,
+              "output": 3072,
+              "usd_no_cache": 0.00591274,
+              "usd_cache": 0.00420805
+            }
+          },
+          "calls": 19,
+          "input": 243703,
+          "cached": 188352,
+          "output": 45510,
+          "usd_no_cache": 0.07962842,
+          "usd_cache": 0.06267674
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__fT2ozhd",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-73",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 184226,
+          "harbor_output": 53886,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27406,
+              "cached": 9604,
+              "output": 9754,
+              "usd_no_cache": 0.01359084,
+              "usd_cache": 0.012726479999999998
+            },
+            "solver": {
+              "calls": 6,
+              "input": 79573,
+              "cached": 62065,
+              "output": 17622,
+              "usd_no_cache": 0.028762219999999998,
+              "usd_cache": 0.023176369999999998
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 15130,
+              "cached": 6994,
+              "output": 7065,
+              "usd_no_cache": 0.0091832,
+              "usd_cache": 0.00855374
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 38184,
+              "cached": 27559,
+              "output": 10184,
+              "usd_no_cache": 0.01552976,
+              "usd_cache": 0.01304945
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 23933,
+              "cached": 20505,
+              "output": 9261,
+              "usd_no_cache": 0.01261162,
+              "usd_cache": 0.01076617
+            }
+          },
+          "calls": 16,
+          "input": 184226,
+          "cached": 126727,
+          "output": 53886,
+          "usd_no_cache": 0.07967764,
+          "usd_cache": 0.06827221
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__fqY7Nv3",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-60",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 335911,
+          "harbor_output": 55430,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9751,
+              "cached": 0,
+              "output": 2333,
+              "usd_no_cache": 0.00369814,
+              "usd_cache": 0.00369814
+            },
+            "solver": {
+              "calls": 13,
+              "input": 236511,
+              "cached": 195930,
+              "output": 30722,
+              "usd_no_cache": 0.06383354,
+              "usd_cache": 0.04619984
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 26926,
+              "cached": 15773,
+              "output": 9122,
+              "usd_no_cache": 0.01289164,
+              "usd_cache": 0.011472070000000001
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22594,
+              "cached": 13111,
+              "output": 9054,
+              "usd_no_cache": 0.01221716,
+              "usd_cache": 0.011037169999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 7214,
+              "cached": 5862,
+              "output": 3492,
+              "usd_no_cache": 0.00450196,
+              "usd_cache": 0.00397438
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 32915,
+              "cached": 30237,
+              "output": 707,
+              "usd_no_cache": 0.0053151000000000006,
+              "usd_cache": 0.0025937700000000005
+            }
+          },
+          "calls": 21,
+          "input": 335911,
+          "cached": 260913,
+          "output": 55430,
+          "usd_no_cache": 0.10245754,
+          "usd_cache": 0.07897537
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__g4c7Thq",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-91",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 213073,
+          "harbor_output": 55296,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27558,
+              "cached": 9680,
+              "output": 8968,
+              "usd_no_cache": 0.01282612,
+              "usd_cache": 0.01195492
+            },
+            "solver": {
+              "calls": 9,
+              "input": 134843,
+              "cached": 113407,
+              "output": 23535,
+              "usd_no_cache": 0.04241302,
+              "usd_cache": 0.03220639
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21987,
+              "cached": 6951,
+              "output": 8766,
+              "usd_no_cache": 0.01184418,
+              "usd_cache": 0.01121859
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6892,
+              "cached": 5743,
+              "output": 4965,
+              "usd_no_cache": 0.00592988,
+              "usd_cache": 0.005413009999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 21793,
+              "cached": 12600,
+              "output": 9062,
+              "usd_no_cache": 0.012113019999999999,
+              "usd_cache": 0.010979019999999999
+            }
+          },
+          "calls": 16,
+          "input": 213073,
+          "cached": 148381,
+          "output": 55296,
+          "usd_no_cache": 0.08512622,
+          "usd_cache": 0.07177193
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__h5TCeZC",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-80",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 415130,
+          "harbor_output": 71617,
+          "roles": {
+            "reader": {
+              "calls": 6,
+              "input": 124780,
+              "cached": 97177,
+              "output": 14882,
+              "usd_no_cache": 0.0323512,
+              "usd_cache": 0.02360527
+            },
+            "solver": {
+              "calls": 12,
+              "input": 177651,
+              "cached": 158544,
+              "output": 26377,
+              "usd_no_cache": 0.05124814,
+              "usd_cache": 0.03697918
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 37184,
+              "cached": 21248,
+              "output": 10417,
+              "usd_no_cache": 0.01562276,
+              "usd_cache": 0.013710439999999999
+            },
+            "verifier.fact_table": {
+              "calls": 4,
+              "input": 53611,
+              "cached": 42807,
+              "output": 10951,
+              "usd_no_cache": 0.01845654,
+              "usd_cache": 0.01460391
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 21904,
+              "cached": 19400,
+              "output": 8990,
+              "usd_no_cache": 0.012056560000000001,
+              "usd_cache": 0.01031056
+            }
+          },
+          "calls": 28,
+          "input": 415130,
+          "cached": 339176,
+          "output": 71617,
+          "usd_no_cache": 0.1297352,
+          "usd_cache": 0.09920936
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__hW5eqDD",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-57",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 197097,
+          "harbor_output": 46150,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9675,
+              "cached": 0,
+              "output": 2403,
+              "usd_no_cache": 0.0037574999999999996,
+              "usd_cache": 0.0037574999999999996
+            },
+            "solver": {
+              "calls": 8,
+              "input": 125891,
+              "cached": 100020,
+              "output": 23614,
+              "usd_no_cache": 0.041238739999999996,
+              "usd_cache": 0.03223694
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7339,
+              "cached": 1,
+              "output": 6415,
+              "usd_no_cache": 0.00744246,
+              "usd_cache": 0.007442369999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15524,
+              "cached": 13129,
+              "output": 4382,
+              "usd_no_cache": 0.00655536,
+              "usd_cache": 0.00537375
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 38668,
+              "cached": 28423,
+              "output": 9336,
+              "usd_no_cache": 0.014749519999999999,
+              "usd_cache": 0.01219145
+            }
+          },
+          "calls": 15,
+          "input": 197097,
+          "cached": 141573,
+          "output": 46150,
+          "usd_no_cache": 0.07374357999999999,
+          "usd_cache": 0.061002009999999995
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__hmgudYC",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-52",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 261007,
+          "harbor_output": 57804,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27709,
+              "cached": 9750,
+              "output": 9032,
+              "usd_no_cache": 0.01291126,
+              "usd_cache": 0.012033760000000001
+            },
+            "solver": {
+              "calls": 7,
+              "input": 122516,
+              "cached": 97901,
+              "output": 19314,
+              "usd_no_cache": 0.03646624,
+              "usd_cache": 0.027655149999999996
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 23249,
+              "cached": 7582,
+              "output": 9204,
+              "usd_no_cache": 0.01245886,
+              "usd_cache": 0.01177648
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 28397,
+              "cached": 22810,
+              "output": 9508,
+              "usd_no_cache": 0.013483579999999998,
+              "usd_cache": 0.011430679999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 59136,
+              "cached": 46509,
+              "output": 10746,
+              "usd_no_cache": 0.01902504,
+              "usd_cache": 0.01483923
+            }
+          },
+          "calls": 18,
+          "input": 261007,
+          "cached": 184552,
+          "output": 57804,
+          "usd_no_cache": 0.09434498,
+          "usd_cache": 0.0777353
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__iVoL8dr",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-12",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 197410,
+          "harbor_output": 53029,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9602,
+              "cached": 0,
+              "output": 5746,
+              "usd_no_cache": 0.007090279999999999,
+              "usd_cache": 0.007090279999999999
+            },
+            "solver": {
+              "calls": 9,
+              "input": 122073,
+              "cached": 102684,
+              "output": 24974,
+              "usd_no_cache": 0.04206422,
+              "usd_cache": 0.032822660000000003
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 6849,
+              "cached": 1,
+              "output": 4153,
+              "usd_no_cache": 0.005111859999999999,
+              "usd_cache": 0.00511177
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 21669,
+              "cached": 12342,
+              "output": 8796,
+              "usd_no_cache": 0.01182966,
+              "usd_cache": 0.01071888
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 37217,
+              "cached": 27144,
+              "output": 9360,
+              "usd_no_cache": 0.01457038,
+              "usd_cache": 0.01212742
+            }
+          },
+          "calls": 16,
+          "input": 197410,
+          "cached": 142171,
+          "output": 53029,
+          "usd_no_cache": 0.0806664,
+          "usd_cache": 0.06787101000000001
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__jCT4Zj9",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-8",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 433270,
+          "harbor_output": 71456,
+          "roles": {
+            "reader": {
+              "calls": 8,
+              "input": 202023,
+              "cached": 171020,
+              "output": 19278,
+              "usd_no_cache": 0.04756122,
+              "usd_cache": 0.032169420000000004
+            },
+            "solver": {
+              "calls": 8,
+              "input": 124584,
+              "cached": 108565,
+              "output": 22680,
+              "usd_no_cache": 0.04012176,
+              "usd_cache": 0.030350910000000002
+            },
+            "verifier.section_table": {
+              "calls": 4,
+              "input": 34825,
+              "cached": 24948,
+              "output": 9126,
+              "usd_no_cache": 0.0140015,
+              "usd_cache": 0.011756180000000001
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22201,
+              "cached": 12725,
+              "output": 9144,
+              "usd_no_cache": 0.01225214,
+              "usd_cache": 0.01110689
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 5,
+              "input": 49637,
+              "cached": 41434,
+              "output": 11228,
+              "usd_no_cache": 0.01817718,
+              "usd_cache": 0.01444812
+            }
+          },
+          "calls": 27,
+          "input": 433270,
+          "cached": 358692,
+          "output": 71456,
+          "usd_no_cache": 0.1321138,
+          "usd_cache": 0.09983152
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__jP4egp3",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-85",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 178580,
+          "harbor_output": 44183,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9607,
+              "cached": 0,
+              "output": 5319,
+              "usd_no_cache": 0.00666398,
+              "usd_cache": 0.00666398
+            },
+            "solver": {
+              "calls": 7,
+              "input": 115721,
+              "cached": 95971,
+              "output": 20384,
+              "usd_no_cache": 0.036584939999999996,
+              "usd_cache": 0.02794755
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22631,
+              "cached": 7267,
+              "output": 9300,
+              "usd_no_cache": 0.01246834,
+              "usd_cache": 0.01181431
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15352,
+              "cached": 12899,
+              "output": 5016,
+              "usd_no_cache": 0.0071652799999999996,
+              "usd_cache": 0.00600437
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15269,
+              "cached": 12863,
+              "output": 4164,
+              "usd_no_cache": 0.006301660000000001,
+              "usd_cache": 0.00514399
+            }
+          },
+          "calls": 14,
+          "input": 178580,
+          "cached": 129000,
+          "output": 44183,
+          "usd_no_cache": 0.0691842,
+          "usd_cache": 0.0575742
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__kQB4W2P",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-72",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 272136,
+          "harbor_output": 52323,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27552,
+              "cached": 9677,
+              "output": 9327,
+              "usd_no_cache": 0.01318428,
+              "usd_cache": 0.01231335
+            },
+            "solver": {
+              "calls": 10,
+              "input": 185076,
+              "cached": 158055,
+              "output": 22848,
+              "usd_no_cache": 0.048758640000000006,
+              "usd_cache": 0.03453369
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22437,
+              "cached": 7176,
+              "output": 9213,
+              "usd_no_cache": 0.01235418,
+              "usd_cache": 0.01170834
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7117,
+              "cached": 5719,
+              "output": 3457,
+              "usd_no_cache": 0.00445338,
+              "usd_cache": 0.00393867
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 29954,
+              "cached": 27597,
+              "output": 7478,
+              "usd_no_cache": 0.011671560000000001,
+              "usd_cache": 0.00918783
+            }
+          },
+          "calls": 19,
+          "input": 272136,
+          "cached": 208224,
+          "output": 52323,
+          "usd_no_cache": 0.09042204000000001,
+          "usd_cache": 0.07168188
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__kYME7KZ",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-37",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 495153,
+          "harbor_output": 77173,
+          "roles": {
+            "reader": {
+              "calls": 4,
+              "input": 108594,
+              "cached": 82354,
+              "output": 11360,
+              "usd_no_cache": 0.026563160000000002,
+              "usd_cache": 0.019151300000000003
+            },
+            "solver": {
+              "calls": 15,
+              "input": 305517,
+              "cached": 260807,
+              "output": 44830,
+              "usd_no_cache": 0.08760238000000001,
+              "usd_cache": 0.06412975
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 15630,
+              "cached": 7340,
+              "output": 6300,
+              "usd_no_cache": 0.0084882,
+              "usd_cache": 0.0078276
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15788,
+              "cached": 13144,
+              "output": 7210,
+              "usd_no_cache": 0.00942032,
+              "usd_cache": 0.008237359999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15759,
+              "cached": 13108,
+              "output": 6580,
+              "usd_no_cache": 0.00878626,
+              "usd_cache": 0.00760654
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 33865,
+              "cached": 32779,
+              "output": 893,
+              "usd_no_cache": 0.0056341,
+              "usd_cache": 0.00268399
+            }
+          },
+          "calls": 26,
+          "input": 495153,
+          "cached": 409532,
+          "output": 77173,
+          "usd_no_cache": 0.14649442000000001,
+          "usd_cache": 0.10963654
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__mCNFVCq",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-35",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 145639,
+          "harbor_output": 46438,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9759,
+              "cached": 0,
+              "output": 7877,
+              "usd_no_cache": 0.00924326,
+              "usd_cache": 0.00924326
+            },
+            "solver": {
+              "calls": 6,
+              "input": 88911,
+              "cached": 70761,
+              "output": 21581,
+              "usd_no_cache": 0.034028539999999996,
+              "usd_cache": 0.02766005
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7403,
+              "cached": 1,
+              "output": 3497,
+              "usd_no_cache": 0.00453342,
+              "usd_cache": 0.0045333299999999995
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7345,
+              "cached": 5844,
+              "output": 4711,
+              "usd_no_cache": 0.0057393,
+              "usd_cache": 0.00521334
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 32221,
+              "cached": 28242,
+              "output": 8772,
+              "usd_no_cache": 0.01328294,
+              "usd_cache": 0.01074116
+            }
+          },
+          "calls": 13,
+          "input": 145639,
+          "cached": 104848,
+          "output": 46438,
+          "usd_no_cache": 0.06682745999999999,
+          "usd_cache": 0.05739114
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__nF6jQib",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-62",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 172230,
+          "harbor_output": 56758,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9675,
+              "cached": 0,
+              "output": 6156,
+              "usd_no_cache": 0.0075105,
+              "usd_cache": 0.0075105
+            },
+            "solver": {
+              "calls": 6,
+              "input": 88763,
+              "cached": 68485,
+              "output": 24524,
+              "usd_no_cache": 0.036950819999999995,
+              "usd_cache": 0.030787169999999996
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7526,
+              "cached": 1,
+              "output": 6466,
+              "usd_no_cache": 0.007519639999999999,
+              "usd_cache": 0.00751955
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 40093,
+              "cached": 28860,
+              "output": 10887,
+              "usd_no_cache": 0.01650002,
+              "usd_cache": 0.01390262
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 26173,
+              "cached": 21462,
+              "output": 8725,
+              "usd_no_cache": 0.01238922,
+              "usd_cache": 0.01045764
+            }
+          },
+          "calls": 14,
+          "input": 172230,
+          "cached": 118808,
+          "output": 56758,
+          "usd_no_cache": 0.08087019999999999,
+          "usd_cache": 0.07017748
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__nME7Aze",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-100",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 381118,
+          "harbor_output": 75022,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27704,
+              "cached": 9753,
+              "output": 9162,
+              "usd_no_cache": 0.01304056,
+              "usd_cache": 0.01216279
+            },
+            "solver": {
+              "calls": 12,
+              "input": 231669,
+              "cached": 195140,
+              "output": 32142,
+              "usd_no_cache": 0.06457566000000001,
+              "usd_cache": 0.047013059999999995
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 16244,
+              "cached": 7495,
+              "output": 6234,
+              "usd_no_cache": 0.00850816,
+              "usd_cache": 0.00783361
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 39910,
+              "cached": 28874,
+              "output": 10455,
+              "usd_no_cache": 0.0160424,
+              "usd_cache": 0.01344374
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 33143,
+              "cached": 28742,
+              "output": 16000,
+              "usd_no_cache": 0.020640020000000002,
+              "usd_cache": 0.01805324
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 32448,
+              "cached": 29735,
+              "output": 1029,
+              "usd_no_cache": 0.0055717200000000005,
+              "usd_cache": 0.00289557
+            }
+          },
+          "calls": 24,
+          "input": 381118,
+          "cached": 299739,
+          "output": 75022,
+          "usd_no_cache": 0.12837852,
+          "usd_cache": 0.10140201
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__oZ3ntt7",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-39",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 211842,
+          "harbor_output": 63185,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9753,
+              "cached": 0,
+              "output": 2528,
+              "usd_no_cache": 0.00389342,
+              "usd_cache": 0.00389342
+            },
+            "solver": {
+              "calls": 8,
+              "input": 113982,
+              "cached": 92045,
+              "output": 32806,
+              "usd_no_cache": 0.04876348,
+              "usd_cache": 0.040479430000000004
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 15335,
+              "cached": 7250,
+              "output": 7365,
+              "usd_no_cache": 0.0095119,
+              "usd_cache": 0.0088594
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 38496,
+              "cached": 28271,
+              "output": 9224,
+              "usd_no_cache": 0.01461344,
+              "usd_cache": 0.01206905
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 34276,
+              "cached": 28942,
+              "output": 11262,
+              "usd_no_cache": 0.01606064,
+              "usd_cache": 0.01345586
+            }
+          },
+          "calls": 18,
+          "input": 211842,
+          "cached": 156508,
+          "output": 63185,
+          "usd_no_cache": 0.09284288,
+          "usd_cache": 0.07875716
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__pDafvYc",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-16",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 208077,
+          "harbor_output": 54902,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27708,
+              "cached": 9755,
+              "output": 9127,
+              "usd_no_cache": 0.01300612,
+              "usd_cache": 0.01212817
+            },
+            "solver": {
+              "calls": 7,
+              "input": 132722,
+              "cached": 105426,
+              "output": 25442,
+              "usd_no_cache": 0.04402308,
+              "usd_cache": 0.03453474
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 23629,
+              "cached": 7772,
+              "output": 8992,
+              "usd_no_cache": 0.01230006,
+              "usd_cache": 0.01160058
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 16344,
+              "cached": 13681,
+              "output": 6241,
+              "usd_no_cache": 0.008529160000000001,
+              "usd_cache": 0.00729787
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 7674,
+              "cached": 5972,
+              "output": 5100,
+              "usd_no_cache": 0.006174359999999999,
+              "usd_cache": 0.0056368799999999995
+            }
+          },
+          "calls": 14,
+          "input": 208077,
+          "cached": 142606,
+          "output": 54902,
+          "usd_no_cache": 0.08403278,
+          "usd_cache": 0.07119824
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__qeRvsfW",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-25",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 191587,
+          "harbor_output": 52586,
+          "roles": {
+            "reader": {
+              "calls": 4,
+              "input": 70611,
+              "cached": 43905,
+              "output": 13532,
+              "usd_no_cache": 0.02341754,
+              "usd_cache": 0.01946609
+            },
+            "solver": {
+              "calls": 6,
+              "input": 76233,
+              "cached": 63083,
+              "output": 15589,
+              "usd_no_cache": 0.02626162,
+              "usd_cache": 0.02058415
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7248,
+              "cached": 1,
+              "output": 7758,
+              "usd_no_cache": 0.00877272,
+              "usd_cache": 0.00877263
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 22467,
+              "cached": 12891,
+              "output": 8847,
+              "usd_no_cache": 0.011992379999999999,
+              "usd_cache": 0.010832189999999998
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15028,
+              "cached": 12855,
+              "output": 6860,
+              "usd_no_cache": 0.00896392,
+              "usd_cache": 0.00780697
+            }
+          },
+          "calls": 15,
+          "input": 191587,
+          "cached": 132735,
+          "output": 52586,
+          "usd_no_cache": 0.07940818,
+          "usd_cache": 0.06746202999999999
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__rQmmWqK",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-59",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 159535,
+          "harbor_output": 47363,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9756,
+              "cached": 0,
+              "output": 1730,
+              "usd_no_cache": 0.00309584,
+              "usd_cache": 0.00309584
+            },
+            "solver": {
+              "calls": 6,
+              "input": 84977,
+              "cached": 65322,
+              "output": 22566,
+              "usd_no_cache": 0.03446278,
+              "usd_cache": 0.0285838
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 27919,
+              "cached": 15342,
+              "output": 9148,
+              "usd_no_cache": 0.013056660000000001,
+              "usd_cache": 0.01167588
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14872,
+              "cached": 12681,
+              "output": 5112,
+              "usd_no_cache": 0.007194079999999999,
+              "usd_cache": 0.00605279
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 22011,
+              "cached": 12644,
+              "output": 8807,
+              "usd_no_cache": 0.01188854,
+              "usd_cache": 0.01075058
+            }
+          },
+          "calls": 14,
+          "input": 159535,
+          "cached": 105989,
+          "output": 47363,
+          "usd_no_cache": 0.0696979,
+          "usd_cache": 0.06015889
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__sDbbzrB",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-14",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 153996,
+          "harbor_output": 45220,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27416,
+              "cached": 9603,
+              "output": 9438,
+              "usd_no_cache": 0.01327624,
+              "usd_cache": 0.012411970000000001
+            },
+            "solver": {
+              "calls": 7,
+              "input": 91316,
+              "cached": 77329,
+              "output": 19546,
+              "usd_no_cache": 0.032330239999999996,
+              "usd_cache": 0.025370629999999998
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21753,
+              "cached": 6834,
+              "output": 9415,
+              "usd_no_cache": 0.01246042,
+              "usd_cache": 0.01184536
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6775,
+              "cached": 5556,
+              "output": 3385,
+              "usd_no_cache": 0.0043335,
+              "usd_cache": 0.00383346
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6736,
+              "cached": 5558,
+              "output": 3436,
+              "usd_no_cache": 0.00437904,
+              "usd_cache": 0.00387882
+            }
+          },
+          "calls": 13,
+          "input": 153996,
+          "cached": 104880,
+          "output": 45220,
+          "usd_no_cache": 0.06677944,
+          "usd_cache": 0.05734024
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__so5Rt8r",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-86",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 263743,
+          "harbor_output": 58136,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27702,
+              "cached": 9752,
+              "output": 9462,
+              "usd_no_cache": 0.01334028,
+              "usd_cache": 0.0124626
+            },
+            "solver": {
+              "calls": 8,
+              "input": 158268,
+              "cached": 130235,
+              "output": 29101,
+              "usd_no_cache": 0.05125852,
+              "usd_cache": 0.03953737
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7311,
+              "cached": 1,
+              "output": 4282,
+              "usd_no_cache": 0.00530554,
+              "usd_cache": 0.00530545
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15555,
+              "cached": 13079,
+              "output": 5954,
+              "usd_no_cache": 0.0081317,
+              "usd_cache": 0.00695459
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 4,
+              "input": 54907,
+              "cached": 44405,
+              "output": 9337,
+              "usd_no_cache": 0.01702398,
+              "usd_cache": 0.013027529999999999
+            }
+          },
+          "calls": 17,
+          "input": 263743,
+          "cached": 197472,
+          "output": 58136,
+          "usd_no_cache": 0.09506002000000001,
+          "usd_cache": 0.07728754
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__t8eb7pz",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-21",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 204539,
+          "harbor_output": 62791,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 27404,
+              "cached": 9603,
+              "output": 9541,
+              "usd_no_cache": 0.01337756,
+              "usd_cache": 0.01251329
+            },
+            "solver": {
+              "calls": 9,
+              "input": 149224,
+              "cached": 128088,
+              "output": 41042,
+              "usd_no_cache": 0.06193335999999999,
+              "usd_cache": 0.050405439999999996
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 6757,
+              "cached": 1,
+              "output": 3470,
+              "usd_no_cache": 0.00441598,
+              "usd_cache": 0.0044158900000000004
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6699,
+              "cached": 5489,
+              "output": 2722,
+              "usd_no_cache": 0.00365986,
+              "usd_cache": 0.00316585
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 14455,
+              "cached": 12151,
+              "output": 6016,
+              "usd_no_cache": 0.0080397,
+              "usd_cache": 0.00694611
+            }
+          },
+          "calls": 15,
+          "input": 204539,
+          "cached": 155332,
+          "output": 62791,
+          "usd_no_cache": 0.09142645999999999,
+          "usd_cache": 0.07744658
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__t9EjhbT",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-56",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 297546,
+          "harbor_output": 69354,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9750,
+              "cached": 0,
+              "output": 5980,
+              "usd_no_cache": 0.007345,
+              "usd_cache": 0.007345
+            },
+            "solver": {
+              "calls": 11,
+              "input": 210897,
+              "cached": 181973,
+              "output": 36948,
+              "usd_no_cache": 0.06647358,
+              "usd_cache": 0.05009601
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22751,
+              "cached": 7333,
+              "output": 8959,
+              "usd_no_cache": 0.012144140000000001,
+              "usd_cache": 0.01148417
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15551,
+              "cached": 13121,
+              "output": 7759,
+              "usd_no_cache": 0.00993614,
+              "usd_cache": 0.00875525
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 38597,
+              "cached": 28408,
+              "output": 9708,
+              "usd_no_cache": 0.01511158,
+              "usd_cache": 0.01255486
+            }
+          },
+          "calls": 19,
+          "input": 297546,
+          "cached": 230835,
+          "output": 69354,
+          "usd_no_cache": 0.11101044,
+          "usd_cache": 0.09023529
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__wGUBrj5",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-99",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 318114,
+          "harbor_output": 50243,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9752,
+              "cached": 0,
+              "output": 1810,
+              "usd_no_cache": 0.00317528,
+              "usd_cache": 0.00317528
+            },
+            "solver": {
+              "calls": 14,
+              "input": 231217,
+              "cached": 210058,
+              "output": 24158,
+              "usd_no_cache": 0.05652838,
+              "usd_cache": 0.03762316
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22510,
+              "cached": 7213,
+              "output": 9356,
+              "usd_no_cache": 0.0125074,
+              "usd_cache": 0.01185823
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 39476,
+              "cached": 28146,
+              "output": 11382,
+              "usd_no_cache": 0.01690864,
+              "usd_cache": 0.0143755
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15159,
+              "cached": 12869,
+              "output": 3537,
+              "usd_no_cache": 0.005659259999999999,
+              "usd_cache": 0.0045010499999999995
+            }
+          },
+          "calls": 22,
+          "input": 318114,
+          "cached": 258286,
+          "output": 50243,
+          "usd_no_cache": 0.09477896,
+          "usd_cache": 0.07153322000000001
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__xVRDviC",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-73",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 307459,
+          "harbor_output": 83407,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9683,
+              "cached": 0,
+              "output": 6025,
+              "usd_no_cache": 0.00738062,
+              "usd_cache": 0.00738062
+            },
+            "solver": {
+              "calls": 14,
+              "input": 246361,
+              "cached": 221216,
+              "output": 48286,
+              "usd_no_cache": 0.08277654,
+              "usd_cache": 0.0628671
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 22280,
+              "cached": 7097,
+              "output": 8668,
+              "usd_no_cache": 0.011787200000000001,
+              "usd_cache": 0.01114847
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 7038,
+              "cached": 5756,
+              "output": 4428,
+              "usd_no_cache": 0.005413319999999999,
+              "usd_cache": 0.00489528
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 22097,
+              "cached": 12758,
+              "output": 16000,
+              "usd_no_cache": 0.01909358,
+              "usd_cache": 0.01794536
+            }
+          },
+          "calls": 20,
+          "input": 307459,
+          "cached": 246827,
+          "output": 83407,
+          "usd_no_cache": 0.12645125999999998,
+          "usd_cache": 0.10423683
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__yaFhxe5",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-12",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 249514,
+          "harbor_output": 60287,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9678,
+              "cached": 0,
+              "output": 1509,
+              "usd_no_cache": 0.00286392,
+              "usd_cache": 0.00286392
+            },
+            "solver": {
+              "calls": 9,
+              "input": 173348,
+              "cached": 145876,
+              "output": 35005,
+              "usd_no_cache": 0.05927372,
+              "usd_cache": 0.04614488
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 23187,
+              "cached": 7551,
+              "output": 8825,
+              "usd_no_cache": 0.01207118,
+              "usd_cache": 0.01139159
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 27301,
+              "cached": 22202,
+              "output": 9381,
+              "usd_no_cache": 0.013203139999999999,
+              "usd_cache": 0.01120496
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 16000,
+              "cached": 13273,
+              "output": 5567,
+              "usd_no_cache": 0.007807,
+              "usd_cache": 0.00661243
+            }
+          },
+          "calls": 17,
+          "input": 249514,
+          "cached": 188902,
+          "output": 60287,
+          "usd_no_cache": 0.09521896,
+          "usd_cache": 0.07821778
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__ydEFJrV",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-1-airline-cases-88",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 212399,
+          "harbor_output": 47907,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9679,
+              "cached": 0,
+              "output": 1766,
+              "usd_no_cache": 0.00312106,
+              "usd_cache": 0.00312106
+            },
+            "solver": {
+              "calls": 12,
+              "input": 161612,
+              "cached": 144288,
+              "output": 24819,
+              "usd_no_cache": 0.04744468,
+              "usd_cache": 0.03445876
+            },
+            "verifier.section_table": {
+              "calls": 3,
+              "input": 27405,
+              "cached": 15165,
+              "output": 8955,
+              "usd_no_cache": 0.0127917,
+              "usd_cache": 0.011426849999999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6871,
+              "cached": 5708,
+              "output": 7922,
+              "usd_no_cache": 0.00888394,
+              "usd_cache": 0.008370220000000001
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 6832,
+              "cached": 5711,
+              "output": 4445,
+              "usd_no_cache": 0.00540148,
+              "usd_cache": 0.00488749
+            }
+          },
+          "calls": 18,
+          "input": 212399,
+          "cached": 170872,
+          "output": 47907,
+          "usd_no_cache": 0.07764286000000001,
+          "usd_cache": 0.06226438
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__ytQzijA",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-46",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 242023,
+          "harbor_output": 60397,
+          "roles": {
+            "reader": {
+              "calls": 4,
+              "input": 73897,
+              "cached": 46622,
+              "output": 14578,
+              "usd_no_cache": 0.02492358,
+              "usd_cache": 0.0207276
+            },
+            "solver": {
+              "calls": 6,
+              "input": 98835,
+              "cached": 77742,
+              "output": 24702,
+              "usd_no_cache": 0.0385389,
+              "usd_cache": 0.03154212
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 7454,
+              "cached": 1,
+              "output": 5121,
+              "usd_no_cache": 0.0061645599999999995,
+              "usd_cache": 0.00616447
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 39210,
+              "cached": 28713,
+              "output": 9474,
+              "usd_no_cache": 0.0149634,
+              "usd_cache": 0.01237923
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 22627,
+              "cached": 20728,
+              "output": 6522,
+              "usd_no_cache": 0.00968978,
+              "usd_cache": 0.00782426
+            }
+          },
+          "calls": 17,
+          "input": 242023,
+          "cached": 173806,
+          "output": 60397,
+          "usd_no_cache": 0.09428022,
+          "usd_cache": 0.07863768
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__zNipmoH",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-0-airline-cases-2",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 148727,
+          "harbor_output": 35471,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9605,
+              "cached": 0,
+              "output": 3010,
+              "usd_no_cache": 0.0043546999999999995,
+              "usd_cache": 0.0043546999999999995
+            },
+            "solver": {
+              "calls": 6,
+              "input": 88505,
+              "cached": 72436,
+              "output": 12792,
+              "usd_no_cache": 0.025182700000000002,
+              "usd_cache": 0.01866346
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 21965,
+              "cached": 6940,
+              "output": 9077,
+              "usd_no_cache": 0.0121521,
+              "usd_cache": 0.0115275
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 6881,
+              "cached": 5584,
+              "output": 1617,
+              "usd_no_cache": 0.00258034,
+              "usd_cache": 0.00207778
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 21771,
+              "cached": 12429,
+              "output": 8975,
+              "usd_no_cache": 0.012022940000000001,
+              "usd_cache": 0.01090433
+            }
+          },
+          "calls": 12,
+          "input": 148727,
+          "cached": 97389,
+          "output": 35471,
+          "usd_no_cache": 0.05629278,
+          "usd_cache": 0.04752777
+        },
+        {
+          "trial": "deonticbench-direct-airline-airl__zhzGqGN",
+          "task": "deonticbench-direct-airline-airline-cases-complexity-2-airline-cases-66",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 402848,
+          "harbor_output": 84722,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 9756,
+              "cached": 0,
+              "output": 2276,
+              "usd_no_cache": 0.00364184,
+              "usd_cache": 0.00364184
+            },
+            "solver": {
+              "calls": 14,
+              "input": 283607,
+              "cached": 241978,
+              "output": 57075,
+              "usd_no_cache": 0.09677998,
+              "usd_cache": 0.07500196
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 15466,
+              "cached": 7192,
+              "output": 6890,
+              "usd_no_cache": 0.009055239999999999,
+              "usd_cache": 0.008407959999999999
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 39275,
+              "cached": 28022,
+              "output": 11018,
+              "usd_no_cache": 0.0165165,
+              "usd_cache": 0.01399452
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 21679,
+              "cached": 19970,
+              "output": 6831,
+              "usd_no_cache": 0.00986606,
+              "usd_cache": 0.00806876
+            },
+            "compaction": {
+              "calls": 1,
+              "input": 33065,
+              "cached": 30733,
+              "output": 632,
+              "usd_no_cache": 0.0052611,
+              "usd_cache": 0.00249513
+            }
+          },
+          "calls": 24,
+          "input": 402848,
+          "cached": 327895,
+          "output": 84722,
+          "usd_no_cache": 0.14112072,
+          "usd_cache": 0.11161017000000001
+        }
+      ]
+    }
+  ]
+}

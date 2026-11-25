@@ -49,7 +49,7 @@ deontic-reasoning-with-harness/
 │   │                                SERVED_NAME, MAX_NUM_SEQS and LOG serve another local model
 │   │                                (Qwen3.8-27B, 2026-11-17, 06)
 │   ├── run_dar_qwen35_35b.sh        launch a DAR run against that server; AGENT=t2|t2fix|t2verify{,2,3}|t2rv|t2rvc|t2sc|t2srvc|kirasrvc|kira,
-│   │                                SUBSET=sara|numeric|binary|all, MODEL=<served name>; writes
+│   │                                SUBSET=sara|numeric|binary|airline|uscis|all, MODEL=<served name>; writes
 │   │                                harbor-deonticbench/jobs/<MODEL>/...
 │   ├── dar_terminus2_local.py       Terminus2 subclass with a truthful truncation marker
 │   │                                (AGENT=t2fix): same 10 KB limit, idempotent limiter
@@ -153,6 +153,7 @@ deontic-reasoning-with-harness/
 │   │                            outputs/srvc_run1_{numeric,binary}_inference_cost.json and
 │   │                            outputs/kirasrvc_smoke2_inference_cost.json (11 §10, §11);
 │   │                            outputs/kirasrvc_run1_{numeric,binary}_inference_cost.json (11 §11.1);
+│   │                            outputs/srvc_{airline,uscis}_run1_inference_cost.json (11 §12.2);
 │   │                            outputs/sc_run1_numeric_qwen38_27b_inference_cost.json (both models,
 │   │                            Qwen3.5 card) and ..._own_card.json (Qwen3.8-27B price) (10 §7.3);
 │   │                            outputs/db_direct_qwen35_inference_cost.json from db_direct_cost.py (10 §7.4)

@@ -1,0 +1,1765 @@
+{
+  "price_usd_per_token": {
+    "input": 1.4e-07,
+    "output": 1e-06,
+    "cache_read": 5.0000000000000004e-08
+  },
+  "jobs": [
+    {
+      "job": "jobs/qwen3.5-35b-a3b/t2srvc-direct/srvc-uscis-run1",
+      "n_trials": 28,
+      "accuracy": 0.6071428571428571,
+      "n_correct": 17.0,
+      "exceptions": 0,
+      "budget_exhausted": 0,
+      "cut_off_calls": 38,
+      "unknown_calls": 0,
+      "source": [
+        "ledger"
+      ],
+      "totals_differ_from_harbor": 0,
+      "mean": {
+        "calls": 11.678571428571429,
+        "input": 74487.35714285714,
+        "cached": 47024.25,
+        "output": 28213.285714285714,
+        "usd_no_cache": 0.038641515714285715,
+        "usd_cache": 0.034409333214285714
+      },
+      "usd_no_cache": {
+        "median": 0.03754866,
+        "p95": 0.058284239999999994,
+        "max": 0.05858512
+      },
+      "usd_cache": {
+        "median": 0.03319971,
+        "p95": 0.05363394,
+        "max": 0.053766339999999996
+      },
+      "roles": {
+        "reader": {
+          "calls": 32,
+          "input": 185571,
+          "cached": 26544,
+          "output": 50089,
+          "usd_no_cache": 0.07606893999999997,
+          "usd_cache": 0.07367997999999998
+        },
+        "solver": {
+          "calls": 169,
+          "input": 1207953,
+          "cached": 1031467,
+          "output": 234244,
+          "usd_no_cache": 0.40335741999999997,
+          "usd_cache": 0.31052539
+        },
+        "verifier.section_table": {
+          "calls": 41,
+          "input": 214035,
+          "cached": 39815,
+          "output": 147807,
+          "usd_no_cache": 0.1777719,
+          "usd_cache": 0.17418854999999994
+        },
+        "verifier.fact_table": {
+          "calls": 49,
+          "input": 306111,
+          "cached": 136590,
+          "output": 189633,
+          "usd_no_cache": 0.23248854000000002,
+          "usd_cache": 0.22019544000000008
+        },
+        "verifier.grounded_reasoning": {
+          "calls": 36,
+          "input": 171976,
+          "cached": 82263,
+          "output": 168199,
+          "usd_no_cache": 0.19227563999999997,
+          "usd_cache": 0.18487197
+        }
+      },
+      "trials": [
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__4qrbRah",
+          "task": "deonticbench-direct-uscis-aao-uscis-3ea42a14",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 133902,
+          "harbor_output": 38305,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5373,
+              "cached": 0,
+              "output": 2245,
+              "usd_no_cache": 0.00299722,
+              "usd_cache": 0.00299722
+            },
+            "solver": {
+              "calls": 7,
+              "input": 70250,
+              "cached": 59439,
+              "output": 8989,
+              "usd_no_cache": 0.018824,
+              "usd_cache": 0.013474489999999999
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 15387,
+              "cached": 3651,
+              "output": 8541,
+              "usd_no_cache": 0.01069518,
+              "usd_cache": 0.01036659
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 15271,
+              "cached": 5484,
+              "output": 9171,
+              "usd_no_cache": 0.01130894,
+              "usd_cache": 0.010815380000000001
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 3,
+              "input": 27621,
+              "cached": 17086,
+              "output": 9359,
+              "usd_no_cache": 0.013225939999999999,
+              "usd_cache": 0.0116882
+            }
+          },
+          "calls": 15,
+          "input": 133902,
+          "cached": 85660,
+          "output": 38305,
+          "usd_no_cache": 0.057051279999999996,
+          "usd_cache": 0.04934188
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__4yzfNJy",
+          "task": "deonticbench-direct-uscis-aao-uscis-0f7acbb7",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 57900,
+          "harbor_output": 38339,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5394,
+              "cached": 0,
+              "output": 844,
+              "usd_no_cache": 0.00159916,
+              "usd_cache": 0.00159916
+            },
+            "solver": {
+              "calls": 6,
+              "input": 32630,
+              "cached": 28991,
+              "output": 20283,
+              "usd_no_cache": 0.0248512,
+              "usd_cache": 0.02224201
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14059,
+              "cached": 2987,
+              "output": 8365,
+              "usd_no_cache": 0.01033326,
+              "usd_cache": 0.01006443
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 2928,
+              "cached": 1831,
+              "output": 2595,
+              "usd_no_cache": 0.0030049200000000003,
+              "usd_cache": 0.00284013
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2889,
+              "cached": 1834,
+              "output": 6252,
+              "usd_no_cache": 0.0066564599999999995,
+              "usd_cache": 0.0064914
+            }
+          },
+          "calls": 11,
+          "input": 57900,
+          "cached": 35643,
+          "output": 38339,
+          "usd_no_cache": 0.046445,
+          "usd_cache": 0.04323713
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__5GDZUM7",
+          "task": "deonticbench-direct-uscis-aao-uscis-b299cdcf",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 4,
+          "unknown_calls": 0,
+          "harbor_input": 88303,
+          "harbor_output": 43451,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 17866,
+              "cached": 4828,
+              "output": 8269,
+              "usd_no_cache": 0.01077024,
+              "usd_cache": 0.01033572
+            },
+            "solver": {
+              "calls": 6,
+              "input": 32826,
+              "cached": 27590,
+              "output": 9365,
+              "usd_no_cache": 0.01396064,
+              "usd_cache": 0.01147754
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 12636,
+              "cached": 2276,
+              "output": 8300,
+              "usd_no_cache": 0.01006904,
+              "usd_cache": 0.0098642
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 12532,
+              "cached": 3632,
+              "output": 8799,
+              "usd_no_cache": 0.01055348,
+              "usd_cache": 0.010226599999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 12443,
+              "cached": 3596,
+              "output": 8718,
+              "usd_no_cache": 0.01046002,
+              "usd_cache": 0.01013638
+            }
+          },
+          "calls": 14,
+          "input": 88303,
+          "cached": 41922,
+          "output": 43451,
+          "usd_no_cache": 0.05581342,
+          "usd_cache": 0.05204044
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__9XoNGCi",
+          "task": "deonticbench-direct-uscis-aao-uscis-f067f697",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 91658,
+          "harbor_output": 25567,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5749,
+              "cached": 0,
+              "output": 1281,
+              "usd_no_cache": 0.00208586,
+              "usd_cache": 0.00208586
+            },
+            "solver": {
+              "calls": 7,
+              "input": 53002,
+              "cached": 46937,
+              "output": 5817,
+              "usd_no_cache": 0.01323728,
+              "usd_cache": 0.00901295
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14867,
+              "cached": 3390,
+              "output": 8515,
+              "usd_no_cache": 0.01059638,
+              "usd_cache": 0.01029128
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14748,
+              "cached": 5598,
+              "output": 8561,
+              "usd_no_cache": 0.01062572,
+              "usd_cache": 0.0101219
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 3292,
+              "cached": 2269,
+              "output": 1393,
+              "usd_no_cache": 0.00185388,
+              "usd_cache": 0.00164967
+            }
+          },
+          "calls": 13,
+          "input": 91658,
+          "cached": 58194,
+          "output": 25567,
+          "usd_no_cache": 0.03839912,
+          "usd_cache": 0.03316166
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__ADRKBg8",
+          "task": "deonticbench-direct-uscis-aao-uscis-0ce54e09",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 79050,
+          "harbor_output": 34380,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5386,
+              "cached": 0,
+              "output": 1112,
+              "usd_no_cache": 0.00186604,
+              "usd_cache": 0.00186604
+            },
+            "solver": {
+              "calls": 6,
+              "input": 41531,
+              "cached": 35843,
+              "output": 10856,
+              "usd_no_cache": 0.01667034,
+              "usd_cache": 0.01344447
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14551,
+              "cached": 3233,
+              "output": 8348,
+              "usd_no_cache": 0.01038514,
+              "usd_cache": 0.01009417
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14447,
+              "cached": 5132,
+              "output": 8673,
+              "usd_no_cache": 0.01069558,
+              "usd_cache": 0.0102337
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 3135,
+              "cached": 1959,
+              "output": 5391,
+              "usd_no_cache": 0.0058299,
+              "usd_cache": 0.00565359
+            }
+          },
+          "calls": 12,
+          "input": 79050,
+          "cached": 46167,
+          "output": 34380,
+          "usd_no_cache": 0.045446999999999994,
+          "usd_cache": 0.04129197
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__D7eeKnz",
+          "task": "deonticbench-direct-uscis-aao-uscis-979c1db1",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 92108,
+          "harbor_output": 45690,
+          "roles": {
+            "reader": {
+              "calls": 3,
+              "input": 25933,
+              "cached": 16597,
+              "output": 3243,
+              "usd_no_cache": 0.00687362,
+              "usd_cache": 0.00537989
+            },
+            "solver": {
+              "calls": 5,
+              "input": 33374,
+              "cached": 26394,
+              "output": 22846,
+              "usd_no_cache": 0.02751836,
+              "usd_cache": 0.0251429
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14823,
+              "cached": 3369,
+              "output": 8445,
+              "usd_no_cache": 0.01052022,
+              "usd_cache": 0.010217009999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14707,
+              "cached": 5246,
+              "output": 8851,
+              "usd_no_cache": 0.01090998,
+              "usd_cache": 0.01043784
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 3271,
+              "cached": 1936,
+              "output": 2305,
+              "usd_no_cache": 0.0027629399999999998,
+              "usd_cache": 0.0025886999999999998
+            }
+          },
+          "calls": 13,
+          "input": 92108,
+          "cached": 53542,
+          "output": 45690,
+          "usd_no_cache": 0.05858512,
+          "usd_cache": 0.053766339999999996
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__H5s7dLa",
+          "task": "deonticbench-direct-uscis-aao-uscis-11c5b710",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 85270,
+          "harbor_output": 25605,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5067,
+              "cached": 0,
+              "output": 867,
+              "usd_no_cache": 0.00157638,
+              "usd_cache": 0.00157638
+            },
+            "solver": {
+              "calls": 7,
+              "input": 49767,
+              "cached": 42058,
+              "output": 5876,
+              "usd_no_cache": 0.012843380000000001,
+              "usd_cache": 0.009058159999999999
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2608,
+              "cached": 1,
+              "output": 1664,
+              "usd_no_cache": 0.0020291199999999997,
+              "usd_cache": 0.00202903
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 25317,
+              "cached": 14773,
+              "output": 10831,
+              "usd_no_cache": 0.01437538,
+              "usd_cache": 0.013045810000000001
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2511,
+              "cached": 1587,
+              "output": 6367,
+              "usd_no_cache": 0.006718539999999999,
+              "usd_cache": 0.006575709999999999
+            }
+          },
+          "calls": 13,
+          "input": 85270,
+          "cached": 58419,
+          "output": 25605,
+          "usd_no_cache": 0.0375428,
+          "usd_cache": 0.03228509
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__JXcabWa",
+          "task": "deonticbench-direct-uscis-aao-uscis-e3f48ef6",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 72640,
+          "harbor_output": 15731,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5067,
+              "cached": 0,
+              "output": 1807,
+              "usd_no_cache": 0.00251638,
+              "usd_cache": 0.00251638
+            },
+            "solver": {
+              "calls": 8,
+              "input": 58818,
+              "cached": 53061,
+              "output": 4214,
+              "usd_no_cache": 0.012448520000000001,
+              "usd_cache": 0.00767303
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2970,
+              "cached": 1,
+              "output": 1538,
+              "usd_no_cache": 0.0019538,
+              "usd_cache": 0.00195371
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 2912,
+              "cached": 1656,
+              "output": 1405,
+              "usd_no_cache": 0.00181268,
+              "usd_cache": 0.00166364
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2873,
+              "cached": 1658,
+              "output": 6767,
+              "usd_no_cache": 0.00716922,
+              "usd_cache": 0.007019999999999999
+            }
+          },
+          "calls": 12,
+          "input": 72640,
+          "cached": 56376,
+          "output": 15731,
+          "usd_no_cache": 0.0259006,
+          "usd_cache": 0.02082676
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__Kmq5mnm",
+          "task": "deonticbench-direct-uscis-aao-uscis-cbcadc1b",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 90277,
+          "harbor_output": 35427,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5123,
+              "cached": 0,
+              "output": 953,
+              "usd_no_cache": 0.00167022,
+              "usd_cache": 0.00167022
+            },
+            "solver": {
+              "calls": 9,
+              "input": 66160,
+              "cached": 57328,
+              "output": 16588,
+              "usd_no_cache": 0.0258504,
+              "usd_cache": 0.02069088
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2780,
+              "cached": 1,
+              "output": 1225,
+              "usd_no_cache": 0.0016142,
+              "usd_cache": 0.00161411
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 13531,
+              "cached": 4360,
+              "output": 9479,
+              "usd_no_cache": 0.01137334,
+              "usd_cache": 0.01098094
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2683,
+              "cached": 1639,
+              "output": 7182,
+              "usd_no_cache": 0.00755762,
+              "usd_cache": 0.00741011
+            }
+          },
+          "calls": 14,
+          "input": 90277,
+          "cached": 63328,
+          "output": 35427,
+          "usd_no_cache": 0.048065779999999995,
+          "usd_cache": 0.042366259999999996
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__LaT4MkL",
+          "task": "deonticbench-direct-uscis-aao-uscis-0d94f1cb",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 54434,
+          "harbor_output": 28569,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 4766,
+              "cached": 0,
+              "output": 2322,
+              "usd_no_cache": 0.0029892399999999998,
+              "usd_cache": 0.0029892399999999998
+            },
+            "solver": {
+              "calls": 6,
+              "input": 32424,
+              "cached": 28730,
+              "output": 8813,
+              "usd_no_cache": 0.01335236,
+              "usd_cache": 0.01076666
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 12743,
+              "cached": 2329,
+              "output": 8257,
+              "usd_no_cache": 0.010041020000000001,
+              "usd_cache": 0.00983141
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 2270,
+              "cached": 1299,
+              "output": 2283,
+              "usd_no_cache": 0.0026008,
+              "usd_cache": 0.00248389
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2231,
+              "cached": 1300,
+              "output": 6894,
+              "usd_no_cache": 0.00720634,
+              "usd_cache": 0.0070893399999999995
+            }
+          },
+          "calls": 11,
+          "input": 54434,
+          "cached": 33658,
+          "output": 28569,
+          "usd_no_cache": 0.03618976,
+          "usd_cache": 0.03316054
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__M7y2fA4",
+          "task": "deonticbench-direct-uscis-aao-uscis-054bb9c0",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 58606,
+          "harbor_output": 10487,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5273,
+              "cached": 0,
+              "output": 1980,
+              "usd_no_cache": 0.00271822,
+              "usd_cache": 0.00271822
+            },
+            "solver": {
+              "calls": 7,
+              "input": 44653,
+              "cached": 39511,
+              "output": 4753,
+              "usd_no_cache": 0.011004420000000001,
+              "usd_cache": 0.007448429999999999
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2945,
+              "cached": 1,
+              "output": 1498,
+              "usd_no_cache": 0.0019103,
+              "usd_cache": 0.0019102099999999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 2887,
+              "cached": 1788,
+              "output": 1356,
+              "usd_no_cache": 0.00176018,
+              "usd_cache": 0.00159926
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2848,
+              "cached": 1790,
+              "output": 900,
+              "usd_no_cache": 0.00129872,
+              "usd_cache": 0.00113762
+            }
+          },
+          "calls": 11,
+          "input": 58606,
+          "cached": 43090,
+          "output": 10487,
+          "usd_no_cache": 0.01869184,
+          "usd_cache": 0.014813739999999999
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__TtyYA8q",
+          "task": "deonticbench-direct-uscis-aao-uscis-d9377ea9",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 73968,
+          "harbor_output": 27199,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5133,
+              "cached": 0,
+              "output": 1142,
+              "usd_no_cache": 0.00186062,
+              "usd_cache": 0.00186062
+            },
+            "solver": {
+              "calls": 6,
+              "input": 48571,
+              "cached": 41475,
+              "output": 9030,
+              "usd_no_cache": 0.01582994,
+              "usd_cache": 0.01209719
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14253,
+              "cached": 3084,
+              "output": 8741,
+              "usd_no_cache": 0.010736419999999998,
+              "usd_cache": 0.010458859999999999
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 3025,
+              "cached": 1701,
+              "output": 1409,
+              "usd_no_cache": 0.0018325,
+              "usd_cache": 0.0016794099999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2986,
+              "cached": 1704,
+              "output": 6877,
+              "usd_no_cache": 0.007295039999999999,
+              "usd_cache": 0.007141679999999999
+            }
+          },
+          "calls": 11,
+          "input": 73968,
+          "cached": 47964,
+          "output": 27199,
+          "usd_no_cache": 0.03755452,
+          "usd_cache": 0.03323776
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__VnAGaje",
+          "task": "deonticbench-direct-uscis-aao-uscis-b2ea0966",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 58590,
+          "harbor_output": 21988,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 4801,
+              "cached": 0,
+              "output": 2238,
+              "usd_no_cache": 0.00291014,
+              "usd_cache": 0.00291014
+            },
+            "solver": {
+              "calls": 6,
+              "input": 35799,
+              "cached": 31490,
+              "output": 3717,
+              "usd_no_cache": 0.00872886,
+              "usd_cache": 0.00589476
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2529,
+              "cached": 1,
+              "output": 1261,
+              "usd_no_cache": 0.00161506,
+              "usd_cache": 0.0016149699999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 13029,
+              "cached": 3776,
+              "output": 8928,
+              "usd_no_cache": 0.01075206,
+              "usd_cache": 0.01041222
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2432,
+              "cached": 1306,
+              "output": 5844,
+              "usd_no_cache": 0.006184479999999999,
+              "usd_cache": 0.00606694
+            }
+          },
+          "calls": 11,
+          "input": 58590,
+          "cached": 36573,
+          "output": 21988,
+          "usd_no_cache": 0.030190599999999998,
+          "usd_cache": 0.026899029999999997
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__YVeS2yn",
+          "task": "deonticbench-direct-uscis-aao-uscis-681f96e2",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 65620,
+          "harbor_output": 26190,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5714,
+              "cached": 0,
+              "output": 1414,
+              "usd_no_cache": 0.00221396,
+              "usd_cache": 0.00221396
+            },
+            "solver": {
+              "calls": 5,
+              "input": 37639,
+              "cached": 31207,
+              "output": 9115,
+              "usd_no_cache": 0.01438446,
+              "usd_cache": 0.01157583
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 3608,
+              "cached": 1,
+              "output": 1969,
+              "usd_no_cache": 0.00247412,
+              "usd_cache": 0.00247403
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 3550,
+              "cached": 2199,
+              "output": 5230,
+              "usd_no_cache": 0.0057269999999999995,
+              "usd_cache": 0.0055290899999999995
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 15109,
+              "cached": 5711,
+              "output": 8462,
+              "usd_no_cache": 0.01057726,
+              "usd_cache": 0.01006327
+            }
+          },
+          "calls": 10,
+          "input": 65620,
+          "cached": 39118,
+          "output": 26190,
+          "usd_no_cache": 0.0353768,
+          "usd_cache": 0.03185618
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__YfLaKo6",
+          "task": "deonticbench-direct-uscis-aao-uscis-fbfd1fe8",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 23058,
+          "harbor_output": 20127,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5136,
+              "cached": 0,
+              "output": 1081,
+              "usd_no_cache": 0.00180004,
+              "usd_cache": 0.00180004
+            },
+            "solver": {
+              "calls": 2,
+              "input": 9437,
+              "cached": 7345,
+              "output": 8014,
+              "usd_no_cache": 0.00933518,
+              "usd_cache": 0.00867413
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2880,
+              "cached": 1,
+              "output": 1911,
+              "usd_no_cache": 0.0023141999999999998,
+              "usd_cache": 0.00231411
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 2822,
+              "cached": 1678,
+              "output": 2110,
+              "usd_no_cache": 0.00250508,
+              "usd_cache": 0.00235406
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2783,
+              "cached": 1679,
+              "output": 7011,
+              "usd_no_cache": 0.00740062,
+              "usd_cache": 0.00724951
+            }
+          },
+          "calls": 6,
+          "input": 23058,
+          "cached": 10703,
+          "output": 20127,
+          "usd_no_cache": 0.02335512,
+          "usd_cache": 0.02239185
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__YfQeas5",
+          "task": "deonticbench-direct-uscis-aao-uscis-9774ab30",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 90216,
+          "harbor_output": 45654,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5449,
+              "cached": 0,
+              "output": 1783,
+              "usd_no_cache": 0.00254586,
+              "usd_cache": 0.00254586
+            },
+            "solver": {
+              "calls": 5,
+              "input": 40461,
+              "cached": 30302,
+              "output": 23790,
+              "usd_no_cache": 0.029454539999999998,
+              "usd_cache": 0.02672736
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 3234,
+              "cached": 1,
+              "output": 1881,
+              "usd_no_cache": 0.00233376,
+              "usd_cache": 0.00233367
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26711,
+              "cached": 16334,
+              "output": 9727,
+              "usd_no_cache": 0.013466539999999999,
+              "usd_cache": 0.01199648
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 14361,
+              "cached": 5033,
+              "output": 8473,
+              "usd_no_cache": 0.01048354,
+              "usd_cache": 0.010030569999999999
+            }
+          },
+          "calls": 12,
+          "input": 90216,
+          "cached": 51670,
+          "output": 45654,
+          "usd_no_cache": 0.058284239999999994,
+          "usd_cache": 0.05363394
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__aSvSKH3",
+          "task": "deonticbench-direct-uscis-aao-uscis-e2f62d25",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 55460,
+          "harbor_output": 24714,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5035,
+              "cached": 0,
+              "output": 1361,
+              "usd_no_cache": 0.0020659,
+              "usd_cache": 0.0020659
+            },
+            "solver": {
+              "calls": 5,
+              "input": 30975,
+              "cached": 26183,
+              "output": 2969,
+              "usd_no_cache": 0.0073054999999999995,
+              "usd_cache": 0.00494903
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2894,
+              "cached": 1,
+              "output": 5757,
+              "usd_no_cache": 0.00616216,
+              "usd_cache": 0.00616207
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 13759,
+              "cached": 4374,
+              "output": 8959,
+              "usd_no_cache": 0.01088526,
+              "usd_cache": 0.0104916
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2797,
+              "cached": 1537,
+              "output": 5668,
+              "usd_no_cache": 0.006059579999999999,
+              "usd_cache": 0.005921249999999999
+            }
+          },
+          "calls": 10,
+          "input": 55460,
+          "cached": 32095,
+          "output": 24714,
+          "usd_no_cache": 0.0324784,
+          "usd_cache": 0.02958985
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__btMzzwW",
+          "task": "deonticbench-direct-uscis-aao-uscis-4ffc62f6",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 52244,
+          "harbor_output": 9587,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 4925,
+              "cached": 0,
+              "output": 1250,
+              "usd_no_cache": 0.0019395,
+              "usd_cache": 0.0019395
+            },
+            "solver": {
+              "calls": 7,
+              "input": 39911,
+              "cached": 35966,
+              "output": 3845,
+              "usd_no_cache": 0.00943254,
+              "usd_cache": 0.0061956
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2521,
+              "cached": 1,
+              "output": 1393,
+              "usd_no_cache": 0.00174594,
+              "usd_cache": 0.00174585
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 2463,
+              "cached": 1375,
+              "output": 1436,
+              "usd_no_cache": 0.00178082,
+              "usd_cache": 0.00165707
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2424,
+              "cached": 1376,
+              "output": 1663,
+              "usd_no_cache": 0.00200236,
+              "usd_cache": 0.00187852
+            }
+          },
+          "calls": 11,
+          "input": 52244,
+          "cached": 38718,
+          "output": 9587,
+          "usd_no_cache": 0.01690116,
+          "usd_cache": 0.01341654
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__cZ7Pagf",
+          "task": "deonticbench-direct-uscis-aao-uscis-4a944215",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 76563,
+          "harbor_output": 22933,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5526,
+              "cached": 0,
+              "output": 3291,
+              "usd_no_cache": 0.00406464,
+              "usd_cache": 0.00406464
+            },
+            "solver": {
+              "calls": 5,
+              "input": 49523,
+              "cached": 40731,
+              "output": 4992,
+              "usd_no_cache": 0.01192522,
+              "usd_cache": 0.00825943
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 3410,
+              "cached": 1,
+              "output": 3943,
+              "usd_no_cache": 0.0044204,
+              "usd_cache": 0.004420309999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14791,
+              "cached": 5458,
+              "output": 8629,
+              "usd_no_cache": 0.01069974,
+              "usd_cache": 0.010208519999999999
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 3313,
+              "cached": 2109,
+              "output": 2078,
+              "usd_no_cache": 0.00254182,
+              "usd_cache": 0.00235201
+            }
+          },
+          "calls": 10,
+          "input": 76563,
+          "cached": 48299,
+          "output": 22933,
+          "usd_no_cache": 0.03365182,
+          "usd_cache": 0.029304909999999997
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__f9Lbvk5",
+          "task": "deonticbench-direct-uscis-aao-uscis-59de5644",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 116321,
+          "harbor_output": 27935,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5219,
+              "cached": 0,
+              "output": 683,
+              "usd_no_cache": 0.0014136600000000002,
+              "usd_cache": 0.0014136600000000002
+            },
+            "solver": {
+              "calls": 9,
+              "input": 80246,
+              "cached": 69366,
+              "output": 8063,
+              "usd_no_cache": 0.01929744,
+              "usd_cache": 0.0130545
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14417,
+              "cached": 3166,
+              "output": 8471,
+              "usd_no_cache": 0.01048938,
+              "usd_cache": 0.010204439999999999
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 13371,
+              "cached": 8893,
+              "output": 8949,
+              "usd_no_cache": 0.010820940000000001,
+              "usd_cache": 0.01002057
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 3068,
+              "cached": 1696,
+              "output": 1769,
+              "usd_no_cache": 0.00219852,
+              "usd_cache": 0.00204588
+            }
+          },
+          "calls": 16,
+          "input": 116321,
+          "cached": 83121,
+          "output": 27935,
+          "usd_no_cache": 0.04421994,
+          "usd_cache": 0.036739049999999995
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__j6KfvWG",
+          "task": "deonticbench-direct-uscis-aao-uscis-7710d382",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 106311,
+          "harbor_output": 31574,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5138,
+              "cached": 0,
+              "output": 1688,
+              "usd_no_cache": 0.00240732,
+              "usd_cache": 0.00240732
+            },
+            "solver": {
+              "calls": 8,
+              "input": 70000,
+              "cached": 60213,
+              "output": 7936,
+              "usd_no_cache": 0.017736000000000002,
+              "usd_cache": 0.01231683
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 3062,
+              "cached": 1,
+              "output": 4540,
+              "usd_no_cache": 0.00496868,
+              "usd_cache": 0.00496859
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14094,
+              "cached": 4622,
+              "output": 8871,
+              "usd_no_cache": 0.01084416,
+              "usd_cache": 0.01042818
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 14017,
+              "cached": 4583,
+              "output": 8539,
+              "usd_no_cache": 0.01050138,
+              "usd_cache": 0.01008891
+            }
+          },
+          "calls": 14,
+          "input": 106311,
+          "cached": 69419,
+          "output": 31574,
+          "usd_no_cache": 0.04645754,
+          "usd_cache": 0.04020983
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__jdN6nsE",
+          "task": "deonticbench-direct-uscis-aao-uscis-86108351",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 86365,
+          "harbor_output": 27197,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5315,
+              "cached": 0,
+              "output": 1439,
+              "usd_no_cache": 0.0021831,
+              "usd_cache": 0.0021831
+            },
+            "solver": {
+              "calls": 5,
+              "input": 44333,
+              "cached": 36599,
+              "output": 4513,
+              "usd_no_cache": 0.01071962,
+              "usd_cache": 0.00742571
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 7001,
+              "cached": 3182,
+              "output": 3454,
+              "usd_no_cache": 0.00443414,
+              "usd_cache": 0.00414776
+            },
+            "verifier.fact_table": {
+              "calls": 3,
+              "input": 26632,
+              "cached": 16129,
+              "output": 10038,
+              "usd_no_cache": 0.013766480000000001,
+              "usd_cache": 0.01231487
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 3084,
+              "cached": 1798,
+              "output": 7753,
+              "usd_no_cache": 0.00818476,
+              "usd_cache": 0.00802294
+            }
+          },
+          "calls": 12,
+          "input": 86365,
+          "cached": 57708,
+          "output": 27197,
+          "usd_no_cache": 0.0392881,
+          "usd_cache": 0.03409438
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__k3RtZT5",
+          "task": "deonticbench-direct-uscis-aao-uscis-9cde868d",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 61087,
+          "harbor_output": 28567,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5683,
+              "cached": 0,
+              "output": 1195,
+              "usd_no_cache": 0.00199062,
+              "usd_cache": 0.00199062
+            },
+            "solver": {
+              "calls": 5,
+              "input": 33673,
+              "cached": 28643,
+              "output": 8969,
+              "usd_no_cache": 0.01368322,
+              "usd_cache": 0.01110535
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 3474,
+              "cached": 1,
+              "output": 6926,
+              "usd_no_cache": 0.00741236,
+              "usd_cache": 0.00741227
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 3416,
+              "cached": 2183,
+              "output": 2849,
+              "usd_no_cache": 0.00332724,
+              "usd_cache": 0.00313077
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 14841,
+              "cached": 5561,
+              "output": 8628,
+              "usd_no_cache": 0.01070574,
+              "usd_cache": 0.01020525
+            }
+          },
+          "calls": 10,
+          "input": 61087,
+          "cached": 36388,
+          "output": 28567,
+          "usd_no_cache": 0.03711918,
+          "usd_cache": 0.03384426
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__s7RRCmQ",
+          "task": "deonticbench-direct-uscis-aao-uscis-2136ba08",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 68567,
+          "harbor_output": 24487,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5339,
+              "cached": 0,
+              "output": 1047,
+              "usd_no_cache": 0.00179446,
+              "usd_cache": 0.00179446
+            },
+            "solver": {
+              "calls": 7,
+              "input": 51126,
+              "cached": 44258,
+              "output": 6148,
+              "usd_no_cache": 0.01330564,
+              "usd_cache": 0.00932242
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 6403,
+              "cached": 2928,
+              "output": 3532,
+              "usd_no_cache": 0.00442842,
+              "usd_cache": 0.0041649
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 2869,
+              "cached": 1800,
+              "output": 7279,
+              "usd_no_cache": 0.00768066,
+              "usd_cache": 0.00751866
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2830,
+              "cached": 1800,
+              "output": 6481,
+              "usd_no_cache": 0.0068772,
+              "usd_cache": 0.0067152
+            }
+          },
+          "calls": 12,
+          "input": 68567,
+          "cached": 50786,
+          "output": 24487,
+          "usd_no_cache": 0.03408638,
+          "usd_cache": 0.02951564
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__tSqjvdV",
+          "task": "deonticbench-direct-uscis-aao-uscis-2512fafd",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 0,
+          "unknown_calls": 0,
+          "harbor_input": 41792,
+          "harbor_output": 22996,
+          "roles": {
+            "reader": {
+              "calls": 2,
+              "input": 10507,
+              "cached": 5119,
+              "output": 2553,
+              "usd_no_cache": 0.00402398,
+              "usd_cache": 0.00356327
+            },
+            "solver": {
+              "calls": 4,
+              "input": 22302,
+              "cached": 17830,
+              "output": 2953,
+              "usd_no_cache": 0.006075280000000001,
+              "usd_cache": 0.00447058
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 3046,
+              "cached": 1,
+              "output": 6189,
+              "usd_no_cache": 0.00661544,
+              "usd_cache": 0.00661535
+            },
+            "verifier.fact_table": {
+              "calls": 1,
+              "input": 2988,
+              "cached": 1631,
+              "output": 6397,
+              "usd_no_cache": 0.00681532,
+              "usd_cache": 0.00666853
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2949,
+              "cached": 1630,
+              "output": 4904,
+              "usd_no_cache": 0.00531686,
+              "usd_cache": 0.005170159999999999
+            }
+          },
+          "calls": 9,
+          "input": 41792,
+          "cached": 26211,
+          "output": 22996,
+          "usd_no_cache": 0.02884688,
+          "usd_cache": 0.02648789
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__tbtKhyu",
+          "task": "deonticbench-direct-uscis-aao-uscis-b703c22c",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 1,
+          "unknown_calls": 0,
+          "harbor_input": 50524,
+          "harbor_output": 24539,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5072,
+              "cached": 0,
+              "output": 928,
+              "usd_no_cache": 0.00163808,
+              "usd_cache": 0.00163808
+            },
+            "solver": {
+              "calls": 6,
+              "input": 28146,
+              "cached": 25855,
+              "output": 2215,
+              "usd_no_cache": 0.00615544,
+              "usd_cache": 0.00382849
+            },
+            "verifier.section_table": {
+              "calls": 1,
+              "input": 2355,
+              "cached": 1,
+              "output": 6302,
+              "usd_no_cache": 0.006631699999999999,
+              "usd_cache": 0.00663161
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 12693,
+              "cached": 3927,
+              "output": 8575,
+              "usd_no_cache": 0.01035202,
+              "usd_cache": 0.00999859
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 2258,
+              "cached": 1630,
+              "output": 6519,
+              "usd_no_cache": 0.00683512,
+              "usd_cache": 0.00668842
+            }
+          },
+          "calls": 11,
+          "input": 50524,
+          "cached": 31413,
+          "output": 24539,
+          "usd_no_cache": 0.03161236,
+          "usd_cache": 0.02878519
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__zJExCdA",
+          "task": "deonticbench-direct-uscis-aao-uscis-e2ec2a0e",
+          "reward": 0.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 2,
+          "unknown_calls": 0,
+          "harbor_input": 54773,
+          "harbor_output": 30276,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5434,
+              "cached": 0,
+              "output": 1039,
+              "usd_no_cache": 0.00179976,
+              "usd_cache": 0.00179976
+            },
+            "solver": {
+              "calls": 3,
+              "input": 17003,
+              "cached": 13289,
+              "output": 4412,
+              "usd_no_cache": 0.00679242,
+              "usd_cache": 0.0055964100000000004
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 14637,
+              "cached": 3276,
+              "output": 8375,
+              "usd_no_cache": 0.010424179999999998,
+              "usd_cache": 0.010129339999999999
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 14521,
+              "cached": 5183,
+              "output": 9019,
+              "usd_no_cache": 0.01105194,
+              "usd_cache": 0.01058547
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 1,
+              "input": 3178,
+              "cached": 1968,
+              "output": 7431,
+              "usd_no_cache": 0.00787592,
+              "usd_cache": 0.0076988
+            }
+          },
+          "calls": 9,
+          "input": 54773,
+          "cached": 23716,
+          "output": 30276,
+          "usd_no_cache": 0.03794422,
+          "usd_cache": 0.03580978
+        },
+        {
+          "trial": "deonticbench-direct-uscis-aao-us__zz4kLzf",
+          "task": "deonticbench-direct-uscis-aao-uscis-d036757e",
+          "reward": 1.0,
+          "exception": null,
+          "source": "ledger",
+          "budget_exhausted": false,
+          "cut_off_calls": 3,
+          "unknown_calls": 0,
+          "harbor_input": 100039,
+          "harbor_output": 32458,
+          "roles": {
+            "reader": {
+              "calls": 1,
+              "input": 5148,
+              "cached": 0,
+              "output": 1034,
+              "usd_no_cache": 0.00175472,
+              "usd_cache": 0.00175472
+            },
+            "solver": {
+              "calls": 7,
+              "input": 53373,
+              "cached": 44833,
+              "output": 5163,
+              "usd_no_cache": 0.01263522,
+              "usd_cache": 0.00860025
+            },
+            "verifier.section_table": {
+              "calls": 2,
+              "input": 13942,
+              "cached": 2929,
+              "output": 8466,
+              "usd_no_cache": 0.01041788,
+              "usd_cache": 0.01015427
+            },
+            "verifier.fact_table": {
+              "calls": 2,
+              "input": 13827,
+              "cached": 4528,
+              "output": 9224,
+              "usd_no_cache": 0.01115978,
+              "usd_cache": 0.01075226
+            },
+            "verifier.grounded_reasoning": {
+              "calls": 2,
+              "input": 13749,
+              "cached": 4488,
+              "output": 8571,
+              "usd_no_cache": 0.01049586,
+              "usd_cache": 0.010091939999999999
+            }
+          },
+          "calls": 14,
+          "input": 100039,
+          "cached": 56778,
+          "output": 32458,
+          "usd_no_cache": 0.04646346,
+          "usd_cache": 0.04135344
+        }
+      ]
+    }
+  ]
+}
